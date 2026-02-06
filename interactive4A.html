@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIOS/UEFI Troubleshooting Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .scenario-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .scenario-box h3 {
+            color: #92400e;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .scenario-box p {
+            color: #78350f;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        
+        .bios-screen {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            min-height: 400px;
+            position: relative;
+        }
+        
+        .bios-header {
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .bios-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .bios-menu {
+            margin-top: 20px;
+        }
+        
+        .menu-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .menu-item:hover {
+            background: #003300;
+            border-color: #00ff00;
+        }
+        
+        .menu-item.selected {
+            background: #004400;
+            border-color: #00ff00;
+        }
+        
+        .submenu {
+            margin-left: 30px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .submenu.active {
+            display: block;
+        }
+        
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border: 2px solid transparent;
+            border-radius: 4px;
+        }
+        
+        .setting-row.editable {
+            cursor: pointer;
+        }
+        
+        .setting-row.editable:hover {
+            background: #003300;
+            border-color: #00ff00;
+        }
+        
+        .setting-value {
+            color: #ffff00;
+        }
+        
+        .setting-value.incorrect {
+            color: #ff0000;
+        }
+        
+        .setting-value.correct {
+            color: #00ff00;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #15803d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .feedback {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .feedback.show {
+            display: block;
+        }
+        
+        .feedback.error {
+            background: #fee2e2;
+            border-left: 4px solid #dc2626;
+            color: #991b1b;
+        }
+        
+        .feedback.success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            color: #065f46;
+        }
+        
+        .feedback.warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+        }
+        
+        .progress-bar {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal-content h2 {
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+        
+        .modal-content p {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .hint-box {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        
+        .hint-box h4 {
+            color: #1e40af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .hint-box p {
+            color: #1e3a8a;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding: 0 20px;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: -1;
+        }
+        
+        .step:last-child::after {
+            display: none;
+        }
+        
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .step.active .step-circle {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .step.completed .step-circle {
+            background: #10b981;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .bios-screen {
+                font-size: 12px;
+                padding: 15px;
+            }
+            
+            .step-label {
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖥️ BIOS/UEFI Troubleshooting Simulator</h1>
+            <p>Diagnose and fix a "No Boot Device Found" error</p>
+        </div>
+        
+        <div class="content">
+            <div class="step-indicator">
+                <div class="step active" id="step1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Boot Order</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">SATA Config</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Save & Exit</div>
+                </div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="scenario-box">
+                <h3>🚨 Scenario: Boot Failure</h3>
+                <p><strong>Problem:</strong> An employee reports their computer displays "No Boot Device Found" after a hardware upgrade.</p>
+                <p><strong>Your Task:</strong> Access the UEFI setup and configure the boot settings to resolve the issue.</p>
+                <p><strong>Hint:</strong> Check the boot order and ensure all storage devices are enabled.</p>
+            </div>
+            
+            <div class="bios-screen" id="biosScreen">
+                <div class="bios-header">
+                    <div class="bios-title">ASUS UEFI BIOS Utility - Advanced Mode</div>
+                    <div style="font-size: 12px; margin-top: 5px;">Version 2.15.1236 | Service Tag: DL7X9K2</div>
+                </div>
+                
+                <div class="bios-menu" id="biosMenu">
+                    <!-- Content will be dynamically generated -->
+                </div>
+                
+                <div style="position: absolute; bottom: 20px; left: 20px; font-size: 11px; opacity: 0.7;">
+                    F1=Help | F5=Previous Values | F10=Save & Exit | ESC=Exit
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="checkBtn" disabled>✓ Check Configuration</button>
+                <button class="btn btn-success" id="saveExitBtn" disabled>💾 Save & Exit</button>
+                <button class="btn btn-secondary" id="resetBtn">↻ Reset Simulation</button>
+                <button class="btn btn-secondary" id="hintBtn">💡 Show Hint</button>
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <div class="hint-box">
+                <h4>📚 Key Concepts to Remember:</h4>
+                <p><strong>Boot Priority:</strong> The order in which the system firmware searches devices for a boot manager. The first device with a valid boot loader will be used.</p>
+                <p><strong>SATA Ports:</strong> Storage devices must be enabled in UEFI to be detected by the system. Disabled ports will not appear in the boot sequence.</p>
+                <p><strong>Save Changes:</strong> Always save your configuration before exiting, or changes will be lost!</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="completionModal">
+        <div class="modal-content">
+            <h2>🎉 Excellent Work!</h2>
+            <p>You've successfully configured the BIOS/UEFI settings and resolved the boot issue!</p>
+            <p><strong>What you learned:</strong></p>
+            <ul style="text-align: left; margin: 15px 0; padding-left: 30px;">
+                <li>How to modify boot device priority</li>
+                <li>How to enable disabled SATA ports</li>
+                <li>The importance of saving UEFI configuration changes</li>
+            </ul>
+            <button class="btn btn-primary" onclick="closeModal()">Continue Learning</button>
+        </div>
+    </div>
+
+    <script>
+        // Simulation state
+        let state = {
+            bootOrder: ['USB Drive', 'Network Boot', 'Hard Drive'],
+            sataPort0: false,
+            sataPort1: true,
+            currentMenu: 'main',
+            changesApplied: false,
+            step: 1
+        };
+        
+        const correctBootOrder = ['Hard Drive', 'USB Drive', 'Network Boot'];
+        
+        // Initialize the simulation
+        function init() {
+            renderBiosMenu();
+            updateProgress();
+        }
+        
+        function renderBiosMenu() {
+            const menu = document.getElementById('biosMenu');
+            
+            if (state.currentMenu === 'main') {
+                menu.innerHTML = `
+                    <div style="margin-bottom: 15px; color: #ffff00;">Main Menu - Select an option:</div>
+                    <div class="menu-item" onclick="openBootMenu()">► Boot Configuration</div>
+                    <div class="menu-item" onclick="openSataMenu()">► SATA Configuration</div>
+                    <div class="menu-item" onclick="openSecurityMenu()">► Security Settings</div>
+                    <div class="menu-item" onclick="openAdvancedMenu()">► Advanced Settings</div>
+                `;
+            } else if (state.currentMenu === 'boot') {
+                menu.innerHTML = `
+                    <div style="margin-bottom: 10px;">
+                        <span onclick="backToMain()" style="cursor: pointer; color: #ffff00;">← Back to Main Menu</span>
+                    </div>
+                    <div style="margin-bottom: 15px; color: #ffff00; font-weight: bold;">Boot Configuration</div>
+                    <div style="margin-bottom: 10px; font-size: 13px;">Boot Device Priority (drag to reorder):</div>
+                    <div id="bootOrderList">
+                        ${state.bootOrder.map((device, index) => `
+                            <div class="setting-row editable" draggable="true" data-index="${index}" 
+                                 ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)">
+                                <span>${index + 1}. ${device}</span>
+                                <span class="setting-value ${getBootOrderStatus(index)}">${device === 'Hard Drive' && index === 0 ? '✓' : ''}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top: 15px; font-size: 12px; opacity: 0.8;">
+                        💡 Tip: The Hard Drive should be first in the boot order
+                    </div>
+                `;
+            } else if (state.currentMenu === 'sata') {
+                menu.innerHTML = `
+                    <div style="margin-bottom: 10px;">
+                        <span onclick="backToMain()" style="cursor: pointer; color: #ffff00;">← Back to Main Menu</span>
+                    </div>
+                    <div style="margin-bottom: 15px; color: #ffff00; font-weight: bold;">SATA Configuration</div>
+                    <div class="setting-row editable" onclick="toggleSata(0)">
+                        <span>SATA Port 0 (Primary Drive)</span>
+                        <span class="setting-value ${state.sataPort0 ? 'correct' : 'incorrect'}">[${state.sataPort0 ? 'Enabled' : 'Disabled'}]</span>
+                    </div>
+                    <div class="setting-row editable" onclick="toggleSata(1)">
+                        <span>SATA Port 1 (Secondary Drive)</span>
+                        <span class="setting-value">[${state.sataPort1 ? 'Enabled' : 'Disabled'}]</span>
+                    </div>
+                    <div class="setting-row">
+                        <span>SATA Mode</span>
+                        <span class="setting-value">[AHCI]</span>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 12px; opacity: 0.8;">
+                        💡 Tip: SATA Port 0 must be enabled for the primary drive to be detected
+                    </div>
+                `;
+            } else if (state.currentMenu === 'security') {
+                menu.innerHTML = `
+                    <div style="margin-bottom: 10px;">
+                        <span onclick="backToMain()" style="cursor: pointer; color: #ffff00;">← Back to Main Menu</span>
+                    </div>
+                    <div style="margin-bottom: 15px; color: #ffff00; font-weight: bold;">Security Settings</div>
+                    <div class="setting-row">
+                        <span>Secure Boot</span>
+                        <span class="setting-value">[Enabled]</span>
+                    </div>
+                    <div class="setting-row">
+                        <span>TPM Device</span>
+                        <span class="setting-value">[Enabled, Activated]</span>
+                    </div>
+                    <div class="setting-row">
+                        <span>Supervisor Password</span>
+                        <span class="setting-value">[Not Installed]</span>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 12px; opacity: 0.8;">
+                        ℹ️ Security settings are correctly configured
+                    </div>
+                `;
+            } else if (state.currentMenu === 'advanced') {
+                menu.innerHTML = `
+                    <div style="margin-bottom: 10px;">
+                        <span onclick="backToMain()" style="cursor: pointer; color: #ffff00;">← Back to Main Menu</span>
+                    </div>
+                    <div style="margin-bottom: 15px; color: #ffff00; font-weight: bold;">Advanced Settings</div>
+                    <div class="setting-row">
+                        <span>CPU Temperature</span>
+                        <span class="setting-value">[42°C]</span>
+                    </div>
+                    <div class="setting-row">
+                        <span>CPU Fan Speed</span>
+                        <span class="setting-value">[1200 RPM]</span>
+                    </div>
+                    <div class="setting-row">
+                        <span>Fan Control Mode</span>
+                        <span class="setting-value">[Balanced]</span>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 12px; opacity: 0.8;">
+                        ℹ️ System temperatures are within normal range
+                    </div>
+                `;
+            }
+            
+            checkConfiguration();
+        }
+        
+        function getBootOrderStatus(index) {
+            if (state.bootOrder[index] === correctBootOrder[index]) {
+                return 'correct';
+            }
+            return 'incorrect';
+        }
+        
+        function openBootMenu() {
+            state.currentMenu = 'boot';
+            renderBiosMenu();
+        }
+        
+        function openSataMenu() {
+            state.currentMenu = 'sata';
+            renderBiosMenu();
+        }
+        
+        function openSecurityMenu() {
+            state.currentMenu = 'security';
+            renderBiosMenu();
+        }
+        
+        function openAdvancedMenu() {
+            state.currentMenu = 'advanced';
+            renderBiosMenu();
+        }
+        
+        function backToMain() {
+            state.currentMenu = 'main';
+            renderBiosMenu();
+        }
+        
+        function toggleSata(port) {
+            if (port === 0) {
+                state.sataPort0 = !state.sataPort0;
+            } else {
+                state.sataPort1 = !state.sataPort1;
+            }
+            renderBiosMenu();
+        }
+        
+        // Drag and drop functionality
+        let draggedIndex = null;
+        
+        function dragStart(e) {
+            draggedIndex = parseInt(e.target.dataset.index);
+            e.target.style.opacity = '0.5';
+        }
+        
+        function dragOver(e) {
+            e.preventDefault();
+        }
+        
+        function drop(e) {
+            e.preventDefault();
+            const dropIndex = parseInt(e.target.closest('.setting-row').dataset.index);
+            
+            if (draggedIndex !== null && draggedIndex !== dropIndex) {
+                const temp = state.bootOrder[draggedIndex];
+                state.bootOrder[draggedIndex] = state.bootOrder[dropIndex];
+                state.bootOrder[dropIndex] = temp;
+                renderBiosMenu();
+            }
+            
+            document.querySelectorAll('.setting-row').forEach(row => {
+                row.style.opacity = '1';
+            });
+        }
+        
+        function checkConfiguration() {
+            const bootOrderCorrect = JSON.stringify(state.bootOrder) === JSON.stringify(correctBootOrder);
+            const sataCorrect = state.sataPort0 === true;
+            
+            const checkBtn = document.getElementById('checkBtn');
+            const saveExitBtn = document.getElementById('saveExitBtn');
+            
+            if (bootOrderCorrect && sataCorrect) {
+                checkBtn.disabled = false;
+                saveExitBtn.disabled = false;
+                updateStep(3);
+            } else if (bootOrderCorrect || sataCorrect) {
+                checkBtn.disabled = false;
+                updateStep(2);
+            } else {
+                checkBtn.disabled = false;
+                updateStep(1);
+            }
+            
+            updateProgress();
+        }
+        
+        function updateStep(step) {
+            state.step = step;
+            
+            for (let i = 1; i <= 3; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                stepEl.classList.remove('active', 'completed');
+                
+                if (i < step) {
+                    stepEl.classList.add('completed');
+                } else if (i === step) {
+                    stepEl.classList.add('active');
+                }
+            }
+        }
+        
+        function updateProgress() {
+            const bootOrderCorrect = JSON.stringify(state.bootOrder) === JSON.stringify(correctBootOrder);
+            const sataCorrect = state.sataPort0 === true;
+            
+            let progress = 0;
+            if (bootOrderCorrect) progress += 40;
+            if (sataCorrect) progress += 40;
+            if (state.changesApplied) progress += 20;
+            
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        document.getElementById('checkBtn').addEventListener('click', function() {
+            const feedback = document.getElementById('feedback');
+            const bootOrderCorrect = JSON.stringify(state.bootOrder) === JSON.stringify(correctBootOrder);
+            const sataCorrect = state.sataPort0 === true;
+            
+            feedback.className = 'feedback show';
+            
+            if (bootOrderCorrect && sataCorrect) {
+                feedback.classList.add('success');
+                feedback.innerHTML = `
+                    <strong>✓ Configuration Correct!</strong><br>
+                    ✓ Boot order is correct (Hard Drive is first priority)<br>
+                    ✓ SATA Port 0 is enabled<br>
+                    <br>
+                    Now click "Save & Exit" to apply your changes and boot the system.
+                `;
+            } else {
+                feedback.classList.add('warning');
+                let message = '<strong>⚠ Configuration Issues Detected:</strong><br>';
+                
+                if (!bootOrderCorrect) {
+                    message += '✗ Boot order is incorrect. Hard Drive should be first.<br>';
+                } else {
+                    message += '✓ Boot order is correct.<br>';
+                }
+                
+                if (!sataCorrect) {
+                    message += '✗ SATA Port 0 (Primary Drive) is disabled.<br>';
+                } else {
+                    message += '✓ SATA Port 0 is enabled.<br>';
+                }
+                
+                message += '<br>Review the settings and try again.';
+                feedback.innerHTML = message;
+            }
+        });
+        
+        document.getElementById('saveExitBtn').addEventListener('click', function() {
+            const bootOrderCorrect = JSON.stringify(state.bootOrder) === JSON.stringify(correctBootOrder);
+            const sataCorrect = state.sataPort0 === true;
+            
+            if (bootOrderCorrect && sataCorrect) {
+                state.changesApplied = true;
+                updateProgress();
+                document.getElementById('completionModal').classList.add('show');
+            } else {
+                const feedback = document.getElementById('feedback');
+                feedback.className = 'feedback show error';
+                feedback.innerHTML = `
+                    <strong>✗ Cannot Save - Configuration Errors</strong><br>
+                    Please correct all configuration issues before saving and exiting.
+                `;
+            }
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to reset the simulation? All progress will be lost.')) {
+                state = {
+                    bootOrder: ['USB Drive', 'Network Boot', 'Hard Drive'],
+                    sataPort0: false,
+                    sataPort1: true,
+                    currentMenu: 'main',
+                    changesApplied: false,
+                    step: 1
+                };
+                document.getElementById('feedback').className = 'feedback';
+                init();
+            }
+        });
+        
+        document.getElementById('hintBtn').addEventListener('click', function() {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback show';
+            feedback.style.background = '#dbeafe';
+            feedback.style.borderLeft = '4px solid #2563eb';
+            feedback.style.color = '#1e3a8a';
+            
+            const bootOrderCorrect = JSON.stringify(state.bootOrder) === JSON.stringify(correctBootOrder);
+            const sataCorrect = state.sataPort0 === true;
+            
+            let hint = '<strong>💡 Troubleshooting Hints:</strong><br>';
+            
+            if (!bootOrderCorrect) {
+                hint += '<br><strong>Boot Order Issue:</strong> The system is trying to boot from USB or Network before checking the Hard Drive. Drag the "Hard Drive" to position #1 in the Boot Configuration menu.';
+            }
+            
+            if (!sataCorrect) {
+                hint += '<br><br><strong>SATA Port Issue:</strong> SATA Port 0 is disabled, which means the primary hard drive cannot be detected. Go to SATA Configuration and click on "SATA Port 0" to enable it.';
+            }
+            
+            if (bootOrderCorrect && sataCorrect) {
+                hint += '<br>All settings are correct! Click "Check Configuration" to verify, then "Save & Exit" to complete the simulation.';
+            }
+            
+            feedback.innerHTML = hint;
+        });
+        
+        function closeModal() {
+            document.getElementById('completionModal').classList.remove('show');
+        }
+        
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
