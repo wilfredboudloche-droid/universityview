@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Help Desk - Power & Disk Troubleshooting</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 670px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-icons {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            font-size: 24px;
+            opacity: 0.3;
+        }
+
+        .header-icons span {
+            animation: bounce 2s infinite;
+        }
+
+        .header-icons span:nth-child(2) { animation-delay: 0.2s; }
+        .header-icons span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 20px;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 13px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '✓';
+            position: absolute;
+            right: 5px;
+            top: -12px;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .ticket-container {
+            background: white;
+            padding: 20px;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-height: 400px;
+            position: relative;
+        }
+
+        .ticket {
+            display: none;
+        }
+
+        .ticket.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scene illustrations for each ticket */
+        .scene-illustration {
+            width: 100%;
+            height: 180px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border: 2px solid #e2e8f0;
+        }
+
+        /* Ticket 1: Power Failure Scene */
+        #ticket1 .scene-illustration {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+
+        #ticket1 .scene-illustration::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 100px;
+            background: #1a202c;
+            border-radius: 8px 8px 0 0;
+        }
+
+        #ticket1 .scene-illustration::after {
+            content: '🖥️';
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 70px;
+            opacity: 0.4;
+        }
+
+        .power-icon {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 50px;
+            animation: fadeInOut 2s infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .lightning {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            font-size: 40px;
+            color: #ffd700;
+            animation: flash 1.5s infinite;
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Ticket 2: Blank Screen Scene */
+        #ticket2 .scene-illustration {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        }
+
+        .monitor {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 100px;
+            background: #4a5568;
+            border-radius: 8px 8px 0 0;
+            border: 3px solid #2d3748;
+        }
+
+        .monitor::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 20px;
+            background: #000;
+            border-radius: 4px;
+        }
+
+        .monitor::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 15px;
+            background: #2d3748;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .question-mark {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            font-size: 60px;
+            animation: float 2s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Ticket 3: Boot Error Scene */
+        #ticket3 .scene-illustration {
+            background: linear-gradient(135deg, #742a2a 0%, #9b2c2c 100%);
+        }
+
+        .error-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 120px;
+            background: #000;
+            border-radius: 8px;
+            border: 3px solid #4a5568;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .error-screen::before {
+            content: '⚠️';
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .error-screen::after {
+            content: 'BOOT ERROR';
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .disk-icon {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            font-size: 50px;
+            animation: shake 2s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        /* Ticket 4: RAID Failure Scene */
+        #ticket4 .scene-illustration {
+            background: linear-gradient(135deg, #2c5282 0%, #2b6cb0 100%);
+        }
+
+        .server-rack {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 120px;
+            background: #1a365d;
+            border-radius: 8px;
+            border: 3px solid #2c5282;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px;
+        }
+
+        .drive-bay {
+            width: 100%;
+            height: 20px;
+            background: #2d3748;
+            border-radius: 4px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+        }
+
+        .drive-bay::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #48bb78;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .drive-bay.failed::before {
+            background: #f56565;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .warning-badge {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 50px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Ticket 5: HDD Failure Scene */
+        #ticket5 .scene-illustration {
+            background: linear-gradient(135deg, #744210 0%, #975a16 100%);
+        }
+
+        .hard-drive {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 80px;
+            background: #2d3748;
+            border-radius: 8px;
+            border: 3px solid #1a202c;
+        }
+
+        .hard-drive::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #4a5568;
+            border-radius: 50%;
+        }
+
+        .hard-drive::after {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            width: 10px;
+            height: 10px;
+            background: #4a5568;
+            border-radius: 50%;
+        }
+
+        .sound-waves {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            font-size: 50px;
+            animation: wave 1s infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.5; }
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .ticket-id {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .priority {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .priority::before {
+            font-size: 14px;
+        }
+
+        .priority.high {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .priority.high::before {
+            content: '🔴';
+        }
+
+        .priority.medium {
+            background: #feebc8;
+            color: #c05621;
+        }
+
+        .priority.medium::before {
+            content: '🟡';
+        }
+
+        .priority.low {
+            background: #c6f6d5;
+            color: #276749;
+        }
+
+        .priority.low::before {
+            content: '🟢';
+        }
+
+        .user-info {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .user-info p {
+            color: #4a5568;
+            font-size: 13px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .user-info p::before {
+            font-size: 14px;
+        }
+
+        .user-info p:nth-child(1)::before { content: '👨‍💼'; }
+        .user-info p:nth-child(2)::before { content: '📍'; }
+        .user-info p:nth-child(3)::before { content: '💻'; }
+
+        .user-info strong {
+            color: #2d3748;
+        }
+
+        .issue-description {
+            background: linear-gradient(135deg, #fffaf0 0%, #fef5e7 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ed8936;
+        }
+
+        .issue-description h3 {
+            color: #2d3748;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .issue-description h3::before {
+            content: "⚠️";
+            margin-right: 6px;
+        }
+
+        .issue-description p {
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .question h4 {
+            color: #2d3748;
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .question h4::before {
+            content: '🤔';
+            font-size: 18px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option {
+            background: #f7fafc;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #edf2f7;
+            transform: translateX(3px);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 10px;
+            margin-top: 2px;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: #667eea;
+        }
+
+        .option label {
+            cursor: pointer;
+            color: #2d3748;
+            font-size: 13px;
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        .option.correct {
+            border-color: #48bb78;
+            background: #f0fff4;
+            animation: correctPulse 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .option.incorrect {
+            border-color: #f56565;
+            background: #fff5f5;
+            animation: incorrectShake 0.5s ease;
+        }
+
+        @keyframes incorrectShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .feedback {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+            border-left: 4px solid #48bb78;
+        }
+
+        .feedback.incorrect {
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+            border-left: 4px solid #f56565;
+        }
+
+        .feedback h4 {
+            color: #2d3748;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .feedback.correct h4::before {
+            content: "✅";
+            margin-right: 6px;
+        }
+
+        .feedback.incorrect h4::before {
+            content: "❌";
+            margin-right: 6px;
+        }
+
+        .feedback p {
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .completion-screen {
+            display: none;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .completion-screen.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .completion-icon {
+            font-size: 70px;
+            margin-bottom: 15px;
+            animation: spin 1s ease;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg) scale(0); }
+            to { transform: rotate(360deg) scale(1); }
+        }
+
+        .completion-screen h2 {
+            color: #2d3748;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .score {
+            font-size: 42px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 15px 0;
+        }
+
+        .completion-message {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 12px;
+            min-width: 100px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 13px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .stat-label::before {
+            font-size: 16px;
+        }
+
+        .stat:nth-child(1) .stat-label::before { content: '✅'; }
+        .stat:nth-child(2) .stat-label::before { content: '❌'; }
+
+        /* Confetti effect - fixed for iframe */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(700px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icons">
+                <span>💻</span>
+                <span>🔧</span>
+                <span>⚡</span>
+            </div>
+            <h1>🎫 IT Help Desk - Power & Disk Troubleshooting</h1>
+            <p>Diagnose and resolve hardware issues like a professional IT technician</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="ticket-container" id="ticketContainer">
+            <!-- Ticket 1 -->
+            <div class="ticket active" id="ticket1">
+                <div class="scene-illustration">
+                    <div class="lightning">⚡</div>
+                    <div class="power-icon">🔌</div>
+                </div>
+
+                <div class="ticket-header">
+                    <span class="ticket-id">TICKET #4521</span>
+                    <span class="priority high">HIGH PRIORITY</span>
+                </div>
+
+                <div class="user-info">
+                    <p><strong>User:</strong> Sarah Martinez, Accounting Department</p>
+                    <p><strong>Location:</strong> Building A, Floor 3, Desk 312</p>
+                    <p><strong>Device:</strong> Dell OptiPlex 7090 Desktop</p>
+                </div>
+
+                <div class="issue-description">
+                    <h3>Issue Description</h3>
+                    <p>"My computer won't turn on at all this morning. I pressed the power button multiple times, but nothing happens. No lights, no sounds, nothing. I have an important presentation in 2 hours and all my files are on this computer!"</p>
+                </div>
+
+                <div class="question">
+                    <h4>What should be your FIRST troubleshooting step?</h4>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this, 1, 'a')">
+                            <input type="radio" name="q1" id="q1a" value="a">
+                            <label for="q1a">Replace the power supply unit immediately since it's clearly faulty</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 1, 'b')">
+                            <input type="radio" name="q1" id="q1b" value="b">
+                            <label for="q1b">Check if other equipment in the area is working and test the wall socket with a known-good device</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 1, 'c')">
+                            <input type="radio" name="q1" id="q1c" value="c">
+                            <label for="q1c">Open the computer case and test the motherboard with a multimeter</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 1, 'd')">
+                            <input type="radio" name="q1" id="q1d" value="d">
+                            <label for="q1d">Tell the user their hard drive has failed and they need a new computer</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feedback" id="feedback1"></div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" id="submit1" onclick="submitAnswer(1, 'b')">Submit Answer</button>
+                </div>
+            </div>
+
+            <!-- Ticket 2 -->
+            <div class="ticket" id="ticket2">
+                <div class="scene-illustration">
+                    <div class="monitor"></div>
+                    <div class="question-mark">❓</div>
+                </div>
+
+                <div class="ticket-header">
+                    <span class="ticket-id">TICKET #4522</span>
+                    <span class="priority medium">MEDIUM PRIORITY</span>
+                </div>
+
+                <div class="user-info">
+                    <p><strong>User:</strong> James Chen, Engineering Department</p>
+                    <p><strong>Location:</strong> Building B, Floor 2, Lab 205</p>
+                    <p><strong>Device:</strong> HP Z2 Workstation</p>
+                </div>
+
+                <div class="issue-description">
+                    <h3>Issue Description</h3>
+                    <p>"My workstation powers on—I can hear the fans spinning—but the screen stays completely black. There are no beeps from the computer. I tried turning the monitor on and off, but still nothing appears on screen."</p>
+                </div>
+
+                <div class="question">
+                    <h4>Based on the symptoms, what is the MOST likely cause?</h4>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this, 2, 'a')">
+                            <input type="radio" name="q2" id="q2a" value="a">
+                            <label for="q2a">The monitor is defective and needs to be replaced</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 2, 'b')">
+                            <input type="radio" name="q2" id="q2b" value="b">
+                            <label for="q2b">The POST procedure is not executing, possibly due to a faulty CPU, failed firmware update, or PSU not sending the "power good" signal</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 2, 'c')">
+                            <input type="radio" name="q2" id="q2c" value="c">
+                            <label for="q2c">The hard drive has a corrupted Master Boot Record (MBR)</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 2, 'd')">
+                            <input type="radio" name="q2" id="q2d" value="d">
+                            <label for="q2d">The operating system needs to be reinstalled</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feedback" id="feedback2"></div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" id="submit2" onclick="submitAnswer(2, 'b')">Submit Answer</button>
+                </div>
+            </div>
+
+            <!-- Ticket 3 -->
+            <div class="ticket" id="ticket3">
+                <div class="scene-illustration">
+                    <div class="error-screen"></div>
+                    <div class="disk-icon">💾</div>
+                </div>
+
+                <div class="ticket-header">
+                    <span class="ticket-id">TICKET #4523</span>
+                    <span class="priority high">HIGH PRIORITY</span>
+                </div>
+
+                <div class="user-info">
+                    <p><strong>User:</strong> Lisa Thompson, Marketing Department</p>
+                    <p><strong>Location:</strong> Building A, Floor 1, Office 115</p>
+                    <p><strong>Device:</strong> Lenovo ThinkCentre Desktop</p>
+                </div>
+
+                <div class="issue-description">
+                    <h3>Issue Description</h3>
+                    <p>"When I try to start my computer, I get an error message that says 'Boot device not found' or 'OS not found.' Yesterday everything was working fine. I didn't install anything new or change any settings."</p>
+                </div>
+
+                <div class="question">
+                    <h4>What is the BEST first step to diagnose this boot sector issue?</h4>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this, 3, 'a')">
+                            <input type="radio" name="q3" id="q3a" value="a">
+                            <label for="q3a">Immediately reinstall Windows from scratch</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 3, 'b')">
+                            <input type="radio" name="q3" id="q3b" value="b">
+                            <label for="q3b">Check if the drive is detected in UEFI/BIOS, verify power and data connections, and check boot order settings</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 3, 'c')">
+                            <input type="radio" name="q3" id="q3c" value="c">
+                            <label for="q3c">Replace the hard drive since it has clearly failed</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 3, 'd')">
+                            <input type="radio" name="q3" id="q3d" value="d">
+                            <label for="q3d">Update the graphics card drivers</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feedback" id="feedback3"></div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" id="submit3" onclick="submitAnswer(3, 'b')">Submit Answer</button>
+                </div>
+            </div>
+
+            <!-- Ticket 4 -->
+            <div class="ticket" id="ticket4">
+                <div class="scene-illustration">
+                    <div class="server-rack">
+                        <div class="drive-bay"></div>
+                        <div class="drive-bay failed"></div>
+                        <div class="drive-bay"></div>
+                        <div class="drive-bay"></div>
+                    </div>
+                    <div class="warning-badge">⚠️</div>
+                </div>
+
+                <div class="ticket-header">
+                    <span class="ticket-id">TICKET #4524</span>
+                    <span class="priority high">HIGH PRIORITY</span>
+                </div>
+
+                <div class="user-info">
+                    <p><strong>User:</strong> Michael Rodriguez, IT Server Room</p>
+                    <p><strong>Location:</strong> Building C, Basement, Server Room</p>
+                    <p><strong>Device:</strong> Dell PowerEdge File Server with RAID 1</p>
+                </div>
+
+                <div class="issue-description">
+                    <h3>Issue Description</h3>
+                    <p>"The RAID controller is showing that our file server's RAID 1 array is in a 'degraded' state. One of the two drives has a red LED indicator. The server is still running and users can access files, but I'm concerned about data loss."</p>
+                </div>
+
+                <div class="question">
+                    <h4>What is the CORRECT course of action for this RAID 1 failure?</h4>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this, 4, 'a')">
+                            <input type="radio" name="q4" id="q4a" value="a">
+                            <label for="q4a">Continue using the server normally since RAID 1 has no redundancy and the data is already lost</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 4, 'b')">
+                            <input type="radio" name="q4" id="q4b" value="b">
+                            <label for="q4b">Immediately shut down the server to prevent further damage</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 4, 'c')">
+                            <input type="radio" name="q4" id="q4c" value="c">
+                            <label for="q4c">Replace the failed drive as soon as possible and rebuild the array, as RAID 1 can only tolerate one disk failure</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 4, 'd')">
+                            <input type="radio" name="q4" id="q4d" value="d">
+                            <label for="q4d">Wait until both drives fail before taking any action</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feedback" id="feedback4"></div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" id="submit4" onclick="submitAnswer(4, 'c')">Submit Answer</button>
+                </div>
+            </div>
+
+            <!-- Ticket 5 -->
+            <div class="ticket" id="ticket5">
+                <div class="scene-illustration">
+                    <div class="hard-drive"></div>
+                    <div class="sound-waves">🔊</div>
+                </div>
+
+                <div class="ticket-header">
+                    <span class="ticket-id">TICKET #4525</span>
+                    <span class="priority medium">MEDIUM PRIORITY</span>
+                </div>
+
+                <div class="user-info">
+                    <p><strong>User:</strong> Amanda Foster, Design Department</p>
+                    <p><strong>Location:</strong> Building A, Floor 2, Studio 220</p>
+                    <p><strong>Device:</strong> Custom-built Workstation with HDD</p>
+                </div>
+
+                <div class="issue-description">
+                    <h3>Issue Description</h3>
+                    <p>"My computer has been making loud clicking and grinding noises for the past few days. Now it's running really slowly, and sometimes I get error messages saying files can't be read. I'm worried about losing my design projects."</p>
+                </div>
+
+                <div class="question">
+                    <h4>What do these symptoms indicate and what should you do?</h4>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this, 5, 'a')">
+                            <input type="radio" name="q5" id="q5a" value="a">
+                            <label for="q5a">The computer just needs more RAM to run faster</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 5, 'b')">
+                            <input type="radio" name="q5" id="q5b" value="b">
+                            <label for="q5b">These are normal sounds for an HDD and nothing to worry about</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 5, 'c')">
+                            <input type="radio" name="q5" id="q5c" value="c">
+                            <label for="q5c">The HDD is showing signs of mechanical failure; back up data immediately and replace the drive</label>
+                        </div>
+                        <div class="option" onclick="selectOption(this, 5, 'd')">
+                            <input type="radio" name="q5" id="q5d" value="d">
+                            <label for="q5d">Run a defragmentation tool to fix the problem</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feedback" id="feedback5"></div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" id="submit5" onclick="submitAnswer(5, 'c')">Submit Answer</button>
+                </div>
+            </div>
+
+            <!-- Completion Screen -->
+            <div class="completion-screen" id="completionScreen">
+                <div class="completion-icon">🎉</div>
+                <h2>All Tickets Resolved!</h2>
+                <div class="score" id="finalScore">0/5</div>
+                <p class="completion-message" id="completionMessage"></p>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value" id="correctCount">0</div>
+                        <div class="stat-label">Correct</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="incorrectCount">0</div>
+                        <div class="stat-label">Incorrect</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="restartActivity()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTicket = 1;
+        let totalTickets = 5;
+        let score = 0;
+        let selectedAnswers = {};
+
+        const feedbackData = {
+            1: {
+                correct: "Excellent diagnosis! According to troubleshooting methodology, you should always start with the simplest possible causes. Checking if other equipment works and testing the wall socket helps you rule out power circuit faults or blackouts before assuming the computer itself is faulty. This saves time and prevents unnecessary hardware replacement.",
+                incorrect: "Not quite. Remember the troubleshooting principle: start with the simplest possible causes first. Before opening the computer or replacing components, you should verify that the wall socket is providing power by testing it with a known-good device (like a lamp) and checking if other equipment in the area is working. This helps rule out external power issues."
+            },
+            2: {
+                correct: "Correct! When power is present (fans spinning) but there's a blank screen with no beeps, the POST procedure is likely not executing. This can be caused by a faulty CPU, a failed firmware update, or a PSU fault that prevents the 'power good' signal from reaching the CPU—even though the fans are receiving power. The next steps would be to check cabling, reseat components, and potentially test the PSU.",
+                incorrect: "Not quite right. Since the fans are spinning (indicating power) but there's no display and no beeps, this suggests the POST is not running at all. A corrupted MBR or OS issue would typically occur AFTER POST completes and would usually show an error message. The monitor is unlikely to be the issue since there are no beeps either. The problem is at the hardware/firmware level before the OS even attempts to load."
+            },
+            3: {
+                correct: "Perfect! This systematic approach follows proper troubleshooting methodology. First, verify the drive is detected in UEFI/BIOS (if not, check power and data connections). Then check boot order settings to ensure the system isn't trying to boot from the wrong device. This helps you determine whether it's a hardware detection issue, a connection problem, or boot sector corruption before attempting more invasive repairs.",
+                incorrect: "Not the best approach. Before reinstalling the OS or replacing hardware, you need to diagnose the root cause. The error 'Boot device not found' could mean the drive isn't being detected (hardware issue), the boot order is wrong (configuration issue), or the boot sector is corrupted (software issue). Start by checking if the drive appears in UEFI/BIOS and verifying all connections are secure."
+            },
+            4: {
+                correct: "Excellent! RAID 1 mirrors data across two drives, so when one fails, the array becomes 'degraded' but data remains accessible. However, there's no longer any redundancy—if the second drive fails before you replace the first, all data will be lost. You should replace the failed drive as soon as possible and rebuild the array. Always back up data first, and if hot-swapping, make sure to remove the correct (failed) drive indicated by the red LED.",
+                incorrect: "Incorrect. RAID 1 provides redundancy by mirroring data across two drives. When one drive fails, the array becomes 'degraded' but continues to function using the remaining drive. However, you've lost your redundancy—if the second drive fails before replacement, all data is lost. The correct action is to replace the failed drive as soon as possible and rebuild the array. Note: RAID 0 has no redundancy, but this is RAID 1."
+            },
+            5: {
+                correct: "Absolutely correct! Loud grinding, clicking, or scraping sounds from an HDD indicate mechanical failure—likely issues with the read/write heads or platters. Combined with slow performance and read errors, this drive is failing. The priority is to immediately back up all data before total failure occurs, then replace the drive. Running S.M.A.R.T. diagnostics would likely show increasing bad sectors and other warning signs.",
+                incorrect: "Incorrect. Loud clicking and grinding noises from an HDD are serious warning signs of mechanical failure, not normal operation. Combined with slow performance and file read errors, this indicates the drive is failing and could completely fail at any moment. The correct action is to immediately back up all important data and replace the drive. Defragmentation won't fix mechanical damage, and adding RAM won't solve a failing hard drive."
+            }
+        };
+
+        function selectOption(element, ticketNum, answer) {
+            const options = element.parentElement.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
+            selectedAnswers[ticketNum] = answer;
+        }
+
+        function submitAnswer(ticketNum, correctAnswer) {
+            const selected = selectedAnswers[ticketNum];
+
+            if (!selected) {
+                alert('Please select an answer before submitting.');
+                return;
+            }
+
+            const isCorrect = selected === correctAnswer;
+            const feedback = document.getElementById(`feedback${ticketNum}`);
+            const submitBtn = document.getElementById(`submit${ticketNum}`);
+            const options = document.querySelectorAll(`#ticket${ticketNum} .option`);
+
+            // Disable all options
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                const input = opt.querySelector('input');
+                if (input.value === correctAnswer) {
+                    opt.classList.add('correct');
+                } else if (input.checked) {
+                    opt.classList.add('incorrect');
+                }
+            });
+
+            // Show feedback
+            feedback.className = 'feedback show ' + (isCorrect ? 'correct' : 'incorrect');
+            feedback.innerHTML = `
+                <h4>${isCorrect ? 'Correct!' : 'Not Quite'}</h4>
+                <p>${isCorrect ? feedbackData[ticketNum].correct : feedbackData[ticketNum].incorrect}</p>
+            `;
+
+            if (isCorrect) {
+                score++;
+                createConfetti();
+            }
+
+            // Change button to "Next Ticket"
+            submitBtn.textContent = ticketNum < totalTickets ? 'Next Ticket →' : 'View Results';
+            submitBtn.onclick = () => nextTicket(ticketNum);
+        }
+
+        function createConfetti() {
+            const colors = ['#667eea', '#764ba2', '#48bb78', '#ed8936', '#f56565'];
+            const container = document.getElementById('ticketContainer');
+
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = '0';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animation = `confetti-fall ${2 + Math.random()}s linear forwards`;
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    container.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        function nextTicket(currentNum) {
+            document.getElementById(`ticket${currentNum}`).classList.remove('active');
+
+            if (currentNum < totalTickets) {
+                currentTicket = currentNum + 1;
+                document.getElementById(`ticket${currentTicket}`).classList.add('active');
+                updateProgress();
+            } else {
+                showCompletion();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentTicket - 1) / totalTickets) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showCompletion() {
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('completionScreen').classList.add('show');
+            document.getElementById('finalScore').textContent = `${score}/${totalTickets}`;
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('incorrectCount').textContent = totalTickets - score;
+
+            let message = '';
+            const percentage = (score / totalTickets) * 100;
+
+            if (percentage === 100) {
+                message = '🌟 Outstanding work! You demonstrated expert-level troubleshooting skills. You\'re ready to handle real-world power and disk issues with confidence!';
+                createConfetti();
+            } else if (percentage >= 80) {
+                message = '👏 Great job! You have a solid understanding of power and disk troubleshooting. Review the feedback on missed questions to strengthen your skills further.';
+            } else if (percentage >= 60) {
+                message = '👍 Good effort! You\'re on the right track. Review the lesson content and feedback to improve your diagnostic approach.';
+            } else {
+                message = '📚 Keep learning! Troubleshooting takes practice. Review the lesson materials and try again to build your confidence.';
+            }
+
+            document.getElementById('completionMessage').textContent = message;
+        }
+
+        function restartActivity() {
+            currentTicket = 1;
+            score = 0;
+            selectedAnswers = {};
+
+            // Reset all tickets
+            for (let i = 1; i <= totalTickets; i++) {
+                const ticket = document.getElementById(`ticket${i}`);
+                const options = ticket.querySelectorAll('.option');
+                const feedback = document.getElementById(`feedback${i}`);
+                const submitBtn = document.getElementById(`submit${i}`);
+
+                options.forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'incorrect');
+                    opt.style.pointerEvents = 'auto';
+                    opt.querySelector('input').checked = false;
+                });
+
+                feedback.className = 'feedback';
+                submitBtn.textContent = 'Submit Answer';
+                submitBtn.onclick = () => submitAnswer(i, getCorrectAnswer(i));
+
+                if (i === 1) {
+                    ticket.classList.add('active');
+                } else {
+                    ticket.classList.remove('active');
+                }
+            }
+
+            document.getElementById('completionScreen').classList.remove('show');
+            updateProgress();
+        }
+
+        function getCorrectAnswer(ticketNum) {
+            const answers = {1: 'b', 2: 'b', 3: 'b', 4: 'c', 5: 'c'};
+            return answers[ticketNum];
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>
