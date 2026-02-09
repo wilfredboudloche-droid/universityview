@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 4C: System & Display Issues - Matching Activity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .character-section {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+        
+        .character {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .character-avatar {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+        }
+        
+        .character h3 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .character p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .instructions strong {
+            color: #856404;
+        }
+        
+        .matching-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .problems-column, .solutions-column {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        .column-header {
+            text-align: center;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .problem-card, .solution-card {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            position: relative;
+        }
+        
+        .problem-card:hover, .solution-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        .problem-card {
+            border-left: 5px solid #dc3545;
+        }
+        
+        .solution-card {
+            border-left: 5px solid #28a745;
+        }
+        
+        .card-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .problem-card.selected {
+            border: 3px solid #667eea;
+            background: #e8eaf6;
+        }
+        
+        .solution-card.selected {
+            border: 3px solid #667eea;
+            background: #e8eaf6;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        
+        .matched {
+            opacity: 0.5;
+            pointer-events: none;
+            position: relative;
+        }
+        
+        .matched::after {
+            content: "✓";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-check:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+        
+        .btn-reset {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            background: #5a6268;
+            transform: scale(1.05);
+        }
+        
+        .feedback {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.1em;
+            display: none;
+        }
+        
+        .feedback.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            display: block;
+        }
+        
+        .feedback.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+            display: block;
+        }
+        
+        .feedback.partial {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            display: block;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 1.5em;
+            color: #667eea;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .celebration {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 3em;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .matching-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .character-section {
+                flex-direction: column;
+            }
+            
+            .character {
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 System & Display Troubleshooting Match-Up</h1>
+            <p>Match each problem with its correct solution!</p>
+        </div>
+        
+        <div class="character-section">
+            <div class="character">
+                <svg class="character-avatar" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="90" fill="#FFD93D"/>
+                    <circle cx="75" cy="85" r="8" fill="#333"/>
+                    <circle cx="125" cy="85" r="8" fill="#333"/>
+                    <path d="M 70 120 Q 100 140 130 120" stroke="#333" stroke-width="3" fill="none"/>
+                    <rect x="60" y="40" width="80" height="15" fill="#667eea" rx="5"/>
+                    <circle cx="100" cy="180" r="15" fill="#FFD93D"/>
+                    <rect x="85" y="165" width="30" height="20" fill="#667eea"/>
+                </svg>
+                <h3>Tech Sam</h3>
+                <p>Hardware Specialist</p>
+            </div>
+            
+            <div class="character">
+                <svg class="character-avatar" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="90" fill="#FF6B9D"/>
+                    <circle cx="75" cy="85" r="8" fill="#333"/>
+                    <circle cx="125" cy="85" r="8" fill="#333"/>
+                    <path d="M 70 120 Q 100 140 130 120" stroke="#333" stroke-width="3" fill="none"/>
+                    <path d="M 50 60 Q 70 40 90 60" stroke="#8B4513" stroke-width="8" fill="none"/>
+                    <path d="M 110 60 Q 130 40 150 60" stroke="#8B4513" stroke-width="8" fill="none"/>
+                    <rect x="85" y="165" width="30" height="20" fill="#764ba2"/>
+                </svg>
+                <h3>Alex</h3>
+                <p>Display Expert</p>
+            </div>
+            
+            <div class="character">
+                <svg class="character-avatar" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="90" fill="#6BCB77"/>
+                    <circle cx="75" cy="85" r="8" fill="#333"/>
+                    <circle cx="125" cy="85" r="8" fill="#333"/>
+                    <path d="M 70 120 Q 100 135 130 120" stroke="#333" stroke-width="3" fill="none"/>
+                    <rect x="70" y="50" width="60" height="20" fill="#333" rx="3"/>
+                    <rect x="85" y="165" width="30" height="20" fill="#4D96A9"/>
+                </svg>
+                <h3>Jordan</h3>
+                <p>Troubleshooting Pro</p>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <strong>📋 Instructions:</strong> Click on a problem card, then click on the matching solution card. Once you've made all your matches, click "Check Answers" to see how you did!
+        </div>
+        
+        <div class="score-display" id="scoreDisplay">Score: 0 / 8</div>
+        
+        <div class="matching-area">
+            <div class="problems-column">
+                <div class="column-header">🔴 Problems</div>
+                
+                <div class="problem-card" data-id="1">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="20" fill="#ff6b6b"/>
+                        <path d="M 15 15 L 35 35 M 35 15 L 15 35" stroke="white" stroke-width="3"/>
+                    </svg>
+                    <span class="card-number">1</span>
+                    <strong>Computer randomly shuts down</strong> and feels very hot to the touch
+                </div>
+                
+                <div class="problem-card" data-id="2">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="10" width="40" height="30" fill="#333" rx="2"/>
+                        <rect x="8" y="13" width="34" height="24" fill="#000"/>
+                    </svg>
+                    <span class="card-number">2</span>
+                    <strong>Monitor shows "No Signal"</strong> even though PC is running
+                </div>
+                
+                <div class="problem-card" data-id="3">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="20" fill="#ffd93d"/>
+                        <path d="M 25 15 L 25 28 M 25 32 L 25 35" stroke="#333" stroke-width="3"/>
+                    </svg>
+                    <span class="card-number">3</span>
+                    <strong>System becomes sluggish</strong> after running for a while
+                </div>
+                
+                <div class="problem-card" data-id="4">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="15" width="30" height="20" fill="#888" rx="2"/>
+                        <circle cx="15" cy="20" r="1" fill="#000"/>
+                        <circle cx="20" cy="25" r="1" fill="#000"/>
+                        <circle cx="25" cy="30" r="1" fill="#000"/>
+                    </svg>
+                    <span class="card-number">4</span>
+                    <strong>Display has permanent dark spots</strong> that don't go away
+                </div>
+                
+                <div class="problem-card" data-id="5">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="10" width="40" height="30" fill="#666" rx="2"/>
+                        <text x="25" y="30" font-size="20" fill="#ccc" text-anchor="middle">ABC</text>
+                    </svg>
+                    <span class="card-number">5</span>
+                    <strong>Screen image appears blurry</strong> and text is hard to read
+                </div>
+                
+                <div class="problem-card" data-id="6">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="10" width="40" height="30" fill="#444" rx="2"/>
+                        <rect x="8" y="13" width="34" height="24" fill="#222"/>
+                    </svg>
+                    <span class="card-number">6</span>
+                    <strong>Monitor is very dim</strong> even at maximum brightness
+                </div>
+                
+                <div class="problem-card" data-id="7">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="15" width="30" height="20" fill="#764ba2" rx="2"/>
+                        <path d="M 15 20 L 35 30 M 15 30 L 35 20" stroke="#fff" stroke-width="2"/>
+                    </svg>
+                    <span class="card-number">7</span>
+                    <strong>Projector shuts off</strong> after 20 minutes of use
+                </div>
+                
+                <div class="problem-card" data-id="8">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="10" width="40" height="30" fill="#555" rx="2"/>
+                        <rect x="8" y="13" width="34" height="11" fill="#ff6b9d"/>
+                        <rect x="8" y="24" width="34" height="13" fill="#6bcb77"/>
+                    </svg>
+                    <span class="card-number">8</span>
+                    <strong>Display shows ghost images</strong> of previous screens
+                </div>
+            </div>
+            
+            <div class="solutions-column">
+                <div class="column-header">🟢 Solutions</div>
+                
+                <div class="solution-card" data-id="A" data-match="1">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="20" fill="#4ecdc4"/>
+                        <path d="M 25 15 L 25 25 L 32 32" stroke="white" stroke-width="3" fill="none"/>
+                    </svg>
+                    <span class="card-number">A</span>
+                    Clean dust from fans and vents; replace thermal paste on CPU
+                </div>
+                
+                <div class="solution-card" data-id="B" data-match="2">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 10 25 L 20 25 M 30 25 L 40 25" stroke="#4ecdc4" stroke-width="3"/>
+                        <circle cx="25" cy="25" r="5" fill="#4ecdc4"/>
+                    </svg>
+                    <span class="card-number">B</span>
+                    Check cable connections; test with known good cable and different input source
+                </div>
+                
+                <div class="solution-card" data-id="C" data-match="3">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 15 35 Q 25 15 35 35" stroke="#4ecdc4" stroke-width="3" fill="none"/>
+                        <circle cx="25" cy="20" r="3" fill="#ff6b6b"/>
+                    </svg>
+                    <span class="card-number">C</span>
+                    Monitor CPU temperature; improve airflow and cooling system
+                </div>
+                
+                <div class="solution-card" data-id="D" data-match="4">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="15" y="15" width="20" height="20" fill="none" stroke="#4ecdc4" stroke-width="3"/>
+                        <path d="M 15 15 L 35 35" stroke="#ff6b6b" stroke-width="2"/>
+                    </svg>
+                    <span class="card-number">D</span>
+                    Dead pixels are permanent hardware defects; replace the display panel
+                </div>
+                
+                <div class="solution-card" data-id="E" data-match="5">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="15" width="30" height="20" fill="#4ecdc4" rx="2"/>
+                        <text x="25" y="30" font-size="12" fill="white" text-anchor="middle">1920</text>
+                    </svg>
+                    <span class="card-number">E</span>
+                    Adjust display resolution to match native resolution of the monitor
+                </div>
+                
+                <div class="solution-card" data-id="F" data-match="6">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="15" fill="#ffd93d"/>
+                        <path d="M 25 10 L 25 5 M 25 45 L 25 40 M 10 25 L 5 25 M 45 25 L 40 25" stroke="#ffd93d" stroke-width="2"/>
+                    </svg>
+                    <span class="card-number">F</span>
+                    Replace backlight or inverter; check power settings and cables
+                </div>
+                
+                <div class="solution-card" data-id="G" data-match="7">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 15 35 L 25 15 L 35 35 Z" fill="none" stroke="#4ecdc4" stroke-width="3"/>
+                        <circle cx="25" cy="30" r="2" fill="#ff6b6b"/>
+                    </svg>
+                    <span class="card-number">G</span>
+                    Clean projector air filters; ensure proper ventilation to prevent overheating
+                </div>
+                
+                <div class="solution-card" data-id="H" data-match="8">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="15" y="15" width="20" height="20" fill="#4ecdc4" rx="2"/>
+                        <path d="M 20 20 L 30 30 M 30 20 L 20 30" stroke="white" stroke-width="2"/>
+                    </svg>
+                    <span class="card-number">H</span>
+                    Screen burn-in from static images; use screen savers and pixel refresh features
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-check" onclick="checkAnswers()">Check Answers</button>
+            <button class="btn btn-reset" onclick="resetGame()">Reset</button>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        <div class="celebration" id="celebration">🎉 🎊 🎈</div>
+    </div>
+    
+    <script>
+        let selectedProblem = null;
+        let selectedSolution = null;
+        let matches = {};
+        let correctMatches = 0;
+        
+        const correctAnswers = {
+            '1': 'A',
+            '2': 'B',
+            '3': 'C',
+            '4': 'D',
+            '5': 'E',
+            '6': 'F',
+            '7': 'G',
+            '8': 'H'
+        };
+        
+        // Add click handlers to problem cards
+        document.querySelectorAll('.problem-card').forEach(card => {
+            card.addEventListener('click', function() {
+                if (this.classList.contains('matched')) return;
+                
+                // Deselect previous problem
+                document.querySelectorAll('.problem-card').forEach(c => c.classList.remove('selected'));
+                
+                // Select this problem
+                this.classList.add('selected');
+                selectedProblem = this.dataset.id;
+                
+                // If solution already selected, make the match
+                if (selectedSolution) {
+                    makeMatch();
+                }
+            });
+        });
+        
+        // Add click handlers to solution cards
+        document.querySelectorAll('.solution-card').forEach(card => {
+            card.addEventListener('click', function() {
+                if (this.classList.contains('matched')) return;
+                
+                // Deselect previous solution
+                document.querySelectorAll('.solution-card').forEach(c => c.classList.remove('selected'));
+                
+                // Select this solution
+                this.classList.add('selected');
+                selectedSolution = this.dataset.id;
+                
+                // If problem already selected, make the match
+                if (selectedProblem) {
+                    makeMatch();
+                }
+            });
+        });
+        
+        function makeMatch() {
+            matches[selectedProblem] = selectedSolution;
+            
+            // Mark cards as matched
+            document.querySelector(`.problem-card[data-id="${selectedProblem}"]`).classList.add('matched');
+            document.querySelector(`.solution-card[data-id="${selectedSolution}"]`).classList.add('matched');
+            
+            // Clear selections
+            document.querySelectorAll('.problem-card, .solution-card').forEach(c => c.classList.remove('selected'));
+            selectedProblem = null;
+            selectedSolution = null;
+            
+            // Update score display
+            updateScore();
+        }
+        
+        function updateScore() {
+            const totalMatches = Object.keys(matches).length;
+            document.getElementById('scoreDisplay').textContent = `Matches Made: ${totalMatches} / 8`;
+        }
+        
+        function checkAnswers() {
+            if (Object.keys(matches).length < 8) {
+                showFeedback('partial', '⚠️ Please complete all matches before checking your answers!');
+                return;
+            }
+            
+            correctMatches = 0;
+            
+            for (let problem in matches) {
+                if (matches[problem] === correctAnswers[problem]) {
+                    correctMatches++;
+                }
+            }
+            
+            const percentage = (correctMatches / 8) * 100;
+            
+            if (correctMatches === 8) {
+                showFeedback('success', `🎉 Perfect! You got all 8 matches correct! You're a troubleshooting expert!`);
+                document.getElementById('celebration').style.display = 'block';
+            } else if (correctMatches >= 6) {
+                showFeedback('partial', `👍 Good job! You got ${correctMatches} out of 8 correct (${percentage}%). Review the incorrect matches and try again!`);
+            } else {
+                showFeedback('error', `📚 You got ${correctMatches} out of 8 correct (${percentage}%). Keep studying and try again!`);
+            }
+            
+            document.getElementById('scoreDisplay').textContent = `Score: ${correctMatches} / 8 (${percentage}%)`;
+        }
+        
+        function showFeedback(type, message) {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback ' + type;
+            feedback.textContent = message;
+            feedback.style.display = 'block';
+        }
+        
+        function resetGame() {
+            matches = {};
+            correctMatches = 0;
+            selectedProblem = null;
+            selectedSolution = null;
+            
+            document.querySelectorAll('.problem-card, .solution-card').forEach(card => {
+                card.classList.remove('matched', 'selected');
+            });
+            
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('celebration').style.display = 'none';
+            document.getElementById('scoreDisplay').textContent = 'Score: 0 / 8';
+        }
+    </script>
+</body>
+</html>
