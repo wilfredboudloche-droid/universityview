@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 4C: System & Display Issues - Matching Activity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .character-section {
+            display: flex;
+            justify-content: space-around;
+            padding: 30px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+
+        .character {
+            text-align: center;
+            flex: 1;
+        }
+
+        .character-avatar {
+            width: 180px;
+            height: 280px;
+            margin: 0 auto 15px;
+        }
+
+        .character h3 {
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 1.3em;
+        }
+
+        .character p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 140px;
+            height: 12px;
+            background: #ddd;
+            border-radius: 6px;
+            margin: 10px auto;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .matching-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .problems-column, .solutions-column {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .column-header {
+            text-align: center;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .problem-card, .solution-card {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            position: relative;
+        }
+
+        .problem-card:hover, .solution-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .problem-card {
+            border-left: 5px solid #dc3545;
+        }
+
+        .solution-card {
+            border-left: 5px solid #28a745;
+        }
+
+        .card-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .problem-card.selected {
+            border: 4px solid #667eea;
+            background: #1a237e;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .problem-card.selected .card-number {
+            background: #ffffff;
+            color: #1a237e;
+        }
+
+        .solution-card.selected {
+            border: 4px solid #667eea;
+            background: #1a237e;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .solution-card.selected .card-number {
+            background: #ffffff;
+            color: #1a237e;
+        }
+
+        .matched {
+            opacity: 0.3;
+            pointer-events: none;
+            position: relative;
+            background: #263238 !important;
+            color: #90a4ae !important;
+        }
+
+        .matched .card-number {
+            background: #546e7a !important;
+            color: #ffffff !important;
+        }
+
+        .correct-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            display: none;
+            z-index: 10;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-check:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+
+        .btn-reset {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #ee5a52;
+            transform: scale(1.05);
+        }
+
+        .btn-clear-progress {
+            background: #dc3545;
+            color: white;
+            font-size: 0.9em;
+            padding: 10px 25px;
+        }
+
+        .feedback {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.1em;
+            display: none;
+        }
+
+        .feedback.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            display: block;
+        }
+
+        .feedback.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+            display: block;
+        }
+
+        .feedback.partial {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            display: block;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.5em;
+            color: #667eea;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .celebration {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 3em;
+            display: none;
+        }
+
+        /* Character body parts visibility */
+        .body-part {
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        .body-part.visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .matching-area {
+                grid-template-columns: 1fr;
+            }
+
+            .character-section {
+                flex-direction: column;
+            }
+
+            .character {
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Tech Heroes Assembly Challenge</h1>
+            <p>Gear up your tech heroes by matching problems with solutions!</p>
+        </div>
+
+        <div class="character-section">
+            <!-- COWBOY TECH -->
+            <div class="character">
+                <svg class="character-avatar" id="cowboy-avatar" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="80" r="30" fill="#f4a460"/>
+                    <circle cx="92" cy="75" r="3" fill="#000"/>
+                    <circle cx="108" cy="75" r="3" fill="#000"/>
+                    <path d="M 92 88 Q 100 92 108 88" stroke="#000" stroke-width="2" fill="none"/>
+                    <g class="body-part" id="cowboy-part-1">
+                        <ellipse cx="100" cy="55" rx="35" ry="8" fill="#8B4513"/>
+                        <path d="M 75 55 Q 75 35 100 30 Q 125 35 125 55" fill="#8B4513"/>
+                        <rect x="85" y="28" width="30" height="8" fill="#D2691E" rx="2"/>
+                    </g>
+                    <g class="body-part" id="cowboy-part-2">
+                        <path d="M 75 65 L 100 70 L 125 65 L 130 75 L 100 72 L 70 75 Z" fill="#DC143C"/>
+                    </g>
+                    <g class="body-part" id="cowboy-part-3">
+                        <rect x="80" y="110" width="40" height="50" fill="#4169E1" rx="5"/>
+                        <rect x="85" y="110" width="30" height="50" fill="#8B4513"/>
+                    </g>
+                    <g class="body-part" id="cowboy-part-4">
+                        <rect x="60" y="115" width="20" height="45" fill="#4169E1" rx="8"/>
+                        <rect x="120" y="115" width="20" height="45" fill="#4169E1" rx="8"/>
+                    </g>
+                    <g class="body-part" id="cowboy-part-5">
+                        <rect x="80" y="160" width="40" height="50" fill="#2F4F4F" rx="3"/>
+                    </g>
+                    <g class="body-part" id="cowboy-part-6">
+                        <rect x="82" y="210" width="15" height="25" fill="#8B4513" rx="3"/>
+                        <rect x="103" y="210" width="15" height="25" fill="#8B4513" rx="3"/>
+                    </g>
+                    <g class="body-part" id="cowboy-part-7">
+                        <polygon points="95,130 97,135 103,135 98,139 100,145 95,141 90,145 92,139 87,135 93,135" fill="#FFD700"/>
+                    </g>
+                    <g class="body-part" id="cowboy-part-8">
+                        <ellipse cx="145" cy="140" rx="15" ry="20" fill="none" stroke="#D2691E" stroke-width="3"/>
+                    </g>
+                </svg>
+                <h3>🤠 Sheriff Cache</h3>
+                <div class="progress-bar"><div class="progress-fill" id="cowboy-progress"></div></div>
+                <p id="cowboy-status">0/3 correct</p>
+            </div>
+
+            <!-- POLICE OFFICER -->
+            <div class="character">
+                <svg class="character-avatar" id="police-avatar" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="80" r="30" fill="#fdbcb4"/>
+                    <circle cx="92" cy="75" r="3" fill="#000"/>
+                    <circle cx="108" cy="75" r="3" fill="#000"/>
+                    <path d="M 92 88 Q 100 92 108 88" stroke="#000" stroke-width="2" fill="none"/>
+                    <g class="body-part" id="police-part-1">
+                        <ellipse cx="100" cy="55" rx="32" ry="10" fill="#000080"/>
+                    </g>
+                    <g class="body-part" id="police-part-2">
+                        <circle cx="100" cy="52" r="6" fill="#FFD700"/>
+                    </g>
+                    <g class="body-part" id="police-part-3">
+                        <rect x="80" y="110" width="40" height="50" fill="#4169E1" rx="5"/>
+                    </g>
+                    <g class="body-part" id="police-part-4">
+                        <rect x="60" y="115" width="20" height="45" fill="#4169E1" rx="8"/>
+                        <rect x="120" y="115" width="20" height="45" fill="#4169E1" rx="8"/>
+                    </g>
+                    <g class="body-part" id="police-part-5">
+                        <rect x="80" y="160" width="40" height="50" fill="#000080" rx="3"/>
+                    </g>
+                    <g class="body-part" id="police-part-6">
+                        <rect x="82" y="210" width="15" height="25" fill="#000" rx="3"/>
+                        <rect x="103" y="210" width="15" height="25" fill="#000" rx="3"/>
+                    </g>
+                    <g class="body-part" id="police-part-7">
+                        <polygon points="90,130 92,125 98,125 100,130 98,135 92,135" fill="#C0C0C0"/>
+                    </g>
+                    <g class="body-part" id="police-part-8">
+                        <rect x="115" y="125" width="8" height="20" fill="#000" rx="2"/>
+                    </g>
+                </svg>
+                <h3>👮 Officer Debug</h3>
+                <div class="progress-bar"><div class="progress-fill" id="police-progress"></div></div>
+                <p id="police-status">0/3 correct</p>
+            </div>
+
+            <!-- DOCTOR -->
+            <div class="character">
+                <svg class="character-avatar" id="doctor-avatar" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="80" r="30" fill="#f5d5c8"/>
+                    <circle cx="92" cy="75" r="3" fill="#000"/>
+                    <circle cx="108" cy="75" r="3" fill="#000"/>
+                    <path d="M 92 88 Q 100 92 108 88" stroke="#000" stroke-width="2" fill="none"/>
+                    <g class="body-part" id="doctor-part-1">
+                        <circle cx="100" cy="52" r="8" fill="#E0E0E0" stroke="#666" stroke-width="2"/>
+                    </g>
+                    <g class="body-part" id="doctor-part-2">
+                        <path d="M 70 65 Q 70 45 100 40 Q 130 45 130 65" fill="#4A4A4A"/>
+                    </g>
+                    <g class="body-part" id="doctor-part-3">
+                        <rect x="75" y="110" width="50" height="55" fill="#FFFFFF" rx="5" stroke="#E0E0E0" stroke-width="2"/>
+                    </g>
+                    <g class="body-part" id="doctor-part-4">
+                        <rect x="55" y="115" width="20" height="45" fill="#FFFFFF" rx="8" stroke="#E0E0E0" stroke-width="2"/>
+                        <rect x="125" y="115" width="20" height="45" fill="#FFFFFF" rx="8" stroke="#E0E0E0" stroke-width="2"/>
+                    </g>
+                    <g class="body-part" id="doctor-part-5">
+                        <rect x="80" y="165" width="40" height="45" fill="#2C3E50" rx="3"/>
+                    </g>
+                    <g class="body-part" id="doctor-part-6">
+                        <rect x="82" y="210" width="15" height="25" fill="#FFFFFF" rx="3" stroke="#E0E0E0" stroke-width="2"/>
+                        <rect x="103" y="210" width="15" height="25" fill="#FFFFFF" rx="3" stroke="#E0E0E0" stroke-width="2"/>
+                    </g>
+                    <g class="body-part" id="doctor-part-7">
+                        <path d="M 85 135 Q 100 145 115 135" stroke="#333" stroke-width="3" fill="none"/>
+                    </g>
+                    <g class="body-part" id="doctor-part-8">
+                        <rect x="45" y="140" width="18" height="25" fill="#8B4513" rx="2"/>
+                    </g>
+                </svg>
+                <h3>👨‍⚕️ Dr. Syntax</h3>
+                <div class="progress-bar"><div class="progress-fill" id="doctor-progress"></div></div>
+                <p id="doctor-status">0/2 correct</p>
+            </div>
+        </div>
+
+        <div class="score-display" id="scoreDisplay">Matches Made: 0 / 8 | Total Progress: 0/8</div>
+
+        <div class="matching-area">
+            <div class="problems-column">
+                <div class="column-header">🔴 Problems</div>
+                <div class="problem-card" data-id="1"><span class="card-number">1</span><strong>Computer randomly shuts down</strong> and feels hot<svg class="correct-indicator checkmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#28a745"/><path d="M 8 15 L 13 20 L 22 10" stroke="white" stroke-width="3" fill="none"/></svg><svg class="correct-indicator xmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#dc3545"/><path d="M 10 10 L 20 20 M 20 10 L 10 20" stroke="white" stroke-width="3"/></svg></div>
+                <div class="problem-card" data-id="2"><span class="card-number">2</span><strong>Monitor shows "No Signal"</strong> even though PC is on<svg class="correct-indicator checkmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#28a745"/><path d="M 8 15 L 13 20 L 22 10" stroke="white" stroke-width="3" fill="none"/></svg><svg class="correct-indicator xmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#dc3545"/><path d="M 10 10 L 20 20 M 20 10 L 10 20" stroke="white" stroke-width="3"/></svg></div>
+                <div class="problem-card" data-id="3"><span class="card-number">3</span><strong>System becomes sluggish</strong> after running for a while<svg class="correct-indicator checkmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#28a745"/><path d="M 8 15 L 13 20 L 22 10" stroke="white" stroke-width="3" fill="none"/></svg><svg class="correct-indicator xmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#dc3545"/><path d="M 10 10 L 20 20 M 20 10 L 10 20" stroke="white" stroke-width="3"/></svg></div>
+                <div class="problem-card" data-id="4"><span class="card-number">4</span><strong>Display has permanent dark spots</strong><svg class="correct-indicator checkmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#28a745"/><path d="M 8 15 L 13 20 L 22 10" stroke="white" stroke-width="3" fill="none"/></svg><svg class="correct-indicator xmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#dc3545"/><path d="M 10 10 L 20 20 M 20 10 L 10 20" stroke="white" stroke-width="3"/></svg></div>
+                <div class="problem-card" data-id="5"><span class="card-number">5</span><strong>Screen image appears blurry</strong> and text is hard to read<svg class="correct-indicator checkmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#28a745"/><path d="M 8 15 L 13 20 L 22 10" stroke="white" stroke-width="3" fill="none"/></svg><svg class="correct-indicator xmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#dc3545"/><path d="M 10 10 L 20 20 M 20 10 L 10 20" stroke="white" stroke-width="3"/></svg></div>
+                <div class="problem-card" data-id="6"><span class="card-number">6</span><strong>Monitor is very dim</strong> even at max brightness<svg class="correct-indicator checkmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#28a745"/><path d="M 8 15 L 13 20 L 22 10" stroke="white" stroke-width="3" fill="none"/></svg><svg class="correct-indicator xmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#dc3545"/><path d="M 10 10 L 20 20 M 20 10 L 10 20" stroke="white" stroke-width="3"/></svg></div>
+                <div class="problem-card" data-id="7"><span class="card-number">7</span><strong>Projector shuts off</strong> after 20 minutes of use<svg class="correct-indicator checkmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#28a745"/><path d="M 8 15 L 13 20 L 22 10" stroke="white" stroke-width="3" fill="none"/></svg><svg class="correct-indicator xmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#dc3545"/><path d="M 10 10 L 20 20 M 20 10 L 10 20" stroke="white" stroke-width="3"/></svg></div>
+                <div class="problem-card" data-id="8"><span class="card-number">8</span><strong>Display shows ghost images</strong> of previous screens<svg class="correct-indicator checkmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#28a745"/><path d="M 8 15 L 13 20 L 22 10" stroke="white" stroke-width="3" fill="none"/></svg><svg class="correct-indicator xmark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#dc3545"/><path d="M 10 10 L 20 20 M 20 10 L 10 20" stroke="white" stroke-width="3"/></svg></div>
+            </div>
+            <div class="solutions-column">
+                <div class="column-header">🟢 Solutions</div>
+                <div class="solution-card" data-id="E"><span class="card-number">A</span>Adjust resolution to match native resolution</div>
+                <div class="solution-card" data-id="C"><span class="card-number">B</span>Monitor CPU temperature; improve cooling</div>
+                <div class="solution-card" data-id="H"><span class="card-number">C</span>Screen burn-in; use screen savers</div>
+                <div class="solution-card" data-id="A"><span class="card-number">D</span>Clean dust from fans; replace thermal paste</div>
+                <div class="solution-card" data-id="G"><span class="card-number">E</span>Clean projector air filters; ensure ventilation</div>
+                <div class="solution-card" data-id="D"><span class="card-number">F</span>Dead pixels; replace the display panel</div>
+                <div class="solution-card" data-id="B"><span class="card-number">G</span>Check cable connections; test with known good cable</div>
+                <div class="solution-card" data-id="F"><span class="card-number">H</span>Replace backlight or inverter</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-check" onclick="checkAnswers()">Check Answers</button>
+            <button class="btn btn-reset" onclick="removeIncorrectMatches()">Remove Incorrect Matches</button>
+            <button class="btn btn-clear-progress" onclick="clearProgress()">Clear All Progress</button>
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <div class="celebration" id="celebration">🎉🎊🎈</div>
+    </div>
+
+    <script>
+        let matches = {};
+        let selectedProblem = null;
+        let selectedSolution = null;
+        let correctlyAnswered = JSON.parse(localStorage.getItem('lesson4c_correctlyAnswered')) || [];
+
+        const correctAnswers = {
+            '1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F', '7': 'G', '8': 'H'
+        };
+
+        const questionToCharacter = {
+            '1': 'cowboy', '5': 'cowboy', '7': 'cowboy',
+            '2': 'police', '4': 'police', '8': 'police',
+            '3': 'doctor', '6': 'doctor'
+        };
+
+        window.onload = function() { updateCharacterProgress(); updateScore(); };
+
+        document.querySelectorAll('.problem-card').forEach(card => {
+            card.addEventListener('click', function() {
+                if (this.classList.contains('matched')) return;
+                document.querySelectorAll('.problem-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedProblem = this.dataset.id;
+                if (selectedSolution) makeMatch();
+            });
+        });
+
+        document.querySelectorAll('.solution-card').forEach(card => {
+            card.addEventListener('click', function() {
+                if (this.classList.contains('matched')) return;
+                document.querySelectorAll('.solution-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedSolution = this.dataset.id;
+                if (selectedProblem) makeMatch();
+            });
+        });
+
+        function makeMatch() {
+            matches[selectedProblem] = selectedSolution;
+            document.querySelector(`.problem-card[data-id="${selectedProblem}"]`).classList.add('matched');
+            document.querySelector(`.solution-card[data-id="${selectedSolution}"]`).classList.add('matched');
+            document.querySelectorAll('.problem-card, .solution-card').forEach(c => c.classList.remove('selected'));
+            selectedProblem = null; selectedSolution = null;
+            updateScore();
+        }
+
+        function updateScore() {
+            const totalMatches = Object.keys(matches).length;
+            document.getElementById('scoreDisplay').textContent = `Matches Made: ${totalMatches} / 8 | Total Progress: ${correctlyAnswered.length}/8`;
+        }
+
+        function checkAnswers() {
+            if (Object.keys(matches).length < 8) {
+                showFeedback('partial', '⚠️ Please complete all matches before checking!');
+                return;
+            }
+            let totalCorrect = 0;
+            document.querySelectorAll('.correct-indicator').forEach(i => i.style.display = 'none');
+
+            for (let problem in matches) {
+                const problemCard = document.querySelector(`.problem-card[data-id="${problem}"]`);
+                const checkmark = problemCard.querySelector('.checkmark');
+                const xmark = problemCard.querySelector('.xmark');
+
+                if (matches[problem] === correctAnswers[problem]) {
+                    totalCorrect++;
+                    checkmark.style.display = 'block';
+                    if (!correctlyAnswered.includes(problem)) {
+                        correctlyAnswered.push(problem);
+                    }
+                } else {
+                    xmark.style.display = 'block';
+                }
+            }
+
+            localStorage.setItem('lesson4c_correctlyAnswered', JSON.stringify(correctlyAnswered));
+            if (correctlyAnswered.length === 8) {
+                showFeedback('success', '🎉 LEGENDARY! All heroes equipped!');
+                document.getElementById('celebration').style.display = 'block';
+            } else {
+                showFeedback(totalCorrect === 8 ? 'success' : 'partial', `Score: ${totalCorrect}/8. Total Progress: ${correctlyAnswered.length}/8`);
+            }
+            updateCharacterProgress();
+            updateScore();
+        }
+
+        function updateCharacterProgress() {
+            // First, hide all parts
+            document.querySelectorAll('.body-part').forEach(p => p.classList.remove('visible'));
+
+            ['cowboy', 'police', 'doctor'].forEach(char => {
+                const qs = Object.keys(questionToCharacter).filter(q => questionToCharacter[q] === char);
+                const correct = qs.filter(q => correctlyAnswered.includes(q));
+
+                // Update progress bar and text
+                document.getElementById(`${char}-progress`).style.width = (correct.length / qs.length * 100) + '%';
+                document.getElementById(`${char}-status`).textContent = `${correct.length}/${qs.length} correct`;
+
+                // Show parts for each correct answer
+                correct.forEach(q => {
+                    let parts = [];
+                    if (char === 'cowboy') {
+                        const idx = ['1', '5', '7'].indexOf(q);
+                        parts = idx === 0 ? [1,2,3] : (idx === 1 ? [4,5,6] : [7,8]);
+                    } else if (char === 'police') {
+                        const idx = ['2', '4', '8'].indexOf(q);
+                        parts = idx === 0 ? [1,2,3] : (idx === 1 ? [4,5,6] : [7,8]);
+                    } else if (char === 'doctor') {
+                        const idx = ['3', '6'].indexOf(q);
+                        parts = idx === 0 ? [1,2,3,4] : [5,6,7,8];
+                    }
+                    parts.forEach(p => {
+                        const partEl = document.getElementById(`${char}-part-${p}`);
+                        if (partEl) partEl.classList.add('visible');
+                    });
+                });
+            });
+        }
+
+        function showFeedback(type, msg) {
+            const f = document.getElementById('feedback');
+            f.className = 'feedback ' + type; f.textContent = msg; f.style.display = 'block';
+        }
+
+        function removeIncorrectMatches() {
+            // Only remove matches that have not been marked as correctly answered
+            let incorrectMatches = [];
+
+            for (let problem in matches) {
+                if (!correctlyAnswered.includes(problem)) {
+                    incorrectMatches.push(problem);
+                }
+            }
+
+            // Remove incorrect matches from the matches object
+            incorrectMatches.forEach(problem => {
+                const solutionId = matches[problem];
+                delete matches[problem];
+
+                // Remove matched class and indicator from cards
+                const problemCard = document.querySelector(`.problem-card[data-id="${problem}"]`);
+                const solutionCard = document.querySelector(`.solution-card[data-id="${solutionId}"]`);
+
+                if (problemCard) {
+                    problemCard.classList.remove('matched', 'selected');
+                    problemCard.querySelectorAll('.correct-indicator').forEach(i => i.style.display = 'none');
+                }
+                if (solutionCard) {
+                    solutionCard.classList.remove('matched', 'selected');
+                }
+            });
+
+            // Clear selection states
+            selectedProblem = null;
+            selectedSolution = null;
+
+            // Hide feedback and celebration
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('celebration').style.display = 'none';
+
+            updateScore();
+
+            if (incorrectMatches.length > 0) {
+                showFeedback('partial', `${incorrectMatches.length} incorrect match(es) removed. Keep trying!`);
+            } else {
+                showFeedback('success', 'No incorrect matches to remove!');
+            }
+        }
+
+        function clearProgress() {
+            if (confirm('Are you sure you want to clear all character progress? This cannot be undone.')) {
+                // Clear storage
+                localStorage.removeItem('lesson4c_correctlyAnswered');
+                correctlyAnswered = [];
+
+                // Reset all matches
+                matches = {};
+                selectedProblem = null;
+                selectedSolution = null;
+                document.querySelectorAll('.problem-card, .solution-card').forEach(c => c.classList.remove('matched', 'selected'));
+                document.querySelectorAll('.correct-indicator').forEach(i => i.style.display = 'none');
+                document.getElementById('feedback').style.display = 'none';
+                document.getElementById('celebration').style.display = 'none';
+
+                // Update UI
+                updateCharacterProgress();
+                updateScore();
+
+                showFeedback('partial', 'Progress cleared. Characters have been reset.');
+            }
+        }
+    </script>
+</body>
+</html>
