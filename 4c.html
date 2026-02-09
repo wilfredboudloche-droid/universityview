@@ -1,1191 +1,637 @@
-<!-- Module 4 • Lesson 4C Interactive Practice (Canvas-embeddable: HTML + CSS only, no JS) -->
-<div id="m4c-interactive" style="font-family: 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; color: #0f172a;">
-
-  <style>
-    /* ====== 4C Interactive: scoped styles (safe to paste into Canvas page HTML) ====== */
-    #m4c-interactive * { box-sizing: border-box; }
-    #m4c-interactive a { color: inherit; }
-
-    #m4c-interactive .m4c-shell{
-      border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden;
-      background: radial-gradient(1200px 600px at 10% 0%, #eef2ff 0%, #ffffff 55%, #f0fdf4 100%);
-    }
-
-    #m4c-interactive .m4c-hero{
-      padding: 18px 18px 14px;
-      background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 45%, #22c55e 100%);
-      color: #ffffff;
-      position: relative;
-    }
-    #m4c-interactive .m4c-hero h3{ margin: 0; font-size: 1.25rem; letter-spacing: .2px; }
-    #m4c-interactive .m4c-hero p{ margin: 8px 0 0; opacity: .95; max-width: 92ch; }
-    #m4c-interactive .m4c-hero .m4c-badges{
-      margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px;
-    }
-    #m4c-interactive .m4c-badge{
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28);
-      padding: 6px 10px; border-radius: 999px; font-size: .92rem;
-      backdrop-filter: blur(6px);
-    }
-    #m4c-interactive .m4c-badge svg{ width: 16px; height: 16px; flex: 0 0 auto; }
-
-    #m4c-interactive .m4c-body{ padding: 14px 16px 18px; }
-
-    #m4c-interactive .m4c-note{
-      border-radius: 12px; padding: 10px 12px; margin: 12px 0 14px;
-      background: #fff7ed; border: 1px solid #fed7aa;
-      color: #7c2d12;
-    }
-    #m4c-interactive .m4c-note strong{ color: #7c2d12; }
-
-    /* Tabs (radio + CSS) */
-    #m4c-interactive .m4c-tabs{ margin-top: 12px; }
-    #m4c-interactive .m4c-tab-input{
-      position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;
-    }
-    #m4c-interactive .m4c-tabbar{
-      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-    #m4c-interactive .m4c-tab{
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      border-radius: 14px; padding: 10px 12px;
-      border: 1px solid #e5e7eb; background: #ffffff;
-      box-shadow: 0 1px 0 rgba(15, 23, 42, .05);
-      font-weight: 700;
-      transition: transform .08s ease, border-color .08s ease, box-shadow .08s ease;
-      user-select: none;
-      min-height: 52px;
-    }
-    #m4c-interactive .m4c-tab:hover{ transform: translateY(-1px); border-color: #c7d2fe; box-shadow: 0 8px 22px rgba(99, 102, 241, .12); }
-    #m4c-interactive .m4c-tab svg{ width: 20px; height: 20px; }
-
-    #m4c-interactive #m4c-tab-1:checked ~ .m4c-tabbar label[for="m4c-tab-1"],
-    #m4c-interactive #m4c-tab-2:checked ~ .m4c-tabbar label[for="m4c-tab-2"],
-    #m4c-interactive #m4c-tab-3:checked ~ .m4c-tabbar label[for="m4c-tab-3"]{
-      border-color: #1d4ed8;
-      box-shadow: 0 10px 30px rgba(29, 78, 216, .18);
-      background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
-    }
-
-    #m4c-interactive .m4c-panel{ display: none; margin-top: 14px; }
-    #m4c-interactive #m4c-tab-1:checked ~ .m4c-panels #m4c-panel-1{ display: block; }
-    #m4c-interactive #m4c-tab-2:checked ~ .m4c-panels #m4c-panel-2{ display: block; }
-    #m4c-interactive #m4c-tab-3:checked ~ .m4c-panels #m4c-panel-3{ display: block; }
-
-    /* Case card */
-    #m4c-interactive .m4c-case{
-      border-radius: 16px; overflow: hidden;
-      border: 1px solid #e5e7eb; background: #ffffff;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, .06);
-    }
-    #m4c-interactive .m4c-case-head{
-      padding: 12px 14px;
-      display: grid; grid-template-columns: 92px 1fr; gap: 12px;
-      align-items: center;
-      background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 55%, #ecfdf5 100%);
-      border-bottom: 1px solid #e5e7eb;
-    }
-    #m4c-interactive .m4c-case-head h4{ margin: 0; font-size: 1.1rem; }
-    #m4c-interactive .m4c-case-head p{ margin: 6px 0 0; color: #334155; }
-    #m4c-interactive .m4c-illus{
-      width: 92px; height: 92px; border-radius: 14px;
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      display: flex; align-items: center; justify-content: center;
-    }
-    #m4c-interactive .m4c-illus svg{ width: 74px; height: 74px; }
-
-    #m4c-interactive .m4c-case-body{ padding: 12px 14px 14px; }
-
-    #m4c-interactive .m4c-mini{
-      display: grid; grid-template-columns: 1fr;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    #m4c-interactive .m4c-callout{
-      border-radius: 12px; padding: 10px 12px;
-      border: 1px solid #e5e7eb; background: #ffffff;
-    }
-    #m4c-interactive .m4c-callout strong{ display: inline-block; margin-bottom: 4px; }
-    #m4c-interactive .m4c-callout ul{ margin: 8px 0 0 18px; color: #334155; }
-    #m4c-interactive .m4c-callout li{ margin: 4px 0; }
-
-    /* Questions */
-    #m4c-interactive .m4c-form-actions{
-      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;
-      align-items: center;
-    }
-    #m4c-interactive .m4c-btn{
-      appearance: none; border: 1px solid #cbd5e1; background: #ffffff;
-      color: #0f172a; border-radius: 999px; padding: 8px 14px;
-      font-weight: 700; cursor: pointer;
-      box-shadow: 0 1px 0 rgba(15, 23, 42, .06);
-    }
-    #m4c-interactive .m4c-btn:hover{ border-color: #94a3b8; box-shadow: 0 10px 24px rgba(15,23,42,.10); }
-    #m4c-interactive .m4c-hint{
-      font-size: .95rem; color: #334155;
-      padding: 8px 10px; border-radius: 12px;
-      background: #f1f5f9; border: 1px solid #e2e8f0;
-    }
-
-    #m4c-interactive .m4c-q{
-      border: 1px solid #e5e7eb; border-radius: 14px;
-      background: #ffffff;
-      padding: 10px 12px;
-      margin: 10px 0 12px;
-    }
-    #m4c-interactive .m4c-q fieldset{ border: 0; padding: 0; margin: 0; }
-    #m4c-interactive .m4c-q legend{
-      font-weight: 800; font-size: 1.02rem; margin-bottom: 8px;
-    }
-    #m4c-interactive .m4c-sub{
-      margin: 0 0 10px; color: #334155; font-size: .96rem;
-    }
-
-    #m4c-interactive .m4c-option{
-      border-radius: 12px; border: 1px solid #e5e7eb;
-      background: #f8fafc;
-      margin: 8px 0;
-      overflow: hidden;
-    }
-
-    #m4c-interactive .m4c-option input{
-      position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;
-    }
-
-    #m4c-interactive .m4c-option label{
-      display: grid; grid-template-columns: 26px 1fr; gap: 10px;
-      padding: 10px 12px;
-      cursor: pointer;
-      align-items: start;
-      user-select: none;
-    }
-    #m4c-interactive .m4c-bullet{
-      width: 22px; height: 22px; border-radius: 999px;
-      border: 2px solid #94a3b8; background: #ffffff;
-      display: inline-flex; align-items: center; justify-content: center;
-      font-weight: 900; color: #64748b; margin-top: 1px;
-    }
-
-    #m4c-interactive .m4c-option input:focus-visible + label{
-      outline: 3px solid rgba(59, 130, 246, .35);
-      outline-offset: 2px;
-    }
-
-    #m4c-interactive .m4c-option input:checked + label{
-      background: #ffffff;
-      border-left: 6px solid #0ea5e9;
-    }
-    #m4c-interactive .m4c-option.correct input:checked + label{ border-left-color: #22c55e; }
-    #m4c-interactive .m4c-option.incorrect input:checked + label{ border-left-color: #ef4444; }
-
-    #m4c-interactive .m4c-fb{
-      display: none;
-      padding: 10px 12px 12px;
-      background: #ffffff;
-      border-top: 1px dashed #cbd5e1;
-      color: #0f172a;
-    }
-    #m4c-interactive .m4c-option input:checked ~ .m4c-fb{ display: block; }
-
-    #m4c-interactive .m4c-tag{
-      display: inline-flex; align-items: center; gap: 8px;
-      font-weight: 900;
-      border-radius: 999px;
-      padding: 6px 10px;
-      margin-bottom: 8px;
-      border: 1px solid;
-      font-size: .92rem;
-    }
-    #m4c-interactive .m4c-tag svg{ width: 16px; height: 16px; }
-    #m4c-interactive .m4c-tag.ok{ background: #ecfdf5; color: #166534; border-color: #86efac; }
-    #m4c-interactive .m4c-tag.no{ background: #fef2f2; color: #991b1b; border-color: #fecaca; }
-
-    #m4c-interactive .m4c-fb p{ margin: 0; }
-    #m4c-interactive .m4c-fb p + p{ margin-top: 8px; color: #334155; }
-
-    /* Footer takeaway */
-    #m4c-interactive .m4c-takeaway{
-      margin-top: 14px;
-      border-radius: 14px;
-      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-      border: 1px solid #e5e7eb;
-      padding: 12px 12px;
-      color: #0f172a;
-    }
-    #m4c-interactive .m4c-takeaway h5{ margin: 0 0 8px; font-size: 1.02rem; }
-    #m4c-interactive .m4c-takeaway ul{ margin: 0 0 0 18px; color: #334155; }
-    #m4c-interactive .m4c-takeaway li{ margin: 5px 0; }
-
-    /* Small screens */
-    @media (max-width: 720px){
-      #m4c-interactive .m4c-tabbar{ grid-template-columns: 1fr; }
-      #m4c-interactive .m4c-case-head{ grid-template-columns: 1fr; }
-      #m4c-interactive .m4c-illus{ width: 100%; height: 92px; }
-      #m4c-interactive .m4c-illus svg{ width: 70px; height: 70px; }
-    }
-  </style>
-
-  <div class="m4c-shell" role="region" aria-label="Lesson 4C Interactive Practice: System and Display Issues">
-    <div class="m4c-hero">
-      <h3>Interactive Troubleshooting Simulator (Lesson 4C): System & Display Issues</h3>
-      <p>
-        Practice the lesson objectives through realistic IT support scenarios: diagnose overheating and instability, troubleshoot “no image” problems using input/source checks and the <strong>known good</strong> technique, and fix common display artifacts (fuzzy, flashing, burn-in, color glitches).
-      </p>
-      <div class="m4c-badges" aria-label="Aligned lesson objectives">
-        <span class="m4c-badge">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3c3.866 0 7 3.134 7 7 0 2.2-1.016 4.163-2.608 5.45-.533.43-.892 1.07-1.02 1.75l-.137.73H8.765l-.137-.73a2.89 2.89 0 0 0-1.02-1.75A6.96 6.96 0 0 1 5 10c0-3.866 3.134-7 7-7Z" stroke="rgba(255,255,255,.92)" stroke-width="2"/><path d="M9 21h6" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linecap="round"/></svg>
-          Overheating → corrective actions
-        </span>
-        <span class="m4c-badge">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" stroke="rgba(255,255,255,.92)" stroke-width="2"/><path d="M8 21h8" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linecap="round"/></svg>
-          No image → power, source, cabling
-        </span>
-        <span class="m4c-badge">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linecap="round"/><path d="M3 12h18" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linecap="round"/><path d="M5 5l14 14" stroke="rgba(255,255,255,.62)" stroke-width="2" stroke-linecap="round"/></svg>
-          Artifacts → causes & fixes
-        </span>
-      </div>
-    </div>
-
-    <div class="m4c-body">
-      <div class="m4c-note">
-        <strong>How it works:</strong> Choose a case file tab, answer each question (4 choices each), and read the feedback. Use <strong>Reset Case</strong> to try again. (Scores are not saved to the Canvas gradebook.)
-      </div>
-
-      <div class="m4c-tabs">
-        <!-- Tabs -->
-        <input class="m4c-tab-input" type="radio" name="m4c-tabs" id="m4c-tab-1" checked />
-        <input class="m4c-tab-input" type="radio" name="m4c-tabs" id="m4c-tab-2" />
-        <input class="m4c-tab-input" type="radio" name="m4c-tabs" id="m4c-tab-3" />
-
-        <div class="m4c-tabbar" role="tablist" aria-label="Case files">
-          <label class="m4c-tab" for="m4c-tab-1" role="tab" aria-controls="m4c-panel-1">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3c3 0 5 2 5 5v5c0 3-2 5-5 5s-5-2-5-5V8c0-3 2-5 5-5Z" stroke="#0ea5e9" stroke-width="2"/><path d="M9 13h6" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round"/><path d="M12 21h.01" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round"/></svg>
-            Case 1: Thermal & Instability
-          </label>
-          <label class="m4c-tab" for="m4c-tab-2" role="tab" aria-controls="m4c-panel-2">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" stroke="#6366f1" stroke-width="2"/><path d="M8 21h8" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/><path d="M7 12h10" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/></svg>
-            Case 2: No Image / Black Screen
-          </label>
-          <label class="m4c-tab" for="m4c-tab-3" role="tab" aria-controls="m4c-panel-3">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 4h12v10H6V4Z" stroke="#22c55e" stroke-width="2"/><path d="M8 18h8" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/><path d="M12 14v4" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/><path d="M4 12h2M18 12h2" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/></svg>
-            Case 3: Artifacts & Projectors
-          </label>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 4C: System & Display Issues - Matching Activity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .character-section {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+        
+        .character {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .character-avatar {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+        }
+        
+        .character h3 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .character p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .instructions strong {
+            color: #856404;
+        }
+        
+        .matching-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .problems-column, .solutions-column {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        .column-header {
+            text-align: center;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .problem-card, .solution-card {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            position: relative;
+        }
+        
+        .problem-card:hover, .solution-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        .problem-card {
+            border-left: 5px solid #dc3545;
+        }
+        
+        .solution-card {
+            border-left: 5px solid #28a745;
+        }
+        
+        .card-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .problem-card.selected {
+            border: 3px solid #667eea;
+            background: #e8eaf6;
+        }
+        
+        .solution-card.selected {
+            border: 3px solid #667eea;
+            background: #e8eaf6;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        
+        .matched {
+            opacity: 0.5;
+            pointer-events: none;
+            position: relative;
+        }
+        
+        .matched::after {
+            content: "✓";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-check:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+        
+        .btn-reset {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            background: #5a6268;
+            transform: scale(1.05);
+        }
+        
+        .feedback {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.1em;
+            display: none;
+        }
+        
+        .feedback.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            display: block;
+        }
+        
+        .feedback.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+            display: block;
+        }
+        
+        .feedback.partial {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            display: block;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 1.5em;
+            color: #667eea;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .celebration {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 3em;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .matching-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .character-section {
+                flex-direction: column;
+            }
+            
+            .character {
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 System & Display Troubleshooting Match-Up</h1>
+            <p>Match each problem with its correct solution!</p>
         </div>
-
-        <div class="m4c-panels">
-          <!-- ========================= CASE 1 ========================= -->
-          <section class="m4c-panel" id="m4c-panel-1" role="tabpanel" aria-label="Case 1: Thermal and system instability">
-            <div class="m4c-case">
-              <div class="m4c-case-head">
-                <div class="m4c-illus" aria-hidden="true">
-                  <svg viewBox="0 0 96 96">
-                    <defs>
-                      <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stop-color="#0ea5e9"/>
-                        <stop offset="1" stop-color="#ef4444"/>
-                      </linearGradient>
-                    </defs>
-                    <rect x="14" y="10" width="68" height="76" rx="16" fill="#fff" stroke="#e5e7eb"/>
-                    <path d="M48 22c9 0 16 7 16 16 0 10-7 18-16 18s-16-8-16-18c0-9 7-16 16-16Z" fill="url(#g1)" opacity=".15"/>
-                    <path d="M48 22c9 0 16 7 16 16 0 10-7 18-16 18s-16-8-16-18c0-9 7-16 16-16Z" stroke="#0f172a" opacity=".22"/>
-                    <path d="M48 28v20" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M40 40h16" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M32 66h32" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" opacity=".8"/>
-                  </svg>
-                </div>
-                <div>
-                  <h4>Case 1 – “It crashes… but only later.” (Overheating & instability)</h4>
-                  <p>
-                    Employees report <strong>random shutdowns</strong>, intermittent <strong>lockups</strong>, and occasional <strong>crashes</strong>. It tends to happen after the computer has been running for a while.
-                  </p>
-                </div>
-              </div>
-
-              <div class="m4c-case-body">
-                <div class="m4c-mini">
-                  <div class="m4c-callout">
-                    <strong>Technician focus (from Lesson 4C):</strong>
-                    <ul>
-                      <li>Start by eliminating <strong>software, disk/file corruption, and malware</strong>.</li>
-                      <li>Look for a <strong>pattern</strong> (time/heat-related symptoms can point to a thermal issue).</li>
-                      <li>If needed, verify <strong>stable PSU voltages</strong>, then suspect RAM/CPU/motherboard.</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <form aria-label="Case 1 questions">
-                  <!-- Q1 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>1) If crashes and shutdowns occur after the PC has been running for several hours, what pattern does that suggest?</legend>
-                      <p class="m4c-sub">Choose the best answer based on Lesson 4C diagnostic steps.</p>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c1-q1" id="m4c-c1-q1-a" />
-                        <label for="m4c-c1-q1-a"><span class="m4c-bullet">A</span> A thermal issue (heat builds up over time)</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C emphasizes “identify patterns.” Problems that appear after the PC has been running for a while can indicate a <strong>thermal issue</strong> (overheating can cause crashes/reboots/shutdowns).</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c1-q1" id="m4c-c1-q1-b" />
-                        <label for="m4c-c1-q1-b"><span class="m4c-bullet">B</span> The RTC (CMOS) coin-cell battery is failing</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>A failing RTC battery mainly causes <strong>inaccurate date/time</strong>, not heat-after-hours shutdown patterns.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c1-q1" id="m4c-c1-q1-c" />
-                        <label for="m4c-c1-q1-c"><span class="m4c-bullet">C</span> The monitor input source is incorrect</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>An incorrect input source causes a <strong>no image</strong> situation, not a system that runs for hours and then fails.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c1-q1" id="m4c-c1-q1-d" />
-                        <label for="m4c-c1-q1-d"><span class="m4c-bullet">D</span> It proves the PSU is definitely bad</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Lesson 4C says to <strong>check</strong> the PSU for stable voltages, but the time-based pattern more strongly points to <strong>thermal</strong> behavior first.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <!-- Q2 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>2) What is the best CPU-cooling check when diagnosing overheating?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c1-q2" id="m4c-c1-q2-a" />
-                        <label for="m4c-c1-q2-a"><span class="m4c-bullet">A</span> Verify the CPU fan works (power cable connected, not jammed/clogged, correct size)</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C specifically calls out checking the <strong>CPU fan</strong> (power cable, clog/jam, and whether the fan is suitable for the upgraded CPU).</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c1-q2" id="m4c-c1-q2-b" />
-                        <label for="m4c-c1-q2-b"><span class="m4c-bullet">B</span> Replace the RTC battery (CR2032) first</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>The RTC battery relates to keeping time while the system is off, not CPU cooling.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c1-q2" id="m4c-c1-q2-c" />
-                        <label for="m4c-c1-q2-c"><span class="m4c-bullet">C</span> Change the monitor’s OSD brightness/contrast settings</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>OSD brightness/contrast applies to a <strong>dim image</strong> problem, not overheating diagnostics.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c1-q2" id="m4c-c1-q2-d" />
-                        <label for="m4c-c1-q2-d"><span class="m4c-bullet">D</span> Increase the OS screen resolution to maximum</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Resolution mismatches cause <strong>fuzzy/blurry</strong> images, not overheating.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <!-- Q3 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>3) Which case airflow fix is directly recommended in Lesson 4C to improve cooling?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c1-q3" id="m4c-c1-q3-a" />
-                        <label for="m4c-c1-q3-a"><span class="m4c-bullet">A</span> Install blanking plates to cover open holes in the case</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C notes that uncovered holes can <strong>disrupt airflow</strong> and reduce cooling effectiveness—blanking plates help maintain proper airflow.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c1-q3" id="m4c-c1-q3-b" />
-                        <label for="m4c-c1-q3-b"><span class="m4c-bullet">B</span> Disable all USB ports in firmware</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>USB permissions are a firmware security setting, not an airflow/cooling strategy for overheating.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c1-q3" id="m4c-c1-q3-c" />
-                        <label for="m4c-c1-q3-c"><span class="m4c-bullet">C</span> Replace the projector bulb</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>That’s a projector maintenance step, not a PC airflow correction.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c1-q3" id="m4c-c1-q3-d" />
-                        <label for="m4c-c1-q3-d"><span class="m4c-bullet">D</span> Set the monitor input to “DVI” regardless of cable type</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Input selection is part of “no image” troubleshooting, not cooling/overheating correction.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <div class="m4c-form-actions">
-                    <button class="m4c-btn" type="reset" aria-label="Reset Case 1">Reset Case</button>
-                    <div class="m4c-hint"><strong>Pro move:</strong> If the system feels hot, smells like burning, or you see smoke, Lesson 4C says to <strong>shut down immediately</strong> and investigate.</div>
-                  </div>
-                </form>
-
-                <div class="m4c-takeaway">
-                  <h5>Case 1 Takeaways (what a technician remembers)</h5>
-                  <ul>
-                    <li>Intermittent problems with a “time running” pattern can point to <strong>thermal issues</strong>.</li>
-                    <li>Check <strong>temperature sensors</strong>, verify the <strong>CPU fan</strong>, and confirm the <strong>heat sink/thermal paste</strong> are correct.</li>
-                    <li>Airflow matters: dust, blocked vents, and missing <strong>blanking plates</strong> can reduce cooling.</li>
-                  </ul>
-                </div>
-              </div>
+        
+        <div class="character-section">
+            <div class="character">
+                <svg class="character-avatar" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="90" fill="#FFD93D"/>
+                    <circle cx="75" cy="85" r="8" fill="#333"/>
+                    <circle cx="125" cy="85" r="8" fill="#333"/>
+                    <path d="M 70 120 Q 100 140 130 120" stroke="#333" stroke-width="3" fill="none"/>
+                    <rect x="60" y="40" width="80" height="15" fill="#667eea" rx="5"/>
+                    <circle cx="100" cy="180" r="15" fill="#FFD93D"/>
+                    <rect x="85" y="165" width="30" height="20" fill="#667eea"/>
+                </svg>
+                <h3>Tech Sam</h3>
+                <p>Hardware Specialist</p>
             </div>
-          </section>
-
-          <!-- ========================= CASE 2 ========================= -->
-          <section class="m4c-panel" id="m4c-panel-2" role="tabpanel" aria-label="Case 2: No image troubleshooting">
-            <div class="m4c-case">
-              <div class="m4c-case-head">
-                <div class="m4c-illus" aria-hidden="true">
-                  <svg viewBox="0 0 96 96">
-                    <defs>
-                      <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stop-color="#6366f1"/>
-                        <stop offset="1" stop-color="#0ea5e9"/>
-                      </linearGradient>
-                    </defs>
-                    <rect x="10" y="18" width="76" height="48" rx="12" fill="#fff" stroke="#e5e7eb"/>
-                    <rect x="18" y="26" width="60" height="32" rx="9" fill="url(#g2)" opacity=".15"/>
-                    <path d="M24 42h48" stroke="#64748b" stroke-width="3" stroke-linecap="round" opacity=".6"/>
-                    <path d="M40 72h16" stroke="#0f172a" stroke-width="4" stroke-linecap="round" opacity=".25"/>
-                    <path d="M48 66v6" stroke="#0f172a" stroke-width="4" stroke-linecap="round" opacity=".25"/>
-                    <path d="M28 55l40-22" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
-                    <circle cx="28" cy="55" r="4" fill="#ef4444"/>
-                    <circle cx="68" cy="33" r="4" fill="#ef4444"/>
-                  </svg>
-                </div>
-                <div>
-                  <h4>Case 2 – “Power light is on… but the screen is blank.” (No image)</h4>
-                  <p>
-                    A user reports <strong>no image</strong> on a monitor/projector. Your goal is to troubleshoot power, the input source (OSD), and cabling using the <strong>known good</strong> technique.
-                  </p>
-                </div>
-              </div>
-
-              <div class="m4c-case-body">
-                <div class="m4c-mini">
-                  <div class="m4c-callout">
-                    <strong>Lesson 4C reminder:</strong>
-                    <ul>
-                      <li>First ensure the display is <strong>plugged in</strong>, <strong>on</strong>, and not in standby.</li>
-                      <li>Use the monitor’s OSD to select the <strong>correct input source</strong> (HDMI vs DVI, etc.).</li>
-                      <li>Check cables for loose/stretch/crimp and confirm the cable matches the use case (ex: 4K may require a High‑Speed HDMI cable).</li>
-                      <li>To rule out cable problems, substitute a <strong>known good</strong> cable or test the display with a different PC.</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <form aria-label="Case 2 questions">
-                  <!-- Q1 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>1) What is the FIRST step when troubleshooting “no image” on a monitor or projector?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c2-q1" id="m4c-c2-q1-a" />
-                        <label for="m4c-c2-q1-a"><span class="m4c-bullet">A</span> Confirm the display is plugged in, turned on, and not in standby (cycle power / press a key)</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C says to start by verifying the display device has power and is active (not asleep/standby) before deeper troubleshooting.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q1" id="m4c-c2-q1-b" />
-                        <label for="m4c-c2-q1-b"><span class="m4c-bullet">B</span> Replace the motherboard immediately</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>No-image problems often have simple causes (power/input/cables). Lesson 4C recommends a systematic approach first.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q1" id="m4c-c2-q1-c" />
-                        <label for="m4c-c2-q1-c"><span class="m4c-bullet">C</span> Calibrate gamma in Color Management</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Calibration addresses <strong>incorrect color display</strong>, not a complete lack of image.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q1" id="m4c-c2-q1-d" />
-                        <label for="m4c-c2-q1-d"><span class="m4c-bullet">D</span> Increase CPU fan duty cycle in BIOS</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Cooling settings relate to overheating, not the first step in “no image” display troubleshooting.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <!-- Q2 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>2) The monitor is powered on but still shows no image. What common issue should you check next using the monitor’s controls?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c2-q2" id="m4c-c2-q2-a" />
-                        <label for="m4c-c2-q2-a"><span class="m4c-bullet">A</span> The input source is incorrect (ex: set to DVI when the PC is on HDMI)</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C identifies incorrect input source selection as a <strong>common</strong> reason for “no image.” This is set in the monitor’s on-screen display (OSD).</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q2" id="m4c-c2-q2-b" />
-                        <label for="m4c-c2-q2-b"><span class="m4c-bullet">B</span> The OS is using GPT instead of MBR</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Partition styles affect boot behavior, not the monitor’s ability to show an image once a signal should be present.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q2" id="m4c-c2-q2-c" />
-                        <label for="m4c-c2-q2-c"><span class="m4c-bullet">C</span> The PC’s time is wrong and needs NTP sync</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Time issues can affect authentication/tasks, not a blank display caused by an input mismatch.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q2" id="m4c-c2-q2-d" />
-                        <label for="m4c-c2-q2-d"><span class="m4c-bullet">D</span> Replace the projector’s fan first</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Fan issues matter for overheating/shutdown, but Lesson 4C says to check power and source first for “no image.”</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <!-- Q3 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>3) What is the best way to rule out a video cable problem (Lesson 4C)?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c2-q3" id="m4c-c2-q3-a" />
-                        <label for="m4c-c2-q3-a"><span class="m4c-bullet">A</span> Use the “known good” technique: substitute another working cable</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C explicitly recommends substituting a cable with a <strong>known good</strong> cable to rule out cabling issues.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q3" id="m4c-c2-q3-b" />
-                        <label for="m4c-c2-q3-b"><span class="m4c-bullet">B</span> Disable Secure Boot</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Secure Boot affects bootloader trust; it won’t diagnose a bad/loose display cable.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q3" id="m4c-c2-q3-c" />
-                        <label for="m4c-c2-q3-c"><span class="m4c-bullet">C</span> Immediately reinstall the operating system</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Lesson 4C advises checking physical connections and input source before major software actions.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q3" id="m4c-c2-q3-d" />
-                        <label for="m4c-c2-q3-d"><span class="m4c-bullet">D</span> Replace the monitor without testing anything else</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>A fast technician isolates variables: cable, display, and PC can each be tested with “known good” swaps.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <!-- Q4 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>4) You swapped in a known-good cable and still get no image. What is a recommended isolation test?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c2-q4" id="m4c-c2-q4-a" />
-                        <label for="m4c-c2-q4-a"><span class="m4c-bullet">A</span> Test the monitor with a different PC to determine if the issue is the display or the input source</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C recommends testing the display with another PC to isolate whether the display unit or the computer/video output is at fault.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q4" id="m4c-c2-q4-b" />
-                        <label for="m4c-c2-q4-b"><span class="m4c-bullet">B</span> Change the PC partition table from GPT to MBR</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>This is unrelated to basic display isolation tests.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q4" id="m4c-c2-q4-c" />
-                        <label for="m4c-c2-q4-c"><span class="m4c-bullet">C</span> Immediately adjust gamma calibration</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Calibration is helpful when the image exists but colors are inaccurate—not when there’s no signal.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c2-q4" id="m4c-c2-q4-d" />
-                        <label for="m4c-c2-q4-d"><span class="m4c-bullet">D</span> Enable a screen saver to fix burn-in</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Burn-in is a different symptom category; it won’t restore a missing video signal.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <div class="m4c-form-actions">
-                    <button class="m4c-btn" type="reset" aria-label="Reset Case 2">Reset Case</button>
-                    <div class="m4c-hint"><strong>Also from Lesson 4C:</strong> verify the cable isn’t loose, stretched, or crimped, and that the cable spec fits the job (ex: 4K may require a High‑Speed rated HDMI cable).</div>
-                  </div>
-                </form>
-
-                <div class="m4c-takeaway">
-                  <h5>Case 2 Takeaways</h5>
-                  <ul>
-                    <li>No image troubleshooting starts with <strong>power/standby</strong>, then <strong>input source</strong> (OSD), then <strong>cables</strong>.</li>
-                    <li>The fastest way to isolate cabling is a <strong>known good</strong> swap.</li>
-                    <li>Testing the display on a different PC helps you decide: display problem vs input source/PC output problem.</li>
-                  </ul>
-                </div>
-              </div>
+            
+            <div class="character">
+                <svg class="character-avatar" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="90" fill="#FF6B9D"/>
+                    <circle cx="75" cy="85" r="8" fill="#333"/>
+                    <circle cx="125" cy="85" r="8" fill="#333"/>
+                    <path d="M 70 120 Q 100 140 130 120" stroke="#333" stroke-width="3" fill="none"/>
+                    <path d="M 50 60 Q 70 40 90 60" stroke="#8B4513" stroke-width="8" fill="none"/>
+                    <path d="M 110 60 Q 130 40 150 60" stroke="#8B4513" stroke-width="8" fill="none"/>
+                    <rect x="85" y="165" width="30" height="20" fill="#764ba2"/>
+                </svg>
+                <h3>Alex</h3>
+                <p>Display Expert</p>
             </div>
-          </section>
-
-          <!-- ========================= CASE 3 ========================= -->
-          <section class="m4c-panel" id="m4c-panel-3" role="tabpanel" aria-label="Case 3: Display artifacts and projector shutdowns">
-            <div class="m4c-case">
-              <div class="m4c-case-head">
-                <div class="m4c-illus" aria-hidden="true">
-                  <svg viewBox="0 0 96 96">
-                    <defs>
-                      <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stop-color="#22c55e"/>
-                        <stop offset="1" stop-color="#0ea5e9"/>
-                      </linearGradient>
-                    </defs>
-                    <rect x="10" y="18" width="76" height="46" rx="12" fill="#fff" stroke="#e5e7eb"/>
-                    <path d="M20 28h56v26H20V28Z" fill="url(#g3)" opacity=".18"/>
-                    <path d="M24 50l10-10 10 10 10-10 14 14" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
-                    <circle cx="30" cy="36" r="3.5" fill="#ef4444"/>
-                    <circle cx="40" cy="42" r="3.5" fill="#a855f7"/>
-                    <circle cx="50" cy="36" r="3.5" fill="#22c55e"/>
-                    <path d="M34 74h28" stroke="#0f172a" stroke-width="4" stroke-linecap="round" opacity=".25"/>
-                    <path d="M48 64v10" stroke="#0f172a" stroke-width="4" stroke-linecap="round" opacity=".25"/>
-                  </svg>
-                </div>
-                <div>
-                  <h4>Case 3 – “The picture looks wrong.” (Artifacts, color, flicker, and projector shutdowns)</h4>
-                  <p>
-                    Use Lesson 4C’s video-quality and projector troubleshooting guidance to identify the most likely cause and best corrective step.
-                  </p>
-                </div>
-              </div>
-
-              <div class="m4c-case-body">
-                <div class="m4c-mini">
-                  <div class="m4c-callout">
-                    <strong>Key symptom → fix cues from Lesson 4C:</strong>
-                    <ul>
-                      <li><strong>Fuzzy image:</strong> often a resolution mismatch with native resolution; adjust resolution or update driver.</li>
-                      <li><strong>Flashing/flicker:</strong> check/secure cable; could be failing backlight circuitry; a faulty/overheating video card can also cause flashing.</li>
-                      <li><strong>Burn-in:</strong> prevent via screen saver or auto-off during inactivity (OLED/plasma more prone).</li>
-                      <li><strong>Color glitches (purple/green lines):</strong> often loose/faulty/low-quality connector/cable → try replacing the cable.</li>
-                      <li><strong>Projector shutdown:</strong> typically overheating → check fan/vents/ambient temp; if not, check loose cables, bulb seating, firmware updates.</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <form aria-label="Case 3 questions">
-                  <!-- Q1 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>1) A monitor looks blurry/fuzzy. The panel’s native resolution is 1920×1080, but the PC is set to 1024×768. What is the most likely cause?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c3-q1" id="m4c-c3-q1-a" />
-                        <label for="m4c-c3-q1-a"><span class="m4c-bullet">A</span> Output resolution does not match the display’s native resolution</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C says fuzzy images are often caused by a mismatch between the output resolution and the display’s <strong>native</strong> resolution. Fix by adjusting resolution or updating the video driver.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q1" id="m4c-c3-q1-b" />
-                        <label for="m4c-c3-q1-b"><span class="m4c-bullet">B</span> The RTC battery is failing</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>RTC battery issues affect timekeeping, not sharpness/resolution scaling.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q1" id="m4c-c3-q1-c" />
-                        <label for="m4c-c3-q1-c"><span class="m4c-bullet">C</span> The projector bulb is burnt out</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Bulb issues relate to projectors (dim/no image), not a monitor resolution mismatch.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q1" id="m4c-c3-q1-d" />
-                        <label for="m4c-c3-q1-d"><span class="m4c-bullet">D</span> Burn-in from a static image</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Burn-in looks like a ghost image, not general fuzziness from resolution scaling.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <!-- Q2 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>2) The screen flashes/flickers. What should you check FIRST, and what other possibility does Lesson 4C mention?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c3-q2" id="m4c-c3-q2-a" />
-                        <label for="m4c-c3-q2-a"><span class="m4c-bullet">A</span> Check/secure the video cable; flicker can also be caused by a faulty/overheating video card</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C lists cable/connector checks as a primary step for flashing screens and notes that a <strong>faulty/overheating video card</strong> can also cause flashing—testing with another computer helps isolate.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q2" id="m4c-c3-q2-b" />
-                        <label for="m4c-c3-q2-b"><span class="m4c-bullet">B</span> Reformat the boot disk as GPT; flicker is usually a boot sector issue</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Boot formatting issues cause boot errors, not display flicker.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q2" id="m4c-c3-q2-c" />
-                        <label for="m4c-c3-q2-c"><span class="m4c-bullet">C</span> Replace the RTC battery; flicker is caused by incorrect system time</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Time settings can break authentication/tasks, not the electrical signal integrity of display output.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q2" id="m4c-c3-q2-d" />
-                        <label for="m4c-c3-q2-d"><span class="m4c-bullet">D</span> Enable screen saver; flicker indicates burn-in</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Screen savers prevent burn-in (ghost images), not cable/adapter flicker.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <!-- Q3 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>3) Which prevention strategy does Lesson 4C recommend for display burn-in?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c3-q3" id="m4c-c3-q3-a" />
-                        <label for="m4c-c3-q3-a"><span class="m4c-bullet">A</span> Use a screen saver or enable the display’s auto-off during inactivity</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C states burn-in happens when a static image is displayed too long and recommends using a <strong>screen saver</strong> or auto-off to prevent it.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q3" id="m4c-c3-q3-b" />
-                        <label for="m4c-c3-q3-b"><span class="m4c-bullet">B</span> Lower the monitor resolution to 800×600</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Resolution changes affect sharpness scaling; they don’t prevent static-image retention.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q3" id="m4c-c3-q3-c" />
-                        <label for="m4c-c3-q3-c"><span class="m4c-bullet">C</span> Replace the HDMI cable with a longer one</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>That targets connectivity issues, not burn-in prevention.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q3" id="m4c-c3-q3-d" />
-                        <label for="m4c-c3-q3-d"><span class="m4c-bullet">D</span> Calibrate gamma to “Good gamma”</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Gamma calibration corrects color/brightness response, not static-image retention.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <!-- Q4 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>4) A projector shuts down intermittently during presentations. According to Lesson 4C, what is the typical cause?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c3-q4" id="m4c-c3-q4-a" />
-                        <label for="m4c-c3-q4-a"><span class="m4c-bullet">A</span> Overheating</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C says intermittent projector shutdown is typically caused by <strong>overheating</strong>. Check fan function, clear vents/ventilation, and confirm ambient temperature is within operating range.</p>
-                          <p><strong>Safety note from Lesson 4C:</strong> projector bulbs get extremely hot—allow full cool-down before handling or replacing.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q4" id="m4c-c3-q4-b" />
-                        <label for="m4c-c3-q4-b"><span class="m4c-bullet">B</span> The monitor is set to the wrong input source</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Wrong input source causes “no image,” not an overheating-triggered shutdown of the projector unit.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q4" id="m4c-c3-q4-c" />
-                        <label for="m4c-c3-q4-c"><span class="m4c-bullet">C</span> Burn-in from a static slide</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Burn-in is a display retention issue, not a cause of power shutdown.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q4" id="m4c-c3-q4-d" />
-                        <label for="m4c-c3-q4-d"><span class="m4c-bullet">D</span> NTP time sync failed</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Time sync issues affect network timekeeping and scheduling—not thermal shutdown behaviors.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <!-- Q5 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>5) A designer complains that colors are inaccurate on a Windows workstation. What does Lesson 4C recommend for this type of work?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c3-q5" id="m4c-c3-q5-a" />
-                        <label for="m4c-c3-q5-a"><span class="m4c-bullet">A</span> Calibrate the display using Color Management (profiles, test cards, and verification tools)</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C states that for digital art production, it’s crucial to <strong>calibrate</strong> displays to match scanning/print output using color profiles and tools (e.g., Color Management applet, test patterns, spectrophotometers).</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q5" id="m4c-c3-q5-b" />
-                        <label for="m4c-c3-q5-b"><span class="m4c-bullet">B</span> Replace the PSU because color issues indicate unstable voltage</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>PSU issues can cause shutdowns/instability; inaccurate color is typically handled through calibration or connection troubleshooting.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q5" id="m4c-c3-q5-c" />
-                        <label for="m4c-c3-q5-c"><span class="m4c-bullet">C</span> Switch from HDMI to VGA because VGA always gives better color</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Lesson 4C does not recommend VGA for better color; it emphasizes calibration and correct connections.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q5" id="m4c-c3-q5-d" />
-                        <label for="m4c-c3-q5-d"><span class="m4c-bullet">D</span> Enable a screen saver to fix inaccurate color</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Screen savers help prevent burn-in; they do not calibrate color output.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <!-- Q6 -->
-                  <div class="m4c-q">
-                    <fieldset>
-                      <legend>6) Purple/green horizontal lines appear, and colors change unexpectedly. What does Lesson 4C say is often the cause?</legend>
-
-                      <div class="m4c-option correct">
-                        <input type="radio" name="m4c-c3-q6" id="m4c-c3-q6-a" />
-                        <label for="m4c-c3-q6-a"><span class="m4c-bullet">A</span> Faulty/loose connector or low-quality cabling (try replacing the cable)</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag ok">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct
-                          </span>
-                          <p><strong>Why:</strong> Lesson 4C says color glitches like purple/green lines are often caused by connector/cabling issues. A first corrective step is to <strong>replace the cable</strong>.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q6" id="m4c-c3-q6-b" />
-                        <label for="m4c-c3-q6-b"><span class="m4c-bullet">B</span> The projector bulb filament is broken</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>A burnt-out bulb leads to dim/no projection, not typically colored line artifacts on a monitor.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q6" id="m4c-c3-q6-c" />
-                        <label for="m4c-c3-q6-c"><span class="m4c-bullet">C</span> Burn-in from a static taskbar</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Burn-in appears as a ghost image, not sudden colored lines/glitches across the screen.</p>
-                        </div>
-                      </div>
-
-                      <div class="m4c-option incorrect">
-                        <input type="radio" name="m4c-c3-q6" id="m4c-c3-q6-d" />
-                        <label for="m4c-c3-q6-d"><span class="m4c-bullet">D</span> The OS is using the wrong boot order sequence</label>
-                        <div class="m4c-fb">
-                          <span class="m4c-tag no">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="#991b1b" stroke-width="2" stroke-linecap="round"/></svg>
-                            Not quite
-                          </span>
-                          <p>Boot order affects which device the system tries to boot from, not color line artifacts during display output.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-
-                  <div class="m4c-form-actions">
-                    <button class="m4c-btn" type="reset" aria-label="Reset Case 3">Reset Case</button>
-                    <div class="m4c-hint"><strong>When projector overheating is NOT the issue (Lesson 4C):</strong> check loose connector cables, ensure the bulb is securely installed, and confirm the projector firmware is up to date.</div>
-                  </div>
-                </form>
-
-                <div class="m4c-takeaway">
-                  <h5>Case 3 Takeaways</h5>
-                  <ul>
-                    <li><strong>Fuzzy/blurry</strong> often = resolution mismatch → set to native resolution / update driver.</li>
-                    <li><strong>Flicker/flashing</strong> = check cabling first; also consider video card overheating; isolate by testing with another PC.</li>
-                    <li><strong>Color glitches</strong> often = loose/faulty/low-quality cabling → replace cable.</li>
-                    <li><strong>Projector shutdowns</strong> typically = overheating → fan/vents/ambient temperature checks first.</li>
-                  </ul>
-                </div>
-
-              </div>
+            
+            <div class="character">
+                <svg class="character-avatar" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="90" fill="#6BCB77"/>
+                    <circle cx="75" cy="85" r="8" fill="#333"/>
+                    <circle cx="125" cy="85" r="8" fill="#333"/>
+                    <path d="M 70 120 Q 100 135 130 120" stroke="#333" stroke-width="3" fill="none"/>
+                    <rect x="70" y="50" width="60" height="20" fill="#333" rx="3"/>
+                    <rect x="85" y="165" width="30" height="20" fill="#4D96A9"/>
+                </svg>
+                <h3>Jordan</h3>
+                <p>Troubleshooting Pro</p>
             </div>
-          </section>
         </div>
-      </div>
-
-      <div class="m4c-note" style="margin-top: 14px; background:#eff6ff; border-color:#bfdbfe; color:#1e3a8a;">
-        <strong>Embed tip for Canvas:</strong> Paste this block into the <em>HTML editor</em> where your “INTERACTIVE PRACTICE HERE” placeholder is. If your course uses a DesignPlus template, this can live inside the Step 4 panel content area.
-      </div>
+        
+        <div class="instructions">
+            <strong>📋 Instructions:</strong> Click on a problem card, then click on the matching solution card. Once you've made all your matches, click "Check Answers" to see how you did!
+        </div>
+        
+        <div class="score-display" id="scoreDisplay">Score: 0 / 8</div>
+        
+        <div class="matching-area">
+            <div class="problems-column">
+                <div class="column-header">🔴 Problems</div>
+                
+                <div class="problem-card" data-id="1">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="20" fill="#ff6b6b"/>
+                        <path d="M 15 15 L 35 35 M 35 15 L 15 35" stroke="white" stroke-width="3"/>
+                    </svg>
+                    <span class="card-number">1</span>
+                    <strong>Computer randomly shuts down</strong> and feels very hot to the touch
+                </div>
+                
+                <div class="problem-card" data-id="2">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="10" width="40" height="30" fill="#333" rx="2"/>
+                        <rect x="8" y="13" width="34" height="24" fill="#000"/>
+                    </svg>
+                    <span class="card-number">2</span>
+                    <strong>Monitor shows "No Signal"</strong> even though PC is running
+                </div>
+                
+                <div class="problem-card" data-id="3">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="20" fill="#ffd93d"/>
+                        <path d="M 25 15 L 25 28 M 25 32 L 25 35" stroke="#333" stroke-width="3"/>
+                    </svg>
+                    <span class="card-number">3</span>
+                    <strong>System becomes sluggish</strong> after running for a while
+                </div>
+                
+                <div class="problem-card" data-id="4">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="15" width="30" height="20" fill="#888" rx="2"/>
+                        <circle cx="15" cy="20" r="1" fill="#000"/>
+                        <circle cx="20" cy="25" r="1" fill="#000"/>
+                        <circle cx="25" cy="30" r="1" fill="#000"/>
+                    </svg>
+                    <span class="card-number">4</span>
+                    <strong>Display has permanent dark spots</strong> that don't go away
+                </div>
+                
+                <div class="problem-card" data-id="5">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="10" width="40" height="30" fill="#666" rx="2"/>
+                        <text x="25" y="30" font-size="20" fill="#ccc" text-anchor="middle">ABC</text>
+                    </svg>
+                    <span class="card-number">5</span>
+                    <strong>Screen image appears blurry</strong> and text is hard to read
+                </div>
+                
+                <div class="problem-card" data-id="6">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="10" width="40" height="30" fill="#444" rx="2"/>
+                        <rect x="8" y="13" width="34" height="24" fill="#222"/>
+                    </svg>
+                    <span class="card-number">6</span>
+                    <strong>Monitor is very dim</strong> even at maximum brightness
+                </div>
+                
+                <div class="problem-card" data-id="7">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="15" width="30" height="20" fill="#764ba2" rx="2"/>
+                        <path d="M 15 20 L 35 30 M 15 30 L 35 20" stroke="#fff" stroke-width="2"/>
+                    </svg>
+                    <span class="card-number">7</span>
+                    <strong>Projector shuts off</strong> after 20 minutes of use
+                </div>
+                
+                <div class="problem-card" data-id="8">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="10" width="40" height="30" fill="#555" rx="2"/>
+                        <rect x="8" y="13" width="34" height="11" fill="#ff6b9d"/>
+                        <rect x="8" y="24" width="34" height="13" fill="#6bcb77"/>
+                    </svg>
+                    <span class="card-number">8</span>
+                    <strong>Display shows ghost images</strong> of previous screens
+                </div>
+            </div>
+            
+            <div class="solutions-column">
+                <div class="column-header">🟢 Solutions</div>
+                
+                <div class="solution-card" data-id="A" data-match="1">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="20" fill="#4ecdc4"/>
+                        <path d="M 25 15 L 25 25 L 32 32" stroke="white" stroke-width="3" fill="none"/>
+                    </svg>
+                    <span class="card-number">A</span>
+                    Clean dust from fans and vents; replace thermal paste on CPU
+                </div>
+                
+                <div class="solution-card" data-id="B" data-match="2">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 10 25 L 20 25 M 30 25 L 40 25" stroke="#4ecdc4" stroke-width="3"/>
+                        <circle cx="25" cy="25" r="5" fill="#4ecdc4"/>
+                    </svg>
+                    <span class="card-number">B</span>
+                    Check cable connections; test with known good cable and different input source
+                </div>
+                
+                <div class="solution-card" data-id="C" data-match="3">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 15 35 Q 25 15 35 35" stroke="#4ecdc4" stroke-width="3" fill="none"/>
+                        <circle cx="25" cy="20" r="3" fill="#ff6b6b"/>
+                    </svg>
+                    <span class="card-number">C</span>
+                    Monitor CPU temperature; improve airflow and cooling system
+                </div>
+                
+                <div class="solution-card" data-id="D" data-match="4">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="15" y="15" width="20" height="20" fill="none" stroke="#4ecdc4" stroke-width="3"/>
+                        <path d="M 15 15 L 35 35" stroke="#ff6b6b" stroke-width="2"/>
+                    </svg>
+                    <span class="card-number">D</span>
+                    Dead pixels are permanent hardware defects; replace the display panel
+                </div>
+                
+                <div class="solution-card" data-id="E" data-match="5">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="15" width="30" height="20" fill="#4ecdc4" rx="2"/>
+                        <text x="25" y="30" font-size="12" fill="white" text-anchor="middle">1920</text>
+                    </svg>
+                    <span class="card-number">E</span>
+                    Adjust display resolution to match native resolution of the monitor
+                </div>
+                
+                <div class="solution-card" data-id="F" data-match="6">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="15" fill="#ffd93d"/>
+                        <path d="M 25 10 L 25 5 M 25 45 L 25 40 M 10 25 L 5 25 M 45 25 L 40 25" stroke="#ffd93d" stroke-width="2"/>
+                    </svg>
+                    <span class="card-number">F</span>
+                    Replace backlight or inverter; check power settings and cables
+                </div>
+                
+                <div class="solution-card" data-id="G" data-match="7">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 15 35 L 25 15 L 35 35 Z" fill="none" stroke="#4ecdc4" stroke-width="3"/>
+                        <circle cx="25" cy="30" r="2" fill="#ff6b6b"/>
+                    </svg>
+                    <span class="card-number">G</span>
+                    Clean projector air filters; ensure proper ventilation to prevent overheating
+                </div>
+                
+                <div class="solution-card" data-id="H" data-match="8">
+                    <svg class="card-icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="15" y="15" width="20" height="20" fill="#4ecdc4" rx="2"/>
+                        <path d="M 20 20 L 30 30 M 30 20 L 20 30" stroke="white" stroke-width="2"/>
+                    </svg>
+                    <span class="card-number">H</span>
+                    Screen burn-in from static images; use screen savers and pixel refresh features
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-check" onclick="checkAnswers()">Check Answers</button>
+            <button class="btn btn-reset" onclick="resetGame()">Reset</button>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        <div class="celebration" id="celebration">🎉 🎊 🎈</div>
     </div>
-  </div>
-</div>
+    
+    <script>
+        let selectedProblem = null;
+        let selectedSolution = null;
+        let matches = {};
+        let correctMatches = 0;
+        
+        const correctAnswers = {
+            '1': 'A',
+            '2': 'B',
+            '3': 'C',
+            '4': 'D',
+            '5': 'E',
+            '6': 'F',
+            '7': 'G',
+            '8': 'H'
+        };
+        
+        // Add click handlers to problem cards
+        document.querySelectorAll('.problem-card').forEach(card => {
+            card.addEventListener('click', function() {
+                if (this.classList.contains('matched')) return;
+                
+                // Deselect previous problem
+                document.querySelectorAll('.problem-card').forEach(c => c.classList.remove('selected'));
+                
+                // Select this problem
+                this.classList.add('selected');
+                selectedProblem = this.dataset.id;
+                
+                // If solution already selected, make the match
+                if (selectedSolution) {
+                    makeMatch();
+                }
+            });
+        });
+        
+        // Add click handlers to solution cards
+        document.querySelectorAll('.solution-card').forEach(card => {
+            card.addEventListener('click', function() {
+                if (this.classList.contains('matched')) return;
+                
+                // Deselect previous solution
+                document.querySelectorAll('.solution-card').forEach(c => c.classList.remove('selected'));
+                
+                // Select this solution
+                this.classList.add('selected');
+                selectedSolution = this.dataset.id;
+                
+                // If problem already selected, make the match
+                if (selectedProblem) {
+                    makeMatch();
+                }
+            });
+        });
+        
+        function makeMatch() {
+            matches[selectedProblem] = selectedSolution;
+            
+            // Mark cards as matched
+            document.querySelector(`.problem-card[data-id="${selectedProblem}"]`).classList.add('matched');
+            document.querySelector(`.solution-card[data-id="${selectedSolution}"]`).classList.add('matched');
+            
+            // Clear selections
+            document.querySelectorAll('.problem-card, .solution-card').forEach(c => c.classList.remove('selected'));
+            selectedProblem = null;
+            selectedSolution = null;
+            
+            // Update score display
+            updateScore();
+        }
+        
+        function updateScore() {
+            const totalMatches = Object.keys(matches).length;
+            document.getElementById('scoreDisplay').textContent = `Matches Made: ${totalMatches} / 8`;
+        }
+        
+        function checkAnswers() {
+            if (Object.keys(matches).length < 8) {
+                showFeedback('partial', '⚠️ Please complete all matches before checking your answers!');
+                return;
+            }
+            
+            correctMatches = 0;
+            
+            for (let problem in matches) {
+                if (matches[problem] === correctAnswers[problem]) {
+                    correctMatches++;
+                }
+            }
+            
+            const percentage = (correctMatches / 8) * 100;
+            
+            if (correctMatches === 8) {
+                showFeedback('success', `🎉 Perfect! You got all 8 matches correct! You're a troubleshooting expert!`);
+                document.getElementById('celebration').style.display = 'block';
+            } else if (correctMatches >= 6) {
+                showFeedback('partial', `👍 Good job! You got ${correctMatches} out of 8 correct (${percentage}%). Review the incorrect matches and try again!`);
+            } else {
+                showFeedback('error', `📚 You got ${correctMatches} out of 8 correct (${percentage}%). Keep studying and try again!`);
+            }
+            
+            document.getElementById('scoreDisplay').textContent = `Score: ${correctMatches} / 8 (${percentage}%)`;
+        }
+        
+        function showFeedback(type, message) {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback ' + type;
+            feedback.textContent = message;
+            feedback.style.display = 'block';
+        }
+        
+        function resetGame() {
+            matches = {};
+            correctMatches = 0;
+            selectedProblem = null;
+            selectedSolution = null;
+            
+            document.querySelectorAll('.problem-card, .solution-card').forEach(card => {
+                card.classList.remove('matched', 'selected');
+            });
+            
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('celebration').style.display = 'none';
+            document.getElementById('scoreDisplay').textContent = 'Score: 0 / 8';
+        }
+    </script>
+</body>
+</html>
