@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom YouTube Video Player</title>
+    <title>UVA - Computer Architecture Player</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f0f4f8;
             padding: 20px;
             min-height: 100vh;
         }
@@ -21,35 +21,74 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 30, 80, 0.15);
             overflow: hidden;
+            border: 1px solid #dde5ef;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            text-align: center;
+            background: #0061B2;
+            color: #ffffff;
+            padding: 18px 24px;
+            border-bottom: 4px solid #00824A;
         }
 
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .uva-logo {
+            height: 60px;
+            max-width: 220px;
+            object-fit: contain;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .header-text h1 {
+            font-size: 22px;
+            margin-bottom: 6px;
+            letter-spacing: 0.03em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Techy Subheading Style */
+        .sub-heading {
+            font-size: 13px;
+            font-family: 'Courier New', Courier, monospace;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            border-left: 3px solid #00ff88;
+            color: #e0e0e0;
+        }
+
+        .highlight {
+            color: #00ff88;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .content {
             display: grid;
-            grid-template-columns: 1fr 300px;
+            grid-template-columns: 1fr 320px;
             gap: 20px;
             padding: 20px;
         }
 
         .video-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 18px;
         }
 
         .video-player {
@@ -57,9 +96,10 @@
             padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
-            background: #000;
-            border-radius: 10px;
-            margin-bottom: 15px;
+            background: radial-gradient(circle at top, #0061B2 0%, #002b55 45%, #000 100%);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #dde5ef;
         }
 
         .video-player iframe {
@@ -68,24 +108,32 @@
             left: 0;
             width: 100%;
             height: 100%;
+            border-radius: 12px;
         }
 
         .video-info {
             padding: 15px;
             background: white;
             border-radius: 8px;
+            border: 1px solid #dde5ef;
         }
 
         .video-info h2 {
-            color: #333;
+            color: #0061B2;
             font-size: 20px;
             margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .video-info p {
+            color: #4a5568;
+            font-size: 14px;
         }
 
         .sidebar {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 18px;
         }
 
         .add-video-section {
@@ -93,9 +141,10 @@
         }
 
         .add-video-section h3 {
-            color: #333;
+            color: #0061B2;
             margin-bottom: 15px;
             font-size: 18px;
+            font-weight: 600;
         }
 
         .input-group {
@@ -104,37 +153,47 @@
 
         .input-group input {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
+            padding: 10px 12px;
+            border: 2px solid #dde5ef;
+            border-radius: 6px;
             font-size: 14px;
             transition: border-color 0.3s;
+            font-family: inherit;
         }
 
         .input-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #0061B2;
         }
 
         .btn {
             width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            padding: 11px 14px;
+            background: #0061B2;
+            color: #ffffff;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 15px;
             cursor: pointer;
-            transition: transform 0.2s;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 40, 90, 0.25);
         }
 
         .btn:hover {
-            transform: translateY(-2px);
+            background: #004b88;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(0, 40, 90, 0.3);
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: #00824A;
             margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #006838;
         }
 
         .playlist {
@@ -143,32 +202,35 @@
         }
 
         .playlist h3 {
-            color: #333;
+            color: #0061B2;
             margin-bottom: 15px;
             font-size: 18px;
+            font-weight: 600;
         }
 
         .video-item {
-            background: white;
-            padding: 12px;
+            background: #ffffff;
+            padding: 10px 12px;
             margin-bottom: 10px;
             border-radius: 8px;
+            border: 1px solid #dde5ef;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
         }
 
         .video-item:hover {
-            transform: translateX(5px);
-            border-color: #667eea;
+            border-color: #0061B2;
+            box-shadow: 0 4px 10px rgba(0, 40, 90, 0.15);
+            transform: translateY(-1px);
         }
 
         .video-item.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #0061B2;
+            border-color: #0061B2;
+            color: #ffffff;
         }
 
         .video-item-content {
@@ -177,79 +239,105 @@
 
         .video-item-title {
             font-weight: 600;
-            margin-bottom: 3px;
             font-size: 14px;
         }
 
         .video-item-number {
             font-size: 12px;
-            opacity: 0.7;
+            opacity: 0.85;
+            margin-top: 2px;
         }
 
         .delete-btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 5px 10px;
+            background: #cc1f1a;
             border-radius: 4px;
-            cursor: pointer;
+            border: none;
+            color: #ffffff;
+            padding: 4px 10px;
             font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
         }
 
         .delete-btn:hover {
-            background: #ff3838;
+            background: #991b1b;
         }
 
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #999;
+        }
+
+        .empty-state h2 {
+            font-size: 48px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 10px;
         }
 
         .empty-state p {
-            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
         }
 
         .admin-controls {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
+            background: #e6f4ff;
+            border: 1px solid #b3d8ff;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
         }
 
         .admin-controls h3 {
-            color: #856404;
+            color: #0061B2;
             margin-bottom: 10px;
             font-size: 16px;
+            font-weight: 600;
         }
 
         .admin-badge {
             display: inline-block;
-            background: #28a745;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            margin-bottom: 10px;
+            background: #00824A;
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .locked-message {
-            background: #d1ecf1;
-            border: 2px solid #bee5eb;
+            background: #fdf7e3;
+            border: 1px solid #f3d27a;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            color: #0c5460;
+            padding: 14px;
+            margin-bottom: 16px;
+            color: #6b4b00;
         }
 
         .locked-message p {
             margin: 5px 0;
         }
 
+        .locked-message strong {
+            color: #4a3500;
+        }
+
         @media (max-width: 768px) {
             .content {
                 grid-template-columns: 1fr;
+            }
+
+            .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .uva-logo {
+                height: 48px;
             }
         }
     </style>
@@ -257,8 +345,17 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📺 Custom YouTube Video Player</h1>
-            <p>Lesson Video Playlist</p>
+            <div class="header-left">
+                <img src="https://cdn.abacus.ai/images/b69a3e15-3a50-4e7b-83f1-a16117a6cd52.png" 
+                     alt="University View Academy Logo" 
+                     class="uva-logo">
+                <div class="header-text">
+                    <h1>University View Academy</h1>
+                    <div class="sub-heading">
+                        <span class="highlight">Computer Architecture</span> Video Lesson Player
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="content">
@@ -279,7 +376,7 @@
                 <!-- Admin Controls (Hidden by default) -->
                 <div id="adminSection" style="display: none;">
                     <div class="admin-controls">
-                        <span class="admin-badge">🔓 ADMIN MODE</span>
+                        <span class="admin-badge">🔓 Admin Mode</span>
                         <h3>Instructor Controls</h3>
                         <button class="btn btn-secondary" onclick="lockPlaylist()">Lock Playlist</button>
                     </div>
@@ -434,7 +531,7 @@
             countElement.textContent = videos.length;
 
             if (videos.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>No videos yet</p></div>';
+                container.innerHTML = '<div class="empty-state"><p style="color: #4a5568;">No videos yet</p></div>';
                 return;
             }
 
