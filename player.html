@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UVA - Computer Architecture Player</title>
+    <title>UVA - High Contrast Light Player</title>
     <style>
         :root {
             /* UVA Brand Colors */
@@ -11,24 +11,26 @@
             --uva-green: #00824A;
             --uva-green-glow: rgba(0, 130, 74, 0.4);
 
-            /* Light Mode Defaults */
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            /* 20% OPACITY GLASS */
-            --panel-bg: rgba(255, 255, 255, 0.20); 
-            --panel-border: rgba(255, 255, 255, 0.3);
-            --input-bg: rgba(255, 255, 255, 0.15);
-            --subheading-bg: rgba(255, 255, 255, 0.85);
+            /* ULTRA LIGHT MODE (High Visibility for low brightness) */
+            --text-primary: #000000; /* Pure black for maximum contrast */
+            --text-secondary: #1e293b;
+            --panel-bg: rgba(255, 255, 255, 0.45); /* Increased opacity for visibility */
+            --panel-border: rgba(255, 255, 255, 0.8);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --subheading-bg: #ffffff;
+            --container-bg: rgba(255, 255, 255, 0.25);
+            --item-bg: rgba(255, 255, 255, 0.6);
         }
 
         body.dark-mode {
-            --text-primary: #f1f5f9;
+            --text-primary: #f8fafc;
             --text-secondary: #cbd5e1;
-            /* 20% OPACITY DARK GLASS */
             --panel-bg: rgba(15, 23, 42, 0.20); 
             --panel-border: rgba(255, 255, 255, 0.15);
             --input-bg: rgba(0, 0, 0, 0.25);
             --subheading-bg: rgba(15, 23, 42, 0.85);
+            --container-bg: rgba(15, 23, 42, 0.15);
+            --item-bg: rgba(0, 0, 0, 0.2);
         }
 
         * {
@@ -45,7 +47,7 @@
             justify-content: center;
             padding: 20px;
             color: var(--text-primary);
-            transition: color 0.4s ease;
+            transition: background 0.4s ease, color 0.4s ease;
             overflow-x: hidden;
             position: relative;
         }
@@ -64,16 +66,18 @@
             object-fit: cover;
         }
 
-        /* Dark overlay to help glass panels stand out */
+        /* Light mode overlay is much brighter to help low-brightness screens */
         .bg-overlay {
             position: fixed;
             inset: 0;
             z-index: -2;
-            background: 
-                radial-gradient(circle at 30% 20%, rgba(15,23,42,0.35), transparent 60%),
-                radial-gradient(circle at 70% 80%, rgba(15,23,42,0.45), transparent 60%),
-                rgba(15,23,42,0.40);
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.4s ease;
             pointer-events: none;
+        }
+
+        body.dark-mode .bg-overlay {
+            background: rgba(15, 23, 42, 0.5);
         }
 
         /* --- MAIN GLASS CONTAINER --- */
@@ -82,31 +86,12 @@
             max-width: 1200px;
             position: relative;
             border-radius: 28px;
-            /* Main housing set to 10% to let video shine through, internal panels are 20% */
-            background: rgba(255, 255, 255, 0.10);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            box-shadow:
-                0 35px 90px rgba(0, 0, 0, 0.6),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(35px) saturate(150%);
-            -webkit-backdrop-filter: blur(35px) saturate(150%);
+            background: var(--container-bg);
+            border: 2px solid var(--panel-border);
+            box-shadow: 0 35px 90px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
             overflow: hidden;
-        }
-
-        /* Glass shine effect */
-        .container::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            background: linear-gradient(
-                135deg,
-                rgba(255,255,255,0.12) 0%,
-                transparent 50%,
-                rgba(255,255,255,0.04) 100%
-            );
-            pointer-events: none;
-            z-index: 0;
         }
 
         .container > * { position: relative; z-index: 1; }
@@ -114,13 +99,11 @@
         /* --- HEADER --- */
         .header {
             padding: 28px 40px;
-            border-bottom: 3px solid var(--uva-green);
+            border-bottom: 4px solid var(--uva-green);
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: var(--panel-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
         }
 
         .header-left { display: flex; align-items: center; gap: 28px; }
@@ -130,60 +113,48 @@
             background: white;
             padding: 10px 20px;
             border-radius: 14px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .header-text h1 {
             font-size: 28px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
+            font-weight: 900;
             color: var(--text-primary);
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .sub-heading {
-            font-family: 'Segoe UI', system-ui, sans-serif;
             font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 0.08em;
+            font-weight: 800;
             text-transform: uppercase;
-            padding: 7px 14px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            border-radius: 6px;
             border: 2px solid var(--uva-green);
             background: var(--subheading-bg);
-            color: var(--text-secondary);
+            color: var(--text-primary);
             display: inline-block;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .highlight {
-            color: var(--uva-blue);
-            font-weight: 800;
         }
 
         /* --- THEME TOGGLE --- */
         .theme-toggle {
-            padding: 11px 22px;
+            padding: 12px 24px;
             border-radius: 12px;
             cursor: pointer;
-            font-weight: 700;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
+            font-weight: 800;
+            border: 2px solid var(--uva-blue);
+            background: white;
+            color: var(--uva-blue);
             transition: all 0.3s ease;
-            font-size: 12px;
-            text-transform: uppercase;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             display: flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+        body.dark-mode .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
         /* --- CONTENT --- */
@@ -192,18 +163,14 @@
             grid-template-columns: 1fr 360px;
             gap: 28px;
             padding: 28px;
-            background: transparent;
         }
 
-        /* SEMI-TRANSPARENT GLASS PANELS */
         .video-section {
             border-radius: 22px;
-            padding: 18px;
+            padding: 20px;
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         }
 
         .video-player {
@@ -213,7 +180,6 @@
             border-radius: 16px;
             overflow: hidden;
             background: #000;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
         }
 
         .video-player iframe {
@@ -226,207 +192,106 @@
             margin-top: 20px;
             padding: 20px;
             border-radius: 16px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--item-bg);
             border: 1px solid var(--panel-border);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-        }
-
-        body.dark-mode .video-info {
-            background: rgba(0, 0, 0, 0.15);
         }
 
         .video-info h2 {
             font-size: 22px;
             margin-bottom: 6px;
             color: var(--text-primary);
+            font-weight: 800;
         }
 
-        .video-info p {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        /* --- SIDEBAR GLASS PANELS --- */
+        /* --- SIDEBAR --- */
         .glass-panel {
             border-radius: 20px;
             padding: 22px;
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             margin-bottom: 22px;
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         }
 
         .playlist-container {
             max-height: 480px;
             overflow-y: auto;
-            padding-right: 8px;
-        }
-
-        .playlist-container::-webkit-scrollbar { width: 6px; }
-        .playlist-container::-webkit-scrollbar-thumb {
-            background: var(--uva-green);
-            border-radius: 10px;
         }
 
         .video-item {
-            padding: 15px;
-            border-radius: 14px;
-            margin-bottom: 12px;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
             cursor: pointer;
-            transition: all 0.25s ease;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            background: var(--item-bg);
+            border: 1px solid var(--panel-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             color: var(--text-primary);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        body.dark-mode .video-item {
-            background: rgba(0, 0, 0, 0.12);
+            font-weight: 600;
         }
 
         .video-item:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: var(--uva-green);
+            background: white;
+            border-color: var(--uva-blue);
             transform: translateX(4px);
         }
 
         .video-item.active {
-            background: var(--uva-green);
+            background: var(--uva-blue);
             color: white;
-            box-shadow: 0 6px 20px var(--uva-green-glow);
-            border-color: var(--uva-green);
+            border-color: var(--uva-blue);
         }
 
-        /* --- ADMIN ACTION BUTTONS --- */
-        .item-actions {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            margin-left: 10px;
-        }
-
+        /* --- ADMIN --- */
         .icon-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            border: 1px solid var(--panel-border);
-            background: rgba(255, 255, 255, 0.14);
-            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #0f172a;
             cursor: pointer;
-            font-weight: 900;
-            font-size: 16px;
-            line-height: 1;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            transition: all 0.2s ease;
+            font-weight: bold;
         }
 
-        body.dark-mode .icon-btn {
-            background: rgba(0, 0, 0, 0.18);
-        }
-
-        .icon-btn:hover:not(:disabled) {
-            filter: brightness(1.2);
-            transform: scale(1.08);
-        }
-
-        .icon-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .icon-btn.danger {
-            border-color: rgba(255, 68, 68, 0.35);
-            color: #ff6b6b;
-        }
-
-        /* --- BUTTONS & INPUTS --- */
         .btn {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             border: none;
             border-radius: 12px;
-            font-weight: 800;
+            font-weight: 900;
             cursor: pointer;
-            transition: all 0.25s ease;
             text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 0.5px;
             color: white;
             margin-bottom: 12px;
         }
 
-        .btn-primary {
-            background: var(--uva-blue);
-            box-shadow: 0 4px 15px rgba(0, 74, 153, 0.3);
-        }
-
-        .btn-admin {
-            background: var(--uva-green);
-            box-shadow: 0 4px 15px var(--uva-green-glow);
-        }
-
-        .btn:hover {
-            filter: brightness(1.15);
-            transform: translateY(-2px);
-        }
+        .btn-primary { background: var(--uva-blue); }
+        .btn-admin { background: var(--uva-green); }
 
         input {
             width: 100%;
-            padding: 15px;
-            margin-bottom: 14px;
-            border-radius: 12px;
-            border: 1px solid var(--panel-border);
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            border: 2px solid #cbd5e1;
             background: var(--input-bg);
-            color: var(--text-primary);
-            font-size: 14px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            transition: all 0.25s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--uva-blue);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .admin-badge {
-            background: var(--uva-green);
-            color: white;
-            padding: 5px 14px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            margin-bottom: 16px;
-            display: inline-block;
-            text-transform: uppercase;
+            color: black;
+            font-weight: 600;
         }
 
         @media (max-width: 950px) {
             .content { grid-template-columns: 1fr; }
-            .header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-            .header-left { flex-direction: column; }
         }
     </style>
 </head>
-<body class="dark-mode">
-    <!-- Looping server room video background -->
+<body class="light-mode">
     <video class="bg-video" autoplay muted loop playsinline>
         <source src="server_video.mp4" type="video/mp4">
     </video>
@@ -438,23 +303,19 @@
                 <img src="logo.png" alt="UVA Logo" class="uva-logo" onerror="this.src='https://cdn.abacus.ai/images/b69a3e15-3a50-4e7b-83f1-a16117a6cd52.png'">
                 <div class="header-text">
                     <h1>University View Academy</h1>
-                    <div class="sub-heading">
-                        <span class="highlight">Computer Architecture</span> Video Lesson Player
-                    </div>
+                    <div class="sub-heading">Computer Architecture Video Lesson Player</div>
                 </div>
             </div>
             <button class="theme-toggle" onclick="toggleTheme()">
-                <span id="themeIcon">☀️</span>
-                <span id="themeText">Light Mode</span>
+                <span id="themeIcon">🌙</span>
+                <span id="themeText">Dark Mode</span>
             </button>
         </div>
 
         <div class="content">
             <div class="video-section">
                 <div class="video-player" id="videoPlayer">
-                    <div style="color: white; text-align: center; padding-top: 20%; font-weight: bold;">
-                        Select a lesson to begin
-                    </div>
+                    <div style="color: white; text-align: center; padding-top: 20%; font-weight: bold;">Select a lesson to begin</div>
                 </div>
                 <div class="video-info" id="videoInfo" style="display:none">
                     <h2 id="currentTitle">Video Title</h2>
@@ -464,24 +325,16 @@
 
             <div class="sidebar">
                 <div id="adminControls" class="glass-panel" style="display:none">
-                    <span class="admin-badge">Instructor Access</span>
                     <input type="text" id="vUrl" placeholder="YouTube URL">
                     <input type="text" id="vTitle" placeholder="Lesson Title">
                     <button class="btn btn-primary" onclick="addVideo()">Add Lesson</button>
                     <button class="btn btn-admin" onclick="lockMode()">Lock Player</button>
                 </div>
-
                 <div id="studentControls" class="glass-panel">
-                    <p style="font-size: 13px; margin-bottom: 15px; opacity: 0.8;">
-                        🔒 Playlist managed by instructor.
-                    </p>
                     <button class="btn btn-primary" onclick="unlockMode()">Instructor Login</button>
                 </div>
-
                 <div class="glass-panel">
-                    <h3 style="font-size: 15px; margin-bottom: 18px; letter-spacing: 1px; font-weight: 800;">
-                        COURSE PLAYLIST
-                    </h3>
+                    <h3 style="font-size: 14px; margin-bottom: 15px; font-weight: 900;">COURSE PLAYLIST</h3>
                     <div id="playlist" class="playlist-container"></div>
                 </div>
             </div>
@@ -489,27 +342,27 @@
     </div>
 
     <script>
-        // ========== CONFIGURATION ==========
-        const ADMIN_PASS = "Password#1"; // ⚠️ CHANGE THIS PASSWORD
-        const STORAGE_KEY = 'uva_playlist_v12';
-        const THEME_KEY = 'uva_theme_v12';
+        // ========== 🛠️ INSTRUCTOR CONFIGURATION ==========
+        // 🔑 CHANGE YOUR PASSWORD HERE:
+        const ADMIN_PASS = "Password#1"; 
 
-        // ========== STATE ==========
+        // 📦 STORAGE KEYS (Change these if you want to reset the playlist for a new class)
+        const STORAGE_KEY = 'uva_playlist_v14';
+        const THEME_KEY = 'uva_theme_v14';
+
         let videos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         let currentIdx = -1;
 
-        // ========== INITIALIZATION ==========
         window.onload = () => {
             const savedTheme = localStorage.getItem(THEME_KEY);
-            setTheme(savedTheme === 'light');
+            setTheme(savedTheme !== 'dark'); // Default to light
             if (sessionStorage.getItem('uva_admin') === 'true') showAdmin();
             render();
             if (videos.length > 0) play(0);
         };
 
-        // ========== THEME MANAGEMENT ==========
         function toggleTheme() {
-            setTheme(!document.body.classList.contains('light-mode'));
+            setTheme(document.body.classList.contains('dark-mode'));
         }
 
         function setTheme(toLight) {
@@ -528,14 +381,11 @@
             }
         }
 
-        // ========== AUTHENTICATION ==========
         function unlockMode() {
             const pass = prompt("Instructor Password:");
             if (pass === ADMIN_PASS) {
                 sessionStorage.setItem('uva_admin', 'true');
                 showAdmin();
-            } else if (pass !== null) {
-                alert("Incorrect password.");
             }
         }
 
@@ -550,195 +400,38 @@
             render();
         }
 
-        function isAdmin() {
-            return sessionStorage.getItem('uva_admin') === 'true';
-        }
+        function isAdmin() { return sessionStorage.getItem('uva_admin') === 'true'; }
 
-        // ========== DATA PERSISTENCE ==========
-        function saveVideos() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
-        }
+        function saveVideos() { localStorage.setItem(STORAGE_KEY, JSON.stringify(videos)); }
 
-        // ========== VIDEO MANAGEMENT ==========
         function addVideo() {
-            if (!isAdmin()) return;
-
             const url = document.getElementById('vUrl').value.trim();
             const title = document.getElementById('vTitle').value.trim();
-
             const id = url.match(/(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/user\/\S+|\/ytscreeningroom\?v=))([\w\-]{11})/)?.[1];
-
             if (id) {
-                videos.push({ 
-                    id, 
-                    title: title || `Lesson ${videos.length + 1}` 
-                });
+                videos.push({ id, title: title || `Lesson ${videos.length + 1}` });
                 saveVideos();
-                document.getElementById('vUrl').value = '';
-                document.getElementById('vTitle').value = '';
-                render();
-
-                if (videos.length === 1) {
-                    play(0);
-                }
-            } else {
-                alert("Please enter a valid YouTube URL.");
-            }
-        }
-
-        function editTitle(i) {
-            if (!isAdmin()) return;
-            if (!videos[i]) return;
-
-            const newTitle = prompt("Edit lesson title:", videos[i].title);
-            if (newTitle === null) return; 
-
-            const trimmed = newTitle.trim();
-            if (trimmed.length === 0) {
-                alert("Title cannot be empty.");
-                return;
-            }
-
-            videos[i].title = trimmed;
-            saveVideos();
-            render();
-
-            if (currentIdx === i) {
-                document.getElementById('currentTitle').textContent = videos[i].title;
-            }
-        }
-
-        function moveVideo(from, to) {
-            if (!isAdmin()) return;
-            if (to < 0 || to >= videos.length) return;
-            if (from === to) return;
-
-            const [item] = videos.splice(from, 1);
-            videos.splice(to, 0, item);
-
-            if (currentIdx === from) {
-                currentIdx = to;
-            } else if (from < currentIdx && to >= currentIdx) {
-                currentIdx -= 1;
-            } else if (from > currentIdx && to <= currentIdx) {
-                currentIdx += 1;
-            }
-
-            saveVideos();
-            render();
-            updateNowPlayingMeta();
-        }
-
-        function remove(i) {
-            if (!isAdmin()) return;
-            if (!videos[i]) return;
-
-            if (confirm(`Delete "${videos[i].title}" from the playlist?`)) {
-                videos.splice(i, 1);
-                saveVideos();
-
-                if (currentIdx === i) {
-                    document.getElementById('videoPlayer').innerHTML = 
-                        '<div style="color: white; text-align: center; padding-top: 20%; font-weight: bold;">Select a lesson to begin</div>';
-                    document.getElementById('videoInfo').style.display = 'none';
-                    currentIdx = -1;
-                } else if (currentIdx > i) {
-                    currentIdx -= 1;
-                }
-
                 render();
             }
         }
 
-        // ========== PLAYBACK ==========
         function play(i) {
-            if (!videos[i]) return;
-
             currentIdx = i;
             const v = videos[i];
-
-            document.getElementById('videoPlayer').innerHTML = 
-                `<iframe 
-                    src="https://www.youtube-nocookie.com/embed/${v.id}?rel=0&modestbranding=1&autoplay=1" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-                </iframe>`;
-
+            document.getElementById('videoPlayer').innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?rel=0&autoplay=1" frameborder="0" allowfullscreen></iframe>`;
             document.getElementById('currentTitle').textContent = v.title;
             document.getElementById('currentMeta').textContent = `Lesson ${i + 1} of ${videos.length}`;
             document.getElementById('videoInfo').style.display = 'block';
-
             render();
         }
 
-        function updateNowPlayingMeta() {
-            if (currentIdx < 0 || !videos[currentIdx]) return;
-            document.getElementById('currentTitle').textContent = videos[currentIdx].title;
-            document.getElementById('currentMeta').textContent = `Lesson ${currentIdx + 1} of ${videos.length}`;
-        }
-
-        // ========== RENDERING ==========
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
         function render() {
-            const admin = isAdmin();
             const container = document.getElementById('playlist');
-
-            if (videos.length === 0) {
-                container.innerHTML = '<p style="text-align:center; opacity:0.5; padding:20px;">No lessons added yet.</p>';
-                return;
-            }
-
-            container.innerHTML = videos.map((v, i) => {
-                const safeTitle = escapeHtml(v.title);
-                const isActive = i === currentIdx;
-
-                const adminActions = admin ? `
-                    <div class="item-actions">
-                        <button
-                            class="icon-btn"
-                            aria-label="Move up"
-                            title="Move up"
-                            ${i === 0 ? 'disabled' : ''}
-                            onclick="event.stopPropagation(); moveVideo(${i}, ${i - 1});"
-                        >↑</button>
-
-                        <button
-                            class="icon-btn"
-                            aria-label="Move down"
-                            title="Move down"
-                            ${i === videos.length - 1 ? 'disabled' : ''}
-                            onclick="event.stopPropagation(); moveVideo(${i}, ${i + 1});"
-                        >↓</button>
-
-                        <button
-                            class="icon-btn"
-                            aria-label="Edit title"
-                            title="Edit title"
-                            onclick="event.stopPropagation(); editTitle(${i});"
-                        >✎</button>
-
-                        <button
-                            class="icon-btn danger"
-                            aria-label="Delete lesson"
-                            title="Delete"
-                            onclick="event.stopPropagation(); remove(${i});"
-                        >×</button>
-                    </div>
-                ` : '';
-
-                return `
-                    <div class="video-item ${isActive ? 'active' : ''}" onclick="play(${i})">
-                        <div style="font-weight:700; font-size:14px; flex: 1;">${safeTitle}</div>
-                        ${adminActions}
-                    </div>
-                `;
-            }).join('');
+            container.innerHTML = videos.map((v, i) => `
+                <div class="video-item ${i === currentIdx ? 'active' : ''}" onclick="play(${i})">
+                    ${v.title}
+                </div>
+            `).join('');
         }
     </script>
 </body>
