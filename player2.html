@@ -550,7 +550,7 @@
         function unlockMode() {
             const pass = prompt("Instructor Password:");
             if (pass === ADMIN_PASS) {
-                sessionStorage.setItem('Password#1', 'true');
+                sessionStorage.setItem('uva_admin', 'true');
                 showAdmin();
             } else if (pass !== null) {
                 alert("Incorrect password.");
