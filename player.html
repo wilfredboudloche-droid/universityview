@@ -14,19 +14,21 @@
             /* Light Mode Defaults */
             --text-primary: #0f172a;
             --text-secondary: #475569;
-            --panel-bg: rgba(248, 250, 252, 0.85);
-            --panel-border: rgba(148, 163, 184, 0.4);
-            --input-bg: rgba(255, 255, 255, 0.75);
-            --subheading-bg: rgba(255, 255, 255, 0.9);
+            /* ULTRA-TRANSPARENT GLASS */
+            --panel-bg: rgba(255, 255, 255, 0.15); 
+            --panel-border: rgba(255, 255, 255, 0.3);
+            --input-bg: rgba(255, 255, 255, 0.2);
+            --subheading-bg: rgba(255, 255, 255, 0.8);
         }
 
         body.dark-mode {
             --text-primary: #f1f5f9;
             --text-secondary: #cbd5e1;
-            --panel-bg: rgba(15, 23, 42, 0.85);
-            --panel-border: rgba(148, 163, 184, 0.5);
-            --input-bg: rgba(0, 0, 0, 0.4);
-            --subheading-bg: rgba(15, 23, 42, 0.9);
+            /* ULTRA-TRANSPARENT DARK GLASS */
+            --panel-bg: rgba(15, 23, 42, 0.25); 
+            --panel-border: rgba(255, 255, 255, 0.15);
+            --input-bg: rgba(0, 0, 0, 0.3);
+            --subheading-bg: rgba(15, 23, 42, 0.8);
         }
 
         * {
@@ -68,25 +70,26 @@
             inset: 0;
             z-index: -2;
             background: 
-                radial-gradient(circle at 30% 20%, rgba(15,23,42,0.50), transparent 60%),
-                radial-gradient(circle at 70% 80%, rgba(15,23,42,0.60), transparent 60%),
-                rgba(15,23,42,0.55);
+                radial-gradient(circle at 30% 20%, rgba(15,23,42,0.40), transparent 60%),
+                radial-gradient(circle at 70% 80%, rgba(15,23,42,0.50), transparent 60%),
+                rgba(15,23,42,0.45);
             pointer-events: none;
         }
 
-        /* --- GLASS CONTAINER --- */
+        /* --- MAIN GLASS CONTAINER --- */
         .container {
             width: 100%;
             max-width: 1200px;
             position: relative;
             border-radius: 28px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.35);
+            /* The main housing is now very transparent */
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow:
-                0 35px 90px rgba(0, 0, 0, 0.7),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(30px) saturate(140%);
-            -webkit-backdrop-filter: blur(30px) saturate(140%);
+                0 35px 90px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(40px) saturate(160%);
+            -webkit-backdrop-filter: blur(40px) saturate(160%);
             overflow: hidden;
         }
 
@@ -98,9 +101,9 @@
             border-radius: inherit;
             background: linear-gradient(
                 135deg,
-                rgba(255,255,255,0.25) 0%,
+                rgba(255,255,255,0.15) 0%,
                 transparent 50%,
-                rgba(255,255,255,0.08) 100%
+                rgba(255,255,255,0.05) 100%
             );
             pointer-events: none;
             z-index: 0;
@@ -138,7 +141,6 @@
             margin-bottom: 8px;
         }
 
-        /* ACCESSIBLE SUBHEADING - UVA Blue on solid background */
         .sub-heading {
             font-family: 'Segoe UI', system-ui, sans-serif;
             font-size: 13px;
@@ -166,8 +168,8 @@
             border-radius: 12px;
             cursor: pointer;
             font-weight: 700;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             color: var(--text-primary);
             transition: all 0.3s ease;
             font-size: 12px;
@@ -180,9 +182,8 @@
         }
 
         .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
         /* --- CONTENT --- */
@@ -200,9 +201,9 @@
             padding: 18px;
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
 
         .video-player {
@@ -212,7 +213,7 @@
             border-radius: 16px;
             overflow: hidden;
             background: #000;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
         }
 
         .video-player iframe {
@@ -225,14 +226,14 @@
             margin-top: 20px;
             padding: 20px;
             border-radius: 16px;
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1);
             border: 1px solid var(--panel-border);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
         }
 
         body.dark-mode .video-info {
-            background: rgba(0, 0, 0, 0.25);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .video-info h2 {
@@ -253,9 +254,9 @@
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             margin-bottom: 22px;
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
 
         .playlist-container {
@@ -276,7 +277,7 @@
             margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.25s ease;
-            background: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.1);
             border: 1px solid transparent;
             display: flex;
             justify-content: space-between;
@@ -287,17 +288,13 @@
         }
 
         body.dark-mode .video-item {
-            background: rgba(0, 0, 0, 0.25);
+            background: rgba(0, 0, 0, 0.15);
         }
 
         .video-item:hover {
-            background: rgba(255, 255, 255, 0.55);
+            background: rgba(255, 255, 255, 0.2);
             border-color: var(--uva-green);
             transform: translateX(4px);
-        }
-
-        body.dark-mode .video-item:hover {
-            background: rgba(255, 255, 255, 0.12);
         }
 
         .video-item.active {
@@ -305,6 +302,61 @@
             color: white;
             box-shadow: 0 6px 20px var(--uva-green-glow);
             border-color: var(--uva-green);
+        }
+
+        /* --- ADMIN ACTION BUTTONS --- */
+        .item-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-left: 10px;
+        }
+
+        .icon-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255, 255, 255, 0.14);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 16px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+
+        body.dark-mode .icon-btn {
+            background: rgba(0, 0, 0, 0.18);
+        }
+
+        .icon-btn:hover:not(:disabled) {
+            filter: brightness(1.2);
+            transform: scale(1.08);
+        }
+
+        .icon-btn:focus-visible {
+            outline: 3px solid rgba(0, 74, 153, 0.55);
+            outline-offset: 2px;
+        }
+
+        .icon-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .icon-btn.danger {
+            border-color: rgba(255, 68, 68, 0.35);
+            color: #ff6b6b;
+        }
+
+        .icon-btn.danger:hover:not(:disabled) {
+            background: rgba(255, 68, 68, 0.2);
         }
 
         /* --- BUTTONS & INPUTS --- */
@@ -336,7 +388,6 @@
         .btn:hover {
             filter: brightness(1.15);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
         input {
@@ -356,7 +407,7 @@
         input:focus {
             outline: none;
             border-color: var(--uva-blue);
-            box-shadow: 0 0 0 3px rgba(0, 74, 153, 0.1);
+            background: rgba(255, 255, 255, 0.25);
         }
 
         input::placeholder {
@@ -387,7 +438,6 @@
             .header-left { flex-direction: column; }
         }
 
-        /* Reduce motion support */
         @media (prefers-reduced-motion: reduce) {
             * { transition: none !important; animation: none !important; }
         }
@@ -457,13 +507,16 @@
     </div>
 
     <script>
-        const ADMIN_PASS = "Password#1";
-        const STORAGE_KEY = 'uva_playlist_v9';
-        const THEME_KEY = 'uva_theme_v9';
+        // ========== CONFIGURATION ==========
+        const ADMIN_PASS = "instructor2024"; // ⚠️ CHANGE THIS PASSWORD
+        const STORAGE_KEY = 'uva_playlist_v12';
+        const THEME_KEY = 'uva_theme_v11';
 
+        // ========== STATE ==========
         let videos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         let currentIdx = -1;
 
+        // ========== INITIALIZATION ==========
         window.onload = () => {
             const savedTheme = localStorage.getItem(THEME_KEY);
             setTheme(savedTheme === 'light');
@@ -472,6 +525,7 @@
             if (videos.length > 0) play(0);
         };
 
+        // ========== THEME MANAGEMENT ==========
         function toggleTheme() {
             setTheme(!document.body.classList.contains('light-mode'));
         }
@@ -492,10 +546,11 @@
             }
         }
 
+        // ========== AUTHENTICATION ==========
         function unlockMode() {
             const pass = prompt("Instructor Password:");
             if (pass === ADMIN_PASS) {
-                sessionStorage.setItem('Password#1', 'true');
+                sessionStorage.setItem('uva_admin', 'true');
                 showAdmin();
             } else if (pass !== null) {
                 alert("Incorrect password.");
@@ -513,24 +568,150 @@
             render();
         }
 
+        function isAdmin() {
+            return sessionStorage.getItem('uva_admin') === 'true';
+        }
+
+        // ========== DATA PERSISTENCE ==========
+        function saveVideos() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
+        }
+
+        // ========== VIDEO MANAGEMENT ==========
         function addVideo() {
-            const url = document.getElementById('vUrl').value;
-            const title = document.getElementById('vTitle').value;
+            if (!isAdmin()) return;
+
+            const url = document.getElementById('vUrl').value.trim();
+            const title = document.getElementById('vTitle').value.trim();
+
             const id = url.match(/(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/user\/\S+|\/ytscreeningroom\?v=))([\w\-]{11})/)?.[1];
 
             if (id) {
-                videos.push({ id, title: title || `Lesson ${videos.length + 1}` });
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
+                videos.push({ 
+                    id, 
+                    title: title || `Lesson ${videos.length + 1}` 
+                });
+                saveVideos();
                 document.getElementById('vUrl').value = '';
                 document.getElementById('vTitle').value = '';
                 render();
+
+                // Auto-play first video if this is the first one added
+                if (videos.length === 1) {
+                    play(0);
+                }
             } else {
                 alert("Please enter a valid YouTube URL.");
             }
         }
 
+        function editTitle(i) {
+            if (!isAdmin()) return;
+            if (!videos[i]) return;
+
+            const newTitle = prompt("Edit lesson title:", videos[i].title);
+            if (newTitle === null) return; // User cancelled
+
+            const trimmed = newTitle.trim();
+            if (trimmed.length === 0) {
+                alert("Title cannot be empty.");
+                return;
+            }
+
+            videos[i].title = trimmed;
+            saveVideos();
+            render();
+
+            // Update the now-playing info if this is the current video
+            if (currentIdx === i) {
+                document.getElementById('currentTitle').textContent = videos[i].title;
+            }
+        }
+
+        function moveVideo(from, to) {
+            if (!isAdmin()) return;
+            if (to < 0 || to >= videos.length) return;
+            if (from === to) return;
+
+            // Remove the video from its current position
+            const [item] = videos.splice(from, 1);
+            // Insert it at the new position
+            videos.splice(to, 0, item);
+
+            // Update currentIdx to follow the currently playing video
+            if (currentIdx === from) {
+                currentIdx = to;
+            } else if (from < currentIdx && to >= currentIdx) {
+                currentIdx -= 1;
+            } else if (from > currentIdx && to <= currentIdx) {
+                currentIdx += 1;
+            }
+
+            saveVideos();
+            render();
+            updateNowPlayingMeta();
+        }
+
+        function remove(i) {
+            if (!isAdmin()) return;
+            if (!videos[i]) return;
+
+            if (confirm(`Delete "${videos[i].title}" from the playlist?`)) {
+                videos.splice(i, 1);
+                saveVideos();
+
+                // If we deleted the currently playing video, clear the player
+                if (currentIdx === i) {
+                    document.getElementById('videoPlayer').innerHTML = 
+                        '<div style="color: white; text-align: center; padding-top: 20%; font-weight: bold;">Select a lesson to begin</div>';
+                    document.getElementById('videoInfo').style.display = 'none';
+                    currentIdx = -1;
+                } else if (currentIdx > i) {
+                    // Adjust index if we deleted something before the current video
+                    currentIdx -= 1;
+                }
+
+                render();
+            }
+        }
+
+        // ========== PLAYBACK ==========
+        function play(i) {
+            if (!videos[i]) return;
+
+            currentIdx = i;
+            const v = videos[i];
+
+            document.getElementById('videoPlayer').innerHTML = 
+                `<iframe 
+                    src="https://www.youtube-nocookie.com/embed/${v.id}?rel=0&modestbranding=1&autoplay=1" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>`;
+
+            document.getElementById('currentTitle').textContent = v.title;
+            document.getElementById('currentMeta').textContent = `Lesson ${i + 1} of ${videos.length}`;
+            document.getElementById('videoInfo').style.display = 'block';
+
+            render();
+        }
+
+        function updateNowPlayingMeta() {
+            if (currentIdx < 0 || !videos[currentIdx]) return;
+            document.getElementById('currentTitle').textContent = videos[currentIdx].title;
+            document.getElementById('currentMeta').textContent = `Lesson ${currentIdx + 1} of ${videos.length}`;
+        }
+
+        // ========== RENDERING ==========
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function render() {
-            const isAdmin = sessionStorage.getItem('uva_admin') === 'true';
+            const admin = isAdmin();
             const container = document.getElementById('playlist');
 
             if (videos.length === 0) {
@@ -538,35 +719,51 @@
                 return;
             }
 
-            container.innerHTML = videos.map((v, i) => `
-                <div class="video-item ${i === currentIdx ? 'active' : ''}" onclick="play(${i})">
-                    <div style="font-weight:700; font-size:14px">${v.title}</div>
-                    ${isAdmin ? `<button onclick="event.stopPropagation();remove(${i})" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight:bold; font-size:20px; padding: 0 8px;">×</button>` : ''}
-                </div>
-            `).join('');
-        }
+            container.innerHTML = videos.map((v, i) => {
+                const safeTitle = escapeHtml(v.title);
+                const isActive = i === currentIdx;
 
-        function play(i) {
-            currentIdx = i;
-            const v = videos[i];
-            document.getElementById('videoPlayer').innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?rel=0&modestbranding=1&autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-            document.getElementById('currentTitle').textContent = v.title;
-            document.getElementById('currentMeta').textContent = `Lesson ${i + 1} of ${videos.length}`;
-            document.getElementById('videoInfo').style.display = 'block';
-            render();
-        }
+                const adminActions = admin ? `
+                    <div class="item-actions">
+                        <button
+                            class="icon-btn"
+                            aria-label="Move up"
+                            title="Move up"
+                            ${i === 0 ? 'disabled' : ''}
+                            onclick="event.stopPropagation(); moveVideo(${i}, ${i - 1});"
+                        >↑</button>
 
-        function remove(i) {
-            if (confirm("Delete this lesson from the playlist?")) {
-                videos.splice(i, 1);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
-                if (currentIdx === i) {
-                    document.getElementById('videoPlayer').innerHTML = '<div style="color: white; text-align: center; padding-top: 20%; font-weight: bold;">Select a lesson to begin</div>';
-                    document.getElementById('videoInfo').style.display = 'none';
-                    currentIdx = -1;
-                }
-                render();
-            }
+                        <button
+                            class="icon-btn"
+                            aria-label="Move down"
+                            title="Move down"
+                            ${i === videos.length - 1 ? 'disabled' : ''}
+                            onclick="event.stopPropagation(); moveVideo(${i}, ${i + 1});"
+                        >↓</button>F
+
+                        <button
+                            class="icon-btn"
+                            aria-label="Edit title"
+                            title="Edit title"
+                            onclick="event.stopPropagation(); editTitle(${i});"
+                        >✎</button>
+
+                        <button
+                            class="icon-btn danger"
+                            aria-label="Delete lesson"
+                            title="Delete"
+                            onclick="event.stopPropagation(); remove(${i});"
+                        >×</button>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="video-item ${isActive ? 'active' : ''}" onclick="play(${i})">
+                        <div style="font-weight:700; font-size:14px; flex: 1;">${safeTitle}</div>
+                        ${adminActions}
+                    </div>
+                `;
+            }).join('');
         }
     </script>
 </body>
