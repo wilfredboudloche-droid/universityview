@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVA - Computer Architecture Player</title>
+    <style>
+        :root {
+            /* UVA Brand Colors */
+            --uva-blue: #004A99;
+            --uva-green: #00824A;
+            --uva-green-glow: rgba(0, 130, 74, 0.4);
+
+            /* Light Mode Defaults */
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --panel-bg: rgba(248, 250, 252, 0.85);
+            --panel-border: rgba(148, 163, 184, 0.4);
+            --input-bg: rgba(255, 255, 255, 0.75);
+            --subheading-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body.dark-mode {
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --panel-bg: rgba(15, 23, 42, 0.85);
+            --panel-border: rgba(148, 163, 184, 0.5);
+            --input-bg: rgba(0, 0, 0, 0.4);
+            --subheading-bg: rgba(15, 23, 42, 0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-primary);
+            transition: color 0.4s ease;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- LOOPING VIDEO BACKGROUND --- */
+        .bg-video {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            z-index: -3;
+            object-fit: cover;
+        }
+
+        /* Dark overlay to help glass panels stand out */
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(15,23,42,0.50), transparent 60%),
+                radial-gradient(circle at 70% 80%, rgba(15,23,42,0.60), transparent 60%),
+                rgba(15,23,42,0.55);
+            pointer-events: none;
+        }
+
+        /* --- GLASS CONTAINER --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            box-shadow:
+                0 35px 90px rgba(0, 0, 0, 0.7),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(30px) saturate(140%);
+            -webkit-backdrop-filter: blur(30px) saturate(140%);
+            overflow: hidden;
+        }
+
+        /* Glass shine effect */
+        .container::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(
+                135deg,
+                rgba(255,255,255,0.25) 0%,
+                transparent 50%,
+                rgba(255,255,255,0.08) 100%
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container > * { position: relative; z-index: 1; }
+
+        /* --- HEADER --- */
+        .header {
+            padding: 28px 40px;
+            border-bottom: 3px solid var(--uva-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .header-left { display: flex; align-items: center; gap: 28px; }
+
+        .uva-logo {
+            height: 75px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        /* ACCESSIBLE SUBHEADING - UVA Blue on solid background */
+        .sub-heading {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 2px solid var(--uva-green);
+            background: var(--subheading-bg);
+            color: var(--text-secondary);
+            display: inline-block;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .highlight {
+            color: var(--uva-blue);
+            font-weight: 800;
+        }
+
+        /* --- THEME TOGGLE --- */
+        .theme-toggle {
+            padding: 11px 22px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            font-size: 12px;
+            text-transform: uppercase;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* --- CONTENT --- */
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 28px;
+            padding: 28px;
+            background: transparent;
+        }
+
+        /* SEMI-TRANSPARENT GLASS PANELS */
+        .video-section {
+            border-radius: 22px;
+            padding: 18px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .video-player {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+        }
+
+        .video-player iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+
+        .video-info {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        body.dark-mode .video-info {
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .video-info h2 {
+            font-size: 22px;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .video-info p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* --- SIDEBAR GLASS PANELS --- */
+        .glass-panel {
+            border-radius: 20px;
+            padding: 22px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            margin-bottom: 22px;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .playlist-container {
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .playlist-container::-webkit-scrollbar { width: 6px; }
+        .playlist-container::-webkit-scrollbar-thumb {
+            background: var(--uva-green);
+            border-radius: 10px;
+        }
+
+        .video-item {
+            padding: 15px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: rgba(255, 255, 255, 0.35);
+            border: 1px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-primary);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        body.dark-mode .video-item {
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .video-item:hover {
+            background: rgba(255, 255, 255, 0.55);
+            border-color: var(--uva-green);
+            transform: translateX(4px);
+        }
+
+        body.dark-mode .video-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .video-item.active {
+            background: var(--uva-green);
+            color: white;
+            box-shadow: 0 6px 20px var(--uva-green-glow);
+            border-color: var(--uva-green);
+        }
+
+        /* --- BUTTONS & INPUTS --- */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary {
+            background: var(--uva-blue);
+            box-shadow: 0 4px 15px rgba(0, 74, 153, 0.3);
+        }
+
+        .btn-admin {
+            background: var(--uva-green);
+            box-shadow: 0 4px 15px var(--uva-green-glow);
+        }
+
+        .btn:hover {
+            filter: brightness(1.15);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--uva-blue);
+            box-shadow: 0 0 0 3px rgba(0, 74, 153, 0.1);
+        }
+
+        input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .admin-badge {
+            background: var(--uva-green);
+            color: white;
+            padding: 5px 14px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 950px) {
+            .content { grid-template-columns: 1fr; }
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .header-left { flex-direction: column; }
+        }
+
+        /* Reduce motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <!-- Looping server room video background -->
+    <video class="bg-video" autoplay muted loop playsinline>
+        <source src="server_video.mp4" type="video/mp4">
+    </video>
+    <div class="bg-overlay"></div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <img src="logo.png" alt="UVA Logo" class="uva-logo" onerror="this.src='https://cdn.abacus.ai/images/b69a3e15-3a50-4e7b-83f1-a16117a6cd52.png'">
+                <div class="header-text">
+                    <h1>University View Academy</h1>
+                    <div class="sub-heading">
+                        <span class="highlight">Computer Architecture</span> Video Lesson Player
+                    </div>
+                </div>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="themeIcon">☀️</span>
+                <span id="themeText">Light Mode</span>
+            </button>
+        </div>
+
+        <div class="content">
+            <div class="video-section">
+                <div class="video-player" id="videoPlayer">
+                    <div style="color: white; text-align: center; padding-top: 20%; font-weight: bold;">
+                        Select a lesson to begin
+                    </div>
+                </div>
+                <div class="video-info" id="videoInfo" style="display:none">
+                    <h2 id="currentTitle">Video Title</h2>
+                    <p id="currentMeta">Lesson Details</p>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div id="adminControls" class="glass-panel" style="display:none">
+                    <span class="admin-badge">Instructor Access</span>
+                    <input type="text" id="vUrl" placeholder="YouTube URL">
+                    <input type="text" id="vTitle" placeholder="Lesson Title">
+                    <button class="btn btn-primary" onclick="addVideo()">Add Lesson</button>
+                    <button class="btn btn-admin" onclick="lockMode()">Lock Player</button>
+                </div>
+
+                <div id="studentControls" class="glass-panel">
+                    <p style="font-size: 13px; margin-bottom: 15px; opacity: 0.8;">
+                        🔒 Playlist managed by instructor.
+                    </p>
+                    <button class="btn btn-primary" onclick="unlockMode()">Instructor Login</button>
+                </div>
+
+                <div class="glass-panel">
+                    <h3 style="font-size: 15px; margin-bottom: 18px; letter-spacing: 1px; font-weight: 800;">
+                        COURSE PLAYLIST
+                    </h3>
+                    <div id="playlist" class="playlist-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASS = "Password#1";
+        const STORAGE_KEY = 'uva_playlist_v9';
+        const THEME_KEY = 'uva_theme_v9';
+
+        let videos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        let currentIdx = -1;
+
+        window.onload = () => {
+            const savedTheme = localStorage.getItem(THEME_KEY);
+            setTheme(savedTheme === 'light');
+            if (sessionStorage.getItem('uva_admin') === 'true') showAdmin();
+            render();
+            if (videos.length > 0) play(0);
+        };
+
+        function toggleTheme() {
+            setTheme(!document.body.classList.contains('light-mode'));
+        }
+
+        function setTheme(toLight) {
+            if (toLight) {
+                document.body.classList.add('light-mode');
+                document.body.classList.remove('dark-mode');
+                document.getElementById('themeIcon').textContent = '🌙';
+                document.getElementById('themeText').textContent = 'Dark Mode';
+                localStorage.setItem(THEME_KEY, 'light');
+            } else {
+                document.body.classList.add('dark-mode');
+                document.body.classList.remove('light-mode');
+                document.getElementById('themeIcon').textContent = '☀️';
+                document.getElementById('themeText').textContent = 'Light Mode';
+                localStorage.setItem(THEME_KEY, 'dark');
+            }
+        }
+
+        function unlockMode() {
+            const pass = prompt("Instructor Password:");
+            if (pass === ADMIN_PASS) {
+                sessionStorage.setItem('Password#1', 'true');
+                showAdmin();
+            } else if (pass !== null) {
+                alert("Incorrect password.");
+            }
+        }
+
+        function lockMode() {
+            sessionStorage.removeItem('uva_admin');
+            location.reload();
+        }
+
+        function showAdmin() {
+            document.getElementById('adminControls').style.display = 'block';
+            document.getElementById('studentControls').style.display = 'none';
+            render();
+        }
+
+        function addVideo() {
+            const url = document.getElementById('vUrl').value;
+            const title = document.getElementById('vTitle').value;
+            const id = url.match(/(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/user\/\S+|\/ytscreeningroom\?v=))([\w\-]{11})/)?.[1];
+
+            if (id) {
+                videos.push({ id, title: title || `Lesson ${videos.length + 1}` });
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
+                document.getElementById('vUrl').value = '';
+                document.getElementById('vTitle').value = '';
+                render();
+            } else {
+                alert("Please enter a valid YouTube URL.");
+            }
+        }
+
+        function render() {
+            const isAdmin = sessionStorage.getItem('uva_admin') === 'true';
+            const container = document.getElementById('playlist');
+
+            if (videos.length === 0) {
+                container.innerHTML = '<p style="text-align:center; opacity:0.5; padding:20px;">No lessons added yet.</p>';
+                return;
+            }
+
+            container.innerHTML = videos.map((v, i) => `
+                <div class="video-item ${i === currentIdx ? 'active' : ''}" onclick="play(${i})">
+                    <div style="font-weight:700; font-size:14px">${v.title}</div>
+                    ${isAdmin ? `<button onclick="event.stopPropagation();remove(${i})" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight:bold; font-size:20px; padding: 0 8px;">×</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function play(i) {
+            currentIdx = i;
+            const v = videos[i];
+            document.getElementById('videoPlayer').innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?rel=0&modestbranding=1&autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            document.getElementById('currentTitle').textContent = v.title;
+            document.getElementById('currentMeta').textContent = `Lesson ${i + 1} of ${videos.length}`;
+            document.getElementById('videoInfo').style.display = 'block';
+            render();
+        }
+
+        function remove(i) {
+            if (confirm("Delete this lesson from the playlist?")) {
+                videos.splice(i, 1);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
+                if (currentIdx === i) {
+                    document.getElementById('videoPlayer').innerHTML = '<div style="color: white; text-align: center; padding-top: 20%; font-weight: bold;">Select a lesson to begin</div>';
+                    document.getElementById('videoInfo').style.display = 'none';
+                    currentIdx = -1;
+                }
+                render();
+            }
+        }
+    </script>
+</body>
+</html>
