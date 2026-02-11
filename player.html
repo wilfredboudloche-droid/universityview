@@ -508,7 +508,7 @@
 
     <script>
         // ========== CONFIGURATION ==========
-        const ADMIN_PASS = "instructor2024"; // ⚠️ CHANGE THIS PASSWORD
+        const ADMIN_PASS = "Password#1"; // ⚠️ CHANGE THIS PASSWORD
         const STORAGE_KEY = 'uva_playlist_v12';
         const THEME_KEY = 'uva_theme_v11';
 
@@ -550,8 +550,7 @@
         function unlockMode() {
             const pass = prompt("Instructor Password:");
             if (pass === ADMIN_PASS) {
-                sessionStorage.setItem('Password#1
-                                    ', 'true');
+                sessionStorage.setItem('uva_admin', 'true');
                 showAdmin();
             } else if (pass !== null) {
                 alert("Incorrect password.");
