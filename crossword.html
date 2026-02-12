@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Types Crossword Puzzle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c5f2d 0%, #1e4620 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            max-width: 400px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c5f2d;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #1a5490;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .crossword-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .crossword {
+            display: inline-grid;
+            grid-template-columns: repeat(13, 40px);
+            grid-template-rows: repeat(13, 40px);
+            gap: 1px;
+            background: #ddd;
+            border: 2px solid #2c5f2d;
+            padding: 1px;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 1px solid #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .cell.black {
+            background: #2c5f2d;
+            cursor: default;
+        }
+
+        .cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: transparent;
+            outline: none;
+        }
+
+        .cell.active {
+            background: #ffd700;
+        }
+
+        .cell.correct {
+            background: #90EE90;
+        }
+
+        .cell.incorrect {
+            background: #FFB6C6;
+        }
+
+        .cell-number {
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .clues-container {
+            background: #f0f7f0;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 2px solid #2c5f2d;
+        }
+
+        .clues-section {
+            margin-bottom: 25px;
+        }
+
+        .clues-section h3 {
+            color: #1a5490;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            border-bottom: 2px solid #1a5490;
+            padding-bottom: 5px;
+        }
+
+        .clue {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e0e0e0;
+        }
+
+        .clue:hover {
+            background: #e8f5e9;
+            transform: translateX(5px);
+            border-color: #2c5f2d;
+        }
+
+        .clue.active {
+            background: #ffd700;
+            font-weight: bold;
+            border-color: #2c5f2d;
+        }
+
+        .clue-number {
+            font-weight: bold;
+            color: #1a5490;
+            margin-right: 5px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .check-btn {
+            background: #1a5490;
+            color: white;
+        }
+
+        .check-btn:hover {
+            background: #144073;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .reset-btn {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #b71c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .reveal-btn {
+            background: #2c5f2d;
+            color: white;
+        }
+
+        .reveal-btn:hover {
+            background: #1e4620;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #2c5f2d;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .crossword {
+                grid-template-columns: repeat(13, 35px);
+                grid-template-rows: repeat(13, 35px);
+            }
+
+            .cell {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+
+            .logo {
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .crossword {
+                grid-template-columns: repeat(13, 28px);
+                grid-template-rows: repeat(13, 28px);
+            }
+
+            .cell {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+            }
+
+            .cell input {
+                font-size: 14px;
+            }
+
+            .logo {
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://placehold.co/400x100/2c5f2d/white?text=University+View+Academy" alt="University View Academy" class="logo">
+        </div>
+        <h1>🌐 Network Types Crossword Puzzle</h1>
+        <p class="subtitle">Module 5A: Test your knowledge of network types and abbreviations!</p>
+
+        <div class="content-wrapper">
+            <div class="crossword-container">
+                <div id="crossword" class="crossword"></div>
+            </div>
+
+            <div class="clues-container">
+                <div class="clues-section">
+                    <h3>📍 Across</h3>
+                    <div id="across-clues"></div>
+                </div>
+                <div class="clues-section">
+                    <h3>📍 Down</h3>
+                    <div id="down-clues"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="check-btn" onclick="checkAnswers()">✓ Check Answers</button>
+            <button class="reveal-btn" onclick="revealAnswers()">💡 Reveal Answers</button>
+            <button class="reset-btn" onclick="resetPuzzle()">↻ Reset Puzzle</button>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        const puzzleData = {
+            size: 13,
+            across: {
+                1: { answer: 'LAN', clue: 'Network covering a single site or campus (abbr.)', row: 0, col: 5 },
+                4: { answer: 'WIFI', clue: 'Brand name for IEEE 802.11 wireless standards', row: 2, col: 0 },
+                6: { answer: 'SOHO', clue: 'Small office/home office network type (abbr.)', row: 4, col: 3 },
+                8: { answer: 'ETHERNET', clue: 'Most common cabled LAN standard maintained by IEEE', row: 6, col: 2 },
+                10: { answer: 'ISP', clue: 'Company that provides Internet access (abbr.)', row: 8, col: 0 },
+                12: { answer: 'DATACENTER', clue: 'Whole site dedicated to provisioning server resources', row: 10, col: 1 },
+                13: { answer: 'FIBER', clue: 'Optic cabling that uses pulses of light', row: 12, col: 7 }
+            },
+            down: {
+                1: { answer: 'WLAN', clue: 'Wireless local area network (abbr.)', row: 0, col: 6 },
+                2: { answer: 'WAN', clue: 'Network spanning multiple geographic locations (abbr.)', row: 0, col: 9 },
+                3: { answer: 'IEEE', clue: 'Institute that maintains Ethernet standards (abbr.)', row: 1, col: 3 },
+                5: { answer: 'PAN', clue: 'Personal area network for devices within a few meters (abbr.)', row: 3, col: 0 },
+                7: { answer: 'SAN', clue: 'Storage area network dedicated to storage devices (abbr.)', row: 5, col: 6 },
+                9: { answer: 'MAN', clue: 'Network covering an area equivalent to a city (abbr.)', row: 7, col: 8 },
+                11: { answer: 'SERVER', clue: 'Computer dedicated to running network applications', row: 9, col: 4 }
+            }
+        };
+
+        let currentCell = null;
+        let currentDirection = 'across';
+
+        function createPuzzle() {
+            const crossword = document.getElementById('crossword');
+            const grid = Array(puzzleData.size).fill().map(() => Array(puzzleData.size).fill(null));
+
+            // Fill in answers
+            Object.entries(puzzleData.across).forEach(([num, data]) => {
+                for (let i = 0; i < data.answer.length; i++) {
+                    grid[data.row][data.col + i] = {
+                        letter: data.answer[i],
+                        number: i === 0 ? num : null,
+                        across: num,
+                        down: null
+                    };
+                }
+            });
+
+            Object.entries(puzzleData.down).forEach(([num, data]) => {
+                for (let i = 0; i < data.answer.length; i++) {
+                    if (grid[data.row + i][data.col]) {
+                        grid[data.row + i][data.col].down = num;
+                        if (i === 0 && !grid[data.row + i][data.col].number) {
+                            grid[data.row + i][data.col].number = num;
+                        }
+                    } else {
+                        grid[data.row + i][data.col] = {
+                            letter: data.answer[i],
+                            number: i === 0 ? num : null,
+                            across: null,
+                            down: num
+                        };
+                    }
+                }
+            });
+
+            // Create cells
+            for (let row = 0; row < puzzleData.size; row++) {
+                for (let col = 0; col < puzzleData.size; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+
+                    if (grid[row][col]) {
+                        const input = document.createElement('input');
+                        input.maxLength = 1;
+                        input.dataset.row = row;
+                        input.dataset.col = col;
+                        input.dataset.answer = grid[row][col].letter;
+                        input.dataset.across = grid[row][col].across;
+                        input.dataset.down = grid[row][col].down;
+
+                        input.addEventListener('input', handleInput);
+                        input.addEventListener('keydown', handleKeydown);
+                        input.addEventListener('focus', handleFocus);
+
+                        if (grid[row][col].number) {
+                            const number = document.createElement('span');
+                            number.className = 'cell-number';
+                            number.textContent = grid[row][col].number;
+                            cell.appendChild(number);
+                        }
+
+                        cell.appendChild(input);
+                    } else {
+                        cell.classList.add('black');
+                    }
+
+                    crossword.appendChild(cell);
+                }
+            }
+
+            // Create clues
+            const acrossClues = document.getElementById('across-clues');
+            const downClues = document.getElementById('down-clues');
+
+            Object.entries(puzzleData.across).forEach(([num, data]) => {
+                const clue = document.createElement('div');
+                clue.className = 'clue';
+                clue.innerHTML = `<span class="clue-number">${num}.</span>${data.clue}`;
+                clue.onclick = () => focusClue(num, 'across');
+                acrossClues.appendChild(clue);
+            });
+
+            Object.entries(puzzleData.down).forEach(([num, data]) => {
+                const clue = document.createElement('div');
+                clue.className = 'clue';
+                clue.innerHTML = `<span class="clue-number">${num}.</span>${data.clue}`;
+                clue.onclick = () => focusClue(num, 'down');
+                downClues.appendChild(clue);
+            });
+        }
+
+        function handleInput(e) {
+            const input = e.target;
+            if (input.value) {
+                moveToNext(input);
+            }
+        }
+
+        function handleKeydown(e) {
+            const input = e.target;
+
+            if (e.key === 'Backspace' && !input.value) {
+                moveToPrevious(input);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                currentDirection = 'across';
+                moveToNext(input);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                currentDirection = 'across';
+                moveToPrevious(input);
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                currentDirection = 'down';
+                moveToNext(input);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                currentDirection = 'down';
+                moveToPrevious(input);
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                currentDirection = currentDirection === 'across' ? 'down' : 'across';
+                highlightCurrentWord(input);
+            }
+        }
+
+        function handleFocus(e) {
+            currentCell = e.target;
+            highlightCurrentWord(e.target);
+        }
+
+        function moveToNext(input) {
+            const row = parseInt(input.dataset.row);
+            const col = parseInt(input.dataset.col);
+            let nextInput;
+
+            if (currentDirection === 'across') {
+                nextInput = document.querySelector(`input[data-row="${row}"][data-col="${col + 1}"]`);
+            } else {
+                nextInput = document.querySelector(`input[data-row="${row + 1}"][data-col="${col}"]`);
+            }
+
+            if (nextInput) {
+                nextInput.focus();
+            }
+        }
+
+        function moveToPrevious(input) {
+            const row = parseInt(input.dataset.row);
+            const col = parseInt(input.dataset.col);
+            let prevInput;
+
+            if (currentDirection === 'across') {
+                prevInput = document.querySelector(`input[data-row="${row}"][data-col="${col - 1}"]`);
+            } else {
+                prevInput = document.querySelector(`input[data-row="${row - 1}"][data-col="${col}"]`);
+            }
+
+            if (prevInput) {
+                prevInput.focus();
+            }
+        }
+
+        function highlightCurrentWord(input) {
+            document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('active'));
+            document.querySelectorAll('.clue').forEach(clue => clue.classList.remove('active'));
+
+            const clueNum = currentDirection === 'across' ? input.dataset.across : input.dataset.down;
+            if (!clueNum) return;
+
+            document.querySelectorAll(`input[data-${currentDirection}="${clueNum}"]`).forEach(inp => {
+                inp.parentElement.classList.add('active');
+            });
+
+            const clueElements = document.querySelectorAll('.clue');
+            clueElements.forEach(clue => {
+                if (clue.textContent.startsWith(clueNum + '.')) {
+                    clue.classList.add('active');
+                    clue.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        }
+
+        function focusClue(num, direction) {
+            currentDirection = direction;
+            const data = puzzleData[direction][num];
+            const input = document.querySelector(`input[data-row="${data.row}"][data-col="${data.col}"]`);
+            if (input) {
+                input.focus();
+            }
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let total = 0;
+
+            document.querySelectorAll('input').forEach(input => {
+                total++;
+                input.parentElement.classList.remove('correct', 'incorrect');
+
+                if (input.value.toUpperCase() === input.dataset.answer) {
+                    input.parentElement.classList.add('correct');
+                    correct++;
+                } else if (input.value) {
+                    input.parentElement.classList.add('incorrect');
+                }
+            });
+
+            const message = document.getElementById('message');
+            message.style.display = 'block';
+
+            if (correct === total) {
+                message.className = 'message success';
+                message.textContent = '🎉 Congratulations! You completed the puzzle perfectly!';
+            } else {
+                message.className = 'message error';
+                message.textContent = `You got ${correct} out of ${total} correct. Keep trying!`;
+            }
+
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 5000);
+        }
+
+        function revealAnswers() {
+            document.querySelectorAll('input').forEach(input => {
+                input.value = input.dataset.answer;
+                input.parentElement.classList.add('correct');
+            });
+
+            const message = document.getElementById('message');
+            message.style.display = 'block';
+            message.className = 'message success';
+            message.textContent = '💡 All answers revealed!';
+
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+
+        function resetPuzzle() {
+            document.querySelectorAll('input').forEach(input => {
+                input.value = '';
+                input.parentElement.classList.remove('correct', 'incorrect', 'active');
+            });
+
+            document.querySelectorAll('.clue').forEach(clue => {
+                clue.classList.remove('active');
+            });
+
+            document.getElementById('message').style.display = 'none';
+        }
+
+        // Initialize puzzle on load
+        createPuzzle();
+    </script>
+</body>
+</html>
