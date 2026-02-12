@@ -30,8 +30,9 @@
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-      background: #f0f4fa;
+      background: var(--uva-green);
       color: var(--uva-text-main);
+      padding: 12px;
     }
 
     /* ========= UNIVERSITY VIEW ACADEMY BRANDING ========= */
@@ -39,16 +40,18 @@
     .uva-header {
       background: #ffffff;
       border-bottom: 4px solid var(--uva-blue);
-      padding: 10px 16px;
+      padding: 10px 12px;
       margin-bottom: 12px;
+      border-radius: 8px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .uva-header-inner {
-      max-width: 1100px;
-      margin: 0 auto;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
 
     .uva-logo-wrap {
@@ -56,7 +59,7 @@
     }
 
     .uva-logo {
-      height: 70px; /* adjust as needed */
+      height: 60px;
       width: auto;
       display: block;
     }
@@ -64,19 +67,19 @@
     .uva-title-wrap {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
     }
 
     .uva-school-name {
       margin: 0;
-      font-size: 1.6rem;
+      font-size: 1.3rem;
       color: var(--uva-blue);
       font-family: "Georgia", "Times New Roman", serif;
     }
 
     .uva-course-name {
       margin: 0;
-      font-size: 1rem;
+      font-size: 0.9rem;
       color: var(--uva-green);
       font-family: "Helvetica Neue", Arial, sans-serif;
       font-weight: 600;
@@ -84,16 +87,15 @@
 
     .uva-tagline {
       margin: 0;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: var(--uva-text-muted);
     }
 
     /* ========= APP CONTAINER ========= */
 
     #root {
-      max-width: 1100px;
-      margin: 0 auto 32px auto;
-      padding: 0 16px 24px 16px;
+      max-width: 800px;
+      margin: 0 auto 20px auto;
     }
 
     .app-card {
@@ -101,36 +103,36 @@
       border-radius: 10px;
       border: 1px solid var(--uva-border);
       box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-      padding: 20px 20px 16px 20px;
+      padding: 16px;
     }
 
     .app-heading {
       margin-top: 0;
       margin-bottom: 4px;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: 700;
       color: var(--uva-blue);
     }
 
     .app-subtitle {
       margin-top: 0;
-      margin-bottom: 14px;
-      font-size: 0.95rem;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
       color: var(--uva-text-muted);
     }
 
     .badge-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 14px;
+      gap: 6px;
+      margin-bottom: 12px;
     }
 
     .badge {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      padding: 4px 8px;
+      padding: 3px 7px;
       border-radius: 999px;
       border: 1px solid var(--uva-blue);
       color: var(--uva-blue-dark);
@@ -144,18 +146,12 @@
       background: #e5f7ed;
     }
 
-    /* ========= LAYOUT: MAIN / SIDEBAR ========= */
+    /* ========= LAYOUT: SINGLE COLUMN ========= */
 
     .layout {
-      display: grid;
-      grid-template-columns: 2.4fr 1.4fr;
-      gap: 16px;
-    }
-
-    @media (max-width: 900px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     /* ========= SCENARIO CARD ========= */
@@ -164,30 +160,28 @@
       border-radius: 10px;
       border: 1px solid var(--uva-border);
       background: var(--uva-gray-light);
-      padding: 14px;
+      padding: 12px;
     }
 
     .scenario-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       margin-bottom: 8px;
     }
 
     .scenario-title {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       color: var(--uva-text-main);
+      margin-bottom: 2px;
     }
 
     .scenario-meta {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--uva-text-muted);
     }
 
     .scenario-description {
       margin: 0 0 10px 0;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--uva-text-main);
     }
 
@@ -202,9 +196,9 @@
 
     .tab-button {
       flex: 1 1 0;
-      min-width: 80px;
-      padding: 6px 8px;
-      font-size: 0.8rem;
+      min-width: 70px;
+      padding: 5px 7px;
+      font-size: 0.75rem;
       border-radius: 999px;
       border: 1px solid var(--uva-border);
       background: #ffffff;
@@ -213,12 +207,12 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       transition: background 0.15s, border-color 0.15s, transform 0.08s;
     }
 
     .tab-button span.icon {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     .tab-button.active {
@@ -236,12 +230,12 @@
       background: #ffffff;
       border-radius: 8px;
       border: 1px solid var(--uva-border);
-      padding: 10px 10px 8px 10px;
-      font-size: 0.85rem;
+      padding: 10px;
+      font-size: 0.8rem;
     }
 
     .panel-title {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 600;
       margin: 0 0 6px 0;
       color: var(--uva-blue-dark);
@@ -249,23 +243,28 @@
 
     .kv-grid {
       display: grid;
-      grid-template-columns: 1.4fr 2.1fr;
+      grid-template-columns: 1.2fr 2fr;
       row-gap: 4px;
-      column-gap: 10px;
+      column-gap: 8px;
     }
 
     .kv-label {
       font-weight: 600;
       color: var(--uva-text-muted);
+      font-size: 0.75rem;
+    }
+
+    .kv-grid > div:nth-child(even) {
+      font-size: 0.75rem;
     }
 
     .status-pill {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 2px 7px;
+      gap: 3px;
+      padding: 2px 6px;
       border-radius: 999px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 600;
     }
 
@@ -305,14 +304,14 @@
       border-radius: 8px;
       border: 1px solid var(--uva-border);
       background: #ffffff;
-      padding: 7px 8px;
+      padding: 6px 8px;
       display: flex;
-      gap: 8px;
+      gap: 7px;
       align-items: flex-start;
       cursor: pointer;
       transition: border-color 0.15s, box-shadow 0.15s, background 0.15s,
         transform 0.08s;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
 
     .option:hover {
@@ -328,17 +327,18 @@
     .option-label {
       font-weight: 600;
       color: var(--uva-text-main);
+      font-size: 0.8rem;
     }
 
     .option-desc {
       color: var(--uva-text-muted);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
     }
 
     .submit-row {
       margin-top: 10px;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -348,12 +348,12 @@
       border: 1px solid var(--uva-blue);
       color: white;
       border-radius: 999px;
-      padding: 7px 14px;
-      font-size: 0.85rem;
+      padding: 6px 12px;
+      font-size: 0.8rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       font-weight: 600;
       box-shadow: 0 4px 10px rgba(0, 97, 168, 0.2);
       transition: background 0.15s, transform 0.08s, box-shadow 0.15s;
@@ -375,14 +375,14 @@
     .btn-secondary {
       background-color: white;
       border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 0.8rem;
+      padding: 5px 10px;
+      font-size: 0.75rem;
       cursor: pointer;
       border: 1px solid var(--uva-border);
       color: var(--uva-text-main);
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       font-weight: 500;
       transition: background 0.15s, border-color 0.15s;
     }
@@ -396,9 +396,9 @@
       margin-top: 10px;
       border-radius: 8px;
       padding: 8px 10px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       display: flex;
-      gap: 8px;
+      gap: 7px;
       align-items: flex-start;
     }
 
@@ -415,7 +415,7 @@
     }
 
     .feedback-icon {
-      font-size: 1.1rem;
+      font-size: 1rem;
       margin-top: 2px;
     }
 
@@ -434,13 +434,13 @@
       border-radius: 10px;
       border: 1px solid var(--uva-border);
       background: #ffffff;
-      padding: 10px 12px 12px 12px;
-      font-size: 0.85rem;
+      padding: 10px 12px;
+      font-size: 0.8rem;
     }
 
     .sidebar-title {
       margin: 0 0 6px 0;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: var(--uva-blue-dark);
     }
@@ -448,17 +448,18 @@
     .progress-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--uva-text-muted);
       margin-bottom: 4px;
     }
 
     .progress-bar-outer {
       width: 100%;
-      height: 7px;
+      height: 6px;
       border-radius: 999px;
       background: #e5e7eb;
       overflow: hidden;
+      margin-bottom: 8px;
     }
 
     .progress-bar-inner {
@@ -473,9 +474,10 @@
     }
 
     .sidebar-list {
-      margin: 6px 0 0 0;
+      margin: 6px 0 8px 0;
       padding-left: 16px;
       color: var(--uva-text-muted);
+      font-size: 0.75rem;
     }
 
     .sidebar-list li {
@@ -485,14 +487,14 @@
     .pill-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 5px;
       margin-top: 6px;
     }
 
     .pill {
       border-radius: 999px;
-      padding: 2px 7px;
-      font-size: 0.75rem;
+      padding: 2px 6px;
+      font-size: 0.7rem;
       background: #eef2ff;
       color: var(--uva-blue-dark);
     }
@@ -505,8 +507,8 @@
     /* ========= FOOTER TEXT ========= */
 
     .footer-note {
-      margin-top: 10px;
-      font-size: 0.8rem;
+      margin-top: 8px;
+      font-size: 0.75rem;
       color: var(--uva-text-muted);
       text-align: right;
     }
@@ -921,14 +923,12 @@
           </div>
 
           <div className="layout">
-            {/* LEFT: SCENARIO & ANSWER */}
+            {/* SCENARIO & ANSWER */}
             <div className="scenario-card">
               <div className="scenario-header">
-                <div>
-                  <div className="scenario-title">{scenario.title}</div>
-                  <div className="scenario-meta">
-                    Difficulty: {scenario.difficulty} • Focus: {scenario.objectiveTag}
-                  </div>
+                <div className="scenario-title">{scenario.title}</div>
+                <div className="scenario-meta">
+                  Difficulty: {scenario.difficulty} • Focus: {scenario.objectiveTag}
                 </div>
               </div>
 
@@ -1001,7 +1001,7 @@
                   disabled={currentIndex === 0}
                   type="button"
                 >
-                  ◀ Previous Scenario
+                  ◀ Previous
                 </button>
 
                 <button
@@ -1010,7 +1010,7 @@
                   disabled={currentIndex === total - 1}
                   type="button"
                 >
-                  Next Scenario ▶
+                  Next ▶
                 </button>
               </div>
 
@@ -1020,9 +1020,9 @@
               />
             </div>
 
-            {/* RIGHT: SIDEBAR */}
+            {/* SIDEBAR */}
             <div className="sidebar-card">
-              <h3 className="sidebar-title">Lab Progress – Computer Architecture</h3>
+              <h3 className="sidebar-title">Lab Progress</h3>
               <div className="progress-row">
                 <span>Scenarios mastered</span>
                 <span>
