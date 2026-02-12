@@ -200,6 +200,12 @@
 
         @media (max-width: 900px) {
             .content-wrapper { grid-template-columns: 1fr; }
+            .crossword {
+                grid-template-columns: repeat(13, 30px);
+                grid-template-rows: repeat(13, 30px);
+            }
+            .cell { width: 30px; height: 30px; }
+            .cell input { font-size: 14px; }
         }
     </style>
 </head>
@@ -266,22 +272,34 @@
             const crossword = document.getElementById('crossword');
             const grid = Array(13).fill().map(() => Array(13).fill(null));
 
+            // Map across words
             Object.entries(puzzleData.across).forEach(([num, d]) => {
-                for(let i=0; i<d.answer.length; i++) grid[d.row][d.col+i] = { char: d.answer[i], num: i==0?num:null, a: num, d: null };
-            });
-            Object.entries(puzzleData.down).forEach(([num, d]) => {
                 for(let i=0; i<d.answer.length; i++) {
-                    if(grid[d.row+i][d.col]) {
-                        grid[d.row+i][d.col].d = num;
-                        if(i==0 && !grid[d.row+i][d.col].num) grid[d.row+i][d.col].num = num;
-                    } else grid[d.row+i][d.col] = { char: d.answer[i], num: i==0?num:null, a: null, d: num };
+                    const r = d.row;
+                    const c = d.col + i;
+                    if(!grid[r][c]) grid[r][c] = { char: d.answer[i], num: null, a: null, d: null };
+                    grid[r][c].a = num;
+                    if(i === 0) grid[r][c].num = num;
                 }
             });
 
+            // Map down words
+            Object.entries(puzzleData.down).forEach(([num, d]) => {
+                for(let i=0; i<d.answer.length; i++) {
+                    const r = d.row + i;
+                    const c = d.col;
+                    if(!grid[r][c]) grid[r][c] = { char: d.answer[i], num: null, a: null, d: null };
+                    grid[r][c].d = num;
+                    if(i === 0 && !grid[r][c].num) grid[r][c].num = num;
+                }
+            });
+
+            // Generate HTML
             for(let r=0; r<13; r++) {
                 for(let c=0; c<13; c++) {
                     const cell = document.createElement('div');
                     cell.className = grid[r][c] ? 'cell' : 'cell black';
+
                     if(grid[r][c]) {
                         if(grid[r][c].num) {
                             const n = document.createElement('span');
@@ -292,43 +310,68 @@
                         const input = document.createElement('input');
                         input.maxLength = 1;
                         input.dataset.ans = grid[r][c].char;
-                        input.onfocus = () => highlight(grid[r][c].a, grid[r][c].d);
+                        input.dataset.a = grid[r][c].a || '';
+                        input.dataset.d = grid[r][c].d || '';
+
+                        input.onfocus = function() {
+                            highlight(this.dataset.a, this.dataset.d);
+                        };
+
                         cell.appendChild(input);
                     }
                     crossword.appendChild(cell);
                 }
             }
 
-            const renderClues = (dir, el) => {
-                Object.entries(puzzleData[dir]).forEach(([n, d]) => {
-                    const c = document.createElement('div');
-                    c.className = 'clue';
-                    c.id = dir + n;
-                    c.innerHTML = `<b>${n}.</b> ${d.clue}`;
-                    el.appendChild(c);
-                });
-            };
-            renderClues('across', document.getElementById('across-clues'));
-            renderClues('down', document.getElementById('down-clues'));
+            // Render Clues
+            const acrossEl = document.getElementById('across-clues');
+            const downEl = document.getElementById('down-clues');
+
+            Object.entries(puzzleData.across).forEach(([n, d]) => {
+                const div = document.createElement('div');
+                div.className = 'clue';
+                div.id = 'across' + n;
+                div.innerHTML = `<b>${n}.</b> ${d.clue}`;
+                acrossEl.appendChild(div);
+            });
+
+            Object.entries(puzzleData.down).forEach(([n, d]) => {
+                const div = document.createElement('div');
+                div.className = 'clue';
+                div.id = 'down' + n;
+                div.innerHTML = `<b>${n}.</b> ${d.clue}`;
+                downEl.appendChild(div);
+            });
         }
 
         function highlight(a, d) {
             document.querySelectorAll('.clue').forEach(c => c.classList.remove('active'));
-            if(a) document.getElementById('across'+a).classList.add('active');
-            if(d) document.getElementById('down'+d).classList.add('active');
+            if(a) {
+                const el = document.getElementById('across' + a);
+                if(el) el.classList.add('active');
+            }
+            if(d) {
+                const el = document.getElementById('down' + d);
+                if(el) el.classList.add('active');
+            }
         }
 
         function checkAnswers() {
             let win = true;
             document.querySelectorAll('.cell input').forEach(i => {
-                const correct = i.value.toUpperCase() === i.dataset.ans;
-                i.parentElement.className = 'cell ' + (correct ? 'correct' : 'incorrect');
-                if(!correct) win = false;
+                if(i.value) {
+                    const correct = i.value.toUpperCase() === i.dataset.ans;
+                    i.parentElement.classList.add(correct ? 'correct' : 'incorrect');
+                    i.parentElement.classList.remove(correct ? 'incorrect' : 'correct');
+                    if(!correct) win = false;
+                } else {
+                    win = false;
+                }
             });
             const m = document.getElementById('message');
             m.style.display = 'block';
             m.style.background = win ? '#d4edda' : '#f8d7da';
-            m.textContent = win ? 'Perfect! Great job!' : 'Some answers are incorrect. Keep trying!';
+            m.textContent = win ? 'Perfect! Great job!' : 'Some answers are missing or incorrect.';
         }
 
         function revealAnswers() {
@@ -346,7 +389,7 @@
             document.getElementById('message').style.display = 'none';
         }
 
-        createPuzzle();
+        window.onload = createPuzzle;
     </script>
 </body>
 </html>
