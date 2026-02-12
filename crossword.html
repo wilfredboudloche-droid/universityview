@@ -1,182 +1,371 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>UVA Network Crossword</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVA Network Types Crossword</title>
     <style>
-        body { font-family: sans-serif; background: #2c5f2d; padding: 20px; color: #333; }
-        .card { background: white; max-width: 1000px; margin: 0 auto; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .header { text-align: center; border-bottom: 3px solid #1a5490; margin-bottom: 20px; padding-bottom: 10px; }
-        .school { color: #1a5490; font-size: 24px; font-weight: bold; margin: 0; }
-
-        .main-content { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(13, 35px); 
-            grid-template-rows: repeat(13, 35px); 
-            gap: 1px; 
-            background: #333; 
-            border: 2px solid #2c5f2d;
+        :root {
+            --uva-green: #2c5f2d;
+            --uva-blue: #1a5490;
+            --uva-light-green: #f0f7f0;
+            --correct: #90EE90;
+            --incorrect: #FFB6C6;
+            --active: #ffd700;
         }
 
-        .cell { width: 35px; height: 35px; background: white; position: relative; }
-        .cell.black { background: #2c5f2d; }
-        .cell input { 
-            width: 100%; height: 100%; border: none; text-align: center; 
-            font-weight: bold; font-size: 18px; text-transform: uppercase;
-            background: transparent; outline: none;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .num { position: absolute; top: 1px; left: 2px; font-size: 9px; color: #000; font-weight: bold; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--uva-green) 0%, #1e4620 100%);
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
 
-        .clues { flex: 1; min-width: 300px; background: #f0f7f0; padding: 15px; border-radius: 8px; border: 1px solid #2c5f2d; }
-        .clue-list { margin-bottom: 15px; }
-        .clue-item { margin-bottom: 5px; font-size: 14px; padding: 3px; }
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
 
-        .controls { text-align: center; margin-top: 20px; }
-        button { padding: 10px 20px; margin: 5px; font-weight: bold; cursor: pointer; color: white; border: none; border-radius: 4px; }
-        .btn-check { background: #1a5490; }
-        .btn-reveal { background: #2c5f2d; }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            border-bottom: 4px solid var(--uva-blue);
+            padding-bottom: 20px;
+        }
 
-        .correct { background: #c8e6c9 !important; }
-        .wrong { background: #ffcdd2 !important; }
+        .logo {
+            max-height: 80px;
+            width: auto;
+        }
+
+        .header-text {
+            text-align: left;
+        }
+
+        .school-name {
+            color: var(--uva-blue);
+            font-size: 2.2em;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .motto {
+            color: var(--uva-green);
+            font-weight: bold;
+            letter-spacing: 3px;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--uva-green);
+            margin: 20px 0 5px 0;
+            font-size: 1.8em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #555;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        .crossword-container {
+            display: flex;
+            justify-content: center;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .crossword {
+            display: inline-grid;
+            grid-template-columns: repeat(13, 40px);
+            grid-template-rows: repeat(13, 40px);
+            gap: 1px;
+            background: #999;
+            border: 2px solid var(--uva-green);
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            background: white;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cell.black {
+            background: var(--uva-green);
+        }
+
+        .cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: transparent;
+            outline: none;
+            z-index: 2;
+        }
+
+        .cell.active { background: var(--active); }
+        .cell.correct { background: var(--correct); }
+        .cell.incorrect { background: var(--incorrect); }
+
+        .cell-number {
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+            z-index: 1;
+        }
+
+        .clues-container {
+            background: var(--uva-light-green);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid var(--uva-green);
+            height: fit-content;
+        }
+
+        .clues-section h3 {
+            color: var(--uva-blue);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--uva-blue);
+        }
+
+        .clue-item {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            font-size: 0.95em;
+            border: 1px solid #eee;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .check-btn { background: var(--uva-blue); }
+        .reveal-btn { background: var(--uva-green); }
+        .reset-btn { background: #d32f2f; }
+
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        #message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 900px) {
+            .content-wrapper { grid-template-columns: 1fr; }
+            .header { flex-direction: column; text-align: center; }
+            .header-text { text-align: center; }
+        }
     </style>
 </head>
 <body>
-
-<div class="card">
-    <div class="header">
-        <p class="school">UNIVERSITY VIEW ACADEMY</p>
-        <h2>Network Types Crossword</h2>
-    </div>
-
-    <div class="main-content">
-        <div id="grid-container" class="grid"></div>
-
-        <div class="clues">
-            <div class="clue-list">
-                <h3 style="color:#1a5490">Across</h3>
-                <div id="across-list"></div>
-            </div>
-            <div class="clue-list">
-                <h3 style="color:#1a5490">Down</h3>
-                <div id="down-list"></div>
+    <div class="container">
+        <div class="header">
+            <img src="https://wilfredboudloche-droid.github.io/universityview/uview_logo.png" alt="UVA Logo" class="logo">
+            <div class="header-text">
+                <div class="school-name">University View Academy</div>
+                <div class="motto">VIRTUE • VIGOR • VISION</div>
             </div>
         </div>
+
+        <h1>🌐 Network Types Crossword</h1>
+        <p class="subtitle">Module 5A: Vocabulary & Abbreviations Review</p>
+
+        <div class="content-wrapper">
+            <div class="crossword-container">
+                <div id="grid-container" class="crossword"></div>
+            </div>
+
+            <div class="clues-container">
+                <div class="clues-section">
+                    <h3>Across</h3>
+                    <div id="across-list"></div>
+                </div>
+                <div style="margin-top:20px" class="clues-section">
+                    <h3>Down</h3>
+                    <div id="down-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="check-btn" onclick="check()">Check Answers</button>
+            <button class="reveal-btn" onclick="reveal()">Reveal All</button>
+            <button class="reset-btn" onclick="location.reload()">Reset</button>
+        </div>
+
+        <div id="message"></div>
     </div>
 
-    <div class="controls">
-        <button class="btn-check" onclick="check()">Check Answers</button>
-        <button class="btn-reveal" onclick="reveal()">Reveal All</button>
-        <button class="btn-reveal" style="background:#666" onclick="location.reload()">Reset</button>
-    </div>
-</div>
+    <script>
+        var data = {
+            across: {
+                1: { a: "LAN", c: "Network covering a single site (abbr.)", r: 0, col: 5 },
+                4: { a: "WIFI", c: "Brand name for IEEE 802.11", r: 2, col: 0 },
+                6: { a: "SOHO", c: "Small office/home office (abbr.)", r: 4, col: 3 },
+                8: { a: "ETHERNET", c: "Common cabled LAN standard", r: 6, col: 2 },
+                10: { a: "ISP", c: "Internet Service Provider (abbr.)", r: 8, col: 0 },
+                12: { a: "DATACENTER", c: "Site for provisioning server resources", r: 10, col: 1 },
+                13: { a: "FIBER", c: "Cabling using pulses of light", r: 12, col: 7 }
+            },
+            down: {
+                1: { a: "WLAN", c: "Wireless local area network (abbr.)", r: 0, col: 6 },
+                2: { a: "WAN", c: "Network spanning multiple locations (abbr.)", r: 0, col: 9 },
+                3: { a: "IEEE", c: "Institute maintaining Ethernet standards", r: 1, col: 3 },
+                5: { a: "PAN", c: "Personal area network (abbr.)", r: 3, col: 0 },
+                7: { a: "SAN", c: "Storage area network (abbr.)", r: 5, col: 6 },
+                9: { a: "MAN", c: "Metropolitan area network (abbr.)", r: 7, col: 8 },
+                11: { a: "SERVER", c: "Computer hosting shared resources", r: 7, col: 4 }
+            }
+        };
 
-<script>
-    var data = {
-        across: {
-            1: { a: "LAN", c: "Network covering a single site (abbr.)", r: 0, col: 5 },
-            4: { a: "WIFI", c: "Brand name for IEEE 802.11", r: 2, col: 0 },
-            6: { a: "SOHO", c: "Small office/home office (abbr.)", r: 4, col: 3 },
-            8: { a: "ETHERNET", c: "Common cabled LAN standard", r: 6, col: 2 },
-            10: { a: "ISP", c: "Internet Service Provider (abbr.)", r: 8, col: 0 },
-            12: { a: "DATACENTER", c: "Site for provisioning server resources", r: 10, col: 1 },
-            13: { a: "FIBER", c: "Cabling using pulses of light", r: 12, col: 7 }
-        },
-        down: {
-            1: { a: "WLAN", c: "Wireless local area network (abbr.)", r: 0, col: 6 },
-            2: { a: "WAN", c: "Network spanning multiple locations (abbr.)", r: 0, col: 9 },
-            3: { a: "IEEE", c: "Institute maintaining Ethernet standards", r: 1, col: 3 },
-            5: { a: "PAN", c: "Personal area network (abbr.)", r: 3, col: 0 },
-            7: { a: "SAN", c: "Storage area network (abbr.)", r: 5, col: 6 },
-            9: { a: "MAN", c: "Metropolitan area network (abbr.)", r: 7, col: 8 },
-            11: { a: "SERVER", c: "Computer hosting shared resources", r: 7, col: 4 }
+        var grid = [];
+        for(var i=0; i<13; i++) {
+            grid[i] = [];
+            for(var j=0; j<13; j++) grid[i][j] = null;
         }
-    };
 
-    var grid = [];
-    for(var i=0; i<13; i++) {
-        grid[i] = [];
-        for(var j=0; j<13; j++) grid[i][j] = null;
-    }
-
-    // Place Across
-    for(var k in data.across) {
-        var w = data.across[k];
-        for(var i=0; i<w.a.length; i++) {
-            if(!grid[w.r][w.col+i]) grid[w.r][w.col+i] = { char: w.a[i], num: null };
-            if(i==0) grid[w.r][w.col+i].num = k;
+        // Place Across
+        for(var k in data.across) {
+            var w = data.across[k];
+            for(var i=0; i<w.a.length; i++) {
+                if(!grid[w.r][w.col+i]) grid[w.r][w.col+i] = { char: w.a[i], num: null };
+                if(i==0) grid[w.r][w.col+i].num = k;
+            }
         }
-    }
 
-    // Place Down
-    for(var k in data.down) {
-        var w = data.down[k];
-        for(var i=0; i<w.a.length; i++) {
-            if(!grid[w.r+i][w.col]) grid[w.r+i][w.col] = { char: w.a[i], num: null };
-            if(i==0 && !grid[w.r+i][w.col].num) grid[w.r+i][w.col].num = k;
+        // Place Down
+        for(var k in data.down) {
+            var w = data.down[k];
+            for(var i=0; i<w.a.length; i++) {
+                if(!grid[w.r+i][w.col]) grid[w.r+i][w.col] = { char: w.a[i], num: null };
+                if(i==0 && !grid[w.r+i][w.col].num) grid[w.r+i][w.col].num = k;
+            }
         }
-    }
 
-    // Draw Grid
-    var container = document.getElementById('grid-container');
-    for(var r=0; r<13; r++) {
-        for(var c=0; c<13; c++) {
-            var div = document.createElement('div');
-            if(grid[r][c]) {
-                div.className = 'cell';
-                if(grid[r][c].num) {
-                    var n = document.createElement('span');
-                    n.className = 'num';
-                    n.innerHTML = grid[r][c].num;
-                    div.appendChild(n);
+        // Draw Grid
+        var container = document.getElementById('grid-container');
+        for(var r=0; r<13; r++) {
+            for(var c=0; c<13; c++) {
+                var div = document.createElement('div');
+                if(grid[r][c]) {
+                    div.className = 'cell';
+                    if(grid[r][c].num) {
+                        var n = document.createElement('span');
+                        n.className = 'cell-number';
+                        n.innerHTML = grid[r][c].num;
+                        div.appendChild(n);
+                    }
+                    var input = document.createElement('input');
+                    input.maxLength = 1;
+                    input.setAttribute('data-ans', grid[r][c].char);
+                    div.appendChild(input);
+                } else {
+                    div.className = 'cell black';
                 }
-                var input = document.createElement('input');
-                input.maxLength = 1;
-                input.setAttribute('data-ans', grid[r][c].char);
-                div.appendChild(input);
-            } else {
-                div.className = 'cell black';
+                container.appendChild(div);
             }
-            container.appendChild(div);
         }
-    }
 
-    // Draw Clues
-    function listClues(obj, id) {
-        var el = document.getElementById(id);
-        for(var k in obj) {
-            var d = document.createElement('div');
-            d.className = 'clue-item';
-            d.innerHTML = '<b>' + k + '.</b> ' + obj[k].c;
-            el.appendChild(d);
+        // Draw Clues
+        function listClues(obj, id) {
+            var el = document.getElementById(id);
+            for(var k in obj) {
+                var d = document.createElement('div');
+                d.className = 'clue-item';
+                d.innerHTML = '<b>' + k + '.</b> ' + obj[k].c;
+                el.appendChild(d);
+            }
         }
-    }
-    listClues(data.across, 'across-list');
-    listClues(data.down, 'down-list');
+        listClues(data.across, 'across-list');
+        listClues(data.down, 'down-list');
 
-    function check() {
-        var inputs = document.getElementsByTagName('input');
-        for(var i=0; i<inputs.length; i++) {
-            var val = inputs[i].value.toUpperCase();
-            var ans = inputs[i].getAttribute('data-ans');
-            if(val == ans) {
+        function check() {
+            var inputs = document.getElementsByTagName('input');
+            var win = true;
+            for(var i=0; i<inputs.length; i++) {
+                var val = inputs[i].value.toUpperCase();
+                var ans = inputs[i].getAttribute('data-ans');
+                if(val == ans) {
+                    inputs[i].parentElement.className = 'cell correct';
+                } else if(val != "") {
+                    inputs[i].parentElement.className = 'cell incorrect';
+                    win = false;
+                } else {
+                    win = false;
+                }
+            }
+            var m = document.getElementById('message');
+            m.style.display = 'block';
+            m.style.background = win ? '#d4edda' : '#f8d7da';
+            m.style.color = win ? '#155724' : '#721c24';
+            m.textContent = win ? 'Perfect! Great job!' : 'Some answers are missing or incorrect.';
+        }
+
+        function reveal() {
+            var inputs = document.getElementsByTagName('input');
+            for(var i=0; i<inputs.length; i++) {
+                inputs[i].value = inputs[i].getAttribute('data-ans');
                 inputs[i].parentElement.className = 'cell correct';
-            } else if(val != "") {
-                inputs[i].parentElement.className = 'cell wrong';
             }
         }
-    }
-
-    function reveal() {
-        var inputs = document.getElementsByTagName('input');
-        for(var i=0; i<inputs.length; i++) {
-            inputs[i].value = inputs[i].getAttribute('data-ans');
-            inputs[i].parentElement.className = 'cell correct';
-        }
-    }
-</script>
-
+    </script>
 </body>
 </html>
