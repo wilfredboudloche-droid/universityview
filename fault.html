@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Hardware Troubleshooting Simulation</title>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #error-container {
+            color: orange;
+            font-size: 16px;
+            margin: 12px;
+            min-height: 120px;
+            overflow-y: auto;
+            border: 1px solid orange;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #ff96000d;
+            display: none;
+        }
+        .ticket-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .ticket-card:hover {
+            transform: translateY(-5px);
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-green { background-color: #10b981; }
+        .status-red { background-color: #ef4444; }
+        .status-amber { background-color: #f59e0b; }
+        .diagnostic-panel {
+            background: #f9fafb;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+        }
+        .answer-btn {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .answer-btn:hover {
+            transform: scale(1.02);
+            border-color: #667eea;
+        }
+        .correct-answer {
+            background-color: #10b981 !important;
+            color: white !important;
+            border-color: #059669 !important;
+        }
+        .incorrect-answer {
+            background-color: #ef4444 !important;
+            color: white !important;
+            border-color: #dc2626 !important;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div id="artifact_react"></div>
+    <div id="error-container"></div>
+    <script type="text/babel">
+        try {
+            const { useState, useEffect } = React;
+
+            const scenarios = [
+                {
+                    id: 1,
+                    ticketNumber: "TKT-2401",
+                    user: "Sarah Martinez - Accounting Dept",
+                    complaint: "My computer says 'Network Cable Unplugged' but I just bought a brand new cable and it's plugged into the wall jack that worked yesterday.",
+                    diagnostics: {
+                        nic: {
+                            linkLight: "Off",
+                            activityLight: "Off",
+                            status: "Enabled in Device Manager"
+                        },
+                        os: {
+                            ipAddress: "169.254.12.45 (APIPA)",
+                            mediaState: "Media Disconnected",
+                            driver: "Up to date"
+                        },
+                        physical: {
+                            wallJack: "Labeled 3B - Cable firmly connected",
+                            patchPanel: "Port 3B has cable connected to Switch Port 12",
+                            switchPort: "Port 12 shows green link light"
+                        }
+                    },
+                    options: [
+                        { id: "a", text: "Failed NIC (Network Interface Card)", correct: true },
+                        { id: "b", text: "Bad patch cable from wall to PC", correct: false },
+                        { id: "c", text: "Faulty patch panel connection", correct: false },
+                        { id: "d", text: "Switch port configuration issue", correct: false }
+                    ],
+                    explanation: "The NIC has no link light despite the cable being new and the switch port showing a link light. The OS shows APIPA (169.254.x.x), which indicates the NIC cannot establish a connection. Since the switch port is active and the cable is new, the NIC itself has likely failed."
+                },
+                {
+                    id: 2,
+                    ticketNumber: "TKT-2402",
+                    user: "James Chen - Marketing",
+                    complaint: "I have a link light on my laptop, but I can't access any network resources. The server room shows my desk's switch port is completely dark.",
+                    diagnostics: {
+                        nic: {
+                            linkLight: "Green (Solid)",
+                            activityLight: "Amber (Blinking occasionally)",
+                            status: "Connected - 1 Gbps"
+                        },
+                        os: {
+                            ipAddress: "169.254.88.201 (APIPA)",
+                            mediaState: "Connected",
+                            driver: "Current"
+                        },
+                        physical: {
+                            wallJack: "Labeled 7A - Cable connected",
+                            patchPanel: "Port 7A - No visible damage",
+                            switchPort: "Port 24 - No link light, no activity"
+                        }
+                    },
+                    options: [
+                        { id: "a", text: "Failed NIC", correct: false },
+                        { id: "b", text: "Broken permanent link (wall to patch panel)", correct: true },
+                        { id: "c", text: "Bad patch cord (patch panel to switch)", correct: false },
+                        { id: "d", text: "Dead switch port", correct: false }
+                    ],
+                    explanation: "The laptop shows a link light, meaning the NIC is detecting a connection at the wall jack. However, the switch port shows no activity. This indicates the permanent link between the wall jack and patch panel is broken. The link light at the laptop is likely caused by electrical feedback in the damaged cable."
+                },
+                {
+                    id: 3,
+                    ticketNumber: "TKT-2403",
+                    user: "Reception Desk - IP Phone",
+                    complaint: "The new VoIP phone won't power on when plugged into the wall jack. When we use the power adapter that came with it, the phone works fine.",
+                    diagnostics: {
+                        nic: {
+                            linkLight: "N/A - Device won't power on",
+                            activityLight: "N/A",
+                            status: "Phone requires 15W (802.3af standard)"
+                        },
+                        os: {
+                            ipAddress: "N/A - Device not powered",
+                            mediaState: "N/A",
+                            driver: "N/A"
+                        },
+                        physical: {
+                            wallJack: "Labeled Reception-01",
+                            patchPanel: "Port Reception-01 connected to Switch Port 8",
+                            switchPort: "Port 8 - Unmanaged switch, no PoE indicator lights"
+                        }
+                    },
+                    options: [
+                        { id: "a", text: "Faulty VoIP phone", correct: false },
+                        { id: "b", text: "Damaged network cable", correct: false },
+                        { id: "c", text: "Switch does not support PoE (802.3af/at)", correct: true },
+                        { id: "d", text: "Patch panel wiring error", correct: false }
+                    ],
+                    explanation: "The phone works with its power adapter, proving the device is functional. The phone requires Power over Ethernet (802.3af - 15.4W). The switch is an unmanaged switch with no PoE indicator lights, meaning it cannot supply power over the data cable. A PoE-enabled switch or PoE injector is required."
+                },
+                {
+                    id: 4,
+                    ticketNumber: "TKT-2404",
+                    user: "David Park - Engineering",
+                    complaint: "My connection keeps dropping every few minutes. Sometimes it works, sometimes it doesn't. The cable looks fine to me.",
+                    diagnostics: {
+                        nic: {
+                            linkLight: "Green (Intermittent - flickers)",
+                            activityLight: "Amber (Sporadic)",
+                            status: "Connected at 100 Mbps (should be 1 Gbps)"
+                        },
+                        os: {
+                            ipAddress: "10.50.2.187 (Valid IP)",
+                            mediaState: "Connected (intermittent disconnects)",
+                            driver: "Up to date"
+                        },
+                        physical: {
+                            wallJack: "Labeled Eng-12 - Cable connected but feels loose",
+                            patchPanel: "Port Eng-12 connected properly",
+                            switchPort: "Port 16 - Gigabit port, link light flickers"
+                        }
+                    },
+                    options: [
+                        { id: "a", text: "Failing NIC", correct: false },
+                        { id: "b", text: "Bad patch cable (PC to wall)", correct: true },
+                        { id: "c", text: "Switch port malfunction", correct: false },
+                        { id: "d", text: "Patch panel punch-down failure", correct: false }
+                    ],
+                    explanation: "The intermittent connection and reduced speed (100 Mbps instead of 1 Gbps) indicate a physical layer problem. The cable feels loose at the wall jack, and the link light flickers. The patch cable between the PC and wall jack is likely damaged or has a poor connection at the RJ45 connector. Replacing this cable should resolve the issue."
+                },
+                {
+                    id: 5,
+                    ticketNumber: "TKT-2405",
+                    user: "Conference Room B - Wireless AP",
+                    complaint: "The wireless access point in Conference Room B isn't broadcasting. All cables appear connected, but there's no wireless signal.",
+                    diagnostics: {
+                        nic: {
+                            linkLight: "Green (Solid)",
+                            activityLight: "Amber (Blinking)",
+                            status: "AP requires 25W (802.3at PoE+ standard)"
+                        },
+                        os: {
+                            ipAddress: "AP not fully booting - Status LED: Amber",
+                            mediaState: "Data connection established",
+                            driver: "N/A - Hardware device"
+                        },
+                        physical: {
+                            wallJack: "Ceiling mount - Cable connected",
+                            patchPanel: "Port CR-B connected to Switch Port 32",
+                            switchPort: "Port 32 - PoE switch, 802.3af (15.4W max) indicator lit"
+                        }
+                    },
+                    options: [
+                        { id: "a", text: "Failed wireless access point", correct: false },
+                        { id: "b", text: "Insufficient PoE power (needs 802.3at, only has 802.3af)", correct: true },
+                        { id: "c", text: "Network cable too long (over 100m)", correct: false },
+                        { id: "d", text: "Switch port disabled", correct: false }
+                    ],
+                    explanation: "The AP has a data connection (link and activity lights) but won't fully boot (amber status LED). The AP requires 802.3at (PoE+) which provides up to 25W, but the switch port only supports 802.3af which provides 15.4W. The AP is receiving insufficient power to operate. The switch port needs to be upgraded to 802.3at/bt, or a PoE+ injector must be installed."
+                }
+            ];
+
+            function App() {
+                const [currentScenario, setCurrentScenario] = useState(0);
+                const [selectedAnswer, setSelectedAnswer] = useState(null);
+                const [showExplanation, setShowExplanation] = useState(false);
+                const [score, setScore] = useState(0);
+                const [answeredScenarios, setAnsweredScenarios] = useState([]);
+                const [quizComplete, setQuizComplete] = useState(false);
+
+                const scenario = scenarios[currentScenario];
+                const progress = ((currentScenario + 1) / scenarios.length) * 100;
+
+                const handleAnswerClick = (optionId) => {
+                    if (selectedAnswer !== null) return;
+
+                    setSelectedAnswer(optionId);
+                    setShowExplanation(true);
+
+                    const isCorrect = scenario.options.find(opt => opt.id === optionId).correct;
+                    if (isCorrect) {
+                        setScore(score + 1);
+                    }
+
+                    setAnsweredScenarios([...answeredScenarios, {
+                        ticket: scenario.ticketNumber,
+                        correct: isCorrect
+                    }]);
+                };
+
+                const handleNextScenario = () => {
+                    if (currentScenario < scenarios.length - 1) {
+                        setCurrentScenario(currentScenario + 1);
+                        setSelectedAnswer(null);
+                        setShowExplanation(false);
+                    } else {
+                        setQuizComplete(true);
+                    }
+                };
+
+                const handleRestart = () => {
+                    setCurrentScenario(0);
+                    setSelectedAnswer(null);
+                    setShowExplanation(false);
+                    setScore(0);
+                    setAnsweredScenarios([]);
+                    setQuizComplete(false);
+                };
+
+                if (quizComplete) {
+                    const percentage = (score / scenarios.length) * 100;
+                    let feedback = "";
+                    let feedbackColor = "";
+
+                    if (percentage >= 80) {
+                        feedback = "Excellent! You have a strong understanding of network hardware troubleshooting.";
+                        feedbackColor = "text-green-600";
+                    } else if (percentage >= 60) {
+                        feedback = "Good job! Review the scenarios you missed to strengthen your skills.";
+                        feedbackColor = "text-blue-600";
+                    } else {
+                        feedback = "Keep practicing! Review the A+ Core 1 Objective 2.5 material on networking hardware.";
+                        feedbackColor = "text-amber-600";
+                    }
+
+                    return (
+                        <div className="min-h-screen p-6 flex items-center justify-center">
+                            <div className="ticket-card max-w-2xl w-full p-8">
+                                <div className="text-center mb-6">
+                                    <i className="fas fa-trophy text-6xl text-yellow-500 mb-4"></i>
+                                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Quiz Complete!</h1>
+                                    <p className="text-gray-600">CompTIA A+ Core 1 - Objective 2.5</p>
+                                </div>
+
+                                <div className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-6 rounded-lg mb-6">
+                                    <div className="text-center">
+                                        <p className="text-lg mb-2">Your Score</p>
+                                        <p className="text-5xl font-bold">{score} / {scenarios.length}</p>
+                                        <p className="text-2xl mt-2">{percentage.toFixed(0)}%</p>
+                                    </div>
+                                </div>
+
+                                <p className={`text-center text-lg font-semibold mb-6 ${feedbackColor}`}>
+                                    {feedback}
+                                </p>
+
+                                <div className="mb-6">
+                                    <h3 className="font-bold text-gray-700 mb-3">Scenario Results:</h3>
+                                    {answeredScenarios.map((result, idx) => (
+                                        <div key={idx} className="flex items-center justify-between py-2 border-b">
+                                            <span className="text-gray-700">{result.ticket}</span>
+                                            {result.correct ? (
+                                                <span className="text-green-600 font-semibold">
+                                                    <i className="fas fa-check-circle mr-1"></i> Correct
+                                                </span>
+                                            ) : (
+                                                <span className="text-red-600 font-semibold">
+                                                    <i className="fas fa-times-circle mr-1"></i> Incorrect
+                                                </span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <button
+                                    onClick={handleRestart}
+                                    className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-purple-600 hover:to-indigo-700 transition"
+                                >
+                                    <i className="fas fa-redo mr-2"></i> Try Again
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
+
+                return (
+                    <div className="min-h-screen p-6">
+                        <div className="max-w-4xl mx-auto">
+                            {/* Header */}
+                            <div className="text-center mb-6">
+                                <h1 className="text-4xl font-bold text-white mb-2">
+                                    <i className="fas fa-network-wired mr-3"></i>
+                                    Network Hardware Troubleshooting
+                                </h1>
+                                <p className="text-purple-200 text-lg">CompTIA A+ Core 1 - Objective 2.5: Compare and contrast common networking hardware devices</p>
+                            </div>
+
+                            {/* Progress Bar */}
+                            <div className="mb-6">
+                                <div className="flex justify-between text-white text-sm mb-2">
+                                    <span>Scenario {currentScenario + 1} of {scenarios.length}</span>
+                                    <span>Score: {score}/{answeredScenarios.length}</span>
+                                </div>
+                                <div className="progress-bar">
+                                    <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+                                </div>
+                            </div>
+
+                            {/* Ticket Card */}
+                            <div className="ticket-card p-6 mb-6">
+                                <div className="border-b pb-4 mb-4">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-gray-800">
+                                                <i className="fas fa-ticket-alt text-purple-600 mr-2"></i>
+                                                {scenario.ticketNumber}
+                                            </h2>
+                                            <p className="text-gray-600 mt-1">
+                                                <i className="fas fa-user mr-2"></i>
+                                                {scenario.user}
+                                            </p>
+                                        </div>
+                                        <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                            Priority: High
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* User Complaint */}
+                                <div className="mb-6">
+                                    <h3 className="font-bold text-gray-700 mb-2 flex items-center">
+                                        <i className="fas fa-comment-dots text-blue-600 mr-2"></i>
+                                        User Report:
+                                    </h3>
+                                    <p className="text-gray-700 italic bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                                        "{scenario.complaint}"
+                                    </p>
+                                </div>
+
+                                {/* Diagnostic Data */}
+                                <div className="mb-6">
+                                    <h3 className="font-bold text-gray-700 mb-3 flex items-center">
+                                        <i className="fas fa-stethoscope text-purple-600 mr-2"></i>
+                                        Technical Diagnostic Report:
+                                    </h3>
+
+                                    {/* NIC Status */}
+                                    <div className="diagnostic-panel">
+                                        <h4 className="font-semibold text-gray-800 mb-2">
+                                            <i className="fas fa-microchip mr-2"></i>NIC Status:
+                                        </h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+                                            <div>
+                                                <span className="text-gray-600">Link Light: </span>
+                                                <span className="font-semibold">{scenario.diagnostics.nic.linkLight}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-gray-600">Activity Light: </span>
+                                                <span className="font-semibold">{scenario.diagnostics.nic.activityLight}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-gray-600">Status: </span>
+                                                <span className="font-semibold">{scenario.diagnostics.nic.status}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* OS/Software Info */}
+                                    <div className="diagnostic-panel">
+                                        <h4 className="font-semibold text-gray-800 mb-2">
+                                            <i className="fas fa-desktop mr-2"></i>OS/Software Info:
+                                        </h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+                                            <div>
+                                                <span className="text-gray-600">IP Address: </span>
+                                                <span className="font-semibold">{scenario.diagnostics.os.ipAddress}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-gray-600">Media State: </span>
+                                                <span className="font-semibold">{scenario.diagnostics.os.mediaState}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-gray-600">Driver: </span>
+                                                <span className="font-semibold">{scenario.diagnostics.os.driver}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Physical Environment */}
+                                    <div className="diagnostic-panel">
+                                        <h4 className="font-semibold text-gray-800 mb-2">
+                                            <i className="fas fa-plug mr-2"></i>Physical Environment:
+                                        </h4>
+                                        <div className="space-y-2 text-sm">
+                                            <div>
+                                                <span className="text-gray-600">Wall Jack: </span>
+                                                <span className="font-semibold">{scenario.diagnostics.physical.wallJack}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-gray-600">Patch Panel: </span>
+                                                <span className="font-semibold">{scenario.diagnostics.physical.patchPanel}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-gray-600">Switch Port: </span>
+                                                <span className="font-semibold">{scenario.diagnostics.physical.switchPort}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Question */}
+                                <div className="mb-4">
+                                    <h3 className="font-bold text-gray-800 mb-3 text-lg">
+                                        <i className="fas fa-question-circle text-purple-600 mr-2"></i>
+                                        What is the most likely cause of this network issue?
+                                    </h3>
+                                    <div className="space-y-3">
+                                        {scenario.options.map((option) => {
+                                            let buttonClass = "answer-btn w-full text-left p-4 rounded-lg bg-gray-50 hover:bg-gray-100";
+
+                                            if (selectedAnswer === option.id) {
+                                                if (option.correct) {
+                                                    buttonClass = "answer-btn w-full text-left p-4 rounded-lg correct-answer";
+                                                } else {
+                                                    buttonClass = "answer-btn w-full text-left p-4 rounded-lg incorrect-answer";
+                                                }
+                                            } else if (selectedAnswer !== null && option.correct) {
+                                                buttonClass = "answer-btn w-full text-left p-4 rounded-lg correct-answer";
+                                            }
+
+                                            return (
+                                                <button
+                                                    key={option.id}
+                                                    onClick={() => handleAnswerClick(option.id)}
+                                                    disabled={selectedAnswer !== null}
+                                                    className={buttonClass}
+                                                >
+                                                    <span className="font-semibold mr-2">{option.id.toUpperCase()}.</span>
+                                                    {option.text}
+                                                    {selectedAnswer === option.id && option.correct && (
+                                                        <i className="fas fa-check-circle float-right mt-1"></i>
+                                                    )}
+                                                    {selectedAnswer === option.id && !option.correct && (
+                                                        <i className="fas fa-times-circle float-right mt-1"></i>
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Explanation */}
+                                {showExplanation && (
+                                    <div className="mt-6 p-4 bg-indigo-50 border-l-4 border-indigo-500 rounded-lg">
+                                        <h4 className="font-bold text-indigo-900 mb-2">
+                                            <i className="fas fa-lightbulb mr-2"></i>Explanation:
+                                        </h4>
+                                        <p className="text-indigo-800">{scenario.explanation}</p>
+                                    </div>
+                                )}
+
+                                {/* Next Button */}
+                                {showExplanation && (
+                                    <button
+                                        onClick={handleNextScenario}
+                                        className="w-full mt-6 bg-gradient-to-r from-purple-500 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-purple-600 hover:to-indigo-700 transition"
+                                    >
+                                        {currentScenario < scenarios.length - 1 ? (
+                                            <>Next Scenario <i className="fas fa-arrow-right ml-2"></i></>
+                                        ) : (
+                                            <>View Results <i className="fas fa-flag-checkered ml-2"></i></>
+                                        )}
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Footer */}
+                            <div className="text-center text-white text-sm">
+                                <p>
+                                    <i className="fas fa-graduation-cap mr-2"></i>
+                                    Lesson 5B: Networking Hardware - NICs, MAC Addresses, Patch Panels, Switches, and PoE
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            ReactDOM.render(<App />, document.getElementById('artifact_react'));
+        } catch(error) {
+            displayError('An error occurred while loading the application.');
+        }
+        window.addEventListener('error', function(event) {
+            displayError(event.message, event.error?.stack);
+        });
+        function displayError(message, stackInfo) {
+            const errorContainer = document.getElementById('error-container');
+            const errorMessage = document.createElement('div');
+            errorMessage.textContent = message;
+            errorContainer.appendChild(errorMessage);
+            if(stackInfo) {
+                const stackErrorMessage = document.createElement('pre');
+                stackErrorMessage.textContent = stackInfo.substring(0, 130);
+                errorContainer.appendChild(stackErrorMessage);
+            }
+            errorContainer.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
