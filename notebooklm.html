@@ -11,6 +11,8 @@
       --paper: #fffef0;
       --sticky: #fef08a;
       --sticky-blue: #bfdbfe;
+      --sticky-pink: #fecdd3;
+      --sticky-green: #bbf7d0;
       --highlighter: rgba(254, 240, 138, 0.6);
       --ink: #1e293b;
       --tape: rgba(255, 255, 255, 0.3);
@@ -42,16 +44,22 @@
     main {
       max-width: 1000px;
       margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .activity-area {
       display: grid;
       grid-template-columns: 220px 1fr;
       gap: 15px;
-      height: 550px;
+      height: 480px;
     }
 
     .sidebar {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       overflow-y: auto;
       padding-right: 5px;
     }
@@ -60,17 +68,23 @@
       padding: 8px;
       width: 100%;
       height: 130px;
-      box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.3);
       cursor: grab;
       position: relative;
       border-bottom-right-radius: 20px 5px;
       flex-shrink: 0;
-      transition: transform 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
+      /* Random rotation applied via JS */
     }
-    .sticky-note:nth-child(even) { background: var(--sticky-blue); }
-    .sticky-note h3 { margin: 0; font-size: 0.9rem; border-bottom: 1px dashed #94a3b8; }
+    .sticky-note:hover {
+      transform: scale(1.05) rotate(0deg) !important;
+      box-shadow: 6px 6px 12px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+    .sticky-note:active { cursor: grabbing; }
+    .sticky-note h3 { margin: 0; font-size: 0.9rem; border-bottom: 1px dashed #94a3b8; padding-bottom: 3px; }
     .sticky-note p { font-size: 0.75rem; margin: 5px 0; line-height: 1.1; }
-    .sticker-img { font-size: 1.5rem; text-align: center; }
+    .sticker-img { font-size: 1.5rem; text-align: center; margin: 3px 0; }
 
     .desk-surface {
       display: grid;
@@ -120,32 +134,47 @@
       font-size: 0.7rem;
       color: #94a3b8;
       background: rgba(255,255,255,0.6);
+      transition: all 0.2s;
     }
     .drop-zone.over { background: var(--highlighter); border-color: #3b82f6; }
     
-    .clipboard {
+    /* Bottom Controls */
+    .controls {
       background: #78350f;
-      padding: 10px;
+      padding: 12px;
       border-radius: 8px;
       color: white;
       text-align: center;
       box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
     }
     .btn {
       background: #f8fafc;
       border: none;
-      padding: 6px 10px;
+      padding: 8px 16px;
       border-radius: 4px;
       font-weight: bold;
       cursor: pointer;
       font-family: inherit;
-      font-size: 0.8rem;
-      width: 100%;
-      margin-bottom: 6px;
+      font-size: 0.9rem;
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: all 0.2s;
     }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
     .btn-check { background: #22c55e; color: white; }
-    .score-display { font-size: 1rem; font-weight: bold; color: #fde047; text-shadow: 1px 1px 2px black; }
+    .score-display { 
+      font-size: 1.1rem; 
+      font-weight: bold; 
+      color: #fde047; 
+      text-shadow: 1px 1px 2px black;
+      padding: 8px 16px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+    }
 
     .placed-note {
       transform: scale(0.7) rotate(0deg) !important;
@@ -168,20 +197,21 @@
 </header>
 
 <main>
-  <section class="sidebar">
-    <div id="bank">
+  <div class="activity-area">
+    <section class="sidebar" id="bank">
       <!-- Sticky notes injected here -->
-    </div>
-    <div class="clipboard">
-      <button class="btn btn-check" onclick="checkAnswers()">Check Work</button>
-      <button class="btn" onclick="location.reload()">Reset Board</button>
-      <div class="score-display" id="score">Score: - / 6</div>
-    </div>
-  </section>
+    </section>
 
-  <section class="desk-surface" id="desk">
-    <!-- Task cards injected here -->
-  </section>
+    <section class="desk-surface" id="desk">
+      <!-- Task cards injected here -->
+    </section>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-check" onclick="checkAnswers()">✓ Check Work</button>
+    <button class="btn" onclick="location.reload()">↻ Reset Board</button>
+    <div class="score-display" id="score">Score: — / 6</div>
+  </div>
 </main>
 
 <script>
@@ -203,13 +233,23 @@ const tasks = [
   { id: 6, goal: 'See how chapters relate visually.', match: 'map' }
 ];
 
+const stickyColors = ['var(--sticky)', 'var(--sticky-blue)', 'var(--sticky-pink)', 'var(--sticky-green)'];
+
 function init() {
   const bank = document.getElementById('bank');
-  tools.sort(() => Math.random() - 0.5).forEach(tool => {
+  tools.sort(() => Math.random() - 0.5).forEach((tool, index) => {
     const note = document.createElement('div');
     note.className = 'sticky-note';
     note.draggable = true;
     note.id = tool.id;
+    
+    // Random rotation for sticky notes
+    const randomRot = (Math.random() * 16 - 8).toFixed(2); // -8 to +8 degrees
+    note.style.transform = `rotate(${randomRot}deg)`;
+    
+    // Random color
+    note.style.background = stickyColors[index % stickyColors.length];
+    
     note.innerHTML = `<div class="sticker-img">${tool.img}</div><h3>${tool.name}</h3><p>${tool.desc}</p>`;
     note.addEventListener('dragstart', e => e.dataTransfer.setData('text', e.target.id));
     bank.appendChild(note);
@@ -220,8 +260,8 @@ function init() {
     const card = document.createElement('div');
     card.className = 'task-card';
     
-    // Apply random rotation between -4 and 4 degrees
-    const randomRot = (Math.random() * 8 - 4).toFixed(2);
+    // Random rotation for task cards
+    const randomRot = (Math.random() * 8 - 4).toFixed(2); // -4 to +4 degrees
     card.style.transform = `rotate(${randomRot}deg)`;
     
     card.innerHTML = `<h4>${task.goal}</h4><div class="drop-zone" data-match="${task.match}" id="zone-${task.id}">Drop Here</div>`;
@@ -253,11 +293,17 @@ function checkAnswers() {
     if (placedTool && placedTool.id === zone.dataset.match) {
       correct++;
       zone.classList.add('correct');
+      zone.classList.remove('incorrect');
     } else if (placedTool) {
       zone.classList.add('incorrect');
+      zone.classList.remove('correct');
     }
   });
   document.getElementById('score').innerText = `Score: ${correct} / 6`;
+  
+  if (correct === 6) {
+    setTimeout(() => alert('🎉 Perfect! You matched all tools correctly!'), 200);
+  }
 }
 
 init();
