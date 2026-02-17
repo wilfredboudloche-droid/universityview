@@ -20,158 +20,127 @@
       margin: 0;
       font-family: 'Kalam', 'Segoe UI', cursive, sans-serif;
       background-color: var(--desk);
-      /* Wood Grain Texture */
       background-image: repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0,0,0,0.05) 50px, rgba(0,0,0,0.05) 100px),
                         linear-gradient(to bottom, var(--wood), var(--desk));
       color: var(--ink);
-      padding: 20px;
-      min-height: 100vh;
+      padding: 10px;
+      overflow: hidden; /* Prevents the main window from scrolling */
     }
     header {
       background: var(--paper);
-      padding: 12px 20px;
+      padding: 8px 15px;
       border-radius: 2px;
       box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
-      transform: rotate(-1deg);
-      max-width: 1100px;
-      margin: 0 auto 20px;
-      border-left: 15px solid #ef4444; /* Legal pad style */
+      transform: rotate(-0.5deg);
+      max-width: 950px;
+      margin: 0 auto 15px;
+      border-left: 10px solid #ef4444;
     }
-    h1 { margin: 0; font-size: 1.6rem; text-decoration: underline wavy #3b82f6; }
-    .sub { margin: 5px 0 0; font-size: 0.95rem; font-style: italic; color: #475569; }
+    h1 { margin: 0; font-size: 1.3rem; }
+    .sub { margin: 2px 0 0; font-size: 0.85rem; color: #475569; }
 
     main {
-      max-width: 1100px;
+      max-width: 1000px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 25px;
+      grid-template-columns: 220px 1fr;
+      gap: 15px;
+      height: 550px; /* Fixed height to prevent vertical stretching */
     }
-    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
 
-    /* The Tool Bank (Sticky Notes) */
-    .tool-bank {
+    /* Left Column: Tool Bank & Clipboard */
+    .sidebar {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 10px;
+      overflow-y: auto;
+      padding-right: 5px;
     }
     .sticky-note {
       background: var(--sticky);
-      padding: 12px;
-      width: 180px;
-      height: 170px;
-      box-shadow: 5px 5px 10px rgba(0,0,0,0.2);
-      transform: rotate(2deg);
+      padding: 8px;
+      width: 100%;
+      height: 130px;
+      box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
       cursor: grab;
       position: relative;
-      transition: transform 0.2s;
-      border-bottom-right-radius: 40px 5px;
+      border-bottom-right-radius: 20px 5px;
+      flex-shrink: 0;
     }
-    .sticky-note:nth-child(even) { background: var(--sticky-blue); transform: rotate(-2deg); }
-    .sticky-note:hover { transform: scale(1.05) rotate(0deg); z-index: 10; }
-    .sticky-note:active { cursor: grabbing; }
-    .sticky-note .tape {
-      position: absolute;
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 20px;
-      background: var(--tape);
-      backdrop-filter: blur(2px);
-    }
-    .sticky-note h3 { margin: 0; font-size: 1rem; border-bottom: 1px dashed #94a3b8; padding-bottom: 5px; }
-    .sticky-note p { font-size: 0.8rem; margin: 8px 0; line-height: 1.2; }
-    .sticker-img { font-size: 2rem; text-align: center; margin: 5px 0; }
+    .sticky-note:nth-child(even) { background: var(--sticky-blue); }
+    .sticky-note h3 { margin: 0; font-size: 0.9rem; border-bottom: 1px dashed #94a3b8; }
+    .sticky-note p { font-size: 0.75rem; margin: 5px 0; line-height: 1.1; }
+    .sticker-img { font-size: 1.5rem; text-align: center; }
 
-    /* The Desk Surface (Drop Zones) */
+    /* Right Column: The Stacked Desk */
     .desk-surface {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-    }
-    @media (max-width: 1000px) {
-      .desk-surface {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    @media (max-width: 650px) {
-      .desk-surface {
-        grid-template-columns: 1fr;
-      }
+      grid-template-columns: repeat(2, 1fr); /* 2 columns is safer for stacking */
+      gap: 10px;
+      overflow-y: auto; /* This makes the tasks scrollable while the desk stays put */
+      padding: 10px;
+      background: rgba(0,0,0,0.1);
+      border-radius: 8px;
+      border: 2px inset rgba(0,0,0,0.2);
     }
 
-    .task-paper {
+    .task-card {
       background: var(--paper);
-      padding: 12px;
-      min-height: 170px;
-      box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
-      position: relative;
+      padding: 10px;
+      min-height: 140px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
       border: 1px solid #e2e8f0;
+      position: relative;
     }
-    .task-paper::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 25px; bottom: 0;
-      width: 2px; background: rgba(239, 68, 68, 0.2);
-    }
-    .task-paper h4 { margin: 0 0 8px 15px; font-size: 0.9rem; color: #1e40af; line-height: 1.3; }
+    .task-card h4 { margin: 0 0 5px 0; font-size: 0.85rem; color: #1e40af; line-height: 1.2; }
+    
     .drop-zone {
       border: 2px dashed #cbd5e1;
       border-radius: 4px;
-      min-height: 80px;
-      margin-left: 15px;
+      min-height: 70px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #94a3b8;
-      transition: background 0.2s;
-      padding: 5px;
+      background: rgba(255,255,255,0.5);
     }
-    .drop-zone.over { background: var(--highlighter); border-color: #3b82f6; }
+    .drop-zone.over { background: var(--highlighter); }
     
-    /* Controls & Score */
     .clipboard {
       background: #78350f;
-      padding: 12px;
+      padding: 10px;
       border-radius: 8px;
       color: white;
-      box-shadow: 10px 10px 20px rgba(0,0,0,0.4);
-      margin-top: 15px;
-    }
-    .clipboard-clip {
-      background: silver;
-      height: 25px;
-      width: 70px;
-      margin: -22px auto 8px;
-      border-radius: 5px 5px 0 0;
+      text-align: center;
     }
     .btn {
       background: #f8fafc;
       border: none;
-      padding: 8px 12px;
+      padding: 5px 10px;
       border-radius: 4px;
       font-weight: bold;
       cursor: pointer;
-      margin-right: 8px;
-      margin-bottom: 8px;
       font-family: inherit;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
+      width: 100%;
+      margin-bottom: 5px;
     }
     .btn-check { background: #22c55e; color: white; }
-    .btn:hover { opacity: 0.9; }
-    .score-display { font-size: 1.1rem; margin-top: 8px; font-weight: bold; color: #fde047; }
-
-    .correct { background: #dcfce7 !important; border: 2px solid #22c55e !important; }
-    .incorrect { background: #fee2e2 !important; border: 2px solid #ef4444 !important; }
+    .score-display { font-size: 1rem; font-weight: bold; color: #fde047; }
 
     .placed-note {
-      transform: scale(0.75) rotate(0deg) !important;
-      margin: -15px !important;
-      cursor: default !important;
+      transform: scale(0.7) !important;
+      margin: -25px !important;
+      box-shadow: none !important;
     }
+    .correct { background: #dcfce7 !important; border-color: #22c55e !important; }
+    .incorrect { background: #fee2e2 !important; border-color: #ef4444 !important; }
+
+    /* Custom Scrollbar for the Desk */
+    .desk-surface::-webkit-scrollbar, .sidebar::-webkit-scrollbar { width: 8px; }
+    .desk-surface::-webkit-scrollbar-thumb, .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap" rel="stylesheet">
 </head>
@@ -179,45 +148,43 @@
 
 <header>
   <h1>🧪 NotebookLM Lab Desk</h1>
-  <p class="sub">Drag the sticky notes to the correct research task on the desk. Then check your work!</p>
+  <p class="sub">Match the sticky notes to the tasks. Scroll the desk to see more!</p>
 </header>
 
 <main>
-  <section>
-    <div class="tool-bank" id="bank">
-      <!-- Sticky notes will be injected here -->
+  <section class="sidebar">
+    <div id="bank">
+      <!-- Sticky notes injected here -->
     </div>
-    
     <div class="clipboard">
-      <div class="clipboard-clip"></div>
-      <button class="btn btn-check" onclick="checkAnswers()">✓ Check Work</button>
-      <button class="btn" onclick="location.reload()">↻ Reset Desk</button>
-      <div class="score-display" id="score">Score: — / 6</div>
+      <button class="btn btn-check" onclick="checkAnswers()">Check Work</button>
+      <button class="btn" onclick="location.reload()">Reset</button>
+      <div class="score-display" id="score">Score: - / 6</div>
     </div>
   </section>
 
   <section class="desk-surface" id="desk">
-    <!-- Task papers will be injected here -->
+    <!-- Task cards injected here -->
   </section>
 </main>
 
 <script>
 const tools = [
-  { id: 'audio', name: 'Audio Overview', desc: 'Conversational podcast summary.', img: '🎙️' },
-  { id: 'cite', name: 'Citations', desc: 'Direct links to source text.', img: '📍' },
-  { id: 'guide', name: 'Study Guide', desc: 'Quiz questions & key terms.', img: '📝' },
-  { id: 'faq', name: 'FAQ', desc: 'Answers to common questions.', img: '❓' },
-  { id: 'brief', name: 'Briefing Doc', desc: 'High-level executive summary.', img: '📂' },
-  { id: 'map', name: 'Mind Map', desc: 'Visual web of connections.', img: '🕸️' }
+  { id: 'audio', name: 'Audio Overview', desc: 'Podcast summary.', img: '🎙️' },
+  { id: 'cite', name: 'Citations', desc: 'Links to source text.', img: '📍' },
+  { id: 'guide', name: 'Study Guide', desc: 'Quiz & terms.', img: '📝' },
+  { id: 'faq', name: 'FAQ', desc: 'Common Q&A.', img: '❓' },
+  { id: 'brief', name: 'Briefing Doc', desc: 'Quick summary.', img: '📂' },
+  { id: 'map', name: 'Mind Map', desc: 'Visual web.', img: '🕸️' }
 ];
 
 const tasks = [
-  { id: 1, goal: 'I need to listen to my notes while I exercise.', match: 'audio' },
-  { id: 2, goal: 'I need to prove exactly where this fact came from.', match: 'cite' },
-  { id: 3, goal: 'I want to test myself before the big exam.', match: 'guide' },
-  { id: 4, goal: 'I want to see the most likely questions on this topic.', match: 'faq' },
-  { id: 5, goal: 'I need a 1-page summary for a quick meeting.', match: 'brief' },
-  { id: 6, goal: 'I want to see how different chapters relate visually.', match: 'map' }
+  { id: 1, goal: 'Listen to notes while exercising.', match: 'audio' },
+  { id: 2, goal: 'Prove where a fact came from.', match: 'cite' },
+  { id: 3, goal: 'Test myself before the exam.', match: 'guide' },
+  { id: 4, goal: 'See common questions.', match: 'faq' },
+  { id: 5, goal: '1-page summary for a meeting.', match: 'brief' },
+  { id: 6, goal: 'See how chapters relate visually.', match: 'map' }
 ];
 
 function init() {
@@ -227,33 +194,19 @@ function init() {
     note.className = 'sticky-note';
     note.draggable = true;
     note.id = tool.id;
-    note.innerHTML = `
-      <div class="tape"></div>
-      <div class="sticker-img">${tool.img}</div>
-      <h3>${tool.name}</h3>
-      <p>${tool.desc}</p>
-    `;
-    note.addEventListener('dragstart', e => {
-      e.dataTransfer.setData('text', e.target.id);
-      e.dataTransfer.effectAllowed = 'move';
-    });
+    note.innerHTML = `<div class="sticker-img">${tool.img}</div><h3>${tool.name}</h3><p>${tool.desc}</p>`;
+    note.addEventListener('dragstart', e => e.dataTransfer.setData('text', e.target.id));
     bank.appendChild(note);
   });
 
   const desk = document.getElementById('desk');
   tasks.forEach(task => {
-    const paper = document.createElement('div');
-    paper.className = 'task-paper';
-    paper.innerHTML = `
-      <h4>Task: ${task.goal}</h4>
-      <div class="drop-zone" data-match="${task.match}" id="zone-${task.id}">Drop Tool Here</div>
-    `;
+    const card = document.createElement('div');
+    card.className = 'task-card';
+    card.innerHTML = `<h4>${task.goal}</h4><div class="drop-zone" data-match="${task.match}" id="zone-${task.id}">Drop Here</div>`;
     
-    const zone = paper.querySelector('.drop-zone');
-    zone.addEventListener('dragover', e => { 
-      e.preventDefault(); 
-      zone.classList.add('over'); 
-    });
+    const zone = card.querySelector('.drop-zone');
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
     zone.addEventListener('dragleave', () => zone.classList.remove('over'));
     zone.addEventListener('drop', e => {
       e.preventDefault();
@@ -267,7 +220,7 @@ function init() {
         toolNode.draggable = false;
       }
     });
-    desk.appendChild(paper);
+    desk.appendChild(card);
   });
 }
 
@@ -279,17 +232,11 @@ function checkAnswers() {
     if (placedTool && placedTool.id === zone.dataset.match) {
       correct++;
       zone.classList.add('correct');
-      zone.classList.remove('incorrect');
     } else if (placedTool) {
       zone.classList.add('incorrect');
-      zone.classList.remove('correct');
     }
   });
   document.getElementById('score').innerText = `Score: ${correct} / 6`;
-  
-  if (correct === 6) {
-    setTimeout(() => alert('🎉 Perfect score! You matched all tools correctly!'), 300);
-  }
 }
 
 init();
