@@ -49,11 +49,12 @@
       gap: 15px;
     }
 
+    /* Increased height by 15% (from 480px to 550px) */
     .activity-area {
       display: grid;
       grid-template-columns: 220px 1fr;
       gap: 15px;
-      height: 480px;
+      height: 550px; 
     }
 
     .sidebar {
@@ -74,7 +75,6 @@
       border-bottom-right-radius: 20px 5px;
       flex-shrink: 0;
       transition: transform 0.2s, box-shadow 0.2s;
-      /* Random rotation applied via JS */
     }
     .sticky-note:hover {
       transform: scale(1.05) rotate(0deg) !important;
@@ -100,14 +100,12 @@
     .task-card {
       background: var(--paper);
       padding: 15px 10px 10px;
-      min-height: 150px;
+      min-height: 160px; /* Slightly taller cards to match board height */
       box-shadow: 4px 4px 8px rgba(0,0,0,0.3);
       border: 1px solid #e2e8f0;
       position: relative;
-      /* Random rotation applied via JS */
     }
     
-    /* Pushpin effect */
     .task-card::after {
       content: '';
       position: absolute;
@@ -126,7 +124,7 @@
     .drop-zone {
       border: 2px dashed #cbd5e1;
       border-radius: 4px;
-      min-height: 75px;
+      min-height: 80px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -138,7 +136,6 @@
     }
     .drop-zone.over { background: var(--highlighter); border-color: #3b82f6; }
     
-    /* Bottom Controls */
     .controls {
       background: #78350f;
       padding: 12px;
@@ -243,11 +240,8 @@ function init() {
     note.draggable = true;
     note.id = tool.id;
     
-    // Random rotation for sticky notes
-    const randomRot = (Math.random() * 16 - 8).toFixed(2); // -8 to +8 degrees
+    const randomRot = (Math.random() * 16 - 8).toFixed(2);
     note.style.transform = `rotate(${randomRot}deg)`;
-    
-    // Random color
     note.style.background = stickyColors[index % stickyColors.length];
     
     note.innerHTML = `<div class="sticker-img">${tool.img}</div><h3>${tool.name}</h3><p>${tool.desc}</p>`;
@@ -260,8 +254,7 @@ function init() {
     const card = document.createElement('div');
     card.className = 'task-card';
     
-    // Random rotation for task cards
-    const randomRot = (Math.random() * 8 - 4).toFixed(2); // -4 to +4 degrees
+    const randomRot = (Math.random() * 8 - 4).toFixed(2);
     card.style.transform = `rotate(${randomRot}deg)`;
     
     card.innerHTML = `<h4>${task.goal}</h4><div class="drop-zone" data-match="${task.match}" id="zone-${task.id}">Drop Here</div>`;
