@@ -1,84 +1,239 @@
-const App = () => {
-  const [score, setScore] = useState(0);
-  const [feedback, setFeedback] = useState("Drag the items to the correct category!");
-  const [items, setItems] = useState([
-    { id: 1, text: "Canvas Inbox", category: "help", icon: "fa-envelope" },
-    { id: 2, text: "Learning Circles", category: "learn", icon: "fa-users" },
-    { id: 3, text: "Quick Checks", category: "learn", icon: "fa-bolt" },
-    { id: 4, text: "Yelp Rating Tool", category: "feedback", icon: "fa-star" },
-    { id: 5, text: "Modules Page", category: "learn", icon: "fa-layer-group" },
-    { id: 6, text: "Office Hours", category: "help", icon: "fa-clock" },
-  ]);
-
-  const handleDrop = (item, targetCategory) => {
-    if (item.category === targetCategory) {
-      setScore(score + 1);
-      setFeedback(`Nice! ${item.text} is definitely for ${targetCategory === 'help' ? 'Getting Help' : targetCategory === 'learn' ? 'Learning' : 'Giving Feedback'}!`);
-      setItems(items.filter(i => i.id !== item.id));
-    } else {
-      setFeedback(`Not quite! Try moving ${item.text} to a different spot.`);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Coach Will's Success Sort</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Tailwind via CDN for quick styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-pIVpCf0q9i4rY2zqXds0apD2SCuRh5P7NeR6tF5R0pMFUO6Dq7F8/zlC3ZyVik5p/pdXDtp8hcE3bc5zS0P5Iw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
+      background-color: #e5e7eb;
     }
-  };
-
-  return (
-    <div className="p-6 max-w-2xl mx-auto bg-white rounded-xl shadow-md font-sans border-2 border-blue-500">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-blue-700">Coach Will's Success Sort</h2>
-        <p className="text-gray-600">Show me you know how to navigate our virtual classroom!</p>
-        <div className="mt-2 text-lg font-semibold text-green-600">Score: {score} / 6</div>
+    .drop-zone {
+      min-height: 120px;
+    }
+  </style>
+</head>
+<body class="p-4">
+  <div
+    class="p-6 max-w-3xl mx-auto bg-white rounded-xl shadow-md border-2 border-blue-500"
+  >
+    <div class="text-center mb-6">
+      <h2 class="text-2xl font-bold text-blue-700">
+        Coach Will's Success Sort
+      </h2>
+      <p class="text-gray-600">
+        Show me you know how to navigate our virtual classroom!
+      </p>
+      <div
+        id="score"
+        class="mt-2 text-lg font-semibold text-green-600"
+      >
+        Score: 0 / 6
       </div>
-
-      <div className="bg-blue-50 p-4 rounded-lg mb-6 min-h-[60px] text-center italic text-blue-800 border border-blue-200">
-        {items.length > 0 ? feedback : "🎉 You nailed it! You're ready for Computer Tech Literacy!"}
-      </div>
-
-      <div className="flex flex-wrap justify-center gap-3 mb-8">
-        {items.map(item => (
-          <div
-            key={item.id}
-            draggable
-            onDragStart={(e) => e.dataTransfer.setData("item", JSON.stringify(item))}
-            className="cursor-move bg-white border-2 border-blue-400 p-3 rounded-lg shadow-sm hover:bg-blue-100 transition-colors flex items-center gap-2"
-          >
-            <i className={`fas ${item.icon} text-blue-500`}></i>
-            <span className="font-medium">{item.text}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {['learn', 'help', 'feedback'].map(cat => (
-          <div
-            key={cat}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              const item = JSON.parse(e.dataTransfer.getData("item"));
-              handleDrop(item, cat);
-            }}
-            className={`p-4 rounded-xl border-2 border-dashed min-h-[120px] flex flex-col items-center justify-center transition-all
-              ${cat === 'learn' ? 'border-green-400 bg-green-50' : 
-                cat === 'help' ? 'border-orange-400 bg-orange-50' : 
-                'border-purple-400 bg-purple-50'}`}
-          >
-            <i className={`fas ${cat === 'learn' ? 'fa-book-open' : cat === 'help' ? 'fa-life-ring' : 'fa-comment-dots'} text-2xl mb-2
-              ${cat === 'learn' ? 'text-green-600' : cat === 'help' ? 'text-orange-600' : 'text-purple-600'}`}></i>
-            <span className="font-bold uppercase text-xs tracking-widest">
-              {cat === 'learn' ? 'Learning' : cat === 'help' ? 'Getting Help' : 'Feedback'}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {items.length === 0 && (
-        <button 
-          onClick={() => window.location.reload()} 
-          className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors"
-        >
-          Play Again
-        </button>
-      )}
     </div>
-  );
-};
 
-App;
+    <div
+      id="feedback"
+      class="bg-blue-50 p-4 rounded-lg mb-6 min-h-[60px] text-center italic text-blue-800 border border-blue-200"
+    >
+      Drag the items to the correct category!
+    </div>
+
+    <!-- Draggable items -->
+    <div
+      id="items"
+      class="flex flex-wrap justify-center gap-3 mb-8"
+    >
+      <!-- Each item has data-category for the correct category -->
+      <div
+        class="item cursor-move bg-white border-2 border-blue-400 p-3 rounded-lg shadow-sm hover:bg-blue-100 transition-colors flex items-center gap-2"
+        draggable="true"
+        data-category="help"
+      >
+        <i class="fas fa-envelope text-blue-500"></i>
+        <span class="font-medium">Canvas Inbox</span>
+      </div>
+
+      <div
+        class="item cursor-move bg-white border-2 border-blue-400 p-3 rounded-lg shadow-sm hover:bg-blue-100 transition-colors flex items-center gap-2"
+        draggable="true"
+        data-category="learn"
+      >
+        <i class="fas fa-users text-blue-500"></i>
+        <span class="font-medium">Learning Circles</span>
+      </div>
+
+      <div
+        class="item cursor-move bg-white border-2 border-blue-400 p-3 rounded-lg shadow-sm hover:bg-blue-100 transition-colors flex items-center gap-2"
+        draggable="true"
+        data-category="learn"
+      >
+        <i class="fas fa-bolt text-blue-500"></i>
+        <span class="font-medium">Quick Checks</span>
+      </div>
+
+      <div
+        class="item cursor-move bg-white border-2 border-blue-400 p-3 rounded-lg shadow-sm hover:bg-blue-100 transition-colors flex items-center gap-2"
+        draggable="true"
+        data-category="feedback"
+      >
+        <i class="fas fa-star text-blue-500"></i>
+        <span class="font-medium">Yelp Rating Tool</span>
+      </div>
+
+      <div
+        class="item cursor-move bg-white border-2 border-blue-400 p-3 rounded-lg shadow-sm hover:bg-blue-100 transition-colors flex items-center gap-2"
+        draggable="true"
+        data-category="learn"
+      >
+        <i class="fas fa-layer-group text-blue-500"></i>
+        <span class="font-medium">Modules Page</span>
+      </div>
+
+      <div
+        class="item cursor-move bg-white border-2 border-blue-400 p-3 rounded-lg shadow-sm hover:bg-blue-100 transition-colors flex items-center gap-2"
+        draggable="true"
+        data-category="help"
+      >
+        <i class="fas fa-clock text-blue-500"></i>
+        <span class="font-medium">Office Hours</span>
+      </div>
+    </div>
+
+    <!-- Drop zones -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div
+        class="drop-zone p-4 rounded-xl border-2 border-dashed border-green-400 bg-green-50 flex flex-col items-center justify-center transition-all"
+        data-target="learn"
+      >
+        <i class="fas fa-book-open text-2xl mb-2 text-green-600"></i>
+        <span class="font-bold uppercase text-xs tracking-widest">Learning</span>
+      </div>
+
+      <div
+        class="drop-zone p-4 rounded-xl border-2 border-dashed border-orange-400 bg-orange-50 flex flex-col items-center justify-center transition-all"
+        data-target="help"
+      >
+        <i class="fas fa-life-ring text-2xl mb-2 text-orange-600"></i>
+        <span class="font-bold uppercase text-xs tracking-widest"
+          >Getting Help</span
+        >
+      </div>
+
+      <div
+        class="drop-zone p-4 rounded-xl border-2 border-dashed border-purple-400 bg-purple-50 flex flex-col items-center justify-center transition-all"
+        data-target="feedback"
+      >
+        <i class="fas fa-comment-dots text-2xl mb-2 text-purple-600"></i>
+        <span class="font-bold uppercase text-xs tracking-widest"
+          >Feedback</span
+        >
+      </div>
+    </div>
+
+    <button
+      id="resetBtn"
+      class="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors hidden"
+      type="button"
+    >
+      Play Again
+    </button>
+  </div>
+
+  <script>
+    (function () {
+      const itemsContainer = document.getElementById("items");
+      const feedbackEl = document.getElementById("feedback");
+      const scoreEl = document.getElementById("score");
+      const resetBtn = document.getElementById("resetBtn");
+      let score = 0;
+      const total = itemsContainer.querySelectorAll(".item").length;
+
+      let draggedItem = null;
+
+      function updateScore() {
+        scoreEl.textContent = "Score: " + score + " / " + total;
+        if (score === total) {
+          feedbackEl.textContent =
+            "🎉 You nailed it! You're ready for Computer Tech Literacy!";
+          resetBtn.classList.remove("hidden");
+        }
+      }
+
+      function resetGame() {
+        window.location.reload();
+      }
+
+      // Drag events for items
+      itemsContainer.querySelectorAll(".item").forEach((item) => {
+        item.addEventListener("dragstart", function (e) {
+          draggedItem = this;
+          e.dataTransfer.effectAllowed = "move";
+        });
+        item.addEventListener("dragend", function () {
+          draggedItem = null;
+        });
+      });
+
+      // Drop zones
+      document.querySelectorAll(".drop-zone").forEach((zone) => {
+        zone.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          this.classList.add("opacity-80");
+        });
+
+        zone.addEventListener("dragleave", function () {
+          this.classList.remove("opacity-80");
+        });
+
+        zone.addEventListener("drop", function (e) {
+          e.preventDefault();
+          this.classList.remove("opacity-80");
+          if (!draggedItem) return;
+
+          const targetCategory = this.getAttribute("data-target");
+          const itemCategory = draggedItem.getAttribute("data-category");
+          const itemText = draggedItem.innerText.trim();
+
+          if (targetCategory === itemCategory) {
+            feedbackEl.textContent =
+              "Nice! " +
+              itemText +
+              " is definitely for " +
+              (targetCategory === "help"
+                ? "Getting Help."
+                : targetCategory === "learn"
+                ? "Learning."
+                : "Giving Feedback.") +
+              " 👍";
+            // Remove the item from the list
+            draggedItem.parentNode.removeChild(draggedItem);
+            score++;
+            updateScore();
+          } else {
+            feedbackEl.textContent =
+              "Not quite! Try moving " +
+              itemText +
+              " to a different spot.";
+          }
+        });
+      });
+
+      resetBtn.addEventListener("click", resetGame);
+      updateScore();
+    })();
+  </script>
+</body>
+</html>
