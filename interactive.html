@@ -1,0 +1,84 @@
+const App = () => {
+  const [score, setScore] = useState(0);
+  const [feedback, setFeedback] = useState("Drag the items to the correct category!");
+  const [items, setItems] = useState([
+    { id: 1, text: "Canvas Inbox", category: "help", icon: "fa-envelope" },
+    { id: 2, text: "Learning Circles", category: "learn", icon: "fa-users" },
+    { id: 3, text: "Quick Checks", category: "learn", icon: "fa-bolt" },
+    { id: 4, text: "Yelp Rating Tool", category: "feedback", icon: "fa-star" },
+    { id: 5, text: "Modules Page", category: "learn", icon: "fa-layer-group" },
+    { id: 6, text: "Office Hours", category: "help", icon: "fa-clock" },
+  ]);
+
+  const handleDrop = (item, targetCategory) => {
+    if (item.category === targetCategory) {
+      setScore(score + 1);
+      setFeedback(`Nice! ${item.text} is definitely for ${targetCategory === 'help' ? 'Getting Help' : targetCategory === 'learn' ? 'Learning' : 'Giving Feedback'}!`);
+      setItems(items.filter(i => i.id !== item.id));
+    } else {
+      setFeedback(`Not quite! Try moving ${item.text} to a different spot.`);
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-2xl mx-auto bg-white rounded-xl shadow-md font-sans border-2 border-blue-500">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-blue-700">Coach Will's Success Sort</h2>
+        <p className="text-gray-600">Show me you know how to navigate our virtual classroom!</p>
+        <div className="mt-2 text-lg font-semibold text-green-600">Score: {score} / 6</div>
+      </div>
+
+      <div className="bg-blue-50 p-4 rounded-lg mb-6 min-h-[60px] text-center italic text-blue-800 border border-blue-200">
+        {items.length > 0 ? feedback : "🎉 You nailed it! You're ready for Computer Tech Literacy!"}
+      </div>
+
+      <div className="flex flex-wrap justify-center gap-3 mb-8">
+        {items.map(item => (
+          <div
+            key={item.id}
+            draggable
+            onDragStart={(e) => e.dataTransfer.setData("item", JSON.stringify(item))}
+            className="cursor-move bg-white border-2 border-blue-400 p-3 rounded-lg shadow-sm hover:bg-blue-100 transition-colors flex items-center gap-2"
+          >
+            <i className={`fas ${item.icon} text-blue-500`}></i>
+            <span className="font-medium">{item.text}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {['learn', 'help', 'feedback'].map(cat => (
+          <div
+            key={cat}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              const item = JSON.parse(e.dataTransfer.getData("item"));
+              handleDrop(item, cat);
+            }}
+            className={`p-4 rounded-xl border-2 border-dashed min-h-[120px] flex flex-col items-center justify-center transition-all
+              ${cat === 'learn' ? 'border-green-400 bg-green-50' : 
+                cat === 'help' ? 'border-orange-400 bg-orange-50' : 
+                'border-purple-400 bg-purple-50'}`}
+          >
+            <i className={`fas ${cat === 'learn' ? 'fa-book-open' : cat === 'help' ? 'fa-life-ring' : 'fa-comment-dots'} text-2xl mb-2
+              ${cat === 'learn' ? 'text-green-600' : cat === 'help' ? 'text-orange-600' : 'text-purple-600'}`}></i>
+            <span className="font-bold uppercase text-xs tracking-widest">
+              {cat === 'learn' ? 'Learning' : cat === 'help' ? 'Getting Help' : 'Feedback'}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {items.length === 0 && (
+        <button 
+          onClick={() => window.location.reload()} 
+          className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors"
+        >
+          Play Again
+        </button>
+      )}
+    </div>
+  );
+};
+
+App;
