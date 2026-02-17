@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NotebookLM Lab Desk Activity</title>
+  <style>
+    :root {
+      --desk: #3d2b1f;
+      --wood: #5d4037;
+      --paper: #fffef0;
+      --sticky: #fef08a;
+      --sticky-blue: #bfdbfe;
+      --highlighter: rgba(254, 240, 138, 0.6);
+      --ink: #1e293b;
+      --tape: rgba(255, 255, 255, 0.3);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Kalam', 'Segoe UI', cursive, sans-serif;
+      background-color: var(--desk);
+      /* Wood Grain Texture */
+      background-image: repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0,0,0,0.05) 50px, rgba(0,0,0,0.05) 100px),
+                        linear-gradient(to bottom, var(--wood), var(--desk));
+      color: var(--ink);
+      padding: 20px;
+      min-height: 100vh;
+    }
+    header {
+      background: var(--paper);
+      padding: 15px 25px;
+      border-radius: 2px;
+      box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+      transform: rotate(-1deg);
+      max-width: 900px;
+      margin: 0 auto 30px;
+      border-left: 15px solid #ef4444; /* Legal pad style */
+    }
+    h1 { margin: 0; font-size: 1.8rem; text-decoration: underline wavy #3b82f6; }
+    .sub { margin: 5px 0 0; font-style: italic; color: #475569; }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 30px;
+    }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+
+    /* The Tool Bank (Sticky Notes) */
+    .tool-bank {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .sticky-note {
+      background: var(--sticky);
+      padding: 15px;
+      width: 200px;
+      height: 200px;
+      box-shadow: 5px 5px 10px rgba(0,0,0,0.2);
+      transform: rotate(2deg);
+      cursor: grab;
+      position: relative;
+      transition: transform 0.2s;
+      border-bottom-right-radius: 40px 5px;
+    }
+    .sticky-note:nth-child(even) { background: var(--sticky-blue); transform: rotate(-2deg); }
+    .sticky-note:hover { transform: scale(1.05) rotate(0deg); z-index: 10; }
+    .sticky-note .tape {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 20px;
+      background: var(--tape);
+      backdrop-filter: blur(2px);
+    }
+    .sticky-note h3 { margin: 0; font-size: 1.1rem; border-bottom: 1px dashed #94a3b8; padding-bottom: 5px; }
+    .sticky-note p { font-size: 0.85rem; margin: 8px 0; line-height: 1.2; }
+    .sticker-img { width: 60px; height: 60px; margin: 0 auto; display: block; }
+
+    /* The Desk Surface (Drop Zones) */
+    .desk-surface {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .task-paper {
+      background: var(--paper);
+      padding: 20px;
+      min-height: 220px;
+      box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+      position: relative;
+      border: 1px solid #e2e8f0;
+    }
+    .task-paper::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 30px; bottom: 0;
+      width: 2px; background: rgba(239, 68, 68, 0.2);
+    }
+    .task-paper h4 { margin: 0 0 10px 20px; font-size: 1rem; color: #1e40af; }
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 4px;
+      min-height: 120px;
+      margin-left: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      transition: background 0.2s;
+    }
+    .drop-zone.over { background: var(--highlighter); border-color: #3b82f6; }
+    
+    /* Controls & Score */
+    .clipboard {
+      background: #78350f;
+      padding: 15px;
+      border-radius: 8px;
+      color: white;
+      box-shadow: 10px 10px 20px rgba(0,0,0,0.4);
+      margin-top: 20px;
+    }
+    .btn {
+      background: #f8fafc;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 10px;
+      font-family: inherit;
+    }
+    .btn-check { background: #22c55e; color: white; }
+    .score-display { font-size: 1.2rem; margin-top: 10px; font-weight: bold; color: #fde047; }
+
+    .correct { background: #dcfce7 !important; border: 2px solid #22c55e !important; }
+    .incorrect { background: #fee2e2 !important; border: 2px solid #ef4444 !important; }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <h1>NotebookLM Lab Desk</h1>
+  <p class="sub">Drag the sticky notes to the correct research task on the desk.</p>
+</header>
+
+<main>
+  <section>
+    <div class="tool-bank" id="bank">
+      <!-- Sticky notes will be injected here -->
+    </div>
+    
+    <div class="clipboard">
+      <div style="background: silver; height: 30px; width: 80px; margin: -25px auto 10px; border-radius: 5px 5px 0 0;"></div>
+      <button class="btn btn-check" onclick="checkAnswers()">Check Work</button>
+      <button class="btn" onclick="location.reload()">Reset Desk</button>
+      <div class="score-display" id="score">Score: - / 6</div>
+    </div>
+  </section>
+
+  <section class="desk-surface" id="desk">
+    <!-- Task papers will be injected here -->
+  </section>
+</main>
+
+<script>
+const tools = [
+  { id: 'audio', name: 'Audio Overview', desc: 'Conversational podcast summary.', img: '🎙️' },
+  { id: 'cite', name: 'Citations', desc: 'Direct links to source text.', img: '📍' },
+  { id: 'guide', name: 'Study Guide', desc: 'Quiz questions & key terms.', img: '📝' },
+  { id: 'faq', name: 'FAQ', desc: 'Answers to common questions.', img: '❓' },
+  { id: 'brief', name: 'Briefing Doc', desc: 'High-level executive summary.', img: '📂' },
+  { id: 'map', name: 'Mind Map', desc: 'Visual web of connections.', img: '🕸️' }
+];
+
+const tasks = [
+  { id: 1, goal: 'I need to listen to my notes while I exercise.', match: 'audio' },
+  { id: 2, goal: 'I need to prove exactly where this fact came from.', match: 'cite' },
+  { id: 3, goal: 'I want to test myself before the big exam.', match: 'guide' },
+  { id: 4, goal: 'I want to see the most likely questions on this topic.', match: 'faq' },
+  { id: 5, goal: 'I need a 1-page summary for a quick meeting.', match: 'brief' },
+  { id: 6, goal: 'I want to see how different chapters relate visually.', match: 'map' }
+];
+
+function init() {
+  const bank = document.getElementById('bank');
+  tools.sort(() => Math.random() - 0.5).forEach(tool => {
+    const note = document.createElement('div');
+    note.className = 'sticky-note';
+    note.draggable = true;
+    note.id = tool.id;
+    note.innerHTML = `<div class="tape"></div><div style="font-size:2rem; text-align:center;">${tool.img}</div><h3>${tool.name}</h3><p>${tool.desc}</p>`;
+    note.addEventListener('dragstart', e => e.dataTransfer.setData('text', e.target.id));
+    bank.appendChild(note);
+  });
+
+  const desk = document.getElementById('desk');
+  tasks.forEach(task => {
+    const paper = document.createElement('div');
+    paper.className = 'task-paper';
+    paper.innerHTML = `<h4>Task: ${task.goal}</h4><div class="drop-zone" data-match="${task.match}" id="zone-${task.id}">Drop Tool Here</div>`;
+    
+    const zone = paper.querySelector('.drop-zone');
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('over');
+      const toolId = e.dataTransfer.getData('text');
+      const toolNode = document.getElementById(toolId);
+      zone.innerHTML = '';
+      zone.appendChild(toolNode);
+      toolNode.style.transform = 'scale(0.8) rotate(0deg)';
+      toolNode.style.margin = '-20px';
+    });
+    desk.appendChild(paper);
+  });
+}
+
+function checkAnswers() {
+  let correct = 0;
+  tasks.forEach(task => {
+    const zone = document.getElementById(`zone-${task.id}`);
+    const placedTool = zone.querySelector('.sticky-note');
+    if (placedTool && placedTool.id === zone.dataset.match) {
+      correct++;
+      zone.classList.add('correct');
+      zone.classList.remove('incorrect');
+    } else if (placedTool) {
+      zone.classList.add('incorrect');
+      zone.classList.remove('correct');
+    }
+  });
+  document.getElementById('score').innerText = `Score: ${correct} / 6`;
+}
+
+init();
+</script>
+</body>
+</html>
