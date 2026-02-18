@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NotebookLM Video Workflow - Drag & Drop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1200px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 6px solid #f39c12;
+        }
+
+        .instructions p {
+            margin: 0;
+            color: #2d3436;
+            font-weight: 500;
+        }
+
+        .workflow-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .cards-pool {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 3px dashed #ddd;
+        }
+
+        .cards-pool h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .workflow-steps {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .step-slot {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 12px;
+            padding: 20px;
+            border: 3px dashed #90caf9;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .step-slot.drag-over {
+            background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+            border-color: #66bb6a;
+            transform: scale(1.02);
+        }
+
+        .step-slot.filled {
+            background: linear-gradient(135deg, #c8e6c9 0%, #81c784 100%);
+            border-color: #4caf50;
+            border-style: solid;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-label {
+            font-weight: bold;
+            color: #2d3436;
+            margin-bottom: 5px;
+        }
+
+        .step-description {
+            font-size: 0.9rem;
+            color: #636e72;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: grab;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid #e0e0e0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .card-icon {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-weight: bold;
+            color: #2d3436;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .check-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+            display: block;
+        }
+
+        .feedback.error {
+            background: linear-gradient(135deg, #ff7675 0%, #fd79a8 100%);
+            color: white;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .workflow-container {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 NotebookLM Video Workflow</h1>
+        <p class="subtitle">Drag and drop the steps in the correct order to create an Explainer Video</p>
+
+        <div class="instructions">
+            <p>📋 <strong>Instructions:</strong> Drag each card from the left into the correct step slot on the right. Arrange them in the proper order of the NotebookLM video creation workflow!</p>
+        </div>
+
+        <div class="workflow-container">
+            <div class="cards-pool">
+                <h3>🎯 Workflow Steps</h3>
+                <div class="cards-grid" id="cardsPool">
+                    <div class="card" draggable="true" data-step="1">
+                        <div class="card-icon">📁</div>
+                        <div class="card-title">Gather & Upload Sources</div>
+                    </div>
+                    <div class="card" draggable="true" data-step="2">
+                        <div class="card-icon">🔗</div>
+                        <div class="card-title">Add YouTube Links</div>
+                    </div>
+                    <div class="card" draggable="true" data-step="3">
+                        <div class="card-icon">🎨</div>
+                        <div class="card-title">Customize Video Settings</div>
+                    </div>
+                    <div class="card" draggable="true" data-step="4">
+                        <div class="card-icon">🎥</div>
+                        <div class="card-title">Generate Video Overview</div>
+                    </div>
+                    <div class="card" draggable="true" data-step="5">
+                        <div class="card-icon">✅</div>
+                        <div class="card-title">Verify & Export</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-steps">
+                <div class="step-slot" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-label">First Step</div>
+                        <div class="step-description">What do you do first?</div>
+                    </div>
+                </div>
+
+                <div class="step-slot" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-label">Second Step</div>
+                        <div class="step-description">What comes next?</div>
+                    </div>
+                </div>
+
+                <div class="step-slot" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-label">Third Step</div>
+                        <div class="step-description">How do you prepare?</div>
+                    </div>
+                </div>
+
+                <div class="step-slot" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-label">Fourth Step</div>
+                        <div class="step-description">Time to create!</div>
+                    </div>
+                </div>
+
+                <div class="step-slot" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-label">Final Step</div>
+                        <div class="step-description">Finish strong!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="check-btn" onclick="checkAnswers()">✓ Check My Work</button>
+            <button class="reset-btn" onclick="resetActivity()">↻ Reset</button>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <script>
+        let draggedCard = null;
+
+        // Add drag event listeners to all cards
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragend', handleDragEnd);
+        });
+
+        // Add drop event listeners to all slots
+        document.querySelectorAll('.step-slot').forEach(slot => {
+            slot.addEventListener('dragover', handleDragOver);
+            slot.addEventListener('drop', handleDrop);
+            slot.addEventListener('dragleave', handleDragLeave);
+        });
+
+        function handleDragStart(e) {
+            draggedCard = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            this.classList.remove('drag-over');
+
+            // Check if slot already has a card
+            const existingCard = this.querySelector('.card');
+            if (existingCard) {
+                // Send existing card back to pool
+                document.getElementById('cardsPool').appendChild(existingCard);
+            }
+
+            // Add the dragged card to this slot
+            if (draggedCard) {
+                this.appendChild(draggedCard);
+                this.classList.add('filled');
+            }
+
+            return false;
+        }
+
+        function checkAnswers() {
+            const slots = document.querySelectorAll('.step-slot');
+            let correct = 0;
+            let total = 5;
+
+            slots.forEach(slot => {
+                const card = slot.querySelector('.card');
+                if (card) {
+                    const slotStep = slot.getAttribute('data-step');
+                    const cardStep = card.getAttribute('data-step');
+                    if (slotStep === cardStep) {
+                        correct++;
+                        slot.style.borderColor = '#4caf50';
+                        slot.style.background = 'linear-gradient(135deg, #c8e6c9 0%, #81c784 100%)';
+                    } else {
+                        slot.style.borderColor = '#f44336';
+                        slot.style.background = 'linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 100%)';
+                    }
+                }
+            });
+
+            const feedback = document.getElementById('feedback');
+            if (correct === total) {
+                feedback.className = 'feedback success';
+                feedback.innerHTML = '🎉 Perfect! You\'ve mastered the NotebookLM Video Workflow! You got all ' + correct + ' out of ' + total + ' correct!';
+            } else {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = '❌ Not quite right. You got ' + correct + ' out of ' + total + ' correct. Try again!';
+            }
+        }
+
+        function resetActivity() {
+            // Move all cards back to pool
+            const cards = document.querySelectorAll('.card');
+            const pool = document.getElementById('cardsPool');
+
+            cards.forEach(card => {
+                pool.appendChild(card);
+            });
+
+            // Reset all slots
+            const slots = document.querySelectorAll('.step-slot');
+            slots.forEach(slot => {
+                slot.classList.remove('filled');
+                slot.style.borderColor = '';
+                slot.style.background = '';
+            });
+
+            // Hide feedback
+            const feedback = document.getElementById('feedback');
+            feedback.style.display = 'none';
+            feedback.className = 'feedback';
+        }
+    </script>
+</body>
+</html>
