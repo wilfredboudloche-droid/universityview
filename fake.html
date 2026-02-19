@@ -1,509 +1,1313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Academic Integrity & Citation – University View Academy</title>
-<style>
-:root{--uva-blue:#1d4ed8;--uva-dark:#1e3a8a;--uva-green:#16a34a;--uva-lgreen:#ecfdf5;--uva-yellow:#f59e0b;--uva-lyellow:#fefce8;--uva-red:#dc2626;--uva-purple:#7c3aed;--uva-teal:#0891b2;--bg:#f0f4ff;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:#111827;min-height:100vh;}
-/* HEADER */
-.hdr{background:linear-gradient(135deg,var(--uva-dark) 0%,var(--uva-blue) 60%,var(--uva-teal) 100%);padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 18px rgba(30,58,138,.35);position:relative;overflow:hidden;}
-.hdr::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,.07);border-radius:50%;}
-.hdr img{height:58px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:1;flex-shrink:0;}
-.hdr-txt{z-index:1;}
-.hdr-tag{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#93c5fd;margin-bottom:2px;}
-.hdr h1{font-size:1.3rem;font-weight:900;color:#fff;line-height:1.2;}
-.hdr p{font-size:.8rem;color:#bfdbfe;margin-top:2px;}
-/* HERO */
-.hero{background:linear-gradient(120deg,#1e3a8a 0%,#1d4ed8 45%,#0891b2 100%);padding:26px 20px 20px;text-align:center;position:relative;overflow:hidden;}
-.hero-bg{position:absolute;top:0;left:0;width:100%;height:100%;opacity:.1;pointer-events:none;}
-.hero h2{font-size:1.55rem;font-weight:900;color:#fff;position:relative;z-index:1;}
-.hero p{color:#bfdbfe;font-size:.88rem;margin-top:5px;position:relative;z-index:1;}
-.hero-pills{display:flex;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap;position:relative;z-index:1;}
-.pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:5px 13px;color:#fff;font-size:.75rem;font-weight:700;}
-/* PROGRESS */
-.prog-bar{background:#fff;padding:10px 18px;border-bottom:2px solid #e5e7eb;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.08);}
-.prog-lbl{font-size:.75rem;font-weight:700;color:var(--uva-dark);white-space:nowrap;}
-.prog-out{flex:1;height:9px;background:#e5e7eb;border-radius:999px;overflow:hidden;}
-.prog-in{height:100%;background:linear-gradient(90deg,var(--uva-green),var(--uva-teal));border-radius:999px;transition:width .5s;}
-.prog-sc{font-size:.75rem;font-weight:700;color:var(--uva-green);white-space:nowrap;}
-/* TABS */
-.tabs{display:flex;background:#1e3a8a;overflow-x:auto;}
-.tab{flex:1;min-width:100px;padding:10px 6px;border:none;background:transparent;color:#93c5fd;font-size:.72rem;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;}
-.tab .ti{font-size:1.1rem;}
-.tab:hover{background:rgba(255,255,255,.08);color:#fff;}
-.tab.active{color:#fff;border-bottom:3px solid var(--uva-yellow);background:rgba(255,255,255,.12);}
-/* SECTIONS */
-.sec{display:none;padding:18px 14px 28px;max-width:860px;margin:0 auto;}
-.sec.active{display:block;}
-/* SECTION HEADER */
-.sh{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;}
-.sh-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
-.sh h2{font-size:1.1rem;font-weight:900;color:var(--uva-dark);}
-.sh p{font-size:.78rem;color:#6b7280;margin-top:2px;}
-/* CARDS */
-.card{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 2px 12px rgba(0,0,0,.07);margin-bottom:16px;border-left:5px solid var(--uva-blue);}
-.card.g{border-left-color:var(--uva-green);}
-.card.y{border-left-color:var(--uva-yellow);}
-.card.r{border-left-color:var(--uva-red);}
-.card.p{border-left-color:var(--uva-purple);}
-.card.t{border-left-color:var(--uva-teal);}
-.card h3{font-size:.95rem;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
-.card p,.card li{font-size:.86rem;line-height:1.6;}
-.card ul{padding-left:18px;}
-/* INFO GRID */
-.ig{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;}
-.it{border-radius:14px;padding:16px 12px;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
-.it svg{display:block;margin:0 auto 8px;}
-.it h4{font-size:.85rem;font-weight:800;margin-bottom:5px;}
-.it p{font-size:.76rem;line-height:1.5;}
-/* SCENARIO GRID */
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:580px){.sg{grid-template-columns:1fr;}}
-.sc{background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.08);border:2px solid #e5e7eb;transition:all .2s;}
-.sc:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12);}
-.sc .sci{font-size:2rem;margin-bottom:7px;display:block;}
-.sc h4{font-size:.86rem;font-weight:800;margin-bottom:5px;}
-.sc p{font-size:.78rem;color:#374151;line-height:1.5;}
-.sc .vd{display:none;margin-top:9px;padding:7px 10px;border-radius:8px;font-size:.78rem;font-weight:700;line-height:1.4;}
-.sc.revealed .vd{display:block;}
-.sc.plag{border-color:var(--uva-red);}
-.sc.plag .vd{background:#fef2f2;color:var(--uva-red);}
-.sc.ok{border-color:var(--uva-green);}
-.sc.ok .vd{background:var(--uva-lgreen);color:var(--uva-green);}
-.sc.part{border-color:var(--uva-yellow);}
-.sc.part .vd{background:var(--uva-lyellow);color:#92400e;}
-.rbtn{margin-top:9px;padding:5px 13px;border-radius:999px;border:none;background:var(--uva-blue);color:#fff;font-size:.73rem;font-weight:700;cursor:pointer;transition:background .2s;}
-.rbtn:hover{background:var(--uva-dark);}
-/* QUIZ */
-.qq{background:#fff;border-radius:14px;padding:16px 18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);}
-.qt{font-size:.9rem;font-weight:700;margin-bottom:10px;display:flex;gap:9px;align-items:flex-start;}
-.qn{background:var(--uva-blue);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;margin-top:1px;}
-.qo{display:flex;flex-direction:column;gap:7px;}
-.qopt{padding:8px 12px;border-radius:10px;border:2px solid #e5e7eb;background:#f9fafb;cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:7px;}
-.qopt:hover{border-color:var(--uva-blue);background:#eff6ff;}
-.qopt.correct{border-color:var(--uva-green);background:var(--uva-lgreen);color:var(--uva-green);}
-.qopt.wrong{border-color:var(--uva-red);background:#fef2f2;color:var(--uva-red);}
-.qopt.disabled{pointer-events:none;}
-.qfb{margin-top:9px;padding:7px 11px;border-radius:8px;font-size:.8rem;font-weight:600;display:none;}
-.qfb.show{display:block;}
-.qfb.correct{background:var(--uva-lgreen);color:var(--uva-green);border-left:4px solid var(--uva-green);}
-.qfb.wrong{background:#fef2f2;color:var(--uva-red);border-left:4px solid var(--uva-red);}
-/* CITATION BUILDER */
-.cb{background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,.07);margin-bottom:16px;}
-.cb h3{font-size:.95rem;font-weight:800;margin-bottom:12px;color:var(--uva-dark);display:flex;align-items:center;gap:7px;}
-.cf{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-@media(max-width:540px){.cf{grid-template-columns:1fr;}}
-.cf label{font-size:.73rem;font-weight:700;color:#374151;display:block;margin-bottom:2px;}
-.cf input,.cf select{width:100%;padding:7px 9px;border:2px solid #e5e7eb;border-radius:8px;font-size:.8rem;outline:none;transition:border .2s;}
-.cf input:focus,.cf select:focus{border-color:var(--uva-blue);}
-.co{margin-top:12px;padding:11px 13px;background:#eff6ff;border-radius:10px;border-left:4px solid var(--uva-blue);font-size:.83rem;line-height:1.7;min-height:48px;color:#1e3a8a;font-style:italic;}
-.cbtn{margin-top:10px;padding:8px 20px;border-radius:999px;border:none;background:linear-gradient(90deg,var(--uva-blue),var(--uva-teal));color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;transition:opacity .2s;}
-.cbtn:hover{opacity:.88;}
-/* MATCHING */
-.mg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-@media(max-width:540px){.mg{grid-template-columns:1fr;}}
-.mc h4{font-size:.8rem;font-weight:800;margin-bottom:7px;color:var(--uva-dark);}
-.mi{padding:8px 11px;border-radius:10px;border:2px solid #e5e7eb;background:#f9fafb;font-size:.78rem;font-weight:600;cursor:pointer;margin-bottom:5px;transition:all .2s;min-height:42px;display:flex;align-items:center;}
-.mi:hover{border-color:var(--uva-blue);background:#eff6ff;}
-.mi.sel{border-color:var(--uva-blue);background:#eff6ff;box-shadow:0 0 0 3px rgba(29,78,216,.18);}
-.mi.mok{border-color:var(--uva-green);background:var(--uva-lgreen);color:var(--uva-green);pointer-events:none;}
-.mi.mbad{border-color:var(--uva-red);background:#fef2f2;color:var(--uva-red);}
-.mfb{margin-top:10px;padding:9px 13px;border-radius:10px;font-size:.82rem;font-weight:700;display:none;}
-.mfb.show{display:block;}
-.mfb.ok{background:var(--uva-lgreen);color:var(--uva-green);}
-.mfb.bad{background:#fef2f2;color:var(--uva-red);}
-/* DRAG SORT */
-.dz{background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);min-height:120px;border:2px dashed #d1d5db;transition:all .2s;}
-.dz.over{border-color:var(--uva-blue);background:#eff6ff;}
-.dz h4{font-size:.8rem;font-weight:800;margin-bottom:8px;}
-.di{background:linear-gradient(135deg,#eff6ff,#e0f2fe);border:1.5px solid #bfdbfe;border-radius:8px;padding:6px 9px;font-size:.76rem;font-weight:600;cursor:grab;margin-bottom:5px;display:flex;align-items:center;gap:5px;user-select:none;transition:box-shadow .15s;}
-.di:active{cursor:grabbing;box-shadow:0 4px 14px rgba(29,78,216,.25);}
-.di.dok{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-color:#6ee7b7;}
-.di.dbad{background:linear-gradient(135deg,#fef2f2,#fee2e2);border-color:#fca5a5;}
-/* BADGE */
-.badge{text-align:center;padding:28px 18px;background:linear-gradient(135deg,#1e3a8a,#1d4ed8,#0891b2);border-radius:18px;color:#fff;margin-top:8px;}
-.badge svg{display:block;margin:0 auto 12px;}
-.badge h2{font-size:1.35rem;font-weight:900;}
-.badge p{font-size:.86rem;color:#bfdbfe;margin-top:5px;}
-.badge-sc{font-size:2.2rem;font-weight:900;color:var(--uva-yellow);margin:8px 0;}
-/* NAV */
-.nav{display:flex;justify-content:space-between;margin-top:18px;gap:8px;}
-.nbtn{padding:9px 20px;border-radius:999px;border:none;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;}
-.nbtn.prev{background:#e5e7eb;color:#374151;}
-.nbtn.prev:hover{background:#d1d5db;}
-.nbtn.next{background:linear-gradient(90deg,var(--uva-blue),var(--uva-teal));color:#fff;}
-.nbtn.next:hover{opacity:.88;}
-/* TABLE */
-table{width:100%;border-collapse:collapse;font-size:.78rem;}
-th{padding:7px 9px;text-align:left;}
-td{padding:7px 9px;}
-/* FOOTER */
-.ftr{background:var(--uva-dark);color:#93c5fd;text-align:center;padding:12px;font-size:.73rem;margin-top:8px;}
-.ftr strong{color:#fff;}
-/* SCROLLBAR */
-::-webkit-scrollbar{width:5px;height:5px;}
-::-webkit-scrollbar-track{background:#f1f5f9;}
-::-webkit-scrollbar-thumb{background:#93c5fd;border-radius:3px;}
-/* TOOLTIP */
-.tip{position:relative;display:inline-block;cursor:help;border-bottom:2px dotted var(--uva-blue);color:var(--uva-blue);font-weight:700;}
-.tip .tt{visibility:hidden;opacity:0;background:#1e3a8a;color:#fff;font-size:.73rem;border-radius:8px;padding:5px 9px;position:absolute;z-index:200;bottom:125%;left:50%;transform:translateX(-50%);width:190px;text-align:center;transition:opacity .2s;pointer-events:none;line-height:1.4;}
-.tip:hover .tt{visibility:visible;opacity:1;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Integrity Interactive Module - University View Academy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --uva-blue: #1a5a8c;
+            --uva-blue-dark: #134a6f;
+            --uva-blue-light: #2a7ab5;
+            --uva-green: #2d7a3d;
+            --uva-green-dark: #1f5a2a;
+            --uva-green-light: #3a9a4d;
+            --white: #ffffff;
+            --light-gray: #f5f7fa;
+            --medium-gray: #e0e5eb;
+            --dark-gray: #4a5568;
+            --text-dark: #2d3748;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .module-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 1000px;
+            margin: 0 auto;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--uva-blue) 0%, var(--uva-blue-dark) 100%);
+            color: var(--white);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        .header-logo {
+            height: 60px;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+
+        .header-text h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-text p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Progress Indicator */
+        .progress-bar-container {
+            background: var(--medium-gray);
+            padding: 15px 30px;
+            flex-shrink: 0;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .step-text {
+            font-weight: 600;
+            color: var(--uva-blue);
+        }
+
+        .step-dots {
+            display: flex;
+            gap: 10px;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--medium-gray);
+            border: 2px solid var(--uva-blue);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .step-dot.active {
+            background: var(--uva-blue);
+            transform: scale(1.2);
+        }
+
+        .step-dot.completed {
+            background: var(--uva-green);
+            border-color: var(--uva-green);
+        }
+
+        .progress-track {
+            height: 6px;
+            background: var(--white);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--uva-green), var(--uva-green-light));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Section Container */
+        .sections-wrapper {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 25px 30px;
+            overflow-y: auto;
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .section-title {
+            color: var(--uva-blue);
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--uva-green);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: var(--uva-green);
+        }
+
+        /* Content Cards */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            background: var(--light-gray);
+            border-radius: 10px;
+            padding: 18px;
+            border-left: 4px solid var(--uva-blue);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .info-card h4 {
+            color: var(--uva-blue);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+
+        /* Accordion */
+        .accordion {
+            margin-bottom: 20px;
+        }
+
+        .accordion-item {
+            background: var(--white);
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 14px 18px;
+            background: var(--light-gray);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--uva-blue);
+            transition: background 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background: var(--medium-gray);
+        }
+
+        .accordion-header i {
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-item.open .accordion-header i {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 200px;
+        }
+
+        .accordion-body {
+            padding: 15px 18px;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+
+        /* Quick Check */
+        .quick-check {
+            background: linear-gradient(135deg, var(--uva-blue) 0%, var(--uva-blue-light) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            color: var(--white);
+            margin-top: 20px;
+        }
+
+        .quick-check h4 {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quick-check p {
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .option-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--white);
+            background: transparent;
+            color: var(--white);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: var(--white);
+            color: var(--uva-blue);
+        }
+
+        .option-btn.correct {
+            background: var(--uva-green);
+            border-color: var(--uva-green);
+        }
+
+        .option-btn.incorrect {
+            background: #e53e3e;
+            border-color: #e53e3e;
+            opacity: 0.7;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: rgba(45, 122, 61, 0.3);
+        }
+
+        .feedback.incorrect {
+            background: rgba(229, 62, 62, 0.3);
+        }
+
+        /* Citation Builder */
+        .citation-builder {
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .citation-builder h4 {
+            color: var(--uva-blue);
+            margin-bottom: 15px;
+        }
+
+        .citation-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--uva-blue);
+        }
+
+        .generate-btn {
+            grid-column: 1 / -1;
+            padding: 12px;
+            background: var(--uva-green);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .generate-btn:hover {
+            background: var(--uva-green-dark);
+        }
+
+        .citation-output {
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--white);
+            border-radius: 8px;
+            border-left: 4px solid var(--uva-green);
+            font-style: italic;
+            display: none;
+        }
+
+        .citation-output.show {
+            display: block;
+        }
+
+        /* Match & Sort Game */
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .drop-zone {
+            background: var(--light-gray);
+            border: 3px dashed var(--medium-gray);
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.acceptable {
+            border-color: var(--uva-green);
+        }
+
+        .drop-zone.violation {
+            border-color: #e53e3e;
+        }
+
+        .drop-zone.drag-over {
+            background: rgba(26, 90, 140, 0.1);
+            border-style: solid;
+        }
+
+        .drop-zone h4 {
+            text-align: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--medium-gray);
+        }
+
+        .drop-zone.acceptable h4 {
+            color: var(--uva-green);
+        }
+
+        .drop-zone.violation h4 {
+            color: #e53e3e;
+        }
+
+        .scenarios-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            padding: 15px;
+            background: var(--light-gray);
+            border-radius: 12px;
+        }
+
+        .scenario-card {
+            background: var(--white);
+            border: 2px solid var(--uva-blue);
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: grab;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            max-width: 300px;
+        }
+
+        .scenario-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .scenario-card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .scenario-card.correct-place {
+            border-color: var(--uva-green);
+            background: rgba(45, 122, 61, 0.1);
+        }
+
+        .scenario-card.wrong-place {
+            border-color: #e53e3e;
+            background: rgba(229, 62, 62, 0.1);
+        }
+
+        .check-answers-btn {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 14px;
+            background: var(--uva-blue);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .check-answers-btn:hover {
+            background: var(--uva-blue-dark);
+        }
+
+        .game-feedback {
+            text-align: center;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 600;
+        }
+
+        .game-feedback.show {
+            display: block;
+        }
+
+        .game-feedback.success {
+            background: rgba(45, 122, 61, 0.2);
+            color: var(--uva-green-dark);
+        }
+
+        .game-feedback.error {
+            background: rgba(229, 62, 62, 0.2);
+            color: #c53030;
+        }
+
+        /* Badge Section */
+        .badge-container {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .badge {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+        }
+
+        .badge.locked {
+            background: var(--medium-gray);
+            border: 4px dashed var(--dark-gray);
+        }
+
+        .badge.unlocked {
+            background: linear-gradient(135deg, var(--uva-green) 0%, var(--uva-green-light) 100%);
+            border: 4px solid var(--uva-green-dark);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .badge i {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .badge.locked i {
+            color: var(--dark-gray);
+        }
+
+        .badge.unlocked i {
+            color: var(--white);
+        }
+
+        .badge span {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .badge.locked span {
+            color: var(--dark-gray);
+        }
+
+        .badge.unlocked span {
+            color: var(--white);
+        }
+
+        .badge-status {
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+            margin-bottom: 20px;
+        }
+
+        .requirements-list {
+            text-align: left;
+            max-width: 350px;
+            margin: 0 auto;
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .requirements-list h4 {
+            color: var(--uva-blue);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .requirement-item:last-child {
+            border-bottom: none;
+        }
+
+        .requirement-item i {
+            font-size: 1.2rem;
+        }
+
+        .requirement-item.complete i {
+            color: var(--uva-green);
+        }
+
+        .requirement-item.incomplete i {
+            color: var(--medium-gray);
+        }
+
+        /* Navigation */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: var(--light-gray);
+            border-top: 1px solid var(--medium-gray);
+            flex-shrink: 0;
+        }
+
+        .nav-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn.prev {
+            background: var(--white);
+            color: var(--uva-blue);
+            border: 2px solid var(--uva-blue);
+        }
+
+        .nav-btn.prev:hover:not(:disabled) {
+            background: var(--uva-blue);
+            color: var(--white);
+        }
+
+        .nav-btn.next {
+            background: var(--uva-green);
+            color: var(--white);
+        }
+
+        .nav-btn.next:hover:not(:disabled) {
+            background: var(--uva-green-dark);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-spacer {
+            width: 150px;
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Scrollbar styling */
+        .section::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .section::-webkit-scrollbar-track {
+            background: var(--light-gray);
+        }
+
+        .section::-webkit-scrollbar-thumb {
+            background: var(--uva-blue);
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
+    <div class="module-container">
+        <!-- Header -->
+        <header class="header">
+            <img src="Uploads/logo.png" alt="University View Academy Logo" class="header-logo">
+            <div class="header-text">
+                <h1>Academic Integrity Interactive Module</h1>
+                <p>Virtue • Vigor • Vision</p>
+            </div>
+        </header>
 
-<!-- HEADER -->
-<header class="hdr">
-  <img src="https://wilfredboudloche-droid.github.io/universityview/logo.png" alt="University View Academy" onerror="this.style.display='none'"/>
-  <div class="hdr-txt">
-    <div class="hdr-tag">University View Academy · Computer Tech Literacy</div>
-    <h1>🎓 Academic Integrity & Citation</h1>
-    <p>Interactive Learning Activity · Coach Will</p>
-  </div>
-</header>
+        <!-- Progress Bar -->
+        <div class="progress-bar-container">
+            <div class="step-indicator">
+                <span class="step-text">Section <span id="currentSection">1</span> of 5</span>
+                <div class="step-dots">
+                    <span class="step-dot active" data-section="0"></span>
+                    <span class="step-dot" data-section="1"></span>
+                    <span class="step-dot" data-section="2"></span>
+                    <span class="step-dot" data-section="3"></span>
+                    <span class="step-dot" data-section="4"></span>
+                </div>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
 
-<!-- HERO -->
-<div class="hero">
-  <svg class="hero-bg" viewBox="0 0 800 180" preserveAspectRatio="xMidYMid slice">
-    <circle cx="80" cy="40" r="70" fill="white"/><circle cx="720" cy="140" r="110" fill="white"/>
-    <circle cx="400" cy="15" r="55" fill="white"/><rect x="200" y="70" width="36" height="36" rx="7" fill="white" transform="rotate(20,218,88)"/>
-    <rect x="580" y="25" width="28" height="28" rx="5" fill="white" transform="rotate(-15,594,39)"/>
-  </svg>
-  <h2>🛡️ Integrity Is Your Superpower</h2>
-  <p>Master Academic Integrity, Plagiarism Rules & Citation Skills — 5 Interactive Challenges</p>
-  <div class="hero-pills">
-    <span class="pill">📖 Learn Concepts</span>
-    <span class="pill">🔍 Spot Plagiarism</span>
-    <span class="pill">❓ Take the Quiz</span>
-    <span class="pill">✍️ Build Citations</span>
-    <span class="pill">🧩 Match & Sort</span>
-    <span class="pill">🏆 Earn Your Badge</span>
-  </div>
-</div>
+        <!-- Sections Wrapper -->
+        <div class="sections-wrapper">
+            <!-- Section 1: What is Academic Integrity -->
+            <section class="section active" id="section1">
+                <h2 class="section-title"><i class="fas fa-book-open"></i> What is Academic Integrity?</h2>
+                
+                <div class="content-grid">
+                    <div class="info-card">
+                        <h4><i class="fas fa-star"></i> Honesty</h4>
+                        <p>Submitting only your own work and giving credit where credit is due.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4><i class="fas fa-handshake"></i> Trust</h4>
+                        <p>Building a foundation of reliability between students and educators.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4><i class="fas fa-balance-scale"></i> Fairness</h4>
+                        <p>Ensuring equal opportunity for all students to demonstrate their learning.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4><i class="fas fa-award"></i> Responsibility</h4>
+                        <p>Taking ownership of your academic journey and its outcomes.</p>
+                    </div>
+                </div>
 
-<!-- PROGRESS -->
-<div class="prog-bar">
-  <span class="prog-lbl">📊 Progress</span>
-  <div class="prog-out"><div class="prog-in" id="pBar" style="width:0%"></div></div>
-  <span class="prog-sc" id="pScore">0 / 5 Complete</span>
-</div>
+                <div class="quick-check" id="quickCheck1">
+                    <h4><i class="fas fa-question-circle"></i> Quick Check #1</h4>
+                    <p>Which of the following best describes academic integrity?</p>
+                    <div class="options-grid">
+                        <button class="option-btn" data-correct="false">Getting the highest grades possible</button>
+                        <button class="option-btn" data-correct="true">Being honest and ethical in all academic work</button>
+                        <button class="option-btn" data-correct="false">Working alone on every assignment</button>
+                        <button class="option-btn" data-correct="false">Never asking questions in class</button>
+                    </div>
+                    <div class="feedback" id="feedback1"></div>
+                </div>
+            </section>
 
-<!-- TABS -->
-<div class="tabs">
-  <button class="tab active" onclick="goSec(0)" id="t0"><span class="ti">📚</span>Concepts</button>
-  <button class="tab" onclick="goSec(1)" id="t1"><span class="ti">🔍</span>Scenarios</button>
-  <button class="tab" onclick="goSec(2)" id="t2"><span class="ti">❓</span>Quiz</button>
-  <button class="tab" onclick="goSec(3)" id="t3"><span class="ti">✍️</span>Cite Lab</button>
-  <button class="tab" onclick="goSec(4)" id="t4"><span class="ti">🧩</span>Match</button>
-  <button class="tab" onclick="goSec(5)" id="t5"><span class="ti">🏆</span>Badge</button>
-</div>
+            <!-- Section 2: Types of Academic Misconduct -->
+            <section class="section" id="section2">
+                <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i> Types of Academic Misconduct</h2>
+                
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span><i class="fas fa-copy"></i> Plagiarism</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                Using someone else's words, ideas, or work without proper attribution. This includes copying from websites, books, or other students' work.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span><i class="fas fa-user-secret"></i> Cheating</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                Using unauthorized materials, information, or assistance during an exam or assignment. This includes using notes when not allowed or getting answers from others.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span><i class="fas fa-file-alt"></i> Fabrication</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                Inventing or falsifying data, citations, or information in academic work. This includes making up sources or altering research results.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span><i class="fas fa-users"></i> Collusion</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                Unauthorized collaboration on assignments meant to be completed individually. Working together when independent work is required.
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<!-- ═══════════════════════════════════
-     SEC 0 — CONCEPTS
-═══════════════════════════════════ -->
-<div class="sec active" id="s0">
-  <div class="sh">
-    <div class="sh-icon" style="background:#eff6ff;">📚</div>
-    <div><h2>Core Concepts: Academic Integrity</h2><p>Read each card — hover the blue terms for quick definitions!</p></div>
-  </div>
+                <div class="quick-check" id="quickCheck2">
+                    <h4><i class="fas fa-question-circle"></i> Quick Check #2</h4>
+                    <p>Copying a paragraph from a website without citing the source is an example of:</p>
+                    <div class="options-grid">
+                        <button class="option-btn" data-correct="false">Collusion</button>
+                        <button class="option-btn" data-correct="true">Plagiarism</button>
+                        <button class="option-btn" data-correct="false">Fabrication</button>
+                        <button class="option-btn" data-correct="false">Acceptable research</button>
+                    </div>
+                    <div class="feedback" id="feedback2"></div>
+                </div>
+            </section>
 
-  <!-- SVG Landscape -->
-  <div class="card" style="border-left-color:var(--uva-teal);padding:14px;">
-    <h3>🗺️ The Academic Integrity Landscape</h3>
-    <svg viewBox="0 0 700 310" style="width:100%;max-width:700px;display:block;margin:8px auto 0;" aria-label="Academic Integrity Map">
-      <rect width="700" height="310" rx="14" fill="#f0f4ff"/>
-      <!-- Center Shield -->
-      <g transform="translate(350,155)">
-        <path d="M0,-72 L58,-36 L58,36 Q58,82 0,102 Q-58,82 -58,36 L-58,-36 Z" fill="#1d4ed8" opacity=".13"/>
-        <path d="M0,-58 L46,-29 L46,29 Q46,66 0,83 Q-46,66 -46,29 L-46,-29 Z" fill="#1d4ed8" opacity=".22"/>
-        <text x="0" y="6" text-anchor="middle" font-size="30" font-family="Segoe UI">🛡️</text>
-        <text x="0" y="28" text-anchor="middle" font-size="9" font-weight="800" fill="#1e3a8a">INTEGRITY</text>
-      </g>
-      <!-- Plagiarism node -->
-      <g transform="translate(95,78)">
-        <circle r="44" fill="#fef2f2" stroke="#dc2626" stroke-width="2.5"/>
-        <text x="0" y="-12" text-anchor="middle" font-size="22">🚫</text>
-        <text x="0" y="7" text-anchor="middle" font-size="8.5" font-weight="800" fill="#dc2626">PLAGIARISM</text>
-        <text x="0" y="19" text-anchor="middle" font-size="7.5" fill="#374151">Using others' work</text>
-        <text x="0" y="30" text-anchor="middle" font-size="7.5" fill="#374151">without credit</text>
-      </g>
-      <!-- Citation node -->
-      <g transform="translate(605,78)">
-        <circle r="44" fill="#ecfdf5" stroke="#16a34a" stroke-width="2.5"/>
-        <text x="0" y="-12" text-anchor="middle" font-size="22">📝</text>
-        <text x="0" y="7" text-anchor="middle" font-size="8.5" font-weight="800" fill="#16a34a">CITATION</text>
-        <text x="0" y="19" text-anchor="middle" font-size="7.5" fill="#374151">Giving proper</text>
-        <text x="0" y="30" text-anchor="middle" font-size="7.5" fill="#374151">credit to sources</text>
-      </g>
-      <!-- Paraphrase node -->
-      <g transform="translate(95,235)">
-        <circle r="44" fill="#fefce8" stroke="#f59e0b" stroke-width="2.5"/>
-        <text x="0" y="-12" text-anchor="middle" font-size="22">🔄</text>
-        <text x="0" y="7" text-anchor="middle" font-size="8.5" font-weight="800" fill="#92400e">PARAPHRASE</text>
-        <text x="0" y="19" text-anchor="middle" font-size="7.5" fill="#374151">Restate in your</text>
-        <text x="0" y="30" text-anchor="middle" font-size="7.5" fill="#374151">own words + cite</text>
-      </g>
-      <!-- Direct Quote node -->
-      <g transform="translate(605,235)">
-        <circle r="44" fill="#eef2ff" stroke="#7c3aed" stroke-width="2.5"/>
-        <text x="0" y="-12" text-anchor="middle" font-size="22">💬</text>
-        <text x="0" y="7" text-anchor="middle" font-size="8.5" font-weight="800" fill="#7c3aed">DIRECT QUOTE</text>
-        <text x="0" y="19" text-anchor="middle" font-size="7.5" fill="#374151">Exact words in</text>
-        <text x="0" y="30" text-anchor="middle" font-size="7.5" fill="#374151">quotation marks</text>
-      </g>
-      <!-- Common Knowledge top -->
-      <g transform="translate(350,38)">
-        <rect x="-56" y="-20" width="112" height="40" rx="10" fill="#e0f2fe" stroke="#0891b2" stroke-width="2"/>
-        <text x="0" y="-4" text-anchor="middle" font-size="8.5" font-weight="800" fill="#0891b2">💡 COMMON KNOWLEDGE</text>
-        <text x="0" y="10" text-anchor="middle" font-size="7.5" fill="#374151">No citation needed</text>
-      </g>
-      <!-- Consequences bottom -->
-      <g transform="translate(350,272)">
-        <rect x="-64" y="-20" width="128" height="40" rx="10" fill="#fdf4ff" stroke="#7c3aed" stroke-width="2"/>
-        <text x="0" y="-4" text-anchor="middle" font-size="8.5" font-weight="800" fill="#7c3aed">⚠️ CONSEQUENCES</text>
-        <text x="0" y="10" text-anchor="middle" font-size="7.5" fill="#374151">Failing grade · Suspension · Expulsion</text>
-      </g>
-      <!-- Connector lines -->
-      <line x1="139" y1="78" x2="292" y2="120" stroke="#1d4ed8" stroke-width="1.5" stroke-dasharray="5,3" opacity=".4"/>
-      <line x1="561" y1="78" x2="408" y2="120" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="5,3" opacity=".4"/>
-      <line x1="139" y1="235" x2="292" y2="190" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3" opacity=".4"/>
-      <line x1="561" y1="235" x2="408" y2="190" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3" opacity=".4"/>
-      <line x1="350" y1="58" x2="350" y2="83" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="5,3" opacity=".4"/>
-      <line x1="350" y1="252" x2="350" y2="227" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3" opacity=".4"/>
-    </svg>
-  </div>
+            <!-- Section 3: Proper Citation Practices -->
+            <section class="section" id="section3">
+                <h2 class="section-title"><i class="fas fa-quote-right"></i> Proper Citation Practices</h2>
+                
+                <div class="content-grid">
+                    <div class="info-card">
+                        <h4><i class="fas fa-check-circle"></i> When to Cite</h4>
+                        <p>Direct quotes, paraphrased ideas, statistics, images, and any information that isn't common knowledge.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4><i class="fas fa-list-ul"></i> Citation Styles</h4>
+                        <p>MLA, APA, Chicago, and other formats have specific rules. Always follow your instructor's requirements.</p>
+                    </div>
+                </div>
 
-  <!-- Info tiles -->
-  <div class="ig">
-    <div class="it" style="background:linear-gradient(135deg,#fef2f2,#fee2e2);">
-      <svg viewBox="0 0 56 56" width="50" height="50"><circle cx="28" cy="28" r="26" fill="#dc2626" opacity=".15"/><text x="28" y="36" text-anchor="middle" font-size="26">🚫</text></svg>
-      <h4 style="color:#dc2626;">Plagiarism</h4>
-      <p>Presenting someone else's words, ideas, or work as your own — intentionally <em>or</em> accidentally — without giving credit.</p>
+                <div class="citation-builder">
+                    <h4><i class="fas fa-tools"></i> Interactive Citation Builder</h4>
+                    <div class="citation-form">
+                        <div class="form-group">
+                            <label>Citation Style</label>
+                            <select id="citationStyle">
+                                <option value="mla">MLA</option>
+                                <option value="apa">APA</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Author's Last Name</label>
+                            <input type="text" id="authorLast" placeholder="Smith">
+                        </div>
+                        <div class="form-group">
+                            <label>Author's First Name</label>
+                            <input type="text" id="authorFirst" placeholder="John">
+                        </div>
+                        <div class="form-group">
+                            <label>Title of Work</label>
+                            <input type="text" id="title" placeholder="Article Title">
+                        </div>
+                        <div class="form-group">
+                            <label>Publication Year</label>
+                            <input type="text" id="year" placeholder="2024">
+                        </div>
+                        <div class="form-group">
+                            <label>Publisher/Website</label>
+                            <input type="text" id="publisher" placeholder="Publisher Name">
+                        </div>
+                        <button class="generate-btn" onclick="generateCitation()">
+                            <i class="fas fa-magic"></i> Generate Citation
+                        </button>
+                    </div>
+                    <div class="citation-output" id="citationOutput"></div>
+                </div>
+
+                <div class="quick-check" id="quickCheck3">
+                    <h4><i class="fas fa-question-circle"></i> Quick Check #3</h4>
+                    <p>When must you provide a citation?</p>
+                    <div class="options-grid">
+                        <button class="option-btn" data-correct="false">Only for direct quotes</button>
+                        <button class="option-btn" data-correct="false">Only for online sources</button>
+                        <button class="option-btn" data-correct="true">For any ideas or information from other sources</button>
+                        <button class="option-btn" data-correct="false">Only when the teacher asks</button>
+                    </div>
+                    <div class="feedback" id="feedback3"></div>
+                </div>
+            </section>
+
+            <!-- Section 4: Match & Sort Game -->
+            <section class="section" id="section4">
+                <h2 class="section-title"><i class="fas fa-gamepad"></i> Match & Sort Challenge</h2>
+                <p style="margin-bottom: 15px; color: var(--dark-gray);">Drag each scenario to the correct category: Acceptable Practice or Academic Violation.</p>
+
+                <div class="scenarios-pool" id="scenariosPool">
+                    <div class="scenario-card" draggable="true" data-category="acceptable" data-id="1">
+                        Citing a website after paraphrasing information
+                    </div>
+                    <div class="scenario-card" draggable="true" data-category="violation" data-id="2">
+                        Copying a friend's homework answers
+                    </div>
+                    <div class="scenario-card" draggable="true" data-category="acceptable" data-id="3">
+                        Using quotes with proper attribution
+                    </div>
+                    <div class="scenario-card" draggable="true" data-category="violation" data-id="4">
+                        Submitting the same paper to two classes
+                    </div>
+                    <div class="scenario-card" draggable="true" data-category="acceptable" data-id="5">
+                        Collaborating when the teacher allows it
+                    </div>
+                    <div class="scenario-card" draggable="true" data-category="violation" data-id="6">
+                        Using AI to write your entire essay
+                    </div>
+                </div>
+
+                <div class="game-container">
+                    <div class="drop-zone acceptable" id="acceptableZone">
+                        <h4><i class="fas fa-check-circle"></i> Acceptable Practice</h4>
+                    </div>
+                    <div class="drop-zone violation" id="violationZone">
+                        <h4><i class="fas fa-times-circle"></i> Academic Violation</h4>
+                    </div>
+                </div>
+
+                <button class="check-answers-btn" onclick="checkGameAnswers()">
+                    <i class="fas fa-check"></i> Check My Answers
+                </button>
+                <div class="game-feedback" id="gameFeedback"></div>
+            </section>
+
+            <!-- Section 5: Achievement Badge -->
+            <section class="section" id="section5">
+                <h2 class="section-title"><i class="fas fa-trophy"></i> Achievement Badge</h2>
+                
+                <div class="badge-container">
+                    <div class="badge locked" id="achievementBadge">
+                        <i class="fas fa-lock"></i>
+                        <span>LOCKED</span>
+                    </div>
+                    <p class="badge-status" id="badgeStatus">Complete all activities to unlock your Academic Integrity Champion badge!</p>
+                    
+                    <div class="requirements-list">
+                        <h4>Requirements</h4>
+                        <div class="requirement-item incomplete" id="req1">
+                            <i class="far fa-circle"></i>
+                            <span>Pass Quick Check #1</span>
+                        </div>
+                        <div class="requirement-item incomplete" id="req2">
+                            <i class="far fa-circle"></i>
+                            <span>Pass Quick Check #2</span>
+                        </div>
+                        <div class="requirement-item incomplete" id="req3">
+                            <i class="far fa-circle"></i>
+                            <span>Pass Quick Check #3</span>
+                        </div>
+                        <div class="requirement-item incomplete" id="req4">
+                            <i class="far fa-circle"></i>
+                            <span>Complete Match & Sort Game</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navigation">
+            <button class="nav-btn prev" id="prevBtn" onclick="navigateSection(-1)" disabled>
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <div class="nav-spacer"></div>
+            <button class="nav-btn next" id="nextBtn" onclick="navigateSection(1)">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </nav>
     </div>
-    <div class="it" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);">
-      <svg viewBox="0 0 56 56" width="50" height="50"><circle cx="28" cy="28" r="26" fill="#16a34a" opacity=".15"/><text x="28" y="36" text-anchor="middle" font-size="26">✅</text></svg>
-      <h4 style="color:#16a34a;">Academic Integrity</h4>
-      <p>Doing your own work honestly, citing sources properly, and never misrepresenting your efforts.</p>
-    </div>
-    <div class="it" style="background:linear-gradient(135deg,#fefce8,#fef9c3);">
-      <svg viewBox="0 0 56 56" width="50" height="50"><circle cx="28" cy="28" r="26" fill="#f59e0b" opacity=".15"/><text x="28" y="36" text-anchor="middle" font-size="26">📋</text></svg>
-      <h4 style="color:#92400e;">Citation</h4>
-      <p>A formatted reference that tells your reader <em>who</em> said something, <em>where</em> it was published, and <em>when</em>.</p>
-    </div>
-    <div class="it" style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);">
-      <svg viewBox="0 0 56 56" width="50" height="50"><circle cx="28" cy="28" r="26" fill="#7c3aed" opacity=".15"/><text x="28" y="36" text-anchor="middle" font-size="26">🤖</text></svg>
-      <h4 style="color:#7c3aed;">AI & Integrity</h4>
-      <p>Using AI-generated text without disclosure can be academic dishonesty — always check your school's policy!</p>
-    </div>
-  </div>
 
-  <!-- Types of Plagiarism -->
-  <div class="card g" style="margin-top:14px;">
-    <h3>💡 Types of Plagiarism — Know Them All!</h3>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:8px;">
-      <div style="background:#f0fdf4;border-radius:10px;padding:9px;"><strong style="color:#dc2626;font-size:.8rem;">🔴 Direct Copy</strong><p style="font-size:.76rem;margin-top:3px;">Word-for-word copying without quotes or citation.</p></div>
-      <div style="background:#fefce8;border-radius:10px;padding:9px;"><strong style="color:#92400e;font-size:.8rem;">🟡 Mosaic / Patchwork</strong><p style="font-size:.76rem;margin-top:3px;">Mixing copied phrases with your own words without citing.</p></div>
-      <div style="background:#eff6ff;border-radius:10px;padding:9px;"><strong style="color:#1d4ed8;font-size:.8rem;">🔵 Paraphrase Plagiarism</strong><p style="font-size:.76rem;margin-top:3px;">Restating someone's idea in your own words but NOT citing.</p></div>
-      <div style="background:#fdf4ff;border-radius:10px;padding:9px;"><strong style="color:#7c3aed;font-size:.8rem;">🟣 Self-Plagiarism</strong><p style="font-size:.76rem;margin-top:3px;">Reusing your own previous work without permission.</p></div>
-    </div>
-  </div>
+    <script>
+        // State Management
+        let currentSectionIndex = 0;
+        const totalSections = 5;
+        const completedChecks = {
+            quickCheck1: false,
+            quickCheck2: false,
+            quickCheck3: false,
+            matchSort: false
+        };
 
-  <!-- Citation Styles Table -->
-  <div class="card t" style="margin-top:14px;">
-    <h3>📌 Citation Styles at a Glance</h3>
-    <div style="overflow-x:auto;margin-top:8px;">
-      <table>
-        <thead><tr style="background:#0891b2;color:#fff;"><th style="padding:7px 9px;border-radius:6px 0 0 0;">Style</th><th style="padding:7px 9px;">Used In</th><th style="padding:7px 9px;border-radius:0 6px 0 0;">In-Text Example</th></tr></thead>
-        <tbody>
-          <tr style="background:#f0fdfe;"><td style="padding:7px 9px;font-weight:700;">MLA</td><td style="padding:7px 9px;">English, Humanities</td><td style="padding:7px 9px;font-style:italic;">(Smith 42)</td></tr>
-          <tr style="background:#fff;"><td style="padding:7px 9px;font-weight:700;">APA</td><td style="padding:7px 9px;">Science, Psychology</td><td style="padding:7px 9px;font-style:italic;">(Smith, 2023, p. 42)</td></tr>
-          <tr style="background:#f0fdfe;"><td style="padding:7px 9px;font-weight:700;">Chicago</td><td style="padding:7px 9px;">History, Arts</td><td style="padding:7px 9px;font-style:italic;">Footnote / Endnote</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+        // Navigation
+        function navigateSection(direction) {
+            const newIndex = currentSectionIndex + direction;
+            if (newIndex >= 0 && newIndex < totalSections) {
+                showSection(newIndex);
+            }
+        }
 
-  <!-- Consequences SVG -->
-  <div class="card r" style="margin-top:14px;">
-    <h3>⚠️ Consequences of Plagiarism</h3>
-    <svg viewBox="0 0 640 100" style="width:100%;max-width:640px;display:block;margin:10px auto 0;" aria-label="Consequences scale">
-      <rect width="640" height="100" rx="10" fill="#fff5f5"/>
-      <g transform="translate(60,50)">
-        <circle r="34" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-        <text x="0" y="-8" text-anchor="middle" font-size="18">📉</text>
-        <text x="0" y="10" text-anchor="middle" font-size="7.5" font-weight="800" fill="#dc2626">FAILING</text>
-        <text x="0" y="21" text-anchor="middle" font-size="7" fill="#374151">GRADE</text>
-      </g>
-      <line x1="94" y1="50" x2="136" y2="50" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3"/>
-      <g transform="translate(170,50)">
-        <circle r="34" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-        <text x="0" y="-8" text-anchor="middle" font-size="18">📋</text>
-        <text x="0" y="10" text-anchor="middle" font-size="7.5" font-weight="800" fill="#dc2626">ACADEMIC</text>
-        <text x="0" y="21" text-anchor="middle" font-size="7" fill="#374151">RECORD</text>
-      </g>
-      <line x1="204" y1="50" x2="246" y2="50" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3"/>
-      <g transform="translate(280,50)">
-        <circle r="34" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-        <text x="0" y="-8" text-anchor="middle" font-size="18">🚪</text>
-        <text x="0" y="10" text-anchor="middle" font-size="7.5" font-weight="800" fill="#dc2626">SUSPENSION</text>
-        <text x="0" y="21" text-anchor="middle" font-size="7" fill="#374151">FROM CLASS</text>
-      </g>
-      <line x1="314" y1="50" x2="356" y2="50" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3"/>
-      <g transform="translate(390,50)">
-        <circle r="34" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-        <text x="0" y="-8" text-anchor="middle" font-size="18">🏫</text>
-        <text x="0" y="10" text-anchor="middle" font-size="7.5" font-weight="800" fill="#dc2626">EXPULSION</text>
-        <text x="0" y="21" text-anchor="middle" font-size="7" fill="#374151">FROM SCHOOL</text>
-      </g>
-      <line x1="424" y1="50" x2="466" y2="50" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3"/>
-      <g transform="translate(500,50)">
-        <circle r="34" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-        <text x="0" y="-8" text-anchor="middle" font-size="18">💼</text>
-        <text x="0" y="10" text-anchor="middle" font-size="7.5" font-weight="800" fill="#dc2626">CAREER</text>
-        <text x="0" y="21" text-anchor="middle" font-size="7" fill="#374151">DAMAGE</text>
-      </g>
-      <text x="580" y="55" text-anchor="middle" font-size="22">😱</text>
-    </svg>
-  </div>
+        function showSection(index) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            
+            // Show target section
+            document.getElementById(`section${index + 1}`).classList.add('active');
+            
+            // Update state
+            currentSectionIndex = index;
+            
+            // Update UI
+            updateProgressUI();
+            updateNavigationButtons();
+        }
 
-  <div class="nav"><span></span><button class="nbtn next" onclick="goSec(1)">Next: Spot the Plagiarism ➜</button></div>
-</div>
+        function updateProgressUI() {
+            // Update section number
+            document.getElementById('currentSection').textContent = currentSectionIndex + 1;
+            
+            // Update dots
+            document.querySelectorAll('.step-dot').forEach((dot, i) => {
+                dot.classList.remove('active');
+                if (i === currentSectionIndex) {
+                    dot.classList.add('active');
+                }
+            });
+            
+            // Update progress bar
+            const progress = ((currentSectionIndex + 1) / totalSections) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
 
-<!-- ═══════════════════════════════════
-     SEC 1 — SCENARIOS
-═══════════════════════════════════ -->
-<div class="sec" id="s1">
-  <div class="sh">
-    <div class="sh-icon" style="background:#fef2f2;">🔍</div>
-    <div><h2>Spot the Plagiarism!</h2><p>Read each scenario and tap "Reveal Verdict" to see the ruling.</p></div>
-  </div>
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentSectionIndex === 0;
+            
+            if (currentSectionIndex === totalSections - 1) {
+                nextBtn.innerHTML = 'Finish <i class="fas fa-flag-checkered"></i>';
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+                nextBtn.disabled = false;
+            }
+        }
 
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
-    <span style="background:#fef2f2;border:2px solid #dc2626;border-radius:999px;padding:3px 11px;font-size:.73rem;font-weight:700;color:#dc2626;">🔴 Plagiarism</span>
-    <span style="background:#ecfdf5;border:2px solid #16a34a;border-radius:999px;padding:3px 11px;font-size:.73rem;font-weight:700;color:#16a34a;">🟢 Acceptable</span>
-    <span style="background:#fefce8;border:2px solid #f59e0b;border-radius:999px;padding:3px 11px;font-size:.73rem;font-weight:700;color:#92400e;">🟡 Needs Improvement</span>
-  </div>
+        // Step dots click navigation
+        document.querySelectorAll('.step-dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                const sectionIndex = parseInt(dot.dataset.section);
+                showSection(sectionIndex);
+            });
+        });
 
-  <div class="sg">
-    <div class="sc plag" id="sc0"><span class="sci">📄</span><h4>The Copy-Paste Essay</h4><p>Jordan copies three paragraphs from a Wikipedia article directly into their essay without quotation marks or any citation.</p><button class="rbtn" onclick="revSc('sc0')">🔍 Reveal Verdict</button><div class="vd">🔴 PLAGIARISM — Direct copying without citation is plagiarism, even from free websites like Wikipedia.</div></div>
-    <div class="sc ok" id="sc1"><span class="sci">📚</span><h4>The Proper Paraphrase</h4><p>Maya reads an article, restates the main idea in her own words, and adds "(Johnson, 2022)" at the end of the sentence.</p><button class="rbtn" onclick="revSc('sc1')">🔍 Reveal Verdict</button><div class="vd">🟢 ACCEPTABLE — She paraphrased AND cited the source. This is exactly right!</div></div>
-    <div class="sc plag" id="sc2"><span class="sci">🤖</span><h4>The AI Ghost-Writer</h4><p>Alex uses ChatGPT to write his entire research paper and submits it as his own work without any disclosure.</p><button class="rbtn" onclick="revSc('sc2')">🔍 Reveal Verdict</button><div class="vd">🔴 PLAGIARISM / ACADEMIC DISHONESTY — Submitting AI-generated work as your own without disclosure violates academic integrity policies.</div></div>
-    <div class="sc ok" id="sc3"><span class="sci">💬</span><h4>The Direct Quote</h4><p>Priya writes: According to Smith (2021), "technology has transformed modern education" (p. 14). She then explains the quote in her own words.</p><button class="rbtn" onclick="revSc('sc3')">🔍 Reveal Verdict</button><div class="vd">🟢 ACCEPTABLE — She used quotation marks, cited the author, year, and page number. Perfect!</div></div>
-    <div class="sc part" id="sc4"><span class="sci">🔄</span><h4>The Mosaic Mixer</h4><p>Carlos changes a few words in a paragraph from a textbook and mixes it with his own sentences, but doesn't cite the textbook.</p><button class="rbtn" onclick="revSc('sc4')">🔍 Reveal Verdict</button><div class="vd">🟡 PLAGIARISM (Mosaic) — Changing a few words doesn't make it yours. You must still cite the original source!</div></div>
-    <div class="sc ok" id="sc5"><span class="sci">🌍</span><h4>The Common Knowledge Claim</h4><p>Destiny writes "The Earth orbits the Sun" in her science report without citing any source.</p><button class="rbtn" onclick="revSc('sc5')">🔍 Reveal Verdict</button><div class="vd">🟢 ACCEPTABLE — This is common knowledge. Well-established facts everyone knows do not require a citation.</div></div>
-    <div class="sc plag" id="sc6"><span class="sci">♻️</span><h4>The Recycled Paper</h4><p>Marcus submits a paper he wrote for his English class last year to his Computer Tech class this semester without telling his teacher.</p><button class="rbtn" onclick="revSc('sc6')">🔍 Reveal Verdict</button><div class="vd">🔴 SELF-PLAGIARISM — Reusing your own previous work without permission is still a violation of academic integrity.</div></div>
-    <div class="sc part" id="sc7"><span class="sci">🖼️</span><h4>The Uncited Image</h4><p>Keisha downloads a photo from Google Images and uses it in her presentation without crediting the photographer or website.</p><button class="rbtn" onclick="revSc('sc7')">🔍 Reveal Verdict</button><div class="vd">🟡 NEEDS IMPROVEMENT — Images are intellectual property too! Always credit the source or use Creative Commons images.</div></div>
-  </div>
+        // Accordion
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                item.classList.toggle('open');
+            });
+        });
 
-  <div class="nav"><button class="nbtn prev" onclick="goSec(0)">← Back</button><button class="nbtn next" onclick="goSec(2)">Next: Quiz Time ➜</button></div>
-</div>
+        // Quick Checks
+        document.querySelectorAll('.quick-check').forEach((check, index) => {
+            const checkNum = index + 1;
+            check.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.disabled) return;
+                    
+                    const isCorrect = btn.dataset.correct === 'true';
+                    const feedback = document.getElementById(`feedback${checkNum}`);
+                    
+                    // Disable all buttons
+                    check.querySelectorAll('.option-btn').forEach(b => {
+                        b.disabled = true;
+                        if (b.dataset.correct === 'true') {
+                            b.classList.add('correct');
+                        } else if (b === btn && !isCorrect) {
+                            b.classList.add('incorrect');
+                        }
+                    });
+                    
+                    // Show feedback
+                    if (isCorrect) {
+                        feedback.textContent = '✓ Correct! Great job understanding academic integrity.';
+                        feedback.className = 'feedback show correct';
+                        completedChecks[`quickCheck${checkNum}`] = true;
+                        updateRequirement(checkNum);
+                        markSectionComplete(index);
+                    } else {
+                        feedback.textContent = '✗ Not quite. Review the section and try to understand why the highlighted answer is correct.';
+                        feedback.className = 'feedback show incorrect';
+                    }
+                    
+                    checkBadgeUnlock();
+                });
+            });
+        });
 
-<!-- ═══════════════════════════════════
-     SEC 2 — QUIZ
-═══════════════════════════════════ -->
-<div class="sec" id="s2">
-  <div class="sh">
-    <div class="sh-icon" style="background:#fefce8;">❓</div>
-    <div><h2>Knowledge Check Quiz</h2><p>Select the best answer — instant feedback on every question!</p></div>
-  </div>
+        function markSectionComplete(sectionIndex) {
+            const dots = document.querySelectorAll('.step-dot');
+            dots[sectionIndex].classList.add('completed');
+        }
 
-  <div class="qq"><div class="qt"><span class="qn">1</span>What is plagiarism?</div><div class="qo"><div class="qopt" onclick="ans(0,0,false)">📖 Reading someone else's work for inspiration</div><div class="qopt" onclick="ans(0,1,true)">🚫 Using someone else's work or ideas without giving them credit</div><div class="qopt" onclick="ans(0,2,false)">✅ Citing a source in your bibliography</div><div class="qopt" onclick="ans(0,3,false)">💬 Quoting a source with quotation marks</div></div><div class="qfb" id="qf0"></div></div>
+        function updateRequirement(reqNum) {
+            const req = document.getElementById(`req${reqNum}`);
+            req.classList.remove('incomplete');
+            req.classList.add('complete');
+            req.querySelector('i').className = 'fas fa-check-circle';
+        }
 
-  <div class="qq"><div class="qt"><span class="qn">2</span>Which does NOT require a citation?</div><div class="qo"><div class="qopt" onclick="ans(1,0,false)">📰 A statistic from a news article</div><div class="qopt" onclick="ans(1,1,false)">💡 A unique theory from a textbook</div><div class="qopt" onclick="ans(1,2,true)">🌍 The fact that water boils at 100°C (common knowledge)</div><div class="qopt" onclick="ans(1,3,false)">🖼️ An image downloaded from the internet</div></div><div class="qfb" id="qf1"></div></div>
+        // Citation Builder
+        function generateCitation() {
+            const style = document.getElementById('citationStyle').value;
+            const authorLast = document.getElementById('authorLast').value || 'Author';
+            const authorFirst = document.getElementById('authorFirst').value || 'A.';
+            const title = document.getElementById('title').value || 'Title';
+            const year = document.getElementById('year').value || '2024';
+            const publisher = document.getElementById('publisher').value || 'Publisher';
+            
+            let citation = '';
+            if (style === 'mla') {
+                citation = `${authorLast}, ${authorFirst}. "${title}." ${publisher}, ${year}.`;
+            } else {
+                citation = `${authorLast}, ${authorFirst[0]}. (${year}). ${title}. ${publisher}.`;
+            }
+            
+            const output = document.getElementById('citationOutput');
+            output.textContent = citation;
+            output.classList.add('show');
+        }
 
-  <div class="qq"><div class="qt"><span class="qn">3</span>In APA format, how do you cite a source in-text?</div><div class="qo"><div class="qopt" onclick="ans(2,0,false)">📝 (Smith 42)</div><div class="qopt" onclick="ans(2,1,true)">📝 (Smith, 2023, p. 42)</div><div class="qopt" onclick="ans(2,2,false)">📝 [Smith, 2023]</div><div class="qopt" onclick="ans(2,3,false)">📝 Smith — 2023 — page 42</div></div><div class="qfb" id="qf2"></div></div>
+        // Drag and Drop Game
+        let draggedElement = null;
 
-  <div class="qq"><div class="qt"><span class="qn">4</span>Changing a few words in a copied paragraph without citing is called:</div><div class="qo"><div class="qopt" onclick="ans(3,0,false)">✅ Proper paraphrasing</div><div class="qopt" onclick="ans(3,1,true)">🔴 Mosaic (patchwork) plagiarism</div><div class="qopt" onclick="ans(3,2,false)">💬 A direct quote</div><div class="qopt" onclick="ans(3,3,false)">📚 A bibliography entry</div></div><div class="qfb" id="qf3"></div></div>
+        document.querySelectorAll('.scenario-card').forEach(card => {
+            card.addEventListener('dragstart', (e) => {
+                draggedElement = card;
+                card.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
 
-  <div class="qq"><div class="qt"><span class="qn">5</span>Which citation style is most common in English & Humanities?</div><div class="qo"><div class="qopt" onclick="ans(4,0,false)">🔬 APA</div><div class="qopt" onclick="ans(4,1,true)">📖 MLA</div><div class="qopt" onclick="ans(4,2,false)">📜 Chicago</div><div class="qopt" onclick="ans(4,3,false)">💻 IEEE</div></div><div class="qfb" id="qf4"></div></div>
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+                draggedElement = null;
+            });
+        });
 
-  <div class="qq"><div class="qt"><span class="qn">6</span>Submitting a paper you wrote for a previous class without permission is:</div><div class="qo"><div class="qopt" onclick="ans(5,0,true)">♻️ Self-plagiarism</div><div class="qopt" onclick="ans(5,1,false)">✅ Totally fine — it's your own work</div><div class="qopt" onclick="ans(5,2,false)">📋 Only a problem if you cite it</div><div class="qopt" onclick="ans(5,3,false)">🤷 Not related to academic integrity</div></div><div class="qfb" id="qf5"></div></div>
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
 
-  <div class="qq"><div class="qt"><span class="qn">7</span>A direct quote requires:</div><div class="qo"><div class="qopt" onclick="ans(6,0,false)">📝 Only the author's last name</div><div class="qopt" onclick="ans(6,1,true)">📝 Quotation marks AND a citation with page number</div><div class="qopt" onclick="ans(6,2,false)">📝 No citation if it's short</div><div class="qopt" onclick="ans(6,3,false)">📝 Just a footnote at the bottom</div></div><div class="qfb" id="qf6"></div></div>
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('drag-over');
+            });
 
-  <div class="qq"><div class="qt"><span class="qn">8</span>Which is an example of proper paraphrasing?</div><div class="qo"><div class="qopt" onclick="ans(7,0,false)">📄 Copying the sentence and changing two words</div><div class="qopt" onclick="ans(7,1,true)">📄 Restating the idea in your own words AND citing the source</div><div class="qopt" onclick="ans(7,2,false)">📄 Restating the idea in your own words with no citation</div><div class="qopt" onclick="ans(7,3,false)">📄 Putting the original sentence in quotation marks only</div></div><div class="qfb" id="qf7"></div></div>
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                
+                if (draggedElement) {
+                    zone.appendChild(draggedElement);
+                    draggedElement.classList.remove('correct-place', 'wrong-place');
+                }
+            });
+        });
 
-  <div id="qSum" style="display:none;margin-top:14px;padding:13px 16px;border-radius:12px;background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-left:5px solid #16a34a;">
-    <strong style="color:#16a34a;font-size:.93rem;">🎉 Quiz Complete!</strong>
-    <p id="qSumTxt" style="font-size:.83rem;margin-top:4px;color:#374151;"></p>
-  </div>
+        // Allow dropping back to pool
+        const pool = document.getElementById('scenariosPool');
+        pool.addEventListener('dragover', (e) => e.preventDefault());
+        pool.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (draggedElement) {
+                pool.appendChild(draggedElement);
+                draggedElement.classList.remove('correct-place', 'wrong-place');
+            }
+        });
 
-  <div class="nav"><button class="nbtn prev" onclick="goSec(1)">← Back</button><button class="nbtn next" onclick="goSec(3)">Next: Citation Lab ➜</button></div>
-</div>
+        function checkGameAnswers() {
+            const acceptableZone = document.getElementById('acceptableZone');
+            const violationZone = document.getElementById('violationZone');
+            const feedback = document.getElementById('gameFeedback');
+            
+            let allCorrect = true;
+            let placed = 0;
+            
+            document.querySelectorAll('.scenario-card').forEach(card => {
+                const category = card.dataset.category;
+                const parent = card.parentElement;
+                
+                card.classList.remove('correct-place', 'wrong-place');
+                
+                if (parent === acceptableZone || parent === violationZone) {
+                    placed++;
+                    const isAcceptableZone = parent === acceptableZone;
+                    const shouldBeAcceptable = category === 'acceptable';
+                    
+                    if (isAcceptableZone === shouldBeAcceptable) {
+                        card.classList.add('correct-place');
+                    } else {
+                        card.classList.add('wrong-place');
+                        allCorrect = false;
+                    }
+                }
+            });
+            
+            if (placed < 6) {
+                feedback.textContent = 'Please sort all scenarios before checking!';
+                feedback.className = 'game-feedback show error';
+                return;
+            }
+            
+            if (allCorrect) {
+                feedback.textContent = '🎉 Excellent! You correctly identified all scenarios!';
+                feedback.className = 'game-feedback show success';
+                completedChecks.matchSort = true;
+                updateRequirement(4);
+                markSectionComplete(3);
+                checkBadgeUnlock();
+            } else {
+                feedback.textContent = 'Some scenarios are in the wrong category. Try again!';
+                feedback.className = 'game-feedback show error';
+            }
+        }
 
-<!-- ═══════════════════════════════════
-     SEC 3 — CITATION LAB
-═══════════════════════════════════ -->
-<div class="sec" id="s3">
-  <div class="sh">
-    <div class="sh-icon" style="background:#ecfdf5;">✍️</div>
-    <div><h2>Citation Builder Lab</h2><p>Fill in the fields and watch your citation build in real time!</p></div>
-  </div>
+        // Badge Unlock
+        function checkBadgeUnlock() {
+            const allComplete = Object.values(completedChecks).every(v => v);
+            
+            if (allComplete) {
+                unlockBadge();
+            }
+        }
 
-  <!-- Anatomy SVG -->
-  <div class="card" style="padding:14px;margin-bottom:16px;">
-    <h3>📐 Anatomy of a Citation</h3>
-    <svg viewBox="0 0 680 88" style="width:100%;max-width:680px;display:block;margin:10px auto 0;" aria-label="Citation anatomy">
-      <rect width="680" height="88" rx="10" fill="#f8fafc"/>
-      <rect x="8" y="18" width="108" height="52" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-      <text x="62" y="40" text-anchor="middle" font-size="8.5" font-weight="800" fill="#dc2626">AUTHOR</text>
-      <text x="62" y="54" text-anchor="middle" font-size="7.5" fill="#374151">Last, First.</text>
-      <rect x="130" y="18" width="158" height="52" rx="8" fill="#fefce8" stroke="#f59e0b" stroke-width="2"/>
-      <text x="209" y="40" text-anchor="middle" font-size="8.5" font-weight="800" fill="#92400e">TITLE OF WORK</text>
-      <text x="209" y="54" text-anchor="middle" font-size="7.5" fill="#374151">"Article" or Book Title.</text>
-      <rect x="302" y="18" width="128" height="52" rx="8" fill="#ecfdf5" stroke="#16a34a" stroke-width="2"/>
-      <text x="366" y="40" text-anchor="middle" font-size="8.5" font-weight="800" fill="#16a34a">SOURCE</text>
-      <text x="366" y="54" text-anchor="middle" font-size="7.5" fill="#374151">Journal / Website.</text>
-      <rect x="444" y="18" width="88" height="52" rx="8" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
-      <text x="488" y="40" text-anchor="middle" font-size="8.5" font-weight="800" fill="#1d4ed8">YEAR</text>
-      <text x="488" y="54" text-anchor="middle" font-size="7.5" fill="#374151">2023.</text>
-      <rect x="546" y="18" width="126" height="52" rx="8" fill="#fdf4ff" stroke="#7c3aed" stroke-width="2"/>
-      <text x="609" y="40" text-anchor="middle" font-size="8.5" font-weight="800" fill="#7c3aed">URL / PAGE</text>
-      <text x="609" y="54" text-anchor="middle" font-size="7.5" fill="#374151">p.42 / https://...</text>
-      <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
-      <line x1="116" y1="44" x2="130" y2="44" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
-      <line x1="288" y1="44" x2="302" y2="44" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
-      <line x1="430" y1="44" x2="444" y2="44" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
-      <line x1="532" y1="44" x2="546" y2="44" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
-    </svg>
-  </div>
+        function unlockBadge() {
+            const badge = document.getElementById('achievementBadge');
+            const status = document.getElementById('badgeStatus');
+            
+            badge.classList.remove('locked');
+            badge.classList.add('unlocked');
+            badge.innerHTML = '<i class="fas fa-award"></i><span>CHAMPION</span>';
+            
+            status.textContent = '🎉 Congratulations! You are an Academic Integrity Champion!';
+            
+            markSectionComplete(4);
+            
+            // Trigger confetti
+            createConfetti();
+        }
 
-  <!-- MLA Builder -->
-  <div class="cb">
-    <h3>🔧 Build Your MLA Citation</h3>
-    <div class="cf">
-      <div><label>Author Last Name</label><input type="text" id="cAL" placeholder="e.g. Smith" oninput="buildCite()"/></div>
-      <div><label>Author First Name</label><input type="text" id="cAF" placeholder="e.g. John" oninput="buildCite()"/></div>
-      <div style="grid-column:1/-1;"><label>Title of Article / Chapter</label><input type="text" id="cTi" placeholder='e.g. The Future of Technology' oninput="buildCite()"/></div>
-      <div><label>Website / Journal / Book Name</label><input type="text" id="cSo" placeholder="e.g. TechWorld Magazine" oninput="buildCite()"/></div>
-      <div><label>Year Published</label><input type="text" id="cYr" placeholder="e.g. 2024" oninput="buildCite()"/></div>
-      <div style="grid-column:1/-1;"><label>URL or Page Number</label><input type="text" id="cUrl" placeholder="e.g. https://example.com or p. 42" oninput="buildCite()"/></div>
-    </div>
-    <div class="co" id="cOut">Your MLA citation will appear here as you type...</div>
-    <button class="cbtn" onclick="copyCite()">📋 Copy Citation</button>
-    <span id="cCopied" style="font-size:.75rem;color:var(--uva-green);margin-left:10px;display:none;">✅ Copied!</span>
-  </div>
+        function createConfetti() {
+            const colors = ['#1a5a8c', '#2d7a3d', '#f59e0b', '#ef4444', '#8b5cf6'];
+            
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-10px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    document.body.appendChild(confetti);
+                    
+                    const animation = confetti.animate([
+                        { top: '-10px', opacity: 1 },
+                        { top: '100vh', opacity: 0 }
+                    ], {
+                        duration: 2000 + Math.random() * 2000,
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    });
+                    
+                    animation.onfinish = () => confetti.remove();
+                }, i * 30);
+            }
+        }
 
-  <!-- APA Builder -->
-  <div class="cb">
-    <h3>🔬 Build Your APA Citation</h3>
-    <div class="cf">
-      <div><label>Author Last Name</label><input type="text" id="aAL" placeholder="e.g. Smith" oninput="buildAPA()"/></div>
-      <div><label>Author First Initial</label><input type="text" id="aAF" placeholder="e.g. J." oninput="buildAPA()"/></div>
-      <div><label>Year Published</label><input type="text" id="aYr" placeholder="e.g. 2024" oninput="buildAPA()"/></div>
-      <div><label>Title of Article</label><input type="text" id="aTi" placeholder="e.g. The future of technology" oninput="buildAPA()"/></div>
-      <div><label>Journal / Website Name</label><input type="text" id="aSo" placeholder="e.g. Journal of Technology" oninput="buildAPA()"/></div>
-      <div><label>Volume(Issue) or URL</label><input type="text" id="aVol" placeholder="e.g. 12(3) or https://..." oninput="buildAPA()"/></div>
-    </div>
-    <div class="co" id="aOut">Your APA citation will appear here as you type...</div>
-    <button class="cbtn" onclick="copyAPA()">📋 Copy Citation</button>
-    <span id="aCopied" style="font-size:.75rem;color:var(--uva-green);margin-left:10px;display:none;">✅ Copied!</span>
-  </div>
-
-  <!-- Citation Tips -->
-  <div class="card y">
-    <h3>💡 Quick Citation Tips</h3>
-    <ul styl
+        // Initialize
+        updateProgressUI();
+        updateNavigationButtons();
+    </script>
+</body>
+</html>
