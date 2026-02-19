@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Network Cable Matching Exercise</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+  h1 { text-align: center; }
+  .container { display: flex; justify-content: space-around; flex-wrap: wrap; }
+  .draggables, .droppables { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 0 10px #ccc; width: 45%; min-width: 300px; }
+  .draggables div, .droppables div { margin: 10px; padding: 10px; border: 2px solid #007bff; border-radius: 6px; background: #e9f0ff; cursor: grab; user-select: none; }
+  .droppables div { border: 2px dashed #007bff; height: 120px; display: flex; align-items: center; justify-content: center; background: #fff; }
+  .droppables div img { max-height: 100px; max-width: 100%; pointer-events: none; }
+  .droppables div.over { border-color: #28a745; background: #d4edda; }
+  .matched { background: #28a745 !important; color: white; cursor: default; }
+  #checkBtn { display: block; margin: 20px auto; padding: 10px 20px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; }
+  #result { text-align: center; font-size: 18px; margin-top: 20px; }
+</style>
+</head>
+<body>
+<h1>Match the Network Cable Type to the Picture</h1>
+<div class="container">
+  <div class="draggables" aria-label="Cable Types" role="list">
+    <div draggable="true" id="utp" role="listitem" tabindex="0">Unshielded Twisted Pair (UTP)</div>
+    <div draggable="true" id="stp" role="listitem" tabindex="0">Shielded Twisted Pair (STP)</div>
+    <div draggable="true" id="fiber" role="listitem" tabindex="0">Fiber Optic Cable</div>
+    <div draggable="true" id="coax" role="listitem" tabindex="0">Coaxial Cable</div>
+  </div>
+  <div class="droppables" aria-label="Cable Images" role="list">
+    <div data-accept="utp" role="listitem" tabindex="0">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/UTP_Cable.jpg/320px-UTP_Cable.jpg" alt="Unshielded Twisted Pair Cable" />
+    </div>
+    <div data-accept="stp" role="listitem" tabindex="0">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Shielded_Twisted_Pair_Cable.jpg/320px-Shielded_Twisted_Pair_Cable.jpg" alt="Shielded Twisted Pair Cable" />
+    </div>
+    <div data-accept="fiber" role="listitem" tabindex="0">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Fiber_optic_cable.jpg/320px-Fiber_optic_cable.jpg" alt="Fiber Optic Cable" />
+    </div>
+    <div data-accept="coax" role="listitem" tabindex="0">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Coaxial_cable.jpg/320px-Coaxial_cable.jpg" alt="Coaxial Cable" />
+    </div>
+  </div>
+</div>
+<button id="checkBtn">Check Answers</button>
+<div id="result" aria-live="polite"></div>
+<script>
+  const draggables = document.querySelectorAll('.draggables div');
+  const droppables = document.querySelectorAll('.droppables div');
+  let draggedId = null;
+
+  draggables.forEach(draggable => {
+    draggable.addEventListener('dragstart', e => {
+      draggedId = e.target.id;
+      e.dataTransfer.setData('text/plain', draggedId);
+    });
+    draggable.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        draggedId = e.target.id;
+      }
+    });
+  });
+
+  droppables.forEach(droppable => {
+    droppable.addEventListener('dragover', e => {
+      e.preventDefault();
+      droppable.classList.add('over');
+    });
+    droppable.addEventListener('dragleave', e => {
+      droppable.classList.remove('over');
+    });
+    droppable.addEventListener('drop', e => {
+      e.preventDefault();
+      droppable.classList.remove('over');
+      const data = e.dataTransfer.getData('text/plain');
+      if (droppable.dataset.accept === data) {
+        droppable.textContent = document.getElementById(data).textContent;
+        droppable.classList.add('matched');
+        document.getElementById(data).style.visibility = 'hidden';
+      } else {
+        alert('Incorrect match, try again.');
+      }
+    });
+  });
+
+  document.getElementById('checkBtn').addEventListener('click', () => {
+    let correct = 0;
+    droppables.forEach(droppable => {
+      if (droppable.classList.contains('matched')) correct++;
+    });
+    const total = droppables.length;
+    const result = document.getElementById('result');
+    if (correct === total) {
+      result.textContent = 'Great job! All matches are correct.';
+      result.style.color = 'green';
+    } else {
+      result.textContent = `You have ${correct} out of ${total} correct. Keep trying!`;
+      result.style.color = 'red';
+    }
+  });
+</script>
+</body>
+</html>
