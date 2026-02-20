@@ -12,316 +12,382 @@
     background-color: #f0f6f4;
     color: #004d40;
     display: flex;
+    flex-direction: column;
     height: 100vh;
     overflow: hidden;
   }
   header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
     background-color: #4CBB17; /* Kelly Green */
     color: white;
     padding: 1rem 2rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: space-between;
     z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
   header img {
     height: 50px;
   }
   h1 {
     font-weight: 700;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     margin: 0;
   }
-  #container {
+  .standards-badge {
+    background-color: #0b3d91;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  #main-container {
     display: flex;
     flex-grow: 1;
-    margin-top: 80px; /* header height + some spacing */
     width: 100%;
+    overflow: hidden;
   }
   #left-panel {
-    width: 180px;
+    width: 220px;
     background-color: white;
     border-right: 3px solid #0b3d91;
     padding: 1rem;
     box-sizing: border-box;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
-  #left-panel h2 {
-    font-size: 1.2rem;
+  .scenario-selector {
     margin-bottom: 1rem;
+  }
+  .scenario-selector label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
     color: #0b3d91;
   }
+  select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid #0b3d91;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+  /* NOTE: Background images are placeholders. Please replace the URLs in the scenarios object with your own images. */
+#device-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
   .draggable-icon {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 1.5rem;
-    cursor: grab;
+    background-color: #e0f2f1;
     border: 2px solid transparent;
     border-radius: 8px;
+    padding: 8px;
+    cursor: grab;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    background-color: #e0f2f1;
-    transition: border-color 0.2s ease;
-    position: relative;
-  }
-  .draggable-icon span {
-    font-size: 0.75rem;
-    margin-top: 4px;
-    color: #004d40;
-    font-weight: 600;
+    transition: all 0.2s ease;
     text-align: center;
   }
-  .draggable-icon:hover::after {
-    content: attr(data-label);
-    position: absolute;
-    left: 75px;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #0b3d91;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    z-index: 20;
-    pointer-events: none;
+  .draggable-icon:hover {
+    border-color: #0b3d91;
+    transform: scale(1.05);
   }
-  .draggable-icon:active {
-    cursor: grabbing;
+  .draggable-icon svg {
+    width: 40px;
+    height: 40px;
   }
-  .draggable-icon.dragging {
-    opacity: 0.6;
-    border-color: #4CBB17;
+  .draggable-icon span {
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-top: 4px;
+    display: block;
   }
   #game-area {
     flex-grow: 1;
     position: relative;
-    background: url('https://cdn.pixabay.com/photo/2016/03/27/21/44/farm-1280.jpg') no-repeat center center;
-    background: url('https://cdn.pixabay.com/photo/2017/01/20/00/30/city-1990264_1280.jpg') no-repeat center center;
     background-size: cover;
+    background-position: center;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    transition: background-image 0.5s ease-in-out;
+  }
+  .overlay-content {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    max-width: 800px;
+    width: 90%;
+    text-align: center;
+  }
+  .instructions {
+    text-align: left;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #4CBB17;
+    padding-left: 1rem;
+  }
+  .instructions h3 { margin: 0 0 0.5rem 0; color: #0b3d91; }
+  .instructions p { margin: 0; font-size: 0.9rem; }
+
+  #path-display {
+    display: flex;
     justify-content: center;
     align-items: center;
-    padding: 2rem;
-  }
-  .game-instructions {
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 1rem;
-    border-radius: 8px;
-    border-left: 5px solid #0b3d91;
-    margin-bottom: 1.5rem;
-    max-width: 600px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  .game-instructions h3 {
-    margin-top: 0;
-    color: #0b3d91;
-  }
-  .game-instructions p {
-    margin-bottom: 0;
-    font-size: 0.95rem;
-  }
-  #path {
-    display: flex;
-    gap: 1rem;
-    background-color: rgba(255, 255, 255, 0.85);
-    padding: 1rem 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    gap: 15px;
+    margin: 2rem 0;
+    flex-wrap: wrap;
   }
   .path-box {
-    width: 64px;
-    height: 64px;
-    border: 2px dashed #004d40;
-    border-radius: 8px;
+    width: 80px;
+    height: 80px;
+    border: 3px dashed #0b3d91;
+    border-radius: 12px;
+    background-color: white;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #ffffff;
+    position: relative;
+    transition: all 0.3s ease;
   }
   .path-box.filled {
     border-style: solid;
+    border-color: #4CBB17;
   }
-  .path-box .icon {
-    width: 48px;
-    height: 48px;
+  .path-box.locked {
+    background-color: #f0f0f0;
+    border-style: solid;
+    border-color: #ccc;
   }
-  #check-btn {
-    margin-top: 1.5rem;
-    padding: 0.6rem 1.2rem;
+  .path-box svg { width: 50px; height: 50px; }
+  .path-box .label { font-size: 0.65rem; font-weight: 700; margin-top: 2px; }
+
+  .connector {
+    font-size: 1.5rem;
+    color: #0b3d91;
+    font-weight: bold;
+  }
+
+  .controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+  button {
+    padding: 0.8rem 2rem;
     font-size: 1rem;
-    background-color: #00796b;
-    color: white;
+    font-weight: 700;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background 0.2s;
   }
-  #check-btn:hover {
-    background-color: #004d40;
-  }
+  #check-btn { background-color: #0b3d91; color: white; }
+  #check-btn:hover { background-color: #082d6b; }
+  #reset-btn { background-color: #666; color: white; }
+
   #feedback {
     margin-top: 1rem;
-    font-weight: 600;
-    color: #d32f2f;
+    font-weight: 700;
+    min-height: 1.2rem;
   }
+  .success { color: #2e7d32; }
+  .error { color: #d32f2f; }
 </style>
 </head>
 <body>
+
 <header>
-  <img src="logo.png" alt="University View Academy Logo" />
-  <h1>Network Path Drag and Drop Game</h1>
-</header>
-<div id="container">
-  <div id="left-panel">
-    <h2>Devices</h2>
-    <div id="device-list">
-      <!-- Draggable icons will be inserted here -->
-    </div>
+  <div class="header-left">
+    <img src="logo.png" alt="UVA Logo" />
+    <h1>Network Path Architect</h1>
   </div>
+  <div class="standards-badge">
+    CompTIA A+ Core 1: 2.5 & 2.7
+  </div>
+</header>
+
+<div id="main-container">
+  <div id="left-panel">
+    <div class="scenario-selector">
+      <label for="scenario">Select Scenario:</label>
+      <select id="scenario">
+        <option value="home">Home Office (Fiber)</option>
+        <option value="rural">Rural Farm (Satellite)</option>
+        <option value="enterprise">Enterprise City (Leased Line)</option>
+      </select>
+    </div>
+
+    <h2 style="font-size: 1rem; color: #0b3d91; margin: 0;">Components</h2>
+    <div id="device-list"></div>
+  </div>
+
   <div id="game-area">
-    <div class="game-instructions">
-      <h3>How to Play:</h3>
-      <p>Drag the correct network devices from the left panel and drop them into the empty boxes to complete the path from the <strong>Home Device</strong> to the <strong>Internet</strong>. Hover over icons to see their names.</p>
+    <div class="overlay-content">
+      <div class="instructions">
+        <h3 id="scenario-title">Home Office Scenario</h3>
+        <p id="scenario-desc">Connect the local workstation to the internet using the correct hardware sequence.</p>
+      </div>
+
+      <div id="path-display"></div>
+
+      <div class="controls">
+        <button id="check-btn">Validate Connection</button>
+        <button id="reset-btn">Reset</button>
+      </div>
+      <div id="feedback"></div>
     </div>
-    <div id="path">
-      <!-- Path boxes will be inserted here -->
-    </div>
-    <button id="check-btn">Check Path</button>
-    <div id="feedback"></div>
   </div>
 </div>
+
 <script>
-  const devices = [
-    { id: 'device', label: 'Device', svg: `<rect x="8" y="12" width="48" height="30" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-      <rect x="4" y="44" width="56" height="6" rx="2" fill="#004d40"/>` },
-    { id: 'switch', label: 'Switch', svg: `<rect x="12" y="28" width="40" height="18" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-      <circle cx="20" cy="37" r="3" fill="#4CBB17"/>
-      <circle cx="32" cy="37" r="3" fill="#4CBB17"/>
-      <circle cx="44" cy="37" r="3" fill="#4CBB17"/>` },
-    { id: 'router', label: 'Router', svg: `<rect x="14" y="28" width="36" height="18" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-      <circle cx="32" cy="37" r="3" fill="#004d40"/>
-      <path d="M20 24c6-6 18-6 24 0" fill="none" stroke="#004d40" stroke-width="2" stroke-linecap="round"/>
-      <path d="M24 20c4-4 12-4 16 0" fill="none" stroke="#004d40" stroke-width="2" stroke-linecap="round"/>` },
-    { id: 'modem', label: 'Modem', svg: `<rect x="12" y="16" width="40" height="28" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-      <rect x="20" y="22" width="6" height="6" fill="#4CBB17"/>
-      <rect x="30" y="22" width="6" height="6" fill="#4CBB17"/>
-      <rect x="40" y="22" width="6" height="6" fill="#4CBB17"/>` },
-    { id: 'firewall', label: 'Firewall', svg: `<path d="M32 8 L48 14 L48 28 C48 40 36 50 32 52 C28 50 16 40 16 28 L16 14 Z" fill="#ffffff" stroke="#d32f2f" stroke-width="2"/>
-      <rect x="28" y="26" width="8" height="12" fill="#d32f2f"/>` },
-    { id: 'satellite', label: 'Satellite', svg: `<path d="M44 20 L54 10 L58 14 L48 24 Z" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-      <circle cx="20" cy="44" r="8" fill="#4CBB17" stroke="#004d40" stroke-width="2"/>
-      <path d="M28 36 L46 18" stroke="#004d40" stroke-width="2" stroke-linecap="round"/>` },
-    { id: 'isp', label: 'ISP PoP', svg: `<path d="M20 40h28a8 8 0 0 0 0-16 12 12 0 0 0-22-2 8 8 0 0 0-6 18z" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-      <rect x="22" y="36" width="12" height="10" fill="#e0e0e0" stroke="#004d40"/>` },
-    { id: 'internet', label: 'Internet', svg: `<circle cx="32" cy="32" r="18" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-      <path d="M14 32h36" stroke="#004d40" stroke-width="1.5"/>
-      <path d="M32 14v36" stroke="#004d40" stroke-width="1.5"/>
-      <path d="M22 20c6 6 6 18 0 24" stroke="#004d40" stroke-width="1.2"/>
-      <path d="M42 44c-6-6-6-18 0-24" stroke="#004d40" stroke-width="1.2"/>` },
-  ];
+  const components = {
+    workstation: { label: 'Workstation', svg: `<rect x="8" y="12" width="48" height="30" rx="4" fill="#fff" stroke="#0b3d91" stroke-width="2"/><rect x="4" y="44" width="56" height="6" rx="2" fill="#0b3d91"/>` },
+    switch: { label: 'Switch', svg: `<rect x="10" y="25" width="44" height="14" rx="2" fill="#fff" stroke="#0b3d91" stroke-width="2"/><circle cx="18" cy="32" r="2" fill="#4CBB17"/><circle cx="32" cy="32" r="2" fill="#4CBB17"/><circle cx="46" cy="32" r="2" fill="#4CBB17"/>` },
+    router: { label: 'Router', svg: `<rect x="14" y="28" width="36" height="18" rx="4" fill="#fff" stroke="#0b3d91" stroke-width="2"/><path d="M20 24c6-6 18-6 24 0M24 20c4-4 12-4 16 0" fill="none" stroke="#0b3d91" stroke-width="2"/>` },
+    modem: { label: 'Modem', svg: `<rect x="15" y="15" width="34" height="34" rx="4" fill="#fff" stroke="#0b3d91" stroke-width="2"/><rect x="22" y="22" width="6" height="6" fill="#4CBB17"/><rect x="36" y="22" width="6" height="6" fill="#4CBB17"/>` },
+    firewall: { label: 'Firewall', svg: `<path d="M32 8 L48 14 L48 28 C48 40 36 50 32 52 C28 50 16 40 16 28 L16 14 Z" fill="#fff" stroke="#d32f2f" stroke-width="2"/><rect x="28" y="26" width="8" height="12" fill="#d32f2f"/>` },
+    satellite: { label: 'Dish', svg: `<path d="M44 20 L54 10 L58 14 L48 24 Z" fill="#fff" stroke="#0b3d91" stroke-width="2"/><circle cx="20" cy="44" r="8" fill="#4CBB17" stroke="#0b3d91" stroke-width="2"/><path d="M28 36 L46 18" stroke="#0b3d91" stroke-width="2"/>` },
+    isp: { label: 'ISP PoP', svg: `<path d="M20 40h28a8 8 0 0 0 0-16 12 12 0 0 0-22-2 8 8 0 0 0-6 18z" fill="#fff" stroke="#0b3d91" stroke-width="2"/>` },
+    internet: { label: 'Internet', svg: `<circle cx="32" cy="32" r="20" fill="#fff" stroke="#0b3d91" stroke-width="2"/><path d="M12 32h40M32 12v40" stroke="#0b3d91" stroke-width="1"/>` }
+  };
 
-  const correctPath = ['device', 'switch', 'router', 'modem', 'isp', 'internet'];
-
-  const deviceList = document.getElementById('device-list');
-  const pathContainer = document.getElementById('path');
-  const checkBtn = document.getElementById('check-btn');
-  const feedback = document.getElementById('feedback');
-
-  // Create draggable icons in left panel
-  devices.forEach(device => {
-    const div = document.createElement('div');
-    div.classList.add('draggable-icon');
-    div.setAttribute('draggable', 'true');
-    div.setAttribute('data-id', device.id);
-    div.setAttribute('aria-label', device.label);
-    div.setAttribute('role', 'img');
-    div.innerHTML = `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">${device.svg}</svg>`;
-
-    div.addEventListener('dragstart', (e) => {
-      e.dataTransfer.setData('text/plain', device.id);
-      div.classList.add('dragging');
-    });
-    div.addEventListener('dragend', () => {
-      div.classList.remove('dragging');
-    });
-
-    deviceList.appendChild(div);
-  });
-
-  // Create path boxes with first and last pre-filled
-  correctPath.forEach((deviceId, index) => {
-    const box = document.createElement('div');
-    box.classList.add('path-box');
-    box.setAttribute('data-index', index);
-    box.setAttribute('aria-label', `Path position ${index + 1}`);
-    box.setAttribute('tabindex', 0);
-
-    if (index === 0 || index === correctPath.length - 1) {
-      // Pre-fill first and last
-      const device = devices.find(d => d.id === deviceId);
-      box.classList.add('filled');
-      box.innerHTML = `<svg class="icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">${device.svg}</svg>`;
-      box.setAttribute('data-device', deviceId);
-    } else {
-      box.setAttribute('data-device', '');
-      // Allow drop
-      box.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        box.style.borderColor = '#4CBB17';
-      });
-      box.addEventListener('dragleave', () => {
-        box.style.borderColor = '#004d40';
-      });
-      box.addEventListener('drop', (e) => {
-        e.preventDefault();
-        box.style.borderColor = '#004d40';
-        const deviceId = e.dataTransfer.getData('text/plain');
-        placeDeviceInBox(box, deviceId);
-      });
+  const scenarios = {
+    home: {
+      title: "Home Office (Fiber)",
+      desc: "Build a standard fiber-to-the-home path: Workstation -> Switch -> Router -> Modem -> ISP -> Internet",
+      bg: "https://cdn.pixabay.com/photo/2016/11/29/03/53/house-1867187_1280.jpg",
+      path: ['workstation', 'switch', 'router', 'modem', 'isp', 'internet']
+    },
+    rural: {
+      title: "Rural Farm (Satellite)",
+      desc: "Connect a remote farm via satellite: Workstation -> Router -> Satellite Dish -> ISP -> Internet",
+      bg: "https://cdn.pixabay.com/photo/2021/12/09/18/37/black-forest-6858864_1280.jpg",
+      path: ['workstation', 'router', 'satellite', 'isp', 'internet']
+    },
+    enterprise: {
+      title: "Enterprise City (Leased Line)",
+      desc: "Secure a corporate city office: Workstation -> Switch -> Firewall -> Router -> ISP -> Internet",
+      bg: "https://cdn.pixabay.com/photo/2020/09/19/23/42/architecture-5585737_1280.jpg",
+      path: ['workstation', 'switch', 'firewall', 'router', 'isp', 'internet']
     }
+  };
 
-    pathContainer.appendChild(box);
-  });
+  let currentScenario = 'home';
+  let userPath = [];
 
-  function placeDeviceInBox(box, deviceId) {
-    const device = devices.find(d => d.id === deviceId);
-    if (!device) return;
+  function init() {
+    renderDraggables();
+    loadScenario('home');
 
-    // Remove device from any other box
-    document.querySelectorAll('.path-box.filled').forEach(b => {
-      if (b !== box && b.getAttribute('data-device') === deviceId) {
-        b.classList.remove('filled');
-        b.innerHTML = '';
-        b.setAttribute('data-device', '');
-      }
+    document.getElementById('scenario').addEventListener('change', (e) => {
+      loadScenario(e.target.value);
     });
 
-    // Place device in this box
-    box.classList.add('filled');
-    box.innerHTML = `<svg class="icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">${device.svg}</svg>`;
-    box.setAttribute('data-device', deviceId);
+    document.getElementById('check-btn').addEventListener('click', validate);
+    document.getElementById('reset-btn').addEventListener('click', () => loadScenario(currentScenario));
   }
 
-  checkBtn.addEventListener('click', () => {
-    let correct = true;
-    for (let i = 0; i < correctPath.length; i++) {
-      const box = pathContainer.querySelector(`.path-box[data-index='${i}']`);
-      if (box.getAttribute('data-device') !== correctPath[i]) {
-        correct = false;
+  function renderDraggables() {
+    const list = document.getElementById('device-list');
+    Object.keys(components).forEach(key => {
+      const item = document.createElement('div');
+      item.className = 'draggable-icon';
+      item.draggable = true;
+      item.innerHTML = `<svg viewBox="0 0 64 64">${components[key].svg}</svg><span>${components[key].label}</span>`;
+      item.addEventListener('dragstart', (e) => e.dataTransfer.setData('text/plain', key));
+      list.appendChild(item);
+    });
+  }
+
+  function loadScenario(id) {
+    currentScenario = id;
+    const s = scenarios[id];
+    userPath = new Array(s.path.length).fill(null);
+
+    // Set background and text
+    document.getElementById('game-area').style.backgroundImage = `url('${s.bg}')`;
+    document.getElementById('scenario-title').innerText = s.title;
+    document.getElementById('scenario-desc').innerText = s.desc;
+    document.getElementById('feedback').innerText = '';
+
+    // Render Path Boxes
+    const display = document.getElementById('path-display');
+    display.innerHTML = '';
+
+    s.path.forEach((target, index) => {
+      const box = document.createElement('div');
+      box.className = 'path-box';
+
+      // Lock first and last
+      if (index === 0 || index === s.path.length - 1) {
+        box.classList.add('locked', 'filled');
+        const key = s.path[index];
+        box.innerHTML = `<svg viewBox="0 0 64 64">${components[key].svg}</svg><div class="label">${components[key].label}</div>`;
+        userPath[index] = key;
+      } else {
+        box.addEventListener('dragover', (e) => e.preventDefault());
+        box.addEventListener('drop', (e) => handleDrop(e, index));
+      }
+
+      display.appendChild(box);
+      if (index < s.path.length - 1) {
+        const arrow = document.createElement('div');
+        arrow.className = 'connector';
+        arrow.innerHTML = '→';
+        display.appendChild(arrow);
+      }
+    });
+  }
+
+  function handleDrop(e, index) {
+    e.preventDefault();
+    const key = e.dataTransfer.getData('text/plain');
+    if (!components[key]) return;
+
+    userPath[index] = key;
+    const boxes = document.querySelectorAll('.path-box');
+    const targetBox = boxes[index];
+    targetBox.classList.add('filled');
+    targetBox.innerHTML = `<svg viewBox="0 0 64 64">${components[key].svg}</svg><div class="label">${components[key].label}</div>`;
+  }
+
+  function validate() {
+    const s = scenarios[currentScenario];
+    const feedback = document.getElementById('feedback');
+    let isCorrect = true;
+
+    for (let i = 0; i < s.path.length; i++) {
+      if (userPath[i] !== s.path[i]) {
+        isCorrect = false;
         break;
       }
     }
-    feedback.textContent = correct ? 'Correct! You have successfully created the network path.' : 'Incorrect path. Please try again.';
-    feedback.style.color = correct ? '#00796b' : '#d32f2f';
-  });
+
+    if (isCorrect) {
+      feedback.innerText = "✓ Connection Established! Great job Architect.";
+      feedback.className = "success";
+    } else {
+      feedback.innerText = "✗ Connection Failed. Check your hardware sequence.";
+      feedback.className = "error";
+    }
+  }
+
+  init();
 </script>
 </body>
 </html>
