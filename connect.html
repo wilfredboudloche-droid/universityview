@@ -3,22 +3,30 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Network Path Simulation Game - University View Academy</title>
+<title>Network Path Drag and Drop Game - University View Academy</title>
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f0f6f4;
     margin: 0;
     padding: 0;
+    background-color: #f0f6f4;
     color: #004d40;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
   }
   header {
-    background-color: #0b3d91; /* School blue */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #4CBB17; /* Kelly Green */
     color: white;
     padding: 1rem 2rem;
     display: flex;
     align-items: center;
     gap: 1rem;
+    z-index: 10;
   }
   header img {
     height: 50px;
@@ -28,302 +36,298 @@
     font-size: 1.8rem;
     margin: 0;
   }
-  main {
-    padding: 1rem 2rem;
-    max-width: 900px;
-    margin: auto;
-  }
-  .scenario-selector {
-    margin-bottom: 1rem;
-  }
-  .scenario-selector label {
-    font-weight: 600;
-    margin-right: 1rem;
-  }
-  svg {
+  #container {
+    display: flex;
+    flex-grow: 1;
+    margin-top: 80px; /* header height + some spacing */
     width: 100%;
-    height: 500px;
-    border: 2px solid #0b3d91;
-    border-radius: 8px;
+  }
+  #left-panel {
+    width: 180px;
     background-color: white;
+    border-right: 3px solid #0b3d91;
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow-y: auto;
   }
-  .component {
-    cursor: pointer;
-    transition: transform 0.2s ease;
+  #left-panel h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #0b3d91;
   }
-  .component:hover {
-    transform: scale(1.1);
+  .draggable-icon {
+    width: 80px;
+    height: 90px;
+    margin-bottom: 1.5rem;
+    cursor: grab;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #e0f2f1;
+    transition: border-color 0.2s ease;
+    position: relative;
+    padding: 5px;
+    box-sizing: border-box;
   }
-  .selected {
-    stroke: #00796b;
-    stroke-width: 4px;
+  .draggable-icon svg {
+    width: 48px;
+    height: 48px;
   }
-  .path-line {
-    stroke: #00796b;
-    stroke-width: 4px;
-    fill: none;
+  .draggable-icon span {
+    font-size: 0.75rem;
+    margin-top: 4px;
+    color: #004d40;
+    font-weight: 600;
+    text-align: center;
   }
-  button {
+  .draggable-icon:hover::after {
+    content: attr(data-label);
+    position: absolute;
+    left: 75px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #0b3d91;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .draggable-icon:active {
+    cursor: grabbing;
+  }
+  .draggable-icon.dragging {
+    opacity: 0.6;
+    border-color: #4CBB17;
+  }
+  #game-area {
+    flex-grow: 1;
+    position: relative;
+    background: url('https://cdn.pixabay.com/photo/2016/11/29/03/53/house-1867187_1280.jpg') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+  .game-instructions {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 5px solid #0b3d91;
+    margin-bottom: 1.5rem;
+    max-width: 600px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .game-instructions h3 {
+    margin-top: 0;
+    color: #0b3d91;
+  }
+  .game-instructions p {
+    margin-bottom: 0;
+    font-size: 0.95rem;
+  }
+  #path {
+    display: flex;
+    gap: 1rem;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  .path-box {
+    width: 64px;
+    height: 64px;
+    border: 2px dashed #004d40;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+  }
+  .path-box.filled {
+    border-style: solid;
+  }
+  .path-box .icon {
+    width: 48px;
+    height: 48px;
+  }
+  #check-btn {
+    margin-top: 1.5rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
     background-color: #00796b;
     color: white;
     border: none;
-    padding: 0.6rem 1.2rem;
-    font-size: 1rem;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    margin-top: 1rem;
+    transition: background-color 0.2s ease;
   }
-  button:hover {
+  #check-btn:hover {
     background-color: #004d40;
   }
-  .feedback {
+  #feedback {
     margin-top: 1rem;
     font-weight: 600;
+    color: #d32f2f;
   }
 </style>
 </head>
 <body>
 <header>
   <img src="logo.png" alt="University View Academy Logo" />
-  <h1>Network Path Simulation Game</h1>
+  <h1>Network Path Drag and Drop Game</h1>
 </header>
-<main>
-  <div class="scenario-selector">
-    <label for="scenario">Choose a scenario:</label>
-    <select id="scenario">
-      <option value="1">Scenario 1: Home Network to Internet</option>
-      <option value="2">Scenario 2: Small Office Network</option>
-      <option value="3">Scenario 3: Remote Satellite Connection</option>
-    </select>
+<div id="container">
+  <div id="left-panel">
+    <h2>Devices</h2>
+    <div id="device-list">
+      <!-- Draggable icons will be inserted here -->
+    </div>
   </div>
-  <svg id="network-svg" viewBox="0 0 900 500" aria-label="Network Path Simulation">
-    <!-- Components will be dynamically added here -->
-  </svg>
-  <button id="check-path">Check Path</button>
-  <div class="feedback" id="feedback"></div>
-</main>
+  <div id="game-area">
+    <div class="game-instructions">
+      <h3>How to Play:</h3>
+      <p>Drag the correct network devices from the left panel and drop them into the empty boxes to complete the path from the <strong>Home Device</strong> to the <strong>Internet</strong>. Hover over icons to see their names.</p>
+    </div>
+    <div id="path">
+      <!-- Path boxes will be inserted here -->
+    </div>
+    <button id="check-btn">Check Path</button>
+    <div id="feedback"></div>
+  </div>
+</div>
 <script>
-  const svg = document.getElementById('network-svg');
-  const scenarioSelect = document.getElementById('scenario');
-  const checkBtn = document.getElementById('check-path');
+  const devices = [
+    { id: 'device', label: 'Device', svg: `<rect x="8" y="12" width="48" height="30" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
+      <rect x="4" y="44" width="56" height="6" rx="2" fill="#004d40"/>` },
+    { id: 'switch', label: 'Switch', svg: `<rect x="12" y="28" width="40" height="18" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
+      <circle cx="20" cy="37" r="3" fill="#4CBB17"/>
+      <circle cx="32" cy="37" r="3" fill="#4CBB17"/>
+      <circle cx="44" cy="37" r="3" fill="#4CBB17"/>` },
+    { id: 'router', label: 'Router', svg: `<rect x="14" y="28" width="36" height="18" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
+      <circle cx="32" cy="37" r="3" fill="#004d40"/>
+      <path d="M20 24c6-6 18-6 24 0" fill="none" stroke="#004d40" stroke-width="2" stroke-linecap="round"/>
+      <path d="M24 20c4-4 12-4 16 0" fill="none" stroke="#004d40" stroke-width="2" stroke-linecap="round"/>` },
+    { id: 'modem', label: 'Modem', svg: `<rect x="12" y="16" width="40" height="28" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
+      <rect x="20" y="22" width="6" height="6" fill="#4CBB17"/>
+      <rect x="30" y="22" width="6" height="6" fill="#4CBB17"/>
+      <rect x="40" y="22" width="6" height="6" fill="#4CBB17"/>` },
+    { id: 'firewall', label: 'Firewall', svg: `<path d="M32 8 L48 14 L48 28 C48 40 36 50 32 52 C28 50 16 40 16 28 L16 14 Z" fill="#ffffff" stroke="#d32f2f" stroke-width="2"/>
+      <rect x="28" y="26" width="8" height="12" fill="#d32f2f"/>` },
+    { id: 'satellite', label: 'Satellite', svg: `<path d="M44 20 L54 10 L58 14 L48 24 Z" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
+      <circle cx="20" cy="44" r="8" fill="#4CBB17" stroke="#004d40" stroke-width="2"/>
+      <path d="M28 36 L46 18" stroke="#004d40" stroke-width="2" stroke-linecap="round"/>` },
+    { id: 'isp', label: 'ISP PoP', svg: `<path d="M20 40h28a8 8 0 0 0 0-16 12 12 0 0 0-22-2 8 8 0 0 0-6 18z" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
+      <rect x="22" y="36" width="12" height="10" fill="#e0e0e0" stroke="#004d40"/>` },
+    { id: 'internet', label: 'Internet', svg: `<circle cx="32" cy="32" r="18" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
+      <path d="M14 32h36" stroke="#004d40" stroke-width="1.5"/>
+      <path d="M32 14v36" stroke="#004d40" stroke-width="1.5"/>
+      <path d="M22 20c6 6 6 18 0 24" stroke="#004d40" stroke-width="1.2"/>
+      <path d="M42 44c-6-6-6-18 0-24" stroke="#004d40" stroke-width="1.2"/>` },
+  ];
+
+  const correctPath = ['device', 'switch', 'router', 'modem', 'isp', 'internet'];
+
+  const deviceList = document.getElementById('device-list');
+  const pathContainer = document.getElementById('path');
+  const checkBtn = document.getElementById('check-btn');
   const feedback = document.getElementById('feedback');
 
-  // Network components data for each scenario
-  const scenarios = {
-    1: {
-      description: 'Home Network to Internet',
-      components: [
-        { id: 'device', label: 'Device', x: 100, y: 400 },
-        { id: 'switch', label: 'Switch', x: 250, y: 350 },
-        { id: 'router', label: 'SOHO Router', x: 400, y: 300 },
-        { id: 'modem', label: 'Modem', x: 600, y: 300 },
-        { id: 'isp', label: 'ISP PoP', x: 750, y: 200 },
-        { id: 'internet', label: 'Internet', x: 850, y: 100 },
-      ],
-      correctPath: ['device', 'switch', 'router', 'modem', 'isp', 'internet'],
-    },
-    2: {
-      description: 'Small Office Network',
-      components: [
-        { id: 'workstation', label: 'Workstation', x: 100, y: 400 },
-        { id: 'server', label: 'Server', x: 100, y: 300 },
-        { id: 'switch', label: 'Switch', x: 300, y: 350 },
-        { id: 'router', label: 'Router', x: 500, y: 300 },
-        { id: 'firewall', label: 'Firewall', x: 650, y: 300 },
-        { id: 'isp', label: 'ISP PoP', x: 750, y: 200 },
-        { id: 'internet', label: 'Internet', x: 850, y: 100 },
-      ],
-      correctPath: ['workstation', 'switch', 'router', 'firewall', 'isp', 'internet'],
-    },
-    3: {
-      description: 'Remote Satellite Connection',
-      components: [
-        { id: 'device', label: 'Device', x: 100, y: 400 },
-        { id: 'router', label: 'Router', x: 300, y: 350 },
-        { id: 'modem', label: 'Satellite Modem', x: 500, y: 300 },
-        { id: 'satellite', label: 'Satellite', x: 700, y: 150 },
-        { id: 'isp', label: 'ISP PoP', x: 750, y: 200 },
-        { id: 'internet', label: 'Internet', x: 850, y: 100 },
-      ],
-      correctPath: ['device', 'router', 'modem', 'satellite', 'isp', 'internet'],
-    },
-  };
+  // Create draggable icons in left panel
+  devices.forEach(device => {
+    const div = document.createElement('div');
+    div.classList.add('draggable-icon');
+    div.setAttribute('draggable', 'true');
+    div.setAttribute('data-id', device.id);
+    div.setAttribute('data-label', device.label);
+    div.setAttribute('aria-label', device.label);
+    div.setAttribute('role', 'img');
+    div.innerHTML = `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">${device.svg}</svg><span>${device.label}</span>`;
 
-  let selectedComponents = [];
-
-  // Clear SVG
-  function clearSVG() {
-    while (svg.firstChild) {
-      svg.removeChild(svg.firstChild);
-    }
-  }
-
-  // Draw components
-  function drawComponents(scenarioId) {
-    clearSVG();
-    selectedComponents = [];
-    feedback.textContent = '';
-
-    const scenario = scenarios[scenarioId];
-
-    const icons = {
-      device: `<rect x="8" y="12" width="48" height="30" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-        <rect x="4" y="44" width="56" height="6" rx="2" fill="#004d40"/>`,
-      switch: `<rect x="12" y="28" width="40" height="18" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-        <circle cx="20" cy="37" r="3" fill="#4CBB17"/>
-        <circle cx="32" cy="37" r="3" fill="#4CBB17"/>
-        <circle cx="44" cy="37" r="3" fill="#4CBB17"/>`,
-      router: `<rect x="14" y="28" width="36" height="18" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-        <circle cx="32" cy="37" r="3" fill="#004d40"/>
-        <path d="M20 24c6-6 18-6 24 0" fill="none" stroke="#004d40" stroke-width="2" stroke-linecap="round"/>
-        <path d="M24 20c4-4 12-4 16 0" fill="none" stroke="#004d40" stroke-width="2" stroke-linecap="round"/>`,
-      modem: `<rect x="12" y="16" width="40" height="28" rx="4" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-        <rect x="20" y="22" width="6" height="6" fill="#4CBB17"/>
-        <rect x="30" y="22" width="6" height="6" fill="#4CBB17"/>
-        <rect x="40" y="22" width="6" height="6" fill="#4CBB17"/>`,
-      firewall: `<path d="M32 8 L48 14 L48 28 C48 40 36 50 32 52 C28 50 16 40 16 28 L16 14 Z" fill="#ffffff" stroke="#d32f2f" stroke-width="2"/>
-        <rect x="28" y="26" width="8" height="12" fill="#d32f2f"/>`,
-      satellite: `<path d="M44 20 L54 10 L58 14 L48 24 Z" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-        <circle cx="20" cy="44" r="8" fill="#4CBB17" stroke="#004d40" stroke-width="2"/>
-        <path d="M28 36 L46 18" stroke="#004d40" stroke-width="2" stroke-linecap="round"/>`,
-      isp: `<path d="M20 40h28a8 8 0 0 0 0-16 12 12 0 0 0-22-2 8 8 0 0 0-6 18z" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-        <rect x="22" y="36" width="12" height="10" fill="#e0e0e0" stroke="#004d40"/>`,
-      internet: `<circle cx="32" cy="32" r="18" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-        <path d="M14 32h36" stroke="#004d40" stroke-width="1.5"/>
-        <path d="M32 14v36" stroke="#004d40" stroke-width="1.5"/>
-        <path d="M22 20c6 6 6 18 0 24" stroke="#004d40" stroke-width="1.2"/>
-        <path d="M42 44c-6-6-6-18 0-24" stroke="#004d40" stroke-width="1.2"/>`,
-      server: `<rect x="10" y="12" width="44" height="12" rx="2" fill="#ffffff" stroke="#004d40" stroke-width="2" />
-        <rect x="10" y="28" width="44" height="12" rx="2" fill="#ffffff" stroke="#004d40" stroke-width="2" />
-        <rect x="10" y="44" width="44" height="6" rx="2" fill="#ffffff" stroke="#004d40" stroke-width="2" />`
-    };
-
-    scenario.components.forEach((comp) => {
-      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.setAttribute('class', 'component');
-      g.setAttribute('id', comp.id);
-      g.setAttribute('tabindex', 0);
-      g.setAttribute('aria-label', comp.label);
-      g.setAttribute('role', 'button');
-      g.setAttribute('transform', `translate(${comp.x - 32}, ${comp.y - 32})`);
-      g.innerHTML = icons[comp.id] || icons['device'];
-
-      // Draw label
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', comp.x);
-      text.setAttribute('y', comp.y + 50);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('font-size', '14');
-      text.setAttribute('fill', '#004d40');
-      text.textContent = comp.label;
-
-      svg.appendChild(g);
-      svg.appendChild(text);
-
-      // Add click event
-      g.addEventListener('click', () => {
-        toggleSelect(comp.id);
-      });
-      g.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggleSelect(comp.id);
-        }
-      });
+    div.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', device.id);
+      div.classList.add('dragging');
     });
-  }
-
-  // Toggle selection
-  function toggleSelect(id) {
-    const index = selectedComponents.indexOf(id);
-    if (index === -1) {
-      // Add if next in sequence or first
-      if (selectedComponents.length === 0 || isNextValid(id)) {
-        selectedComponents.push(id);
-      } else {
-        feedback.textContent = 'Please select the next correct component in the path.';
-        return;
-      }
-    } else {
-      // Remove if last selected
-      if (index === selectedComponents.length - 1) {
-        selectedComponents.pop();
-      } else {
-        feedback.textContent = 'You can only deselect the last selected component.';
-        return;
-      }
-    }
-    feedback.textContent = '';
-    updateSelection();
-  }
-
-  // Check if the selected component is the next correct one
-  function isNextValid(id) {
-    const scenario = scenarios[scenarioSelect.value];
-    const nextIndex = selectedComponents.length;
-    return scenario.correctPath[nextIndex] === id;
-  }
-
-  // Update selection visuals and draw path lines
-  function updateSelection() {
-    // Clear all selections
-    scenarios[scenarioSelect.value].components.forEach((comp) => {
-      const elem = document.getElementById(comp.id);
-      elem.classList.remove('selected');
+    div.addEventListener('dragend', () => {
+      div.classList.remove('dragging');
     });
 
-    // Highlight selected
-    selectedComponents.forEach((id) => {
-      const elem = document.getElementById(id);
-      elem.classList.add('selected');
-    });
-
-    // Remove existing path lines
-    const existingLines = svg.querySelectorAll('.path-line');
-    existingLines.forEach((line) => line.remove());
-
-    // Draw lines between selected components
-    for (let i = 0; i < selectedComponents.length - 1; i++) {
-      const fromId = selectedComponents[i];
-      const toId = selectedComponents[i + 1];
-      const fromComp = scenarios[scenarioSelect.value].components.find(c => c.id === fromId);
-      const toComp = scenarios[scenarioSelect.value].components.find(c => c.id === toId);
-      
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', fromComp.x);
-      line.setAttribute('y1', fromComp.y);
-      line.setAttribute('x2', toComp.x);
-      line.setAttribute('y2', toComp.y);
-      line.setAttribute('class', 'path-line');
-      svg.appendChild(line);
-    }
-  }
-
-  // Check path correctness
-  function checkPath() {
-    const scenario = scenarios[scenarioSelect.value];
-    if (selectedComponents.length !== scenario.correctPath.length) {
-      feedback.textContent = 'Incomplete path. Please complete the path.';
-      return;
-    }
-    for (let i = 0; i < scenario.correctPath.length; i++) {
-      if (selectedComponents[i] !== scenario.correctPath[i]) {
-        feedback.textContent = 'Incorrect path. Try again.';
-        return;
-      }
-    }
-    feedback.textContent = 'Correct! You have successfully created the network path.';
-  }
-
-  // Initialize
-  scenarioSelect.addEventListener('change', () => {
-    drawComponents(scenarioSelect.value);
+    deviceList.appendChild(div);
   });
 
-  checkBtn.addEventListener('click', checkPath);
+  // Create path boxes with first and last pre-filled
+  correctPath.forEach((deviceId, index) => {
+    const box = document.createElement('div');
+    box.classList.add('path-box');
+    box.setAttribute('data-index', index);
+    box.setAttribute('aria-label', `Path position ${index + 1}`);
+    box.setAttribute('tabindex', 0);
 
-  // Draw initial scenario
-  drawComponents(scenarioSelect.value);
+    if (index === 0 || index === correctPath.length - 1) {
+      // Pre-fill first and last
+      const device = devices.find(d => d.id === deviceId);
+      box.classList.add('filled');
+      box.innerHTML = `<svg class="icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">${device.svg}</svg>`;
+      box.setAttribute('data-device', deviceId);
+    } else {
+      box.setAttribute('data-device', '');
+      // Allow drop
+      box.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        box.style.borderColor = '#4CBB17';
+      });
+      box.addEventListener('dragleave', () => {
+        box.style.borderColor = '#004d40';
+      });
+      box.addEventListener('drop', (e) => {
+        e.preventDefault();
+        box.style.borderColor = '#004d40';
+        const deviceId = e.dataTransfer.getData('text/plain');
+        placeDeviceInBox(box, deviceId);
+      });
+    }
+
+    pathContainer.appendChild(box);
+  });
+
+  function placeDeviceInBox(box, deviceId) {
+    const device = devices.find(d => d.id === deviceId);
+    if (!device) return;
+
+    // Remove device from any other box
+    document.querySelectorAll('.path-box.filled').forEach(b => {
+      if (b !== box && b.getAttribute('data-device') === deviceId) {
+        b.classList.remove('filled');
+        b.innerHTML = '';
+        b.setAttribute('data-device', '');
+      }
+    });
+
+    // Place device in this box
+    box.classList.add('filled');
+    box.innerHTML = `<svg class="icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">${device.svg}</svg>`;
+    box.setAttribute('data-device', deviceId);
+  }
+
+  checkBtn.addEventListener('click', () => {
+    let correct = true;
+    for (let i = 0; i < correctPath.length; i++) {
+      const box = pathContainer.querySelector(`.path-box[data-index='${i}']`);
+      if (box.getAttribute('data-device') !== correctPath[i]) {
+        correct = false;
+        break;
+      }
+    }
+    feedback.textContent = correct ? 'Correct! You have successfully created the network path.' : 'Incorrect path. Please try again.';
+    feedback.style.color = correct ? '#00796b' : '#d32f2f';
+  });
 </script>
 </body>
 </html>
