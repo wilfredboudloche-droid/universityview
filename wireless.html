@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVA Wireless Networking - Help Desk Simulator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        :root {
+            --uva-blue: #1d4ed8;
+            --uva-green: #166534;
+            --uva-light-blue: #eff6ff;
+            --uva-gold: #facc15;
+            --text-dark: #111827;
+            --border-gray: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid var(--border-gray);
+        }
+
+        /* Header Branding */
+        .header {
+            background-color: white;
+            padding: 20px;
+            border-bottom: 4px solid var(--uva-blue);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header img {
+            height: 60px;
+        }
+
+        .header-title {
+            text-align: right;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--uva-blue);
+        }
+
+        .header-title p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--uva-green);
+            font-weight: bold;
+        }
+
+        /* Ticket Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            padding: 25px;
+        }
+
+        @media (max-width: 850px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+
+        .ticket-card {
+            background: #fff;
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .ticket-header {
+            background: #f9fafb;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-gray);
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ticket-id {
+            font-family: monospace;
+            font-weight: bold;
+            color: #6b7280;
+        }
+
+        .priority-tag {
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .priority-high { background: #fee2e2; color: #b91c1c; }
+        .priority-med { background: #fefce8; color: #854d0e; }
+
+        .ticket-body {
+            padding: 20px;
+        }
+
+        .ticket-subject {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--uva-blue);
+        }
+
+        .ticket-meta {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed var(--border-gray);
+            padding-bottom: 10px;
+        }
+
+        .ticket-description {
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Objectives Sidebar */
+        .sidebar {
+            background: var(--uva-light-blue);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dbeafe;
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            font-size: 1rem;
+            color: var(--uva-blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .objective-item {
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #bfdbfe;
+        }
+
+        .objective-item strong { color: var(--uva-green); }
+
+        /* Interaction Area */
+        .action-zone {
+            padding: 0 25px 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .option-card {
+            border: 2px solid var(--border-gray);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .option-card:hover {
+            border-color: var(--uva-blue);
+            transform: translateY(-2px);
+        }
+
+        .option-card.selected {
+            border-color: var(--uva-blue);
+            background-color: var(--uva-light-blue);
+        }
+
+        .option-card svg {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+
+        .feedback-area {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .feedback-correct { background: #ecfdf5; border: 1px solid #10b981; color: #065f46; }
+        .feedback-incorrect { background: #fff1f2; border: 1px solid #f43f5e; color: #9f1239; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 999px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary { background: var(--uva-blue); color: white; }
+        .btn-next { background: var(--uva-green); color: white; display: none; }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border-gray);
+            width: 100%;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--uva-green);
+            width: 0%;
+            transition: width 0.4s;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+    <header class="header">
+        <img src="logo.png" alt="University View Academy Logo">
+        <div class="header-title">
+            <h1>Wireless Tech Simulator</h1>
+            <p>Module 6: Networking Professional Practice</p>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="ticket-container">
+            <div class="ticket-card">
+                <div class="ticket-header">
+                    <span class="ticket-id" id="ticketId">TICKET #1024</span>
+                    <span class="priority-tag priority-high" id="priority">High Priority</span>
+                </div>
+                <div class="ticket-body">
+                    <div class="ticket-subject" id="subject">Loading Scenario...</div>
+                    <div class="ticket-meta">
+                        <strong>From:</strong> <span id="requester">IT Operations</span> | 
+                        <strong>Location:</strong> <span id="location">Main Campus</span>
+                    </div>
+                    <div class="ticket-description" id="description">
+                        Please select a scenario to begin.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <h3><i class="fas fa-graduation-cap"></i> Exam Focus</h3>
+            <div class="objective-item">
+                <strong>Obj 2.2:</strong> Wireless standards (802.11ax/be), Bluetooth, and NFC.
+            </div>
+            <div class="objective-item">
+                <strong>Obj 2.5:</strong> Access Point (AP) configuration & Infrastructure mode.
+            </div>
+            <div class="objective-item">
+                <strong>Obj 2.8:</strong> Using Wi-Fi Analyzers for signal & troubleshooting.
+            </div>
+        </div>
+    </div>
+
+    <div class="action-zone">
+        <h4 style="margin-bottom: 10px; color: var(--uva-blue);">Select the Professional Solution:</h4>
+        <div class="options-grid" id="optionsGrid">
+            <!-- Options injected by JS -->
+        </div>
+
+        <div class="feedback-area" id="feedbackArea"></div>
+
+        <div class="controls">
+            <button class="btn btn-next" id="nextBtn" onclick="nextScenario()">Next Ticket <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const scenarios = [
+        {
+            id: "TKT-601",
+            priority: "High",
+            subject: "Intermittent Connectivity in Science Wing",
+            requester: "Dr. Aris (Science Dept)",
+            location: "Building B, 2nd Floor",
+            description: "Students are reporting that their laptops frequently disconnect during lab simulations. We have three 802.11ac Access Points installed, but the signal seems 'crowded'. I need you to identify the source of the interference and recommend an upgrade path to the latest high-efficiency standard.",
+            options: [
+                { label: "Wi-Fi Analyzer / 802.11ax", icon: "fa-wifi", correct: true, feedback: "Correct! A Wi-Fi Analyzer (Obj 2.8) is essential to see channel congestion. Upgrading to 802.11ax (Wi-Fi 6) improves efficiency in high-density environments (Obj 2.2)." },
+                { label: "Bluetooth Mesh", icon: "fa-braille", correct: false, feedback: "Incorrect. Bluetooth is for short-range PANs and doesn't support the bandwidth needed for a classroom of laptops." },
+                { label: "NFC Tags", icon: "fa-contact-card", correct: false, feedback: "Incorrect. NFC is for very close proximity (cm) transactions, not building-wide internet." }
+            ]
+        },
+        {
+            id: "TKT-602",
+            priority: "Medium",
+            subject: "Secure Tablet Check-in System",
+            requester: "Admin Office",
+            location: "Front Lobby",
+            description: "We are deploying new tablets for visitor check-in. We need a way for visitors to quickly 'tap' their phone to the tablet to transfer their digital ID info securely without searching for a network. Which technology should we enable?",
+            options: [
+                { label: "NFC (Near Field)", icon: "fa-mobile-screen", correct: true, feedback: "Correct! NFC (Obj 2.2) is designed for secure, short-range 'tap' communication, perfect for digital ID transfers." },
+                { label: "Infrastructure AP", icon: "fa-tower-broadcast", correct: false, feedback: "Incorrect. While an AP provides network, it requires searching and connecting, not a simple 'tap' transfer." },
+                { label: "RFID Long Range", icon: "fa-radio", correct: false, feedback: "Incorrect. RFID is better for inventory tracking; NFC is the standard for secure mobile-to-tablet data exchange." }
+            ]
+        },
+        {
+            id: "TKT-603",
+            priority: "High",
+            subject: "Warehouse Inventory Lag",
+            requester: "Logistics Manager",
+            location: "South Warehouse",
+            description: "Our handheld scanners are losing connection at the far end of the warehouse. We currently use a single powerful router. How should we reconfigure the hardware to ensure seamless roaming across the 50,000 sq ft floor?",
+            options: [
+                { label: "Infrastructure Mode / Multiple APs", icon: "fa-network-wired", correct: true, feedback: "Correct! Using multiple Access Points in Infrastructure Mode (Obj 2.5) allows for a 'Extended Service Set' where devices can roam seamlessly." },
+                { label: "Bluetooth 5.0", icon: "fa-bluetooth", correct: false, feedback: "Incorrect. Bluetooth range is insufficient for a 50,000 sq ft warehouse." },
+                { label: "Ad-Hoc Networking", icon: "fa-laptop-code", correct: false, feedback: "Incorrect. Ad-hoc is peer-to-peer and doesn't scale for professional warehouse infrastructure." }
+            ]
+        }
+    ];
+
+    let currentIdx = 0;
+
+    function loadScenario() {
+        const s = scenarios[currentIdx];
+        document.getElementById('ticketId').textContent = s.id;
+        document.getElementById('priority').textContent = s.priority + " Priority";
+        document.getElementById('priority').className = `priority-tag priority-${s.priority.toLowerCase().substring(0,3)}`;
+        document.getElementById('subject').textContent = s.subject;
+        document.getElementById('requester').textContent = s.requester;
+        document.getElementById('location').textContent = s.location;
+        document.getElementById('description').textContent = s.description;
+
+        const grid = document.getElementById('optionsGrid');
+        grid.innerHTML = '';
+        s.options.forEach((opt, i) => {
+            const div = document.createElement('div');
+            div.className = 'option-card';
+            div.innerHTML = `<i class="fas ${opt.icon} fa-3x" style="color:var(--uva-blue); margin-bottom:10px; display:block;"></i> ${opt.label}`;
+            div.onclick = () => checkAnswer(i);
+            grid.appendChild(div);
+        });
+
+        document.getElementById('feedbackArea').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+
+        const progress = ((currentIdx) / scenarios.length) * 100;
+        document.getElementById('progressFill').style.width = progress + "%";
+    }
+
+    function checkAnswer(optIdx) {
+        const s = scenarios[currentIdx];
+        const opt = s.options[optIdx];
+        const feedback = document.getElementById('feedbackArea');
+
+        feedback.style.display = 'block';
+        feedback.className = `feedback-area ${opt.correct ? 'feedback-correct' : 'feedback-incorrect'}`;
+        feedback.innerHTML = `<strong>${opt.correct ? '✅ Resolved:' : '❌ Escalated:'}</strong> ${opt.feedback}`;
+
+        // Highlight selection
+        const cards = document.querySelectorAll('.option-card');
+        cards.forEach((c, i) => {
+            c.classList.remove('selected');
+            if(i === optIdx) c.classList.add('selected');
+        });
+
+        if(opt.correct) {
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+    }
+
+    function nextScenario() {
+        currentIdx++;
+        if(currentIdx < scenarios.length) {
+            loadScenario();
+        } else {
+            document.getElementById('progressFill').style.width = "100%";
+            document.querySelector('.main-content').innerHTML = `
+                <div style="text-align:center; padding: 50px; grid-column: 1 / -1;">
+                    <i class="fas fa-check-circle fa-5x" style="color:var(--uva-green);"></i>
+                    <h2 style="color:var(--uva-blue);">Shift Complete!</h2>
+                    <p>You have successfully resolved all wireless networking tickets for University View Academy.</p>
+                    <button class="btn btn-primary" onclick="location.reload()">Restart Simulation</button>
+                </div>
+            `;
+            document.querySelector('.action-zone').style.display = 'none';
+        }
+    }
+
+    window.onload = loadScenario;
+</script>
+
+</body>
+</html>
