@@ -111,13 +111,38 @@
   #game-area {
     flex-grow: 1;
     position: relative;
-    background: url('https://cdn.pixabay.com/photo/2016/11/29/03/53/house-1867187_1280.jpg') no-repeat center center;
+    background-color: #e0f2f1;
     background-size: cover;
+    background-position: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 2rem;
+    transition: background 0.5s ease;
+  }
+  #scenario-selector {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 0.8rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  #scenario-selector label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #0b3d91;
+  }
+  #scenario-selector select {
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid #0b3d91;
   }
   .game-instructions {
     background-color: rgba(255, 255, 255, 0.9);
@@ -199,10 +224,18 @@
     </div>
   </div>
   <div id="game-area">
+    <div id="scenario-selector">
+      <label for="scenario">Select Scenario:</label>
+      <select id="scenario">
+        <option value="home">Home Network</option>
+        <option value="rural">Remote/Rural Office</option>
+        <option value="enterprise">Enterprise/School Network</option>
+      </select>
+    </div>
     <div class="game-instructions">
-    <div id="standards">CompTIA A+ Standards Covered: 2.5 Network Hardware, 2.7 Internet Connection Types</div>
+      <div id="standards">CompTIA A+ Standards Covered: 2.5 Network Hardware, 2.7 Internet Connection Types</div>
       <h3>How to Play:</h3>
-      <p>Drag the correct network devices from the left panel and drop them into the empty boxes to complete the path from the <strong>Home Device</strong> to the <strong>Internet</strong>. Hover over icons to see their names.</p>
+      <p>Select a scenario from the dropdown menu. Drag the correct network devices from the left panel and drop them into the empty boxes to complete the path. Hover over icons to see their names.</p>
     </div>
     <div id="path">
       <!-- Path boxes will be inserted here -->
@@ -241,12 +274,46 @@
       <path d="M42 44c-6-6-6-18 0-24" stroke="#004d40" stroke-width="1.2"/>` },
   ];
 
-  const correctPath = ['device', 'switch', 'router', 'modem', 'isp', 'internet'];
+  const scenarios = {
+    home: {
+      background: 'https://cdn.pixabay.com/photo/2016/11/29/03/53/house-1867187_1280.jpg',
+      path: ['device', 'switch', 'router', 'modem', 'isp', 'internet'],
+      prefilled: [0, 5]
+    },
+    rural: {
+      background: 'https://cdn.pixabay.com/photo/2016/11/18/17/46/house-1836070_1280.jpg',
+      path: ['device', 'router', 'satellite', 'isp', 'internet'],
+      prefilled: [0, 4]
+    },
+    enterprise: {
+      background: 'https://cdn.pixabay.com/photo/2014/10/07/13/48/office-477740_1280.jpg',
+      path: ['device', 'switch', 'firewall', 'router', 'modem', 'isp', 'internet'],
+      prefilled: [0, 6]
+    }
+  };
+
+  let currentScenario = 'home';
+  let correctPath = scenarios[currentScenario].path;
 
   const deviceList = document.getElementById('device-list');
   const pathContainer = document.getElementById('path');
   const checkBtn = document.getElementById('check-btn');
   const feedback = document.getElementById('feedback');
+  const scenarioSelect = document.getElementById('scenario');
+  const gameArea = document.getElementById('game-area');
+
+  function initGame() {
+    const scenarioData = scenarios[currentScenario];
+    correctPath = scenarioData.path;
+    gameArea.style.backgroundImage = `url('${scenarioData.background}')`;
+    feedback.textContent = '';
+    renderPath();
+  }
+
+  scenarioSelect.addEventListener('change', (e) => {
+    currentScenario = e.target.value;
+    initGame();
+  });
 
   // Create draggable icons in left panel
   devices.forEach(device => {
@@ -270,40 +337,43 @@
     deviceList.appendChild(div);
   });
 
-  // Create path boxes with first and last pre-filled
-  correctPath.forEach((deviceId, index) => {
-    const box = document.createElement('div');
-    box.classList.add('path-box');
-    box.setAttribute('data-index', index);
-    box.setAttribute('aria-label', `Path position ${index + 1}`);
-    box.setAttribute('tabindex', 0);
+  function renderPath() {
+    pathContainer.innerHTML = '';
+    const scenarioData = scenarios[currentScenario];
+    
+    correctPath.forEach((deviceId, index) => {
+      const box = document.createElement('div');
+      box.classList.add('path-box');
+      box.setAttribute('data-index', index);
+      box.setAttribute('aria-label', `Path position ${index + 1}`);
+      box.setAttribute('tabindex', 0);
 
-    if (index === 0 || index === correctPath.length - 1) {
-      // Pre-fill first and last
-      const device = devices.find(d => d.id === deviceId);
-      box.classList.add('filled');
-      box.innerHTML = `<svg class="icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">${device.svg}</svg>`;
-      box.setAttribute('data-device', deviceId);
-    } else {
-      box.setAttribute('data-device', '');
-      // Allow drop
-      box.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        box.style.borderColor = '#4CBB17';
-      });
-      box.addEventListener('dragleave', () => {
-        box.style.borderColor = '#004d40';
-      });
-      box.addEventListener('drop', (e) => {
-        e.preventDefault();
-        box.style.borderColor = '#004d40';
-        const deviceId = e.dataTransfer.getData('text/plain');
-        placeDeviceInBox(box, deviceId);
-      });
-    }
-
-    pathContainer.appendChild(box);
-  });
+      if (scenarioData.prefilled.includes(index)) {
+        // Pre-fill
+        const device = devices.find(d => d.id === deviceId);
+        box.classList.add('filled');
+        box.innerHTML = `<svg class="icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">${device.svg}</svg>`;
+        box.setAttribute('data-device', deviceId);
+      } else {
+        box.setAttribute('data-device', '');
+        // Allow drop
+        box.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          box.style.borderColor = '#4CBB17';
+        });
+        box.addEventListener('dragleave', () => {
+          box.style.borderColor = '#004d40';
+        });
+        box.addEventListener('drop', (e) => {
+          e.preventDefault();
+          box.style.borderColor = '#004d40';
+          const droppedId = e.dataTransfer.getData('text/plain');
+          placeDeviceInBox(box, droppedId);
+        });
+      }
+      pathContainer.appendChild(box);
+    });
+  }
 
   function placeDeviceInBox(box, deviceId) {
     const device = devices.find(d => d.id === deviceId);
@@ -311,7 +381,8 @@
 
     // Remove device from any other box
     document.querySelectorAll('.path-box.filled').forEach(b => {
-      if (b !== box && b.getAttribute('data-device') === deviceId) {
+      const index = parseInt(b.getAttribute('data-index'));
+      if (b !== box && b.getAttribute('data-device') === deviceId && !scenarios[currentScenario].prefilled.includes(index)) {
         b.classList.remove('filled');
         b.innerHTML = '';
         b.setAttribute('data-device', '');
@@ -336,6 +407,9 @@
     feedback.textContent = correct ? 'Correct! You have successfully created the network path.' : 'Incorrect path. Please try again.';
     feedback.style.color = correct ? '#00796b' : '#d32f2f';
   });
+
+  // Initial load
+  initGame();
 </script>
 </body>
 </html>
