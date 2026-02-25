@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VLAN Segmentation Scenario - University View Academy</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    color: #004d40; /* dark green from logo */
+  }
+  header {
+    background-color: #00539f; /* blue from logo */
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  header img {
+    height: 60px;
+  }
+  header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+  }
+  main {
+    max-width: 825px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 20px;
+  }
+  h2 {
+    color: #00796b; /* medium green */
+    margin-top: 0;
+  }
+  .network-diagram {
+    width: 100%;
+    height: 600px;
+    border: 2px solid #00539f;
+    border-radius: 10px;
+    background: #e0f2f1;
+    position: relative;
+    user-select: none;
+  }
+  .switch {
+    fill: #00539f;
+    stroke: #003d7a;
+    stroke-width: 2;
+  }
+  .device {
+    cursor: pointer;
+    stroke: #004d40;
+    stroke-width: 2;
+  }
+  .device circle {
+    fill: #ffffff;
+  }
+  .device text {
+    font-size: 0.8rem;
+    fill: #004d40;
+    pointer-events: none;
+  }
+  .vlan-label {
+    font-weight: bold;
+    fill: #004d40;
+    font-size: 1rem;
+  }
+  .vlan-area {
+    fill-opacity: 0.15;
+    stroke-width: 2;
+    stroke-dasharray: 6 4;
+  }
+  .vlan1 {
+    fill: #4caf50;
+    stroke: #388e3c;
+  }
+  .vlan2 {
+    fill: #ff9800;
+    stroke: #f57c00;
+  }
+  .vlan3 {
+    fill: #2196f3;
+    stroke: #1976d2;
+  }
+  .info-box {
+    position: absolute;
+    background: white;
+    border: 2px solid #00539f;
+    border-radius: 8px;
+    padding: 10px;
+    max-width: 250px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .info-box.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .instructions {
+    margin-bottom: 15px;
+    font-size: 1rem;
+    color: #004d40;
+  }
+  .legend {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: #004d40;
+  }
+  .color-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+  }
+  .color-vlan1 {
+    background-color: #4caf50;
+  }
+  .color-vlan2 {
+    background-color: #ff9800;
+  }
+  .color-vlan3 {
+    background-color: #2196f3;
+  }
+  button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #00539f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  button:hover {
+    background-color: #003d7a;
+  }
+</style>
+</head>
+<body>
+<header>
+  <img src="logo.png" alt="University View Academy Logo" />
+  <h1>VLAN Segmentation Scenario</h1>
+</header>
+<main>
+  <p class="instructions">Click devices to assign them to VLANs. Devices in the same VLAN can communicate; different VLANs cannot.</p>
+  <svg class="network-diagram" viewBox="0 0 800 600" aria-label="Network VLAN Segmentation Diagram" role="img">
+    <!-- VLAN areas -->
+    <rect x="50" y="50" width="220" height="500" class="vlan-area vlan1" />
+    <text x="160" y="40" class="vlan-label">VLAN 1</text>
+    <rect x="290" y="50" width="220" height="500" class="vlan-area vlan2" />
+    <text x="400" y="40" class="vlan-label">VLAN 2</text>
+    <rect x="530" y="50" width="220" height="500" class="vlan-area vlan3" />
+    <text x="640" y="40" class="vlan-label">VLAN 3</text>
+
+    <!-- Switch -->
+    <rect x="350" y="10" width="100" height="30" class="switch" rx="5" ry="5" />
+    <text x="400" y="30" fill="white" font-size="14" font-weight="bold" text-anchor="middle">Switch</text>
+
+    <!-- Devices -->
+    <g class="device" data-device="PC1" tabindex="0" role="button" aria-pressed="false" aria-label="Device PC1, not assigned to a VLAN">
+      <circle cx="160" cy="100" r="20" />
+      <text x="160" y="105" text-anchor="middle">PC1</text>
+    </g>
+    <g class="device" data-device="PC2" tabindex="0" role="button" aria-pressed="false" aria-label="Device PC2, not assigned to a VLAN">
+      <circle cx="160" cy="180" r="20" />
+      <text x="160" y="185" text-anchor="middle">PC2</text>
+    </g>
+    <g class="device" data-device="PC3" tabindex="0" role="button" aria-pressed="false" aria-label="Device PC3, not assigned to a VLAN">
+      <circle cx="160" cy="260" r="20" />
+      <text x="160" y="265" text-anchor="middle">PC3</text>
+    </g>
+    <g class="device" data-device="PC4" tabindex="0" role="button" aria-pressed="false" aria-label="Device PC4, not assigned to a VLAN">
+      <circle cx="400" cy="100" r="20" />
+      <text x="400" y="105" text-anchor="middle">PC4</text>
+    </g>
+    <g class="device" data-device="PC5" tabindex="0" role="button" aria-pressed="false" aria-label="Device PC5, not assigned to a VLAN">
+      <circle cx="400" cy="180" r="20" />
+      <text x="400" y="185" text-anchor="middle">PC5</text>
+    </g>
+    <g class="device" data-device="PC6" tabindex="0" role="button" aria-pressed="false" aria-label="Device PC6, not assigned to a VLAN">
+      <circle cx="400" cy="260" r="20" />
+      <text x="400" y="265" text-anchor="middle">PC6</text>
+    </g>
+    <g class="device" data-device="PC7" tabindex="0" role="button" aria-pressed="false" aria-label="Device PC7, not assigned to a VLAN">
+      <circle cx="640" cy="100" r="20" />
+      <text x="640" y="105" text-anchor="middle">PC7</text>
+    </g>
+    <g class="device" data-device="PC8" tabindex="0" role="button" aria-pressed="false" aria-label="Device PC8, not assigned to a VLAN">
+      <circle cx="640" cy="180" r="20" />
+      <text x="640" y="185" text-anchor="middle">PC8</text>
+    </g>
+    <g class="device" data-device="PC9" tabindex="0" role="button" aria-pressed="false" aria-label="Device PC9, not assigned to a VLAN">
+      <circle cx="640" cy="260" r="20" />
+      <text x="640" y="265" text-anchor="middle">PC9</text>
+    </g>
+  </svg>
+
+  <div class="legend">
+    <div class="legend-item"><div class="color-box color-vlan1"></div> VLAN 1</div>
+    <div class="legend-item"><div class="color-box color-vlan2"></div> VLAN 2</div>
+    <div class="legend-item"><div class="color-box color-vlan3"></div> VLAN 3</div>
+  </div>
+
+  <button id="reset-btn">Reset VLAN Assignments</button>
+</main>
+
+<script>
+  const devices = document.querySelectorAll('.device');
+  const vlanColors = {
+    'VLAN 1': '#4caf50',
+    'VLAN 2': '#ff9800',
+    'VLAN 3': '#2196f3'
+  };
+
+  // Track VLAN assignment for each device
+  const deviceVLANs = {};
+
+  // Cycle VLAN assignment on click
+  devices.forEach(device => {
+    device.addEventListener('click', () => {
+      const currentVLAN = deviceVLANs[device.dataset.device] || null;
+      let nextVLAN = null;
+      if (currentVLAN === null) nextVLAN = 'VLAN 1';
+      else if (currentVLAN === 'VLAN 1') nextVLAN = 'VLAN 2';
+      else if (currentVLAN === 'VLAN 2') nextVLAN = 'VLAN 3';
+      else nextVLAN = null; // unassigned
+
+      deviceVLANs[device.dataset.device] = nextVLAN;
+      updateDeviceAppearance(device, nextVLAN);
+      updateAria(device, nextVLAN);
+      updateCommunicationLines();
+    });
+
+    // Keyboard accessibility
+    device.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        device.click();
+      }
+    });
+  });
+
+  function updateDeviceAppearance(device, vlan) {
+    const circle = device.querySelector('circle');
+    if (vlan) {
+      circle.setAttribute('fill', vlanColors[vlan]);
+      device.setAttribute('aria-pressed', 'true');
+      device.setAttribute('aria-label', `Device ${device.dataset.device}, assigned to ${vlan}`);
+    } else {
+      circle.setAttribute('fill', '#ffffff');
+      device.setAttribute('aria-pressed', 'false');
+      device.setAttribute('aria-label', `Device ${device.dataset.device}, not assigned to a VLAN`);
+    }
+  }
+
+  // Clear all VLAN assignments
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    devices.forEach(device => {
+      deviceVLANs[device.dataset.device] = null;
+      updateDeviceAppearance(device, null);
+    });
+    clearCommunicationLines();
+  });
+
+  // Communication lines group
+  let commLinesGroup = null;
+
+  function updateCommunicationLines() {
+    clearCommunicationLines();
+    const svg = document.querySelector('.network-diagram');
+
+    // Group for lines
+    commLinesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    commLinesGroup.setAttribute('id', 'comm-lines');
+    svg.appendChild(commLinesGroup);
+
+    // For each pair of devices, draw a line if they share the same VLAN
+    for (let i = 0; i < devices.length; i++) {
+      for (let j = i + 1; j < devices.length; j++) {
+        const devA = devices[i];
+        const devB = devices[j];
+        const vlanA = deviceVLANs[devA.dataset.device];
+        const vlanB = deviceVLANs[devB.dataset.device];
+        if (vlanA && vlanA === vlanB) {
+          drawLineBetweenDevices(devA, devB, vlanColors[vlanA]);
+        }
+      }
+    }
+  }
+
+  function clearCommunicationLines() {
+    if (commLinesGroup) {
+      commLinesGroup.remove();
+      commLinesGroup = null;
+    }
+  }
+
+  function drawLineBetweenDevices(devA, devB, color) {
+    const svg = document.querySelector('.network-diagram');
+    const pt = svg.createSVGPoint();
+
+    const circleA = devA.querySelector('circle');
+    const circleB = devB.querySelector('circle');
+
+    // Get center coordinates of each device circle relative to SVG
+    const rectA = circleA.getBoundingClientRect();
+    const rectB = circleB.getBoundingClientRect();
+    const svgRect = svg.getBoundingClientRect();
+
+    const x1 = rectA.left + rectA.width / 2 - svgRect.left;
+    const y1 = rectA.top + rectA.height / 2 - svgRect.top;
+    const x2 = rectB.left + rectB.width / 2 - svgRect.left;
+    const y2 = rectB.top + rectB.height / 2 - svgRect.top;
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1);
+    line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2);
+    line.setAttribute('y2', y2);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', '3');
+    line.setAttribute('stroke-opacity', '0.7');
+
+    commLinesGroup.appendChild(line);
+  }
+
+  // Initial setup
+  devices.forEach(device => updateDeviceAppearance(device, null));
+</script>
+</body>
+</html>
