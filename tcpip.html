@@ -119,25 +119,29 @@
   .incorrect {
     color: #c62828; /* red */
   }
-  .hint-btn {
-    background-color: #00796b;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    font-size: 0.9rem;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 10px;
-    transition: background-color 0.3s ease;
+  .standards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0;
+    padding: 0 20px;
   }
-  .hint-btn:hover {
-    background-color: #004d40;
+  .standard-pill {
+    background-color: #e0f2f1;
+    color: #004d40;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid #00796b;
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
-  .hint-text {
-    margin-top: 10px;
-    font-style: italic;
+  .standard-pill::before {
+    content: '•';
     color: #00539f;
-    display: none;
+    font-size: 1.2rem;
   }
   footer {
     margin-top: 40px;
@@ -152,6 +156,11 @@
   <img src="logo.png" alt="University View Academy Logo" />
   <h1>TCP/IP Interactive Activity</h1>
 </header>
+<div class="standards-blurb" style="padding: 15px 20px; background-color: #e0f2f1; border-radius: 8px; margin: 15px 0; color: #004d40; font-size: 0.95rem;">
+  <h3 style="margin-top: 0;">Exam Objectives:</h3>
+  <p><strong>2.6 – Given a scenario, configure basic wired/wireless small office/home office (SOHO) networks</strong></p>
+  <p>This lesson covers TCP/IP configuration, including IP addressing, subnet masks, default gateways, DNS servers, DHCP settings, and SOHO router configuration—all critical skills for the A+ exam.</p>
+</div>
 <main>
   <section>
     <h2>TCP/IP Model Layers</h2>
@@ -201,8 +210,6 @@
     <label for="network-id-input">Enter the Network ID:</label>
     <input type="text" id="network-id-input" placeholder="e.g., 192.168.1.0" />
     <button id="check-network-id">Check Answer</button>
-    <button id="hint-btn" class="hint-btn">Get a Hint</button>
-    <div id="hint-text" class="hint-text"></div>
     <div id="network-id-feedback" class="feedback"></div>
   </section>
 </main>
@@ -218,30 +225,6 @@
       // Add active to clicked
       layer.classList.add('active');
     });
-  });
-
-  // Hints logic
-  const hints = [
-    "Hint 1: Look at the subnet mask. 255.255.255.0 means the first three octets are the network portion.",
-    "Hint 2: In a network ID, the host portion (the last octet in this case) is always set to 0.",
-    "Hint 3: Combine the network portion (192.168.1) with a 0 at the end."
-  ];
-  let hintCount = 0;
-  const hintBtn = document.getElementById('hint-btn');
-  const hintDisplay = document.getElementById('hint-text');
-
-  hintBtn.addEventListener('click', () => {
-    if (hintCount < hints.length) {
-      hintDisplay.textContent = hints[hintCount];
-      hintDisplay.style.display = 'block';
-      hintCount++;
-      if (hintCount === hints.length) {
-        hintBtn.textContent = "No more hints";
-        hintBtn.disabled = true;
-        hintBtn.style.opacity = "0.5";
-        hintBtn.style.cursor = "default";
-      }
-    }
   });
 
   // IPv4 Exercise check
