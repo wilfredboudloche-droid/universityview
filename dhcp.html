@@ -27,38 +27,52 @@
     font-size: 1.8rem;
     margin: 0;
   }
+  .standards-blurb {
+    background-color: #e0f2f1;
+    border-left: 5px solid #00796b;
+    margin: 20px auto;
+    padding: 15px;
+    max-width: 825px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .standards-blurb strong {
+    color: #00539f;
+    display: block;
+    margin-bottom: 5px;
+  }
   main {
     max-width: 825px;
-    margin: 20px auto;
+    margin: 0 auto 20px auto;
     background: white;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     padding: 20px;
-  }
-  h2 {
-    color: #00796b; /* medium green */
-    margin-top: 0;
   }
   .animation-container {
     width: 100%;
     height: 300px;
     margin-bottom: 30px;
     position: relative;
+    background: #f0f4f8;
+    border-radius: 8px;
   }
   svg {
     width: 100%;
     height: 100%;
   }
   .step {
-    fill: #00539f;
-    stroke: #003d7a;
+    transition: all 0.3s ease;
+  }
+  .step-bg {
+    fill: #ffffff;
+    stroke: #00539f;
     stroke-width: 2;
-    cursor: default;
   }
   .step-label {
-    fill: #004d40;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 14px;
     user-select: none;
   }
   .arrow {
@@ -67,18 +81,23 @@
     stroke-width: 3;
     marker-end: url(#arrowhead);
   }
-  .highlight {
+  .highlight .step-bg {
     fill: #ff9800 !important;
     stroke: #f57c00 !important;
   }
+  .highlight text {
+    fill: white !important;
+  }
   .quiz-section {
     margin-top: 20px;
+    border-top: 2px solid #eee;
+    padding-top: 20px;
   }
   .question {
-    margin-bottom: 15px;
+    margin-bottom: 25px;
   }
   .question h3 {
-    margin: 0 0 8px 0;
+    margin: 0 0 12px 0;
     color: #00539f;
   }
   .options {
@@ -86,14 +105,21 @@
     padding: 0;
   }
   .options li {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    padding: 8px;
+    background: #f1f8ff;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  .options li:hover {
+    background: #e1effe;
   }
   .options input[type="radio"] {
-    margin-right: 8px;
+    margin-right: 10px;
   }
   button {
     margin-top: 10px;
-    padding: 10px 20px;
+    padding: 12px 24px;
     background-color: #00539f;
     color: white;
     border: none;
@@ -106,14 +132,23 @@
     background-color: #003d7a;
   }
   .feedback {
-    margin-top: 8px;
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 4px;
     font-weight: bold;
+    display: none;
   }
   .correct {
-    color: #4caf50;
+    display: block;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
   }
   .incorrect {
-    color: #f44336;
+    display: block;
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
   }
 </style>
 </head>
@@ -122,34 +157,71 @@
   <img src="logo.png" alt="University View Academy Logo" />
   <h1>DHCP DORA Process Animation & Quiz</h1>
 </header>
+
+<div class="standards-blurb">
+  <strong>Exam Objectives: 2.3 – Summarize services provided by networked hosts</strong>
+  Understanding DHCP and DNS services that enable automatic configuration and name resolution on networks.
+</div>
+
 <main>
   <section class="animation-container" aria-label="DHCP DORA process animation">
-    <svg viewBox="0 0 800 300" role="img" aria-labelledby="title desc">
-      <title id="title">DHCP DORA Process</title>
-      <desc id="desc">Animation showing Discover, Offer, Request, and Acknowledge steps in DHCP process</desc>
+    <svg viewBox="0 0 825 300" role="img">
       <defs>
         <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
           <polygon points="0 0, 10 3.5, 0 7" fill="#00539f" />
         </marker>
+
+        <!-- Computer Graphic Template -->
+        <symbol id="computer-icon" viewBox="0 0 100 80">
+          <rect x="10" y="5" width="80" height="50" rx="5" fill="#333" />
+          <rect x="15" y="10" width="70" height="40" fill="#eee" />
+          <rect x="40" y="55" width="20" height="15" fill="#666" />
+          <rect x="25" y="70" width="50" height="5" rx="2" fill="#333" />
+        </symbol>
+
+        <!-- Server Graphic Template -->
+        <symbol id="server-icon" viewBox="0 0 100 80">
+          <rect x="25" y="5" width="50" height="70" rx="3" fill="#333" />
+          <rect x="30" y="15" width="40" height="5" fill="#00ff00" />
+          <rect x="30" y="25" width="40" height="5" fill="#00ff00" />
+          <circle cx="35" cy="45" r="3" fill="#666" />
+          <circle cx="45" cy="45" r="3" fill="#666" />
+          <circle cx="55" cy="45" r="3" fill="#666" />
+        </symbol>
       </defs>
-      <!-- Steps -->
-      <rect id="discover" class="step" x="50" y="100" width="140" height="80" rx="15" ry="15" />
-      <text x="120" y="150" class="step-label" text-anchor="middle">Discover</text>
-      <rect id="offer" class="step" x="250" y="100" width="140" height="80" rx="15" ry="15" />
-      <text x="320" y="150" class="step-label" text-anchor="middle">Offer</text>
-      <rect id="request" class="step" x="450" y="100" width="140" height="80" rx="15" ry="15" />
-      <text x="520" y="150" class="step-label" text-anchor="middle">Request</text>
-      <rect id="acknowledge" class="step" x="650" y="100" width="140" height="80" rx="15" ry="15" />
-      <text x="720" y="150" class="step-label" text-anchor="middle">Acknowledge</text>
+
+      <!-- Discover (Computer) -->
+      <g id="discover" class="step">
+        <use href="#computer-icon" x="40" y="80" width="100" height="80" />
+        <text x="90" y="185" class="step-label" text-anchor="middle" fill="#004d40">1. Discover</text>
+      </g>
+
+      <!-- Offer (Server) -->
+      <g id="offer" class="step">
+        <use href="#server-icon" x="240" y="80" width="100" height="80" />
+        <text x="290" y="185" class="step-label" text-anchor="middle" fill="#004d40">2. Offer</text>
+      </g>
+
+      <!-- Request (Computer) -->
+      <g id="request" class="step">
+        <use href="#computer-icon" x="440" y="80" width="100" height="80" />
+        <text x="490" y="185" class="step-label" text-anchor="middle" fill="#004d40">3. Request</text>
+      </g>
+
+      <!-- Accept (Server) -->
+      <g id="acknowledge" class="step">
+        <use href="#server-icon" x="640" y="80" width="100" height="80" />
+        <text x="690" y="185" class="step-label" text-anchor="middle" fill="#004d40">4. Accept</text>
+      </g>
 
       <!-- Arrows -->
-      <line x1="190" y1="140" x2="250" y2="140" class="arrow" />
-      <line x1="390" y1="140" x2="450" y2="140" class="arrow" />
-      <line x1="590" y1="140" x2="650" y2="140" class="arrow" />
+      <line x1="145" y1="120" x2="235" y2="120" class="arrow" />
+      <line x1="345" y1="120" x2="435" y2="120" class="arrow" />
+      <line x1="545" y1="120" x2="635" y2="120" class="arrow" />
     </svg>
   </section>
 
-  <section class="quiz-section" aria-label="DHCP quiz">
+  <section class="quiz-section">
     <div class="question" id="question1">
       <h3>1. What is the first step in the DHCP DORA process?</h3>
       <ul class="options">
@@ -159,20 +231,21 @@
         <li><label><input type="radio" name="q1" value="Acknowledge" /> Acknowledge</label></li>
       </ul>
       <button onclick="checkAnswer('q1', 'Discover', 'feedback1')">Check Answer</button>
-      <div id="feedback1" class="feedback" aria-live="polite"></div>
+      <div id="feedback1" class="feedback"></div>
     </div>
 
     <div class="question" id="question2">
       <h3>2. What is the purpose of a DHCP reservation?</h3>
       <ul class="options">
-        <li><label><input type="radio" name="q2" value="Same IP for device" /> To ensure a specific device always receives the same IP address from the DHCP server</label></li>
-        <li><label><input type="radio" name="q2" value="Prevent unauthorized devices" /> To prevent unauthorized devices from obtaining IP addresses</label></li>
-        <li><label><input type="radio" name="q2" value="Extend lease time" /> To extend the lease time for all DHCP clients</label></li>
+        <li><label><input type="radio" name="q2" value="Same IP" /> To ensure a specific device always receives the same IP address</label></li>
+        <li><label><input type="radio" name="q2" value="Prevent" /> To prevent unauthorized devices from obtaining IP addresses</label></li>
+        <li><label><input type="radio" name="q2" value="Extend" /> To extend the lease time for all DHCP clients</label></li>
       </ul>
-      <button onclick="checkAnswer('q2', 'Same IP for device', 'feedback2')">Check Answer</button>
-      <div id="feedback2" class="feedback" aria-live="polite"></div>
+      <button onclick="checkAnswer('q2', 'Same IP', 'feedback2')">Check Answer</button>
+      <div id="feedback2" class="feedback"></div>
     </div>
   </section>
+</main>
 
 <script>
   const steps = ['discover', 'offer', 'request', 'acknowledge'];
@@ -212,10 +285,10 @@
       return;
     }
     if (selected === correctAnswer) {
-      feedback.textContent = 'Correct!';
+      feedback.textContent = 'Correct! Great job.';
       feedback.className = 'feedback correct';
     } else {
-      feedback.textContent = `Incorrect. The correct answer is "${correctAnswer}".`;
+      feedback.textContent = 'Incorrect. Try reviewing the DORA animation above!';
       feedback.className = 'feedback incorrect';
     }
   }
