@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Active Recall Simulator - University View Academy</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f9;
+    margin: 0;
+    padding: 0;
+    color: #004d40;
+  }
+  header {
+    background-color: #00539f;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  header img { height: 50px; }
+  header h1 { font-size: 1.5rem; margin: 0; }
+
+  .standards-blurb {
+    background-color: #e0f2f1;
+    border-left: 5px solid #00796b;
+    margin: 20px auto;
+    padding: 15px;
+    max-width: 825px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .standards-blurb strong { color: #00539f; display: block; margin-bottom: 5px; }
+
+  main {
+    max-width: 825px;
+    margin: 0 auto 40px auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 30px;
+    text-align: center;
+  }
+
+  .lab-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: #f0f4f8;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+  }
+
+  .source-bin {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .source-item {
+    background: #fff;
+    border: 2px solid #00539f;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: grab;
+    font-weight: bold;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .notebook-funnel {
+    width: 200px;
+    height: 200px;
+    border: 4px dashed #00796b;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #e0f2f1;
+    transition: all 0.3s;
+  }
+  .notebook-funnel.hover { background: #b2dfdb; transform: scale(1.05); }
+
+  .brain-meter {
+    width: 150px;
+    text-align: center;
+  }
+  .meter-bg {
+    width: 30px;
+    height: 150px;
+    background: #ddd;
+    margin: 10px auto;
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+  }
+  .meter-fill {
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(to top, #00796b, #00ff00);
+    position: absolute;
+    bottom: 0;
+    transition: height 0.5s ease;
+  }
+
+  .flashcard-zone {
+    margin-top: 20px;
+    min-height: 200px;
+    display: none;
+    perspective: 1000px;
+  }
+
+  .flashcard {
+    width: 300px;
+    height: 180px;
+    margin: 0 auto;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    font-size: 1.1rem;
+    font-weight: bold;
+    box-sizing: border-box;
+  }
+  .card-front { background: #00539f; color: white; }
+  .card-back { background: #00796b; color: white; transform: rotateY(180deg); }
+
+  .btn-action {
+    background: #00539f;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    display: none;
+  }
+  .btn-action:disabled { background: #ccc; cursor: not-allowed; }
+
+  .instruction-text { font-style: italic; color: #555; margin-bottom: 15px; }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo.png" alt="University View Academy Logo" />
+  <h1>Active Recall Simulator</h1>
+</header>
+
+<div class="standards-blurb">
+  <strong>Objective: Generate and utilize AI-powered flashcards within NotebookLM to improve retention through active recall and spaced repetition.</strong>
+  This simulator demonstrates how NotebookLM transforms raw sources into active recall tools that "power up" your long-term memory.
+</div>
+
+<main>
+  <p class="instruction-text" id="main-instruction">Step 1: Drag your source materials into the NotebookLM Funnel to begin processing.</p>
+
+  <div class="lab-container">
+    <div class="source-bin" id="source-bin">
+      <div class="source-item" draggable="true" id="src1">📄 Lesson PDF</div>
+      <div class="source-item" draggable="true" id="src2">🎙️ Podcast MP3</div>
+      <div class="source-item" draggable="true" id="src3">📝 Class Notes</div>
+    </div>
+
+    <div class="notebook-funnel" id="funnel">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="#00539f">
+        <path d="M12 3L4 9v12h16V9l-8-6zm0 2.5L18 10v9H6v-9l6-4.5zM11 12h2v5h-2v-5zm0-3h2v2h-2V9z"/>
+      </svg>
+      <span style="font-weight:bold; font-size:0.8rem; margin-top:10px;">NotebookLM</span>
+      <small id="count-text">0 / 3 Sources</small>
+    </div>
+
+    <div class="brain-meter">
+      <div style="font-weight:bold; font-size:0.8rem;">Brain Power</div>
+      <div class="meter-bg">
+        <div class="meter-fill" id="meter"></div>
+      </div>
+      <small id="meter-text">0% Recall</small>
+    </div>
+  </div>
+
+  <button class="btn-action" id="btn-generate" onclick="generateCards()">Generate Flashcards</button>
+
+  <div class="flashcard-zone" id="card-zone">
+    <p class="instruction-text">Step 2: Practice Active Recall. Try to answer before flipping!</p>
+    <div class="flashcard" id="card" onclick="flipCard()">
+      <div class="card-face card-front" id="card-q">Question goes here...</div>
+      <div class="card-face card-back" id="card-a">Answer goes here!</div>
+    </div>
+    <button class="btn-action" id="btn-next" style="display:inline-block;" onclick="nextCard()">Next Card</button>
+  </div>
+
+  <div id="final-feedback" style="display:none; margin-top:20px;">
+    <h2 style="color:#00796b;">Memory Powered Up! ⚡</h2>
+    <p>By using NotebookLM to generate cards and practicing active recall, you've moved this information into your long-term memory.</p>
+    <button class="btn-action" style="display:inline-block;" onclick="location.reload()">Restart Lab</button>
+  </div>
+</main>
+
+<script>
+  let sourcesAdded = 0;
+  const totalSources = 3;
+  const funnel = document.getElementById('funnel');
+  const meter = document.getElementById('meter');
+  const meterText = document.getElementById('meter-text');
+  const btnGenerate = document.getElementById('btn-generate');
+  const cardZone = document.getElementById('card-zone');
+  const mainInstruction = document.getElementById('main-instruction');
+
+  const deck = [
+    { q: "What is Active Recall?", a: "The process of challenging your brain to retrieve information rather than just re-reading it." },
+    { q: "Where is the Study Guide tool located?", a: "Inside the Notebook Guide section of NotebookLM." },
+    { q: "What is Spaced Repetition?", a: "Reviewing information at increasing intervals over time to improve long-term retention." }
+  ];
+  let currentCard = 0;
+
+  // Drag and Drop Logic
+  document.querySelectorAll('.source-item').forEach(item => {
+    item.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', e.target.id);
+    });
+  });
+
+  funnel.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    funnel.classList.add('hover');
+  });
+
+  funnel.addEventListener('dragleave', () => {
+    funnel.classList.remove('hover');
+  });
+
+  funnel.addEventListener('drop', (e) => {
+    e.preventDefault();
+    funnel.classList.remove('hover');
+    const id = e.dataTransfer.getData('text/plain');
+    const item = document.getElementById(id);
+    if (item) {
+      item.style.display = 'none';
+      sourcesAdded++;
+      document.getElementById('count-text').textContent = `${sourcesAdded} / ${totalSources} Sources`;
+
+      if (sourcesAdded === totalSources) {
+        funnel.style.background = '#b2dfdb';
+        btnGenerate.style.display = 'inline-block';
+        mainInstruction.textContent = "Sources Processed! Click 'Generate Flashcards' to create your study set.";
+      }
+    }
+  });
+
+  function generateCards() {
+    btnGenerate.style.display = 'none';
+    cardZone.style.display = 'block';
+    mainInstruction.style.display = 'none';
+    loadCard();
+  }
+
+  function loadCard() {
+    const card = document.getElementById('card');
+    card.classList.remove('flipped');
+    document.getElementById('card-q').textContent = deck[currentCard].q;
+    document.getElementById('card-a').textContent = deck[currentCard].a;
+  }
+
+  function flipCard() {
+    const card = document.getElementById('card');
+    if (!card.classList.contains('flipped')) {
+      card.classList.add('flipped');
+      updateMeter();
+    }
+  }
+
+  function updateMeter() {
+    const progress = ((currentCard + 1) / deck.length) * 100;
+    meter.style.height = progress + '%';
+    meterText.textContent = Math.round(progress) + '% Recall';
+  }
+
+  function nextCard() {
+    currentCard++;
+    if (currentCard < deck.length) {
+      loadCard();
+    } else {
+      cardZone.style.display = 'none';
+      document.getElementById('final-feedback').style.display = 'block';
+    }
+  }
+</script>
+</body>
+</html>
