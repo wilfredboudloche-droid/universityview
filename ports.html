@@ -440,7 +440,10 @@
 
       if (matches.length === protocols.length) {
         stopTimer();
-        feedback.textContent = 'Challenge Complete! Review the definitions below.';
+        const finalTime = timerDisplay.textContent;
+        feedback.innerHTML = `Challenge Complete! Your time: <strong>${finalTime}</strong>. Can you do better?`;
+        protocolContainer.classList.add('hidden');
+        connectionSvg.innerHTML = ''; // Clear wires
         definitionsColumn.classList.add('visible');
         tryAgainBtn.style.display = 'block';
       }
@@ -454,6 +457,7 @@
 
   tryAgainBtn.addEventListener('click', () => {
     definitionsColumn.classList.remove('visible');
+    protocolContainer.classList.remove('hidden');
     tryAgainBtn.style.display = 'none';
     feedback.textContent = '';
     resetTimer();
