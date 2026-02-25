@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IT Support Ticket Simulator - University View Academy</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f4f8;
+    margin: 0;
+    padding: 0;
+    color: #333;
+  }
+  header {
+    background-color: #00539f;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  header img { height: 50px; }
+  header h1 { margin: 0; font-size: 1.5rem; }
+
+  .standards-blurb {
+    background-color: #e0f2f1;
+    border-left: 5px solid #00796b;
+    margin: 20px auto;
+    padding: 15px;
+    max-width: 825px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+
+  main {
+    max-width: 825px;
+    margin: 0 auto 40px auto;
+    padding: 0 10px;
+  }
+
+  .ticket-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .ticket-card {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+
+  .ticket-header {
+    background: #f8f9fa;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .ticket-id { font-weight: bold; color: #00539f; }
+  .priority { font-size: 0.8rem; padding: 3px 8px; border-radius: 12px; background: #ffebee; color: #c62828; font-weight: bold; }
+
+  .ticket-body { padding: 20px; }
+  .user-info { font-size: 0.9rem; color: #666; margin-bottom: 10px; }
+  .issue-description { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.4; }
+
+  .resolution-form {
+    background: #f1f8ff;
+    padding: 15px;
+    border-radius: 6px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  label { font-size: 0.85rem; font-weight: bold; color: #00539f; }
+  select { padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
+
+  .actions { margin-top: 15px; display: flex; gap: 10px; align-items: center; }
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+  }
+
+  .btn-submit { background: #00796b; color: white; }
+  .btn-submit:hover { background: #004d40; }
+  .btn-hint { background: #ff9800; color: white; }
+  .btn-hint:hover { background: #f57c00; }
+
+  .hint-text {
+    margin-top: 10px;
+    padding: 10px;
+    background: #fff3e0;
+    border-left: 4px solid #ff9800;
+    font-size: 0.9rem;
+    display: none;
+  }
+
+  .feedback {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 4px;
+    display: none;
+    font-weight: bold;
+  }
+  .correct { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; display: block; }
+  .incorrect { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; display: block; }
+
+  @media (max-width: 600px) {
+    .resolution-form { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo.png" alt="University View Academy Logo" />
+  <h1>IT Support Help Desk Simulator</h1>
+</header>
+
+<div class="standards-blurb">
+  <strong>Exam Objectives: 2.3 – Summarize services provided by networked hosts</strong>
+  Technicians must identify the correct protocols and ports to resolve connectivity issues for web, mail, and remote access services.
+</div>
+
+<main>
+  <div class="ticket-dashboard">
+
+    <!-- Ticket 1 -->
+    <div class="ticket-card" id="ticket-1">
+      <div class="ticket-header">
+        <span class="ticket-id">TICKET #4092</span>
+        <span class="priority">HIGH PRIORITY</span>
+      </div>
+      <div class="ticket-body">
+        <div class="user-info">From: Sarah Jenkins (Marketing)</div>
+        <div class="issue-description">
+          "I'm trying to set up my new iPhone to receive work emails. I can send messages fine, but I can't <strong>download or view</strong> my existing messages from the server. My manager said we use a protocol that keeps everything synced across all my devices."
+        </div>
+
+        <div class="resolution-form">
+          <div class="form-group">
+            <label>Select Protocol:</label>
+            <select id="proto-1">
+              <option value="">-- Select --</option>
+              <option value="SMTP">SMTP</option>
+              <option value="POP3">POP3</option>
+              <option value="IMAP">IMAP</option>
+              <option value="HTTP">HTTP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Select Port:</label>
+            <select id="port-1">
+              <option value="">-- Select --</option>
+              <option value="25">25</option>
+              <option value="110">110</option>
+              <option value="143">143</option>
+              <option value="443">443</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn-submit" onclick="checkTicket(1, 'IMAP', '143')">Resolve Ticket</button>
+          <button class="btn-hint" onclick="toggleHint(1)">Get Hint</button>
+        </div>
+        <div id="hint-1" class="hint-text">Hint: POP3 downloads and deletes from the server, while this protocol syncs folders across multiple devices.</div>
+        <div id="feedback-1" class="feedback"></div>
+      </div>
+    </div>
+
+    <!-- Ticket 2 -->
+    <div class="ticket-card" id="ticket-2">
+      <div class="ticket-header">
+        <span class="ticket-id">TICKET #4105</span>
+        <span class="priority">MEDIUM PRIORITY</span>
+      </div>
+      <div class="ticket-body">
+        <div class="user-info">From: David Chen (Accounting)</div>
+        <div class="issue-description">
+          "I need to access the company's financial portal, but the browser says 'Connection Not Secure'. I know I should be using the <strong>encrypted</strong> version of the web protocol to protect our data."
+        </div>
+
+        <div class="resolution-form">
+          <div class="form-group">
+            <label>Select Protocol:</label>
+            <select id="proto-2">
+              <option value="">-- Select --</option>
+              <option value="HTTP">HTTP</option>
+              <option value="HTTPS">HTTPS</option>
+              <option value="SSH">SSH</option>
+              <option value="RDP">RDP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Select Port:</label>
+            <select id="port-2">
+              <option value="">-- Select --</option>
+              <option value="22">22</option>
+              <option value="80">80</option>
+              <option value="443">443</option>
+              <option value="3389">3389</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn-submit" onclick="checkTicket(2, 'HTTPS', '443')">Resolve Ticket</button>
+          <button class="btn-hint" onclick="toggleHint(2)">Get Hint</button>
+        </div>
+        <div id="hint-2" class="hint-text">Hint: Standard web traffic uses port 80, but the secure, encrypted version uses this port.</div>
+        <div id="feedback-2" class="feedback"></div>
+      </div>
+    </div>
+
+    <!-- Ticket 3 -->
+    <div class="ticket-card" id="ticket-3">
+      <div class="ticket-header">
+        <span class="ticket-id">TICKET #4118</span>
+        <span class="priority">URGENT</span>
+      </div>
+      <div class="ticket-body">
+        <div class="user-info">From: System Admin (IT Dept)</div>
+        <div class="issue-description">
+          "We need to perform emergency maintenance on the Windows Server in the basement. I need to <strong>remotely log in</strong> to the server's graphical desktop from my office to check the configuration."
+        </div>
+
+        <div class="resolution-form">
+          <div class="form-group">
+            <label>Select Protocol:</label>
+            <select id="proto-3">
+              <option value="">-- Select --</option>
+              <option value="Telnet">Telnet</option>
+              <option value="SSH">SSH</option>
+              <option value="RDP">RDP</option>
+              <option value="SMB">SMB</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Select Port:</label>
+            <select id="port-3">
+              <option value="">-- Select --</option>
+              <option value="22">22</option>
+              <option value="23">23</option>
+              <option value="445">445</option>
+              <option value="3389">3389</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn-submit" onclick="checkTicket(3, 'RDP', '3389')">Resolve Ticket</button>
+          <button class="btn-hint" onclick="toggleHint(3)">Get Hint</button>
+        </div>
+        <div id="hint-3" class="hint-text">Hint: While SSH is for command-line access, this Microsoft protocol allows for a full graphical desktop connection.</div>
+        <div id="feedback-3" class="feedback"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  function toggleHint(id) {
+    const hint = document.getElementById('hint-' + id);
+    hint.style.display = (hint.style.display === 'block') ? 'none' : 'block';
+  }
+
+  function checkTicket(id, correctProto, correctPort) {
+    const proto = document.getElementById('proto-' + id).value;
+    const port = document.getElementById('port-' + id).value;
+    const feedback = document.getElementById('feedback-' + id);
+
+    if (!proto || !port) {
+      feedback.textContent = "Please select both a protocol and a port.";
+      feedback.className = "feedback incorrect";
+      return;
+    }
+
+    if (proto === correctProto && port === correctPort) {
+      feedback.innerHTML = `Correct! Ticket Resolved. <br><small>Technician Note: ${correctProto} on port ${correctPort} is the industry standard for this request.</small>`;
+      feedback.className = "feedback correct";
+    } else {
+      feedback.textContent = "Incorrect configuration. The user is still experiencing issues. Check your port/protocol matching and try again.";
+      feedback.className = "feedback incorrect";
+    }
+  }
+</script>
+</body>
+</html>
