@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DHCP DORA Process Animation & Quiz - University View Academy</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    color: #004d40; /* dark green from logo */
+  }
+  header {
+    background-color: #00539f; /* blue from logo */
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  header img {
+    height: 60px;
+  }
+  header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+  }
+  main {
+    max-width: 825px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 20px;
+  }
+  h2 {
+    color: #00796b; /* medium green */
+    margin-top: 0;
+  }
+  .animation-container {
+    width: 100%;
+    height: 300px;
+    margin-bottom: 30px;
+    position: relative;
+  }
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+  .step {
+    fill: #00539f;
+    stroke: #003d7a;
+    stroke-width: 2;
+    cursor: default;
+  }
+  .step-label {
+    fill: #004d40;
+    font-weight: bold;
+    font-size: 1.1rem;
+    user-select: none;
+  }
+  .arrow {
+    fill: none;
+    stroke: #00539f;
+    stroke-width: 3;
+    marker-end: url(#arrowhead);
+  }
+  .highlight {
+    fill: #ff9800 !important;
+    stroke: #f57c00 !important;
+  }
+  .quiz-section {
+    margin-top: 20px;
+  }
+  .question {
+    margin-bottom: 15px;
+  }
+  .question h3 {
+    margin: 0 0 8px 0;
+    color: #00539f;
+  }
+  .options {
+    list-style: none;
+    padding: 0;
+  }
+  .options li {
+    margin-bottom: 8px;
+  }
+  .options input[type="radio"] {
+    margin-right: 8px;
+  }
+  button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #00539f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  button:hover {
+    background-color: #003d7a;
+  }
+  .feedback {
+    margin-top: 8px;
+    font-weight: bold;
+  }
+  .correct {
+    color: #4caf50;
+  }
+  .incorrect {
+    color: #f44336;
+  }
+</style>
+</head>
+<body>
+<header>
+  <img src="logo.png" alt="University View Academy Logo" />
+  <h1>DHCP DORA Process Animation & Quiz</h1>
+</header>
+<main>
+  <section class="animation-container" aria-label="DHCP DORA process animation">
+    <svg viewBox="0 0 800 300" role="img" aria-labelledby="title desc">
+      <title id="title">DHCP DORA Process</title>
+      <desc id="desc">Animation showing Discover, Offer, Request, and Acknowledge steps in DHCP process</desc>
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#00539f" />
+        </marker>
+      </defs>
+      <!-- Steps -->
+      <rect id="discover" class="step" x="50" y="100" width="140" height="80" rx="15" ry="15" />
+      <text x="120" y="150" class="step-label" text-anchor="middle">Discover</text>
+      <rect id="offer" class="step" x="250" y="100" width="140" height="80" rx="15" ry="15" />
+      <text x="320" y="150" class="step-label" text-anchor="middle">Offer</text>
+      <rect id="request" class="step" x="450" y="100" width="140" height="80" rx="15" ry="15" />
+      <text x="520" y="150" class="step-label" text-anchor="middle">Request</text>
+      <rect id="acknowledge" class="step" x="650" y="100" width="140" height="80" rx="15" ry="15" />
+      <text x="720" y="150" class="step-label" text-anchor="middle">Acknowledge</text>
+
+      <!-- Arrows -->
+      <line x1="190" y1="140" x2="250" y2="140" class="arrow" />
+      <line x1="390" y1="140" x2="450" y2="140" class="arrow" />
+      <line x1="590" y1="140" x2="650" y2="140" class="arrow" />
+    </svg>
+  </section>
+
+  <section class="quiz-section" aria-label="DHCP quiz">
+    <div class="question" id="question1">
+      <h3>1. What is the first step in the DHCP DORA process?</h3>
+      <ul class="options">
+        <li><label><input type="radio" name="q1" value="Discover" /> Discover</label></li>
+        <li><label><input type="radio" name="q1" value="Offer" /> Offer</label></li>
+        <li><label><input type="radio" name="q1" value="Request" /> Request</label></li>
+        <li><label><input type="radio" name="q1" value="Acknowledge" /> Acknowledge</label></li>
+      </ul>
+      <button onclick="checkAnswer('q1', 'Discover', 'feedback1')">Check Answer</button>
+      <div id="feedback1" class="feedback" aria-live="polite"></div>
+    </div>
+
+    <div class="question" id="question2">
+      <h3>2. What is the purpose of a DHCP reservation?</h3>
+      <ul class="options">
+        <li><label><input type="radio" name="q2" value="Same IP for device" /> To ensure a specific device always receives the same IP address from the DHCP server</label></li>
+        <li><label><input type="radio" name="q2" value="Prevent unauthorized devices" /> To prevent unauthorized devices from obtaining IP addresses</label></li>
+        <li><label><input type="radio" name="q2" value="Extend lease time" /> To extend the lease time for all DHCP clients</label></li>
+      </ul>
+      <button onclick="checkAnswer('q2', 'Same IP for device', 'feedback2')">Check Answer</button>
+      <div id="feedback2" class="feedback" aria-live="polite"></div>
+    </div>
+  </section>
+
+<script>
+  const steps = ['discover', 'offer', 'request', 'acknowledge'];
+  let currentStep = 0;
+
+  function highlightStep(stepId) {
+    steps.forEach(id => {
+      const elem = document.getElementById(id);
+      if (id === stepId) {
+        elem.classList.add('highlight');
+      } else {
+        elem.classList.remove('highlight');
+      }
+    });
+  }
+
+  function animateSteps() {
+    highlightStep(steps[currentStep]);
+    currentStep = (currentStep + 1) % steps.length;
+  }
+
+  setInterval(animateSteps, 2000);
+
+  function checkAnswer(questionName, correctAnswer, feedbackId) {
+    const options = document.getElementsByName(questionName);
+    let selected = null;
+    for (const option of options) {
+      if (option.checked) {
+        selected = option.value;
+        break;
+      }
+    }
+    const feedback = document.getElementById(feedbackId);
+    if (selected === null) {
+      feedback.textContent = 'Please select an answer.';
+      feedback.className = 'feedback incorrect';
+      return;
+    }
+    if (selected === correctAnswer) {
+      feedback.textContent = 'Correct!';
+      feedback.className = 'feedback correct';
+    } else {
+      feedback.textContent = `Incorrect. The correct answer is "${correctAnswer}".`;
+      feedback.className = 'feedback incorrect';
+    }
+  }
+</script>
+</body>
+</html>
