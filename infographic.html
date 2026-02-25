@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Visual DNA: Infographic vs Flyer vs Webpage - University View Academy</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f4f8;
+    margin: 0;
+    padding: 0;
+    color: #004d40;
+  }
+  header {
+    background-color: #00539f;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  header img { height: 50px; }
+  header h1 { margin: 0; font-size: 1.5rem; }
+
+  .standards-blurb {
+    background-color: #e0f2f1;
+    border-left: 5px solid #00796b;
+    margin: 20px auto;
+    padding: 15px;
+    max-width: 750px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .standards-text {
+    max-width: 65%;
+  }
+
+  main {
+    max-width: 750px;
+    margin: 0 auto 40px auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 30px;
+  }
+
+  .dna-graphic {
+    width: 80px;
+    height: 80px;
+  }
+
+  .interactive-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .trait-pool {
+    background: #e0f2f1;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .trait-card {
+    background: white;
+    border: 2px solid #00539f;
+    border-radius: 6px;
+    padding: 10px 15px;
+    cursor: grab;
+    font-weight: bold;
+    color: #004d40;
+    user-select: none;
+    max-width: 220px;
+    text-align: center;
+  }
+
+  .target-zones {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+  }
+
+  .target-zone {
+    flex: 1;
+    min-height: 250px;
+    background: #f0f4f8;
+    border: 2px dashed #00796b;
+    border-radius: 8px;
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .target-zone h3 {
+    margin-top: 0;
+    color: #00539f;
+    margin-bottom: 10px;
+  }
+
+  .dropped-trait {
+    background: #c8e6c9;
+    border: 2px solid #00796b;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 5px 0;
+    width: 90%;
+    text-align: center;
+    font-weight: bold;
+    color: #004d40;
+  }
+
+  .pillars-section {
+    margin-top: 20px;
+    background: #e0f2f1;
+    border-radius: 8px;
+    padding: 15px;
+  }
+
+  .pillars-section h4 {
+    color: #00796b;
+    margin-top: 0;
+  }
+
+  .pillars-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .pillar-pill {
+    background: #00796b;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    user-select: none;
+  }
+
+  .btn-container {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  button {
+    background-color: #00539f;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #003d7a;
+  }
+
+  @media (max-width: 700px) {
+    .target-zones {
+      flex-direction: column;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <img src="logo.png" alt="University View Academy Logo" />
+  <h1>Visual DNA: Infographic vs Flyer vs Webpage</h1>
+</header>
+
+<div class="standards-blurb">
+  <div class="standards-text">
+    <strong>Objective:</strong> Define the core components of effective infographic design and explain how AI models like Nano Banana Pro synthesize source material into visual frameworks.
+  </div>
+  <img class="dna-graphic" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/DNA_double_helix_horizontal.svg/1200px-DNA_double_helix_horizontal.svg.png" alt="DNA Molecule Graphic" />
+</div>
+
+<main>
+  <div class="interactive-container">
+    <div class="trait-pool" id="trait-pool">
+      <!-- Traits will be dynamically inserted here -->
+    </div>
+
+    <div class="target-zones">
+      <div class="target-zone" data-category="Infographic">
+        <h3>Infographic</h3>
+      </div>
+      <div class="target-zone" data-category="Flyer">
+        <h3>Flyer</h3>
+      </div>
+      <div class="target-zone" data-category="Webpage">
+        <h3>Webpage</h3>
+      </div>
+    </div>
+
+    <div class="pillars-section">
+      <h4>7 Pillars of Effective Infographic Design</h4>
+      <div class="pillars-list" id="pillars-list">
+        <!-- Pillars will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <div class="btn-container">
+      <button id="check-btn">Check Answers</button>
+      <button id="reset-btn">Reset</button>
+    </div>
+
+    <div id="feedback" class="feedback"></div>
+  </div>
+</main>
+
+<script>
+  const traits = [
+    { text: "Collapses research into visual narratives", category: "Infographic" },
+    { text: "Uses 7 Pillars of Design", category: "Infographic" },
+    { text: "Minimal text (under 800 words)", category: "Infographic" },
+    { text: "Focuses on data storytelling", category: "Infographic" },
+    { text: "65% retention rate", category: "Infographic" },
+    { text: "Single call to action (event/sale)", category: "Flyer" },
+    { text: "High-impact imagery", category: "Flyer" },
+    { text: "Temporary information", category: "Flyer" },
+    { text: "Navigation and interactive links", category: "Webpage" },
+    { text: "Deep text content", category: "Webpage" },
+    { text: "User-driven exploration", category: "Webpage" },
+    { text: "Designed for quick info delivery", category: "Flyer" },
+    { text: "Often printed or handed out", category: "Flyer" },
+    { text: "Accessible on multiple devices", category: "Webpage" },
+    { text: "Uses visual hierarchy", category: "Infographic" },
+  ];
+
+  const pillars = [
+    "Clarity",
+    "Hierarchy",
+    "Size",
+    "Contrast",
+    "Simplicity",
+    "Accessibility",
+    "Data Storytelling"
+  ];
+
+  const traitPool = document.getElementById('trait-pool');
+  const targetZones = document.querySelectorAll('.target-zone');
+  const pillarsList = document.getElementById('pillars-list');
+  const feedback = document.getElementById('feedback');
+
+  // Initialize trait cards
+  traits.forEach(trait => {
+    const card = document.createElement('div');
+    card.className = 'trait-card';
+    card.textContent = trait.text;
+    card.setAttribute('draggable', 'true');
+    card.dataset.category = trait.category;
+    traitPool.appendChild(card);
+  });
+
+  // Initialize pillar pills
+  pillars.forEach(pillar => {
+    const pill = document.createElement('div');
+    pill.className = 'pillar-pill';
+    pill.textContent = pillar;
+    pillarsList.appendChild(pill);
+  });
+
+  let draggedTrait = null;
+
+  traitPool.addEventListener('dragstart', e => {
+    if (e.target.classList.contains('trait-card')) {
+      draggedTrait = e.target;
+    }
+  });
+
+  targetZones.forEach(zone => {
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+    });
+
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      if (!draggedTrait) return;
+      const traitCategory = draggedTrait.dataset.category;
+      const zoneCategory = zone.dataset.category;
+
+      // Prevent duplicate drops
+      const existing = Array.from(zone.querySelectorAll('.dropped-trait')).find(
+        el => el.textContent === draggedTrait.textContent
+      );
+      if (existing) return;
+
+      // Create dropped trait element
+      const dropped = document.createElement('div');
+      dropped.className = 'dropped-trait';
+      dropped.textContent = draggedTrait.textContent;
+
+      // Color coding for correct/incorrect
+      if (traitCategory === zoneCategory) {
+        dropped.style.borderColor = '#00796b';
+        dropped.style.backgroundColor = '#c8e6c9';
+      } else {
+        dropped.style.borderColor = '#c62828';
+        dropped.style.backgroundColor = '#ffcdd2';
+      }
+
+      zone.appendChild(dropped);
+      // Remove from pool only if placed correctly
+      if (traitCategory === zoneCategory) {
+        draggedTrait.style.display = 'none';
+      }
+
+      // Remove from pool
+      draggedTrait.style.display = 'none';
+      draggedTrait = null;
+    });
+  });
+
+  document.getElementById('check-btn').addEventListener('click', () => {
+    let allCorrect = true;
+    feedback.textContent = '';
+
+    targetZones.forEach(zone => {
+      const zoneCategory = zone.dataset.category;
+      const droppedTraits = zone.querySelectorAll('.dropped-trait');
+      droppedTraits.forEach(traitEl => {
+        const traitText = traitEl.textContent;
+        const traitObj = traits.find(t => t.text === traitText);
+        if (traitObj.category !== zoneCategory) {
+          allCorrect = false;
+          traitEl.style.borderColor = '#c62828';
+          traitEl.style.backgroundColor = '#ffcdd2';
+        } else {
+          traitEl.style.borderColor = '#00796b';
+          traitEl.style.backgroundColor = '#c8e6c9';
+        }
+      });
+    });
+
+    if (allCorrect) {
+      feedback.textContent = 'Great job! You correctly matched all traits.';
+      feedback.style.color = '#2e7d32';
+    } else {
+      feedback.textContent = 'Some matches are incorrect. Please try again.';
+      feedback.style.color = '#c62828';
+    }
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    // Clear all dropped traits
+    targetZones.forEach(zone => {
+      const droppedTraits = zone.querySelectorAll('.dropped-trait');
+      droppedTraits.forEach(traitEl => {
+        // Show back in pool
+        const poolCard = Array.from(traitPool.children).find(
+          card => card.textContent === traitEl.textContent
+        );
+        if (poolCard) poolCard.style.display = 'block';
+        traitEl.remove();
+      });
+    });
+    feedback.textContent = '';
+  });
+</script>
+
+</body>
+</html>
