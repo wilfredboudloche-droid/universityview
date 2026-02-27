@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UView Lesson Builder</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #1d4ed8; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { margin-top: 20px; padding: 12px 24px; background: #16a34a; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #15803d; }
+        #output-area { margin-top: 30px; display: none; }
+        pre { background: #272822; color: #f8f8f2; padding: 15px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>UView Lesson Builder</h1>
+    <p>Fill in the details below to generate your Canvas-ready HTML.</p>
+
+    <label>Unit Number</label>
+    <input type="text" id="unitNum" placeholder="e.g. 5">
+
+    <label>Unit Title</label>
+    <input type="text" id="unitTitle" placeholder="e.g. Advanced AI Prompting">
+
+    <label>Subtitle</label>
+    <input type="text" id="subtitle" placeholder="e.g. Mastering the Art of the Prompt">
+
+    <label>Introduction Text</label>
+    <textarea id="introText" rows="4" placeholder="Welcome to Unit 5..."></textarea>
+
+    <label>Lesson Objective</label>
+    <textarea id="objective" rows="2" placeholder="By the end of this lesson, I will be able to..."></textarea>
+
+    <label>Video URL (YouTube or Studio Embed Link)</label>
+    <input type="text" id="videoUrl" placeholder="https://...">
+
+    <label>Podcast Embed URL (Podbean/Spotify)</label>
+    <input type="text" id="podcastUrl" placeholder="https://...">
+
+    <label>Interactive Activity URL (GitHub Link)</label>
+    <input type="text" id="activityUrl" placeholder="https://...">
+
+    <button onclick="generateHTML()">Generate Lesson Code</button>
+
+    <div id="output-area">
+        <h3>Your Lesson Code (Copy & Paste into Canvas HTML Editor)</h3>
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
+        <pre id="finalCode"></pre>
+    </div>
+</div>
+
+<script>
+function generateHTML() {
+    const unitNum = document.getElementById('unitNum').value;
+    const unitTitle = document.getElementById('unitTitle').value;
+    const subtitle = document.getElementById('subtitle').value;
+    const intro = document.getElementById('introText').value;
+    const objective = document.getElementById('objective').value;
+    const video = document.getElementById('videoUrl').value;
+    const podcast = document.getElementById('podcastUrl').value;
+    const activity = document.getElementById('activityUrl').value;
+
+    // This is your "Perfect Template" with variables injected
+    const template = `
+<div id="dp-wrapper" class="dp-wrapper dp-circle-left" style="font-family: 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6;">
+    <header class="dp-header dp-circle-left">
+        <h2 class="dp-heading" style="text-align: center;"><span class="dp-header-pre"> <span class="dp-header-pre-1">Computer Tech Literacy</span> </span> <span class="dp-header-title">Unit ${unitNum}: ${unitTitle}</span></h2>
+        <p class="dp-header-subtitle" style="text-align: left;">${subtitle}</p>
+    </header>
+    <div class="dp-content-block" style="background-color: #ffff; padding: 16px 18px 20px; border-radius: 10px; margin-top: 16px;">
+        <h3 class="dp-has-icon"><i class="fas fa-handshake"></i> Introduction & Agenda</h3>
+        <div style="background-color: #f3f4f6; border-radius: 10px; padding: 10px 12px; border-left: 4px solid #16a34a; margin-top: 10px; color: #111827;">
+            <p style="margin-top: 0px;">${intro}</p>
+        </div>
+    </div>
+    <div class="dp-content-block content-block" style="background-color: #ffff; padding: 16px 18px 20px; border-radius: 10px; margin-top: 20px;">
+        <h3 class="dp-has-icon"><i class="fas fa-tasks"></i> Standards • Objective</h3>
+        <div class="dp-panel-content" style="padding: 10px; background-color: #ffff; color: #111827;">
+            <p><strong>Objective:</strong> ${objective}</p>
+            <div class="dp-embed-wrapper" style="text-align: center;">
+                <iframe src="${video}" width="720" height="405" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="dp-content-block content-block" style="background-color: #ffff; padding: 16px 18px 20px; border-radius: 10px; margin-top: 20px;">
+        <h3 class="dp-has-icon"><i class="fas fa-book-reader"></i> Independent Learning</h3>
+        <div class="dp-panel-group" style="border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 10px;">
+            <h3 class="dp-panel-heading" style="margin: 0; padding: 8px 12px; background-color: #f9fafb;">🎧 Step 1 – Lesson Podcast</h3>
+            <div class="dp-panel-content" style="padding: 10px 12px;">
+                <iframe src="${podcast}" width="100%" height="300" frameborder="0"></iframe>
+            </div>
+        </div>
+        <div class="dp-panel-group" style="border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 10px;">
+            <h3 class="dp-panel-heading" style="margin: 0; padding: 8px 12px; background-color: #ecfdf3;">🧠 Step 2 – Interactive Activity</h3>
+            <div class="dp-panel-content" style="padding: 10px 12px;">
+                <iframe src="${activity}" width="100%" height="750" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+</div>`;
+
+    document.getElementById('finalCode').innerText = template;
+    document.getElementById('output-area').style.display = 'block';
+}
+
+function copyToClipboard() {
+    const code = document.getElementById('finalCode').innerText;
+    navigator.clipboard.writeText(code);
+    alert("Code copied! Now paste it into the Canvas HTML editor.");
+}
+</script>
+
+</body>
+</html>
