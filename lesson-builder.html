@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UView AI Lesson Engine</title>
-    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f0f2f5; color: #333; }
         .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
@@ -16,6 +16,8 @@
         button:hover { background: #1e40af; }
         .gen-btn { background: #16a34a; width: 100%; font-size: 18px; }
         .gen-btn:hover { background: #15803d; }
+        .clean-btn { background: #f59e0b; width: 100%; margin-top: 10px; }
+        .clean-btn:hover { background: #d97706; }
         #output-area { margin-top: 30px; display: none; }
         pre { background: #1e293b; color: #f8fafc; padding: 20px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; font-family: 'Courier New', monospace; }
         .loading { display: none; color: #1d4ed8; font-weight: bold; margin-top: 10px; }
@@ -39,6 +41,7 @@
         <label>Raw Lesson Text (Auto-filled from PDF)</label>
         <textarea id="rawText" rows="8" placeholder="PDF text will appear here..."></textarea>
         
+        <button class="clean-btn" onclick="cleanText()">🧹 Clean Text with AI</button>
         <button class="gen-btn" onclick="callAI()">✨ Generate Lesson Assets</button>
         <div id="loadingMsg" class="loading">AI is thinking... generating your lesson assets...</div>
     </div>
@@ -76,24 +79,82 @@
 
 <script>
 // ✅ YOUR HIDDEN API KEY
-const apiKey = "s2_cb8a46e9cd7e4867b0413d5082fa678a"; // <-- Replace with your real key
+const apiKey = "s2_cb8a46e9cd7e4867b0413d5082fa678a";
 
-// 📄 PDF TEXT EXTRACTOR
+// 📄 IMPROVED PDF TEXT EXTRACTOR
 async function handleFiles(files) {
     const file = files[0];
     const reader = new FileReader();
+    const loadingMsg = document.getElementById('loadingMsg');
+    
+    loadingMsg.innerText = "Reading PDF... please wait.";
+    loadingMsg.style.display = "block";
+
     reader.onload = async function() {
-        const typedarray = new Uint8Array(reader.result);
-        const pdf = await pdfjsLib.getDocument(typedarray).promise;
-        let text = '';
-        for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const content = await page.getTextContent();
-            text += content.items.map(item => item.str).join(' ') + '\n';
+        try {
+            const typedarray = new Uint8Array(reader.result);
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+            
+            const pdf = await pdfjsLib.getDocument(typedarray).promise;
+            let fullText = '';
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                const pageText = content.items.map(item => item.str).join(' ');
+                fullText += `--- Page ${i} ---\n${pageText}\n\n`;
+            }
+
+            document.getElementById('rawText').value = fullText;
+            loadingMsg.style.display = "none";
+            alert("PDF Extracted! Review the text below.");
+        } catch (err) {
+            console.error(err);
+            alert("Error reading PDF. Try copying/pasting text manually.");
+            loadingMsg.style.display = "none";
         }
-        document.getElementById('rawText').value = text;
     };
     reader.readAsArrayBuffer(file);
+}
+
+// 🧹 CLEAN TEXT WITH AI
+async function cleanText() {
+    const rawText = document.getElementById('rawText').value;
+    const loadingMsg = document.getElementById('loadingMsg');
+
+    if (!rawText) { alert("Please upload a PDF first!"); return; }
+
+    loadingMsg.innerText = "AI is cleaning the text...";
+    loadingMsg.style.display = "block";
+
+    const prompt = `You are an expert curriculum designer. The following text was extracted from a PDF and is slightly garbled. Please clean it up and return only the readable lesson content in plain text. No markdown or formatting.
+
+RAW TEXT:
+${rawText}`;
+
+    try {
+        const response = await fetch('https://routellm.abacus.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'route-llm',
+                messages: [{ role: 'user', content: prompt }]
+            })
+        });
+
+        const data = await response.json();
+        const cleanText = data.choices[0].message.content.trim();
+        document.getElementById('rawText').value = cleanText;
+        loadingMsg.style.display = "none";
+        alert("Text cleaned! Now click 'Generate Lesson Assets'.");
+    } catch (error) {
+        console.error(error);
+        loadingMsg.style.display = "none";
+        alert("Error cleaning text.");
+    }
 }
 
 // 🤖 AI CALL
@@ -103,6 +164,7 @@ async function callAI() {
 
     if (!rawText) { alert("Please upload a PDF or paste lesson text!"); return; }
 
+    loadingMsg.innerText = "AI is generating lesson assets...";
     loadingMsg.style.display = "block";
 
     const prompt = `You are an expert curriculum designer. Based on the following lesson text, generate a JSON object with these fields: unitNum, unitTitle, subtitle, introText, objective, podcastScript (a 2-person dialogue), and videoScript (a 1-minute intro). 
@@ -126,7 +188,6 @@ async function callAI() {
         const data = await response.json();
         const aiResult = JSON.parse(data.choices[0].message.content);
 
-        // Auto-fill the form
         document.getElementById('unitNum').value = aiResult.unitNum || "";
         document.getElementById('unitTitle').value = aiResult.unitTitle || "";
         document.getElementById('subtitle').value = aiResult.subtitle || "";
