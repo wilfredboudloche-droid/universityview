@@ -3,60 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UView Lesson Builder</title>
+    <title>UView AI Lesson Engine</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1 { color: #1d4ed8; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        button { margin-top: 20px; padding: 12px 24px; background: #16a34a; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #15803d; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f0f2f5; color: #333; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h1 { color: #1d4ed8; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+        .section { background: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #475569; }
+        input, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        button { margin-top: 20px; padding: 12px 24px; background: #1d4ed8; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { background: #1e40af; }
+        .gen-btn { background: #16a34a; width: 100%; font-size: 18px; }
+        .gen-btn:hover { background: #15803d; }
         #output-area { margin-top: 30px; display: none; }
-        pre { background: #272822; color: #f8f8f2; padding: 15px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; }
+        pre { background: #1e293b; color: #f8fafc; padding: 20px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; font-family: 'Courier New', monospace; }
+        .loading { display: none; color: #1d4ed8; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>UView Lesson Builder</h1>
-    <p>Fill in the details below to generate your Canvas-ready HTML.</p>
+    <h1>UView AI Lesson Engine</h1>
 
-    <label>Unit Number</label>
-    <input type="text" id="unitNum" placeholder="e.g. 5">
+    <!-- STEP 1: THE BRAIN -->
+    <div class="section">
+        <h3>Step 1: The AI Brain</h3>
+        <label>RouteLLM API Key (sk_...)</label>
+        <input type="password" id="apiKey" placeholder="Paste your Abacus RouteLLM Key here">
+        
+        <label>Paste Raw Lesson Text (from PDF)</label>
+        <textarea id="rawText" rows="8" placeholder="Paste the text from your lesson PDF here..."></textarea>
+        
+        <button class="gen-btn" onclick="callAI()">✨ Generate Lesson Assets</button>
+        <div id="loadingMsg" class="loading">AI is thinking... generating your lesson assets...</div>
+    </div>
 
-    <label>Unit Title</label>
-    <input type="text" id="unitTitle" placeholder="e.g. Advanced AI Prompting">
+    <!-- STEP 2: THE FORM (Auto-filled by AI) -->
+    <div class="section">
+        <h3>Step 2: Review & Customize</h3>
+        <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;"><label>Unit #</label><input type="text" id="unitNum"></div>
+            <div style="flex: 3;"><label>Unit Title</label><input type="text" id="unitTitle"></div>
+        </div>
+        <label>Subtitle</label><input type="text" id="subtitle">
+        <label>Introduction Text</label><textarea id="introText" rows="3"></textarea>
+        <label>Lesson Objective</label><textarea id="objective" rows="2"></textarea>
+        
+        <label>Podcast Script (for NotebookLM)</label>
+        <textarea id="podcastScript" rows="5"></textarea>
+        
+        <label>Video Script (for HeyGen/Synthesia)</label>
+        <textarea id="videoScript" rows="3"></textarea>
 
-    <label>Subtitle</label>
-    <input type="text" id="subtitle" placeholder="e.g. Mastering the Art of the Prompt">
+        <label>Video URL (Embed)</label><input type="text" id="videoUrl" value="https://...">
+        <label>Podcast URL (Embed)</label><input type="text" id="podcastUrl" value="https://...">
+        <label>Activity URL (GitHub)</label><input type="text" id="activityUrl" value="https://...">
+    </div>
 
-    <label>Introduction Text</label>
-    <textarea id="introText" rows="4" placeholder="Welcome to Unit 5..."></textarea>
-
-    <label>Lesson Objective</label>
-    <textarea id="objective" rows="2" placeholder="By the end of this lesson, I will be able to..."></textarea>
-
-    <label>Video URL (YouTube or Studio Embed Link)</label>
-    <input type="text" id="videoUrl" placeholder="https://...">
-
-    <label>Podcast Embed URL (Podbean/Spotify)</label>
-    <input type="text" id="podcastUrl" placeholder="https://...">
-
-    <label>Interactive Activity URL (GitHub Link)</label>
-    <input type="text" id="activityUrl" placeholder="https://...">
-
-    <button onclick="generateHTML()">Generate Lesson Code</button>
+    <button onclick="generateCanvasHTML()">Generate Final Canvas Code</button>
 
     <div id="output-area">
-        <h3>Your Lesson Code (Copy & Paste into Canvas HTML Editor)</h3>
+        <h3>Final Canvas HTML Code</h3>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
         <pre id="finalCode"></pre>
     </div>
 </div>
 
 <script>
-function generateHTML() {
+async function callAI() {
+    const apiKey = document.getElementById('apiKey').value;
+    const rawText = document.getElementById('rawText').value;
+    const loadingMsg = document.getElementById('loadingMsg');
+
+    if (!apiKey || !rawText) { alert("Please provide both API Key and Lesson Text!"); return; }
+
+    loadingMsg.style.display = "block";
+
+    const prompt = `You are an expert curriculum designer. Based on the following lesson text, generate a JSON object with these fields: unitNum, unitTitle, subtitle, introText, objective, podcastScript (a 2-person dialogue), and videoScript (a 1-minute intro). 
+    
+    LESSON TEXT: ${rawText}`;
+
+    try {
+        const response = await fetch('https://routellm.abacus.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'route-llm',
+                messages: [{ role: 'user', content: prompt }],
+                response_format: { type: "json_object" }
+            })
+        });
+
+        const data = await response.json();
+        const aiResult = JSON.parse(data.choices[0].message.content);
+
+        // Auto-fill the form
+        document.getElementById('unitNum').value = aiResult.unitNum || "";
+        document.getElementById('unitTitle').value = aiResult.unitTitle || "";
+        document.getElementById('subtitle').value = aiResult.subtitle || "";
+        document.getElementById('introText').value = aiResult.introText || "";
+        document.getElementById('objective').value = aiResult.objective || "";
+        document.getElementById('podcastScript').value = aiResult.podcastScript || "";
+        document.getElementById('videoScript').value = aiResult.videoScript || "";
+
+        loadingMsg.style.display = "none";
+        alert("Lesson Assets Generated!");
+
+    } catch (error) {
+        console.error(error);
+        loadingMsg.style.display = "none";
+        alert("Error calling AI. Check your API key and console.");
+    }
+}
+
+function generateCanvasHTML() {
+    // (Same logic as before, injecting values into your Admin Template)
     const unitNum = document.getElementById('unitNum').value;
     const unitTitle = document.getElementById('unitTitle').value;
     const subtitle = document.getElementById('subtitle').value;
@@ -66,8 +130,7 @@ function generateHTML() {
     const podcast = document.getElementById('podcastUrl').value;
     const activity = document.getElementById('activityUrl').value;
 
-    // This is your "Perfect Template" with variables injected
-    const template = `
+    const template = `<!-- YOUR ADMIN TEMPLATE CODE HERE WITH ${unitNum}, etc. -->
 <div id="dp-wrapper" class="dp-wrapper dp-circle-left" style="font-family: 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6;">
     <header class="dp-header dp-circle-left">
         <h2 class="dp-heading" style="text-align: center;"><span class="dp-header-pre"> <span class="dp-header-pre-1">Computer Tech Literacy</span> </span> <span class="dp-header-title">Unit ${unitNum}: ${unitTitle}</span></h2>
@@ -112,7 +175,7 @@ function generateHTML() {
 function copyToClipboard() {
     const code = document.getElementById('finalCode').innerText;
     navigator.clipboard.writeText(code);
-    alert("Code copied! Now paste it into the Canvas HTML editor.");
+    alert("Code copied! Paste into Canvas.");
 }
 </script>
 
