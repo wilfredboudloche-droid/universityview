@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UView AI Lesson Engine</title>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f0f2f5; color: #333; }
         .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
@@ -18,6 +19,8 @@
         #output-area { margin-top: 30px; display: none; }
         pre { background: #1e293b; color: #f8fafc; padding: 20px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; font-family: 'Courier New', monospace; }
         .loading { display: none; color: #1d4ed8; font-weight: bold; margin-top: 10px; }
+        #drop-area { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 20px; text-align: center; margin-top: 10px; background: #f1f5f9; cursor: pointer; }
+        #drop-area:hover { background: #e2e8f0; }
     </style>
 </head>
 <body>
@@ -27,12 +30,14 @@
 
     <!-- STEP 1: THE BRAIN -->
     <div class="section">
-        <h3>Step 1: The AI Brain</h3>
-        <label>RouteLLM API Key (sk_...)</label>
-        <input type="password" id="apiKey" placeholder="Paste your Abacus RouteLLM Key here">
-        
-        <label>Paste Raw Lesson Text (from PDF)</label>
-        <textarea id="rawText" rows="8" placeholder="Paste the text from your lesson PDF here..."></textarea>
+        <h3>Step 1: Upload & Generate</h3>
+        <div id="drop-area" onclick="document.getElementById('fileElem').click();">
+            <p>📁 Drag & Drop a PDF here or click to upload</p>
+            <input type="file" id="fileElem" accept="application/pdf" style="display:none" onchange="handleFiles(this.files)">
+        </div>
+
+        <label>Raw Lesson Text (Auto-filled from PDF)</label>
+        <textarea id="rawText" rows="8" placeholder="PDF text will appear here..."></textarea>
         
         <button class="gen-btn" onclick="callAI()">✨ Generate Lesson Assets</button>
         <div id="loadingMsg" class="loading">AI is thinking... generating your lesson assets...</div>
@@ -70,12 +75,33 @@
 </div>
 
 <script>
+// ✅ YOUR HIDDEN API KEY
+const apiKey = "s2_cb8a46e9cd7e4867b0413d5082fa678a"; // <-- Replace with your real key
+
+// 📄 PDF TEXT EXTRACTOR
+async function handleFiles(files) {
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = async function() {
+        const typedarray = new Uint8Array(reader.result);
+        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+        let text = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map(item => item.str).join(' ') + '\n';
+        }
+        document.getElementById('rawText').value = text;
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// 🤖 AI CALL
 async function callAI() {
-   const apiKey = "s2_cb8a46e9cd7e4867b0413d5082fa678a"; // Hidden from public view
     const rawText = document.getElementById('rawText').value;
     const loadingMsg = document.getElementById('loadingMsg');
 
-    if (!apiKey || !rawText) { alert("Please provide both API Key and Lesson Text!"); return; }
+    if (!rawText) { alert("Please upload a PDF or paste lesson text!"); return; }
 
     loadingMsg.style.display = "block";
 
@@ -119,8 +145,8 @@ async function callAI() {
     }
 }
 
+// 🧾 CANVAS HTML GENERATOR
 function generateCanvasHTML() {
-    // (Same logic as before, injecting values into your Admin Template)
     const unitNum = document.getElementById('unitNum').value;
     const unitTitle = document.getElementById('unitTitle').value;
     const subtitle = document.getElementById('subtitle').value;
@@ -130,7 +156,7 @@ function generateCanvasHTML() {
     const podcast = document.getElementById('podcastUrl').value;
     const activity = document.getElementById('activityUrl').value;
 
-    const template = `<!-- YOUR ADMIN TEMPLATE CODE HERE WITH ${unitNum}, etc. -->
+    const template = `<!-- YOUR ADMIN TEMPLATE CODE HERE -->
 <div id="dp-wrapper" class="dp-wrapper dp-circle-left" style="font-family: 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6;">
     <header class="dp-header dp-circle-left">
         <h2 class="dp-heading" style="text-align: center;"><span class="dp-header-pre"> <span class="dp-header-pre-1">Computer Tech Literacy</span> </span> <span class="dp-header-title">Unit ${unitNum}: ${unitTitle}</span></h2>
