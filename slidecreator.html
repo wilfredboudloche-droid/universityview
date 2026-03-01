@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slide Deck Architect: Workflow Simulation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #f43f5e;
+            --accent: #10b981;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #fce7f3 100%);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            background: var(--card);
+            max-width: 850px;
+            width: 100%;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 0;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e2e8f0;
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border: 4px solid #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+            transform: scale(1.2);
+        }
+
+        .step.completed {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+        }
+
+        .phase-card {
+            background: #f1f5f9;
+            border-radius: 20px;
+            padding: 30px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .phase-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .phase-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .phase-desc {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #eef2ff;
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback.correct {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .feedback.wrong {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .score-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--text);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .btn-next {
+            margin-top: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .game-container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="score-badge">Score: <span id="score">0</span></div>
+
+    <div class="header">
+        <h1>Slide Deck Architect</h1>
+        <p>Master the 4-Phase Workflow for Grounded AI Presentations</p>
+    </div>
+
+    <div class="progress-bar">
+        <div class="step active" id="step1">1</div>
+        <div class="step" id="step2">2</div>
+        <div class="step" id="step3">3</div>
+        <div class="step" id="step4">4</div>
+    </div>
+
+    <div id="game-content">
+        <!-- Content injected by JS -->
+    </div>
+
+    <div id="feedback-area" class="feedback"></div>
+    <center><button id="next-btn" class="btn-next" style="display:none">Next Phase ➔</button></center>
+</div>
+
+<script>
+    const phases = [
+        {
+            title: "Phase 1: Source Grounding",
+            icon: "📚",
+            desc: "Before generating slides, you must anchor the AI. What is the most critical step here?",
+            options: [
+                { text: "Upload vetted PDFs & URLs to NotebookLM", correct: true, feedback: "Correct! This uses RAG (Retrieval-Augmented Generation) to prevent hallucinations." },
+                { text: "Search Google Images for cool backgrounds", correct: false, feedback: "Not yet! Grounding the data comes before the visuals." }
+            ]
+        },
+        {
+            title: "Phase 2: Drafting the Deck",
+            icon: "✍️",
+            desc: "You need to generate the initial content. Which architecture ensures the AI stays on topic?",
+            options: [
+                { text: "Standard Chatbot Logic", correct: false, feedback: "Standard bots pull from the whole internet, which causes hallucinations." },
+                { text: "RAG (Retrieval-Augmented Generation)", correct: true, feedback: "Yes! RAG forces the AI to retrieve facts only from your uploaded sources." }
+            ]
+        },
+        {
+            title: "Phase 3: Refining for Audience",
+            icon: "🎭",
+            desc: "You are preparing for a LIVE presentation. How should your slides look?",
+            options: [
+                { text: "Detailed text for the audience to read", correct: false, feedback: "That's a 'Reading Deck'. For live narration, you need 'Presenter Slides'." },
+                { text: "Visuals & key bullets for live narration", correct: true, feedback: "Perfect! Presenter slides should support your speech, not replace it." }
+            ]
+        },
+        {
+            title: "Phase 4: Final Fact-Check",
+            icon: "🔍",
+            desc: "The AI finished the slides. What is your final responsibility for academic integrity?",
+            options: [
+                { text: "Trust the AI; it's grounded", correct: false, feedback: "Never! Even grounded AI needs a human fact-check protocol." },
+                { text: "Verify every claim against the source", correct: true, feedback: "Exactly! Always implement the 3-step fact-checking protocol." }
+            ]
+        }
+    ];
+
+    let currentPhase = 0;
+    let score = 0;
+
+    const gameContent = document.getElementById('game-content');
+    const feedbackArea = document.getElementById('feedback-area');
+    const nextBtn = document.getElementById('next-btn');
+    const scoreDisplay = document.getElementById('score');
+
+    function loadPhase() {
+        const phase = phases[currentPhase];
+        feedbackArea.style.display = 'none';
+        nextBtn.style.display = 'none';
+
+        gameContent.innerHTML = `
+            <div class="phase-card">
+                <div class="phase-icon">${phase.icon}</div>
+                <div class="phase-title">${phase.title}</div>
+                <p class="phase-desc">${phase.desc}</p>
+                <div class="options-grid">
+                    ${phase.options.map((opt, i) => `
+                        <button class="option-btn" onclick="checkAnswer(${i})">
+                            ${opt.text}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        // Update progress bar
+        document.querySelectorAll('.step').forEach((s, i) => {
+            if (i < currentPhase) s.className = 'step completed';
+            else if (i === currentPhase) s.className = 'step active';
+            else s.className = 'step';
+        });
+    }
+
+    window.checkAnswer = function(index) {
+        const phase = phases[currentPhase];
+        const option = phase.options[index];
+
+        feedbackArea.textContent = option.feedback;
+        feedbackArea.className = `feedback ${option.correct ? 'correct' : 'wrong'}`;
+
+        if (option.correct) {
+            score += 25;
+            scoreDisplay.textContent = score;
+            nextBtn.style.display = 'block';
+            // Disable buttons
+            document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+        }
+    };
+
+    nextBtn.onclick = () => {
+        currentPhase++;
+        if (currentPhase < phases.length) {
+            loadPhase();
+        } else {
+            showFinal();
+        }
+    };
+
+    function showFinal() {
+        document.getElementById('step4').className = 'step completed';
+        gameContent.innerHTML = `
+            <div class="final-screen">
+                <div class="phase-icon">🏆</div>
+                <h2>Certification Complete!</h2>
+                <p>You are now a certified <strong>Slide Deck Architect</strong>.</p>
+                <p>Final Score: ${score}/100</p>
+                <button class="btn-next" onclick="location.reload()">Restart Simulation</button>
+            </div>
+        `;
+        nextBtn.style.display = 'none';
+        feedbackArea.style.display = 'none';
+    }
+
+    loadPhase();
+</script>
+
+</body>
+</html>
