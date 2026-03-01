@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI-Powered Research with NotebookLM</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f9fafb;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+  .container {
+    background: white;
+    max-width: 700px;
+    width: 90%;
+    margin: 20px;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  }
+  h1 {
+    text-align: center;
+    color: #1f2937;
+  }
+  .scenario {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    line-height: 1.5;
+  }
+  .choices {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  button.choice-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button.choice-btn:hover {
+    background: #2563eb;
+  }
+  .feedback {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .feedback.correct {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+  }
+  .feedback.incorrect {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #ef4444;
+  }
+  .scoreboard {
+    margin-top: 30px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+    color: #111827;
+  }
+  .footer {
+    margin-top: 40px;
+    font-size: 0.9rem;
+    color: #6b7280;
+    text-align: center;
+  }
+  @media (max-width: 600px) {
+    .container {
+      padding: 15px 20px;
+    }
+    button.choice-btn {
+      font-size: 0.9rem;
+      padding: 10px 14px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container" role="main">
+    <h1>AI-Powered Research with NotebookLM</h1>
+    <div id="scenario" class="scenario" aria-live="polite"></div>
+    <div id="choices" class="choices" role="list"></div>
+    <div id="feedback" class="feedback" aria-live="assertive" role="alert" style="display:none"></div>
+    <div id="scoreboard" class="scoreboard"></div>
+    <div class="footer">Complete the activity by making the best choices to maximize your learning score.</div>
+  </div>
+
+<script>
+  // Scenario nodes for branching decision activity
+  const scenarios = {
+    start: {
+      text: `You are starting a new research project using NotebookLM. What is your first step?`,
+      choices: [
+        { text: 'Upload a variety of unverified internet sources quickly.', next: 'sourceGroundingWrong', correct: false },
+        { text: 'Upload only vetted and relevant documents to ensure source grounding.', next: 'sourceGroundingRight', correct: true },
+        { text: 'Skip uploading sources and ask AI general questions.', next: 'sourceGroundingWrong', correct: false },
+      ],
+    },
+    sourceGroundingRight: {
+      text: `Great! Source grounding is key to preventing AI hallucinations by restricting the AI's knowledge to your specific documents. Next, how will you use the Quiz feature?`,
+      choices: [
+        { text: 'Use quizzes to actively recall information and identify gaps.', next: 'quizRight', correct: true },
+        { text: 'Use quizzes only to recognize information you already know.', next: 'quizWrong', correct: false },
+      ],
+    },
+    sourceGroundingWrong: {
+      text: `That approach risks AI hallucinations and inaccurate answers. Source grounding with vetted documents is essential. Try again. What is your first step?`,
+      choices: [
+        { text: 'Upload only vetted and relevant documents to ensure source grounding.', next: 'sourceGroundingRight', correct: true },
+        { text: 'Upload a variety of unverified internet sources quickly.', next: 'sourceGroundingWrong', correct: false },
+        { text: 'Skip uploading sources and ask AI general questions.', next: 'sourceGroundingWrong', correct: false },
+      ],
+    },
+    quizRight: {
+      text: `Correct! Using quizzes for active recall helps move information into long-term memory. How will you use flashcards?`,
+      choices: [
+        { text: 'Create flashcards that synthesize multiple notes and provide detailed explanations.', next: 'flashcardRight', correct: true },
+        { text: 'Create simple flashcards with only definitions and no context.', next: 'flashcardWrong', correct: false },
+      ],
+    },
+    quizWrong: {
+      text: `Using quizzes just for recognition leads to the illusion of competence. Active recall is more effective. Try again. How will you use the Quiz feature?`,
+      choices: [
+        { text: 'Use quizzes to actively recall information and identify gaps.', next: 'quizRight', correct: true },
+        { text: 'Use quizzes only to recognize information you already know.', next: 'quizWrong', correct: false },
+      ],
+    },
+    flashcardRight: {
+      text: `Excellent! Synthesized flashcards with explanations and citations deepen understanding. Next, how will you use multimodal tools like Audio Overviews and Mind Maps?`,
+      choices: [
+        { text: 'Use them to identify research gaps and reinforce learning through multiple senses.', next: 'multimodalRight', correct: true },
+        { text: 'Ignore them and rely only on text-based notes.', next: 'multimodalWrong', correct: false },
+      ],
+    },
+    flashcardWrong: {
+      text: `Simple flashcards without context limit understanding. Try again. How will you use flashcards?`,
+      choices: [
+        { text: 'Create flashcards that synthesize multiple notes and provide detailed explanations.', next: 'flashcardRight', correct: true },
+        { text: 'Create simple flashcards with only definitions and no context.', next: 'flashcardWrong', correct: false },
+      ],
+    },
+    multimodalRight: {
+      text: `Correct! Multimodal tools help reinforce concepts and reveal gaps in your research. Finally, how will you use the Learning Guide?`,
+      choices: [
+        { text: 'Engage with the Learning Guide’s Socratic questions to deepen comprehension.', next: 'learningGuideRight', correct: true },
+        { text: 'Use the Learning Guide only for quick answers.', next: 'learningGuideWrong', correct: false },
+      ],
+    },
+    multimodalWrong: {
+      text: `Ignoring multimodal tools misses opportunities for deeper learning and gap identification. Try again. How will you use multimodal tools?`,
+      choices: [
+        { text: 'Use them to identify research gaps and reinforce learning through multiple senses.', next: 'multimodalRight', correct: true },
+        { text: 'Ignore them and rely only on text-based notes.', next: 'multimodalWrong', correct: false },
+      ],
+    },
+    learningGuideRight: {
+      text: `Well done! The Learning Guide’s probing questions help you actively engage and think critically. You have completed the activity!`,
+      choices: [],
+      end: true,
+    },
+    learningGuideWrong: {
+      text: `Using the Learning Guide only for quick answers limits your learning potential. Try again. How will you use the Learning Guide?`,
+      choices: [
+        { text: 'Engage with the Learning Guide’s Socratic questions to deepen comprehension.', next: 'learningGuideRight', correct: true },
+        { text: 'Use the Learning Guide only for quick answers.', next: 'learningGuideWrong', correct: false },
+      ],
+    },
+  };
+
+  let score = 0;
+  let totalQuestions = 0;
+
+  const scenarioEl = document.getElementById('scenario');
+  const choicesEl = document.getElementById('choices');
+  const feedbackEl = document.getElementById('feedback');
+  const scoreboardEl = document.getElementById('scoreboard');
+
+  function updateScoreboard() {
+    scoreboardEl.textContent = `Score: ${score} / ${totalQuestions}`;
+  }
+
+  function showScenario(key) {
+    const scenario = scenarios[key];
+    scenarioEl.textContent = scenario.text;
+    choicesEl.innerHTML = '';
+    feedbackEl.style.display = 'none';
+
+    if (scenario.choices.length === 0 && scenario.end) {
+      // End of activity
+      feedbackEl.style.display = 'block';
+      feedbackEl.className = 'feedback correct';
+      feedbackEl.textContent = `Activity complete! Your final score is ${score} out of ${totalQuestions}.`;
+      choicesEl.innerHTML = '';
+      return;
+    }
+
+    scenario.choices.forEach((choice, index) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = choice.text;
+      btn.setAttribute('role', 'listitem');
+      btn.onclick = () => handleChoice(choice);
+      choicesEl.appendChild(btn);
+    });
+  }
+
+  function handleChoice(choice) {
+    totalQuestions++;
+    if (choice.correct) {
+      score++;
+      feedbackEl.className = 'feedback correct';
+      feedbackEl.textContent = 'Correct!';
+    } else {
+      feedbackEl.className = 'feedback incorrect';
+      feedbackEl.textContent = 'Not quite. Try again or choose another option.';
+    }
+    feedbackEl.style.display = 'block';
+    updateScoreboard();
+
+    // Delay before moving to next scenario to allow user to read feedback
+    setTimeout(() => {
+      showScenario(choice.next);
+    }, 1500);
+  }
+
+  // Initialize
+  showScenario('start');
+  updateScoreboard();
+</script>
+</body>
+</html>
