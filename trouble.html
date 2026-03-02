@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Troubleshoot Networks - Step-by-Step Simulation</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f7f8;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+  .container {
+    background: white;
+    max-width: 600px;
+    width: 90%;
+    margin: 20px;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  h1 {
+    text-align: center;
+    color: #005a9c;
+  }
+  .step {
+    margin-top: 20px;
+  }
+  .question {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .options {
+    list-style: none;
+    padding: 0;
+  }
+  .options li {
+    background: #e1ecf7;
+    margin-bottom: 10px;
+    padding: 12px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+  .options li:hover {
+    border-color: #005a9c;
+  }
+  .options li.selected {
+    background: #005a9c;
+    color: white;
+    border-color: #003f6b;
+  }
+  .feedback {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .feedback.correct {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .feedback.incorrect {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  .btn {
+    margin-top: 20px;
+    background-color: #005a9c;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .btn:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+  }
+  .score {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 25px;
+    font-weight: bold;
+    color: #005a9c;
+  }
+  @media (max-width: 600px) {
+    .container {
+      padding: 15px 20px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container" role="main">
+    <h1>Troubleshoot Networks: Step-by-Step Simulation</h1>
+    <div id="step-container"></div>
+    <button id="next-btn" class="btn" disabled>Next Step</button>
+    <div class="score" id="score-display"></div>
+  </div>
+
+<script>
+  const steps = [
+    {
+      question: "Step 1: You notice a user cannot connect to the wired network. What is the first physical component you should check?",
+      options: [
+        "Check the patch cord connecting the computer to the wall jack",
+        "Restart the computer",
+        "Check the wireless signal strength",
+        "Replace the network card"
+      ],
+      correctIndex: 0,
+      feedback: [
+        "Correct! Faulty patch cords are a common physical issue.",
+        "Incorrect. Restarting the computer is not the first step for physical issues.",
+        "Incorrect. Wireless signal strength is unrelated to wired connections.",
+        "Incorrect. Replacing the network card is premature without checking cables."
+      ]
+    },
+    {
+      question: "Step 2: After confirming the patch cord is fine, the user still has no connectivity. What should you check next?",
+      options: [
+        "Check the switch port for a link light",
+        "Check the DHCP server",
+        "Check the wireless access point",
+        "Run a speed test"
+      ],
+      correctIndex: 0,
+      feedback: [
+        "Correct! A bad switch port can cause connectivity issues.",
+        "Incorrect. DHCP server issues come later in troubleshooting.",
+        "Incorrect. Wireless access points are irrelevant for wired issues.",
+        "Incorrect. Speed test is not relevant at this stage."
+      ]
+    },
+    {
+      question: "Step 3: The switch port shows no link light. What is the best next step?",
+      options: [
+        "Replace the patch cord",
+        "Move the patch cord to a different switch port",
+        "Restart the switch",
+        "Check the computer's IP address"
+      ],
+      correctIndex: 1,
+      feedback: [
+        "Incorrect. The patch cord was already confirmed good.",
+        "Correct! Moving to a different port can isolate the bad port.",
+        "Incorrect. Restarting the switch is not the immediate next step.",
+        "Incorrect. IP address check comes after physical link is established."
+      ]
+    },
+    {
+      question: "Step 4: The user now connects wirelessly but complains of poor signal. What should you check first?",
+      options: [
+        "Check the wireless signal strength",
+        "Check the patch cord",
+        "Restart the computer",
+        "Check the DHCP server"
+      ],
+      correctIndex: 0,
+      feedback: [
+        "Correct! Signal strength is the primary factor in wireless connectivity.",
+        "Incorrect. Patch cords do not affect wireless connections.",
+        "Incorrect. Restarting the computer is not the first step here.",
+        "Incorrect. DHCP server is unrelated to signal strength."
+      ]
+    },
+    {
+      question: "Step 5: The wireless signal is strong but the user still cannot access the network. What could be the issue?",
+      options: [
+        "Configuration mismatch between wireless client and AP",
+        "Faulty patch cord",
+        "Bad switch port",
+        "Low latency"
+      ],
+      correctIndex: 0,
+      feedback: [
+        "Correct! Configuration mismatches can block wireless access.",
+        "Incorrect. Patch cords do not affect wireless clients.",
+        "Incorrect. Switch ports do not affect wireless clients.",
+        "Incorrect. Latency affects performance but not basic connectivity."
+      ]
+    },
+    {
+      question: "Step 6: You are troubleshooting a VoIP call with poor audio quality. What network factors should you analyze?",
+      options: [
+        "Latency and jitter",
+        "Patch cord quality",
+        "Wireless signal strength",
+        "DHCP server status"
+      ],
+      correctIndex: 0,
+      feedback: [
+        "Correct! Latency and jitter directly impact VoIP quality.",
+        "Incorrect. Patch cords rarely affect VoIP audio quality.",
+        "Incorrect. Wireless signal strength is less relevant for VoIP quality.",
+        "Incorrect. DHCP server status does not affect audio quality."
+      ]
+    },
+    {
+      question: "Step 7: A user has limited connectivity and an APIPA address. What is the likely cause?",
+      options: [
+        "DHCP failure",
+        "Bad patch cord",
+        "Wireless interference",
+        "High jitter"
+      ],
+      correctIndex: 0,
+      feedback: [
+        "Correct! APIPA addresses indicate DHCP failures.",
+        "Incorrect. Patch cords do not cause APIPA addresses.",
+        "Incorrect. Wireless interference does not cause APIPA.",
+        "Incorrect. Jitter affects performance, not IP assignment."
+      ]
+    }
+  ];
+
+  let currentStep = 0;
+  let score = 0;
+  const stepContainer = document.getElementById('step-container');
+  const nextBtn = document.getElementById('next-btn');
+  const scoreDisplay = document.getElementById('score-display');
+
+  function renderStep() {
+    const step = steps[currentStep];
+    stepContainer.innerHTML = '';
+    nextBtn.disabled = true;
+
+    const questionEl = document.createElement('div');
+    questionEl.className = 'question';
+    questionEl.textContent = step.question;
+    stepContainer.appendChild(questionEl);
+
+    const optionsList = document.createElement('ul');
+    optionsList.className = 'options';
+
+    step.options.forEach((option, index) => {
+      const li = document.createElement('li');
+      li.textContent = option;
+      li.setAttribute('tabindex', '0');
+      li.addEventListener('click', () => selectOption(index));
+      li.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectOption(index);
+        }
+      });
+      optionsList.appendChild(li);
+    });
+
+    stepContainer.appendChild(optionsList);
+  }
+
+  function selectOption(selectedIndex) {
+    const step = steps[currentStep];
+    const optionsList = stepContainer.querySelector('.options');
+    const items = optionsList.querySelectorAll('li');
+
+    items.forEach((item, idx) => {
+      item.classList.remove('selected');
+      item.style.pointerEvents = 'none';
+    });
+
+    items[selectedIndex].classList.add('selected');
+
+    // Show feedback
+    let feedbackEl = stepContainer.querySelector('.feedback');
+    if (!feedbackEl) {
+      feedbackEl = document.createElement('div');
+      feedbackEl.className = 'feedback';
+      stepContainer.appendChild(feedbackEl);
+    }
+
+    if (selectedIndex === step.correctIndex) {
+      feedbackEl.textContent = step.feedback[selectedIndex];
+      feedbackEl.className = 'feedback correct';
+      score++;
+    } else {
+      feedbackEl.textContent = step.feedback[selectedIndex];
+      feedbackEl.className = 'feedback incorrect';
+    }
+
+    nextBtn.disabled = false;
+    updateScore();
+  }
+
+  function updateScore() {
+    scoreDisplay.textContent = `Score: ${score} / ${steps.length}`;
+  }
+
+  nextBtn.addEventListener('click', () => {
+    currentStep++;
+    if (currentStep < steps.length) {
+      renderStep();
+    } else {
+      showCompletion();
+    }
+  });
+
+  function showCompletion() {
+    stepContainer.innerHTML = `<h2>Simulation Complete!</h2><p>Your final score is <strong>${score} out of ${steps.length}</strong>.</p>`;
+    nextBtn.style.display = 'none';
+  }
+
+  // Initialize
+  renderStep();
+  updateScore();
+</script>
+</body>
+</html>
