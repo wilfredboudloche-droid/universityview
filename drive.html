@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UVA | Mastering Google Drive – Cloud Storage Mission</title>
+<style>
+:root{--blue:#1B5EAF;--blue-dark:#134a8a;--blue-light:#d6e4f7;--green:#1E7A3E;--green-light:#d4edda;--gold:#F5A623;--red:#C0392B;--red-light:#fdecea;--white:#fff;--gray-light:#f4f6fb;--gray:#e0e6ef;--text:#1a2340;--shadow:0 4px 18px rgba(27,94,175,.13)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gray-light);color:var(--text);min-height:100vh}
+#app-header{background:var(--blue);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;flex-wrap:wrap;gap:8px}
+.uva-logo{display:flex;align-items:center;gap:10px}
+.uva-shield{width:42px;height:42px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--blue);font-size:14px;border:2px solid var(--gold);flex-shrink:0}
+.uva-title{font-size:1.05rem;font-weight:700;line-height:1.2}
+.uva-sub{font-size:.7rem;opacity:.85}
+.header-stats{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stat-pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 12px;font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:4px}
+#rank-badge{background:var(--gold);color:#1a2340;border-radius:20px;padding:4px 12px;font-size:.8rem;font-weight:800;transition:all .4s}
+.motto-ribbon{background:var(--green);text-align:center;padding:5px;font-size:.75rem;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase}
+.progress-bar-wrap{background:rgba(255,255,255,.2);height:6px}
+.progress-bar-fill{height:6px;background:var(--gold);transition:width .6s ease;width:0%}
+#main{max-width:860px;margin:0 auto;padding:20px 14px 60px}
+.screen{display:none}.screen.active{display:block}
+.card{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:24px;margin-bottom:18px}
+.mission-banner{background:linear-gradient(135deg,var(--blue) 60%,var(--blue-dark));color:#fff;border-radius:14px;padding:28px 24px;text-align:center;margin-bottom:18px;position:relative;overflow:hidden}
+.mission-banner h1{font-size:1.6rem;margin-bottom:6px}
+.mission-banner .subtitle{font-size:.95rem;opacity:.88;margin-bottom:14px}
+.domain-tag{display:inline-block;background:var(--gold);color:#1a2340;border-radius:20px;padding:3px 14px;font-size:.73rem;font-weight:700;margin-bottom:14px}
+.mission-list{text-align:left;background:rgba(255,255,255,.1);border-radius:10px;padding:14px 18px;margin:12px 0}
+.mission-list li{list-style:none;padding:5px 0;font-size:.88rem;display:flex;align-items:flex-start;gap:8px}
+.mission-list li::before{content:'🎯';flex-shrink:0}
+.btn{display:inline-block;padding:11px 24px;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;text-align:center}
+.btn-primary{background:var(--gold);color:#1a2340}.btn-primary:hover{background:#e09510;transform:translateY(-1px)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-dark);transform:translateY(-1px)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#155c2e;transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.mission-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.mission-num{background:var(--blue);color:#fff;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.05rem;flex-shrink:0}
+.mission-title-block h2{font-size:1.1rem;color:var(--blue)}
+.mission-title-block p{font-size:.8rem;color:#666;margin-top:2px}
+.streak-banner{background:linear-gradient(90deg,var(--gold),#f7c948);color:#1a2340;border-radius:10px;padding:9px 16px;font-weight:800;font-size:.95rem;text-align:center;margin-bottom:14px;animation:popIn .4s ease;display:none}
+@keyframes popIn{0%{transform:scale(.8);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+.drag-zone{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:var(--gray-light);border-radius:10px;min-height:56px;margin-bottom:16px;border:2px dashed var(--gray)}
+.drag-item{background:var(--blue);color:#fff;border-radius:8px;padding:7px 14px;font-size:.85rem;font-weight:600;cursor:grab;user-select:none;transition:all .2s}
+.drag-item:hover{background:var(--blue-dark);transform:translateY(-2px)}
+.drag-item.dragging{opacity:.4;cursor:grabbing}
+.drop-targets{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:540px){.drop-targets{grid-template-columns:1fr}}
+.drop-target{border:2px dashed var(--blue);border-radius:10px;padding:12px;min-height:90px;background:var(--blue-light);transition:all .2s}
+.drop-target.drag-over{background:#b3d0f5;border-color:var(--blue-dark)}
+.drop-target h4{font-size:.82rem;color:var(--blue-dark);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.drop-target .dropped-items{display:flex;flex-wrap:wrap;gap:5px;min-height:32px}
+.dropped-chip{background:#fff;border:2px solid var(--blue);color:var(--blue);border-radius:6px;padding:3px 9px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
+.dropped-chip:hover{background:var(--red-light);border-color:var(--red);color:var(--red)}
+.drop-target.correct{border-color:var(--green);background:var(--green-light)}
+.drop-target.incorrect{border-color:var(--red);background:var(--red-light)}
+.scenario-box{background:var(--blue-light);border-left:5px solid var(--blue);border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:16px;font-size:.92rem;line-height:1.6}
+.scenario-label{font-size:.72rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.choices{display:flex;flex-direction:column;gap:9px}
+.choice-btn{background:#fff;border:2px solid var(--blue);border-radius:10px;padding:12px 16px;font-size:.9rem;cursor:pointer;text-align:left;transition:all .2s;font-weight:500;color:var(--text);display:flex;align-items:flex-start;gap:9px}
+.choice-btn:hover:not(:disabled){background:var(--blue-light);border-color:var(--blue-dark)}
+.choice-btn.correct{background:var(--green-light);border-color:var(--green);color:var(--green)}
+.choice-btn.incorrect{background:var(--red-light);border-color:var(--red);color:var(--red)}
+.choice-btn:disabled{cursor:default}
+.choice-letter{background:var(--blue);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.choice-btn.correct .choice-letter{background:var(--green)}
+.choice-btn.incorrect .choice-letter{background:var(--red)}
+.feedback-box{border-radius:10px;padding:12px 16px;margin-top:12px;font-size:.88rem;line-height:1.6;display:none}
+.feedback-box.show{display:block;animation:popIn .3s ease}
+.feedback-box.correct{background:var(--green-light);border-left:4px solid var(--green);color:#155c2e}
+.feedback-box.incorrect{background:var(--red-light);border-left:4px solid var(--red);color:#922b21}
+.feedback-box strong{display:block;margin-bottom:3px;font-size:.95rem}
+.sim-ui{background:#f8f9fa;border:1px solid var(--gray);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.sim-toolbar{background:#fff;border-bottom:1px solid var(--gray);padding:7px 12px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.sim-toolbar-btn{background:var(--gray-light);border:1px solid var(--gray);border-radius:6px;padding:5px 11px;font-size:.78rem;cursor:pointer;transition:all .2s;font-weight:500}
+.sim-toolbar-btn:hover:not(:disabled){background:var(--blue-light);border-color:var(--blue)}
+.sim-toolbar-btn.highlight-btn{background:var(--gold);border-color:#c8860a;animation:pulse 1.2s infinite;cursor:pointer}
+.sim-toolbar-btn:disabled{opacity:.4;cursor:not-allowed}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,166,35,.5)}50%{box-shadow:0 0 0 6px rgba(245,166,35,0)}}
+.sim-body{padding:14px;min-height:110px}
+.sim-file-list{display:flex;flex-direction:column;gap:5px}
+.sim-file{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--gray);border-radius:7px;padding:7px 11px;font-size:.83rem;transition:all .2s}
+.sim-file.selected{border-color:var(--blue);background:var(--blue-light)}
+.sim-file .file-icon{font-size:1rem}
+.sim-file .file-name{flex:1;font-weight:500}
+.sim-file .file-meta{font-size:.72rem;color:#888}
+.sim-version-panel{background:#fff;border:1px solid var(--gray);border-radius:8px;padding:11px;margin-top:9px}
+.version-row{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid var(--gray);font-size:.81rem}
+.version-row:last-child{border-bottom:none}
+.version-dot{width:9px;height:9px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.version-dot.current{background:var(--green)}
+.version-restore-btn{margin-left:auto;background:var(--blue-light);border:1px solid var(--blue);border-radius:5px;padding:3px 9px;font-size:.73rem;cursor:pointer;color:var(--blue);font-weight:600;transition:all .2s}
+.version-restore-btn:hover{background:var(--blue);color:#fff}
+.order-list{display:flex;flex-direction:column;gap:7px}
+.order-item{background:#fff;border:2px solid var(--blue);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:11px;cursor:grab;font-size:.88rem;font-weight:500;transition:all .2s;user-select:none}
+.order-item:hover{background:var(--blue-light)}
+.order-item.dragging{opacity:.35}
+.order-item.drag-over-item{border-color:var(--gold);background:#fff8e6}
+.order-num{background:var(--blue);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;flex-shrink:0}
+.order-item.correct-pos{border-color:var(--green);background:var(--green-light)}
+.order-item.correct-pos .order-num{background:var(--green)}
+.order-item.wrong-pos{border-color:var(--red);background:var(--red-light)}
+.order-item.wrong-pos .order-num{background:var(--red)}
+.score-circle{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 6px 24px rgba(27,94,175,.35)}
+.score-circle .score-num{font-size:2.2rem;font-weight:900;line-height:1}
+.score-circle .score-label{font-size:.72rem;opacity:.85}
+.rank-display{background:var(--gold);color:#1a2340;border-radius:12px;padding:12px 24px;display:inline-block;font-size:1.2rem;font-weight:900;margin-bottom:16px;box-shadow:0 4px 14px rgba(245,166,35,.4)}
+.obj-item{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid var(--gray);font-size:.86rem}
+.obj-item:last-child{border-bottom:none}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:9px}
+.points-earned{display:inline-flex;align-items:center;gap:4px;background:var(--green-light);color:var(--green);border-radius:20px;padding:4px 11px;font-size:.8rem;font-weight:700}
+.tip-box{background:#fff8e6;border-left:4px solid var(--gold);border-radius:0 8px 8px 0;padding:9px 13px;font-size:.83rem;margin-bottom:12px;color:#7a5200}
+.tip-box strong{color:#5a3c00}
+.label-sm{font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:5px}
+.hidden{display:none!important}
+.sim-instruction{background:var(--blue-light);border-radius:8px;padding:9px 13px;font-size:.86rem;color:var(--blue-dark);font-weight:600;margin-top:9px}
+.step-dots{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+.step-dot{padding:4px 11px;border-radius:20px;font-size:.75rem;font-weight:700;background:var(--gray);color:#888;transition:all .3s}
+.step-dot.active{background:var(--blue);color:#fff}
+.step-dot.done{background:var(--green);color:#fff}
+#confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+#badge-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none}
+#badge-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:#fff;border-radius:16px;padding:26px 32px;text-align:center;box-shadow:0 12px 48px rgba(0,0,0,.25);z-index:10000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);min-width:220px}
+#badge-popup.show{transform:translate(-50%,-50%) scale(1)}
+#badge-popup .badge-icon{font-size:3.2rem;margin-bottom:7px}
+#badge-popup h3{color:var(--blue);font-size:1.15rem;margin-bottom:3px}
+#badge-popup p{color:#666;font-size:.85rem}
+.rank-progress{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.rank-card{flex:1;min-width:90px;text-align:center;padding:9px;background:var(--gray-light);border-radius:8px}
+.rank-card.active-rank{background:linear-gradient(135deg,var(--blue),var(--green));color:#fff}
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+<div id="badge-overlay"></div>
+<div id="badge-popup">
+  <div class="badge-icon" id="badge-icon">🏅</div>
+  <h3 id="badge-title">Achievement Unlocked!</h3>
+  <p id="badge-desc">You earned a new badge.</p>
+  <button class="btn btn-blue" onclick="closeBadge()" style="margin-top:12px">Awesome! ✊</button>
+</div>
+
+<div id="app-header">
+  <div class="header-top">
+    <div class="uva-logo">
+      <div class="uva-shield">UVA</div>
+      <div>
+        <div class="uva-title">University View Academy</div>
+        <div class="uva-sub">Computer Tech Literacy · Google Drive Mastery</div>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="stat-pill">⭐ <span id="score-display">0 pts</span></div>
+      <div class="stat-pill">🔥 <span id="streak-display">0 streak</span></div>
+      <div id="rank-badge">🎓 Trainee</div>
+    </div>
+  </div>
+  <div class="motto-ribbon">✦ Virtue · Vigor · Vision ✦</div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar"></div></div>
+</div>
+
+<div id="main">
+
+<!-- SCREEN 0: INTRO -->
+<div id="screen-0" class="screen active">
+  <div class="mission-banner">
+    <div class="domain-tag">📋 Domain 4.2 · Common Computing Devices & Their Purposes</div>
+    <h1>☁️ Google Drive Mastery</h1>
+    <p class="subtitle">Advanced Cloud Storage Management & Desktop Integration</p>
+    <ul class="mission-list">
+      <li>Differentiate local vs. virtual file storage to optimize hardware performance</li>
+      <li>Use Google Drive Workspaces to manage multi-subject workloads</li>
+      <li>Apply version control & restoration to prevent data loss</li>
+      <li>Configure offline access & browser settings for productivity anywhere</li>
+    </ul>
+    <p style="font-size:.8rem;opacity:.8;margin-bottom:16px">⏱ 10–15 minutes  |  4 Missions  |  400 pts possible</p>
+    <button class="btn btn-primary" onclick="startActivity()" style="font-size:1rem;padding:12px 32px">🚀 Begin Your Mission</button>
+  </div>
+  <div class="card">
+    <div class="label-sm">🏆 Rank Progression</div>
+    <div class="rank-progress">
+      <div class="rank-card"><div style="font-size:1.3rem">🎓</div><div style="font-size:.75rem;font-weight:700;margin-top:3px">Trainee</div><div style="font-size:.68rem;color:#888">0–99 pts</div></div>
+      <div class="rank-card"><div style="font-size:1.3rem">⚙️</div><div style="font-size:.75rem;font-weight:700;margin-top:3px">Apprentice</div><div style="font-size:.68rem;color:#888">100–199 pts</div></div>
+      <div class="rank-card"><div style="font-size:1.3rem">🔬</div><div style="font-size:.75rem;font-weight:700;margin-top:3px">Expert</div><div style="font-size:.68rem;color:#888">200–299 pts</div></div>
+      <div class="rank-card active-rank"><div style="font-size:1.3rem">🏆</div><div style="font-size:.75rem;font-weight:700;margin-top:3px">Master</div><div style="font-size:.68rem;opacity:.85">300+ pts</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 1: MISSION 1 – DRAG & DROP -->
+<div id="screen-1" class="screen">
+  <div class="streak-banner" id="streak-banner">🔥 <span id="streak-text">3 in a row!</span> Keep it up!</div>
+  <div class="card">
+    <div class="mission-header">
+      <div class="mission-num">1</div>
+      <div class="mission-title-block">
+        <h2>Mission 1: Storage Classification HQ</h2>
+        <p>Drag-and-Drop · Local vs. Cloud Storage · 100 pts</p>
+      </div>
+    </div>
+    <div class="tip-box"><strong>🗂 Mission Briefing:</strong> UVA's IT department needs you to classify storage behaviors. Drag each item to the correct storage category. This helps you decide what to store locally vs. in the cloud to optimize your device's performance.</div>
+    <div class="label-sm">📦 Items to Classify — drag each to the correct zone below</div>
+    <div class="drag-zone" id="drag-source">
+      <div class="drag-item" draggable="true" data-id="d1">Hard Drive Space Used</div>
+      <div class="drag-item" draggable="true" data-id="d2">Accessible from any device</div>
+      <div class="drag-item" draggable="true" data-id="d3">Works without internet</div>
+      <div class="drag-item" draggable="true" data-id="d4">Auto-syncs across devices</div>
+      <div class="drag-item" draggable="true" data-id="d5">Stored on Google's servers</div>
+      <div class="drag-item" draggable="true" data-id="d6">Frees up local disk space</div>
+      <div class="drag-item" draggable="true" data-id="d7">Requires physical device</div>
+      <div class="drag-item" draggable="true" data-id="d8">15 GB free storage included</div>
+    </div>
+    <div class="drop-targets">
+      <div class="drop-target" id="drop-local" data-target="local">
+        <h4>💾 Local Storage</h4>
+        <div class="dropped-items" id="dropped-local"></div>
+      </div>
+      <div class="drop-target" id="drop-cloud" data-target="cloud">
+        <h4>☁️ Google Drive (Cloud)</h4>
+        <div class="dropped-items" id="dropped-cloud"></div>
+      </div>
+    </div>
+    <div class="feedback-box" id="m1-feedback"></div>
+    <div class="nav-row">
+      <span class="points-earned hidden" id="m1-points">✅ +100 pts!</span>
+      <button class="btn btn-blue" id="m1-check-btn" onclick="checkMission1()">Check My Answers ✓</button>
+      <button class="btn btn-green hidden" id="m1-next-btn" onclick="goToScreen(2)">Next Mission →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: MISSION 2 – SCENARIO BRANCHING -->
+<div id="screen-2" class="screen">
+  <div class="streak-banner" id="streak-banner-2">🔥 <span id="streak-text-2">Streak!</span></div>
+  <div class="card">
+    <div class="mission-header">
+      <div class="mission-num">2</div>
+      <div class="mission-title-block">
+        <h2>Mission 2: Workspace Command Center</h2>
+        <p>Scenario Decisions · Google Drive Workspaces · 3 × 25 pts</p>
+      </div>
+    </div>
+    <div class="tip-box"><strong>📋 Mission Briefing:</strong> You're a UVA student managing files across 4 subjects. Navigate three real-world Google Drive scenarios by choosing the best action. Each correct decision earns points!</div>
+    <div id="m2-container"></div>
+    <div class="nav-row" style="margin-top:8px">
+      <span class="points-earned hidden" id="m2-points">✅ Mission 2 Complete!</span>
+      <button class="btn btn-green hidden" id="m2-next-btn" onclick="goToScreen(3)">Next Mission →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: MISSION 3 – STEP SIMULATION -->
+<div id="screen-3" class="screen">
+  <div class="card">
+    <div class="mission-header">
+      <div class="mission-num">3</div>
+      <div class="mission-title-block">
+        <h2>Mission 3: Version Control Vault</h2>
+        <p>Step Simulation · Version History & Restoration · 100 pts</p>
+      </div>
+    </div>
+    <div class="tip-box"><strong>🔄 Mission Briefing:</strong> Your research paper was accidentally overwritten! Use Google Drive's Version History to restore the correct version. Click the highlighted buttons in the correct order to complete the recovery procedure.</div>
+    <div class="step-dots" id="sim-steps">
+      <div class="step-dot active" id="sdot-1">1. Select File</div>
+      <div style="color:#ccc;align-self:center">→</div>
+      <div class="step-dot" id="sdot-2">2. Open Menu</div>
+      <div style="color:#ccc;align-self:center">→</div>
+      <div class="step-dot" id="sdot-3">3. Version History</div>
+      <div style="color:#ccc;align-self:center">→</div>
+      <div class="step-dot" id="sdot-4">4. Restore Version</div>
+    </div>
+    <div class="sim-ui">
+      <div class="sim-toolbar" id="sim-toolbar">
+        <span style="font-size:.78rem;font-weight:700;color:var(--blue);margin-right:4px">📁 My Drive</span>
+        <button class="sim-toolbar-btn" id="sim-btn-new" disabled>+ New</button>
+        <button class="sim-toolbar-btn" id="sim-btn-menu" onclick="simAction('menu')" disabled>⋮ More Actions</button>
+        <button class="sim-toolbar-btn" id="sim-btn-version" onclick="simAction('version')" disabled>🕐 Version History</button>
+        <button class="sim-toolbar-btn" id="sim-btn-restore" onclick="simAction('restore')" disabled>↩ Restore This Version</button>
+      </div>
+      <div class="sim-body" id="sim-body">
+        <div class="label-sm" style="margin-bottom:8px">📂 My Drive › School Projects</div>
+        <div class="sim-file-list">
+          <div class="sim-file highlight-btn" id="sim-file-1" onclick="simAction('select')" style="cursor:pointer;animation:pulse 1.2s infinite">
+            <span class="file-icon">📄</span>
+            <span class="file-name">Research_Paper_Final.gdoc</span>
+            <span class="file-meta">Modified: Today, 9:42 AM · You</span>
+          </div>
+          <div class="sim-file" id="sim-file-2">
+            <span class="file-icon">📊</span>
+            <span class="file-name">Data_Analysis.gsheet</span>
+            <span class="file-meta">Modified: Yesterday · You</span>
+          </div>
+          <div class="sim-file" id="sim-file-3">
+            <span class="file-icon">📑</span>
+            <span class="file-name">Presentation_Draft.gslides</span>
+            <span class="file-meta">Modified: Mar 8 · You</span>
+          </div>
+        </div>
+        <div class="sim-version-panel hidden" id="sim-version-panel">
+          <div class="label-sm" style="margin-bottom:8px">🕐 Version History — Research_Paper_Final.gdoc</div>
+          <div class="version-row">
+            <div class="version-dot current"></div>
+            <div style="flex:1"><strong>Today, 9:42 AM</strong> — Accidental overwrite (current)</div>
+            <span style="font-size:.72rem;color:#888">Current</span>
+          </div>
+          <div class="version-row" id="version-target">
+            <div class="version-dot"></div>
+            <div style="flex:1"><strong>Yesterday, 11:15 PM</strong> — Completed draft ✓</div>
+            <button class="version-restore-btn highlight-btn" id="restore-target-btn" onclick="simAction('restore-version')">Restore</button>
+          </div>
+          <div class="version-row">
+            <div class="version-dot"></div>
+            <div style="flex:1"><strong>Yesterday, 6:30 PM</strong> — Outline only</div>
+            <button class="version-restore-btn" onclick="simAction('wrong-restore')">Restore</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="feedback-box" id="m3-feedback"></div>
+    <div class="sim-instruction" id="sim-instruction">👆 Step 1: Click on <strong>Research_Paper_Final.gdoc</strong> to select it.</div>
+    <div class="nav-row">
+      <span class="points-earned hidden" id="m3-points">✅ +100 pts!</span>
+      <button class="btn btn-green hidden" id="m3-next-btn" onclick="goToScreen(4)">Next Mission →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4: MISSION 4 – ORDERING -->
+<div id="screen-4" class="screen">
+  <div class="card">
+    <div class="mission-header">
+      <div class="mission-num">4</div>
+      <div class="mission-title-block">
+        <h2>Mission 4: Offline Access Protocol</h2>
+        <p>Step Ordering · Offline Configuration · 100 pts</p>
+      </div>
+    </div>
+    <div class="tip-box"><strong>📶 Mission Briefing:</strong> UVA's Wi-Fi is down during finals week! Configure Google Drive for offline access. Drag the steps below into the correct order to complete the offline setup procedure.</div>
+    <div class="label-sm" style="margin-bottom:8px">🔀 Drag to reorder — arrange these steps in the correct sequence:</div>
+    <div class="order-list" id="order-list"></div>
+    <div class="feedback-box" id="m4-feedback"></div>
+    <div class="nav-row">
+      <span class="points-earned hidden" id="m4-points">✅ +100 pts!</span>
+      <button class="btn btn-blue" id="m4-check-btn" onclick="checkMission4()">Submit Order ✓</button>
+      <button class="btn btn-green hidden" id="m4-next-btn" onclick="goToScreen(5)">View Results 🏆</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 5: RESULTS -->
+<div id="screen-5" class="screen">
+  <div class="card" style="text-align:center;padding:28px">
+    <div class="label-sm" style="margin-bottom:10px">🏁 Mission Complete — Final Results</div>
+    <div class="score-circle">
+      <div class="score-num" id="final-score">0</div>
+      <div class="score-label">/ 400 pts</div>
+    </div>
+    <div class="rank-display" id="final-rank">🎓 Trainee</div>
+    <p id="final-message" style="color:#555;font-size:.92rem;margin-bottom:16px"></p>
+    <hr style="border:none;border-top:2px solid var(--gray);margin:16px 0">
+    <div class="label-sm" style="margin-bottom:8px">📚 Learning Objectives Covered</div>
+    <div>
+      <div class="obj-item">✅ <span>Differentiated local vs. virtual file storage to optimize hardware performance</span></div>
+      <div class="obj-item">✅ <span>Implemented priority-based organization using Google Drive Workspaces</span></div>
+      <div class="obj-item">✅ <span>Applied version control procedures and restoration steps to mitigate data loss</span></div>
+      <div class="obj-item">✅ <span>Configured offline access settings to maintain productivity without network access</span></div>
+    </div>
+    <hr style="border:none;border-top:2px solid var(--gray);margin:16px 0">
+    <div style="background:var(--blue-light);border-radius:10px;padding:13px;text-align:left;margin-bottom:16px">
+      <div class="label-sm" style="margin-bottom:6px">📋 Domain 4.2 Connection</div>
+      <p style="font-size:.86rem;line-height:1.6;color:var(--blue-dark)">Google Drive exemplifies how modern computing devices leverage cloud infrastructure. Understanding local vs. cloud storage, hybrid workflows, and offline configuration is a core competency for Domain 4.2: Common Computing Devices and Their Purposes.</p>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-blue" onclick="restartActivity()">🔄 Retry Missions</button>
+    </div>
+    <p style="font-size:.72rem;color:#aaa;margin-top:14px">✦ Virtue · Vigor · Vision ✦ University View Academy</p>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ── STATE ──
+var score=0,streak=0,maxStreak=0,currentScreen=0;
+var m1Done=false,m2Done=false,m3Done=false,m4Done=false;
+var m2QIdx=0,m2Score=0,simStep=1;
+var droppedItems={local:[],cloud:[]};
+var orderItems=[];
+var orderDragSrc=null;
+
+// ── RANKS ──
+var RANKS=[
+  {min:0,max:99,label:'🎓 Trainee',badge:'🎓',desc:'Welcome to UVA Cloud Academy!'},
+  {min:100,max:199,label:'⚙️ Apprentice',badge:'⚙️',desc:"You're building solid cloud skills!"},
+  {min:200,max:299,label:'🔬 Expert',badge:'🔬',desc:'Impressive mastery of Google Drive!'},
+  {min:300,max:9999,label:'🏆 Master',badge:'🏆',desc:"You've achieved UVA Cloud Master status!"}
+];
+function getRank(pts){return RANKS.find(function(r){return pts>=r.min&&pts<=r.max})||RANKS[0];}
+
+// ── MISSION 2 DATA ──
+var m2Questions=[
+  {
+    scenario:"You have 47 files scattered across My Drive for your AP Biology, English Lit, History, and Computer Tech classes. Every time you need a file, you spend 3+ minutes searching. Your teacher mentions Google Drive has a feature specifically designed for this problem.",
+    question:"What is the BEST Google Drive feature to organize your multi-subject workload without moving or duplicating files?",
+    choices:[
+      {text:"Create separate Google Accounts for each subject",correct:false},
+      {text:"Use Google Drive Workspaces to group relevant files from any location into subject-based views",correct:true},
+      {text:"Download all files locally and organize them in Windows folders",correct:false},
+      {text:"Share all files with yourself via email for quick access",correct:false}
+    ],
+    feedbackCorrect:"✅ Correct! Google Drive Workspaces (found in the left sidebar) lets you group files from anywhere in Drive into a named workspace — without moving or copying them. Perfect for multi-subject management!",
+    feedbackWrong:"❌ Not quite. Google Drive Workspaces is the right tool. It groups files from any Drive location into a single view per subject, without duplicating storage or requiring separate accounts."
+  },
+  {
+    scenario:"You're in the Workspaces panel and want to add your 'Bio Lab Report.gdoc' (currently in a shared folder) to your 'AP Biology' workspace. You right-click the file.",
+    question:"Which option in the right-click context menu adds the file to your Workspace?",
+    choices:[
+      {text:"'Move to' — to physically relocate the file into the workspace folder",correct:false},
+      {text:"'Add to workspace' — which links the file to the workspace without moving it",correct:true},
+      {text:"'Make a copy' — then add the copy to the workspace",correct:false},
+      {text:"'Share' — and share it with your workspace collaborators",correct:false}
+    ],
+    feedbackCorrect:"✅ Exactly right! 'Add to workspace' creates a reference link to the file in your workspace — the original stays in its current location. Workspaces don't move files!",
+    feedbackWrong:"❌ 'Add to workspace' is the correct option. Unlike 'Move to,' it doesn't relocate the file — it adds a shortcut/reference to your workspace. The original stays in its shared folder."
+  },
+  {
+    scenario:"Your 'Computer Tech' workspace has 12 files. It's getting cluttered with old assignment drafts you no longer need quick access to. You want to clean it up without deleting the actual files.",
+    question:"What is the correct action to remove a file from a Workspace without deleting it from Drive?",
+    choices:[
+      {text:"Right-click the file → 'Remove from workspace' — this unlinks it from the workspace only",correct:true},
+      {text:"Press Delete — this removes it from the workspace but keeps it in Drive",correct:false},
+      {text:"Right-click → 'Move to Trash' — files in trash are hidden from workspaces",correct:false},
+      {text:"You cannot remove individual files; you must delete the entire workspace",correct:false}
+    ],
+    feedbackCorrect:"✅ Perfect! 'Remove from workspace' unlinks the file from that workspace view without affecting the actual file in Drive. It's non-destructive — the file remains in its original location.",
+    feedbackWrong:"❌ The correct action is 'Remove from workspace.' This only removes the workspace link. The file stays safe in its original Drive location. Never use 'Move to Trash' for workspace cleanup!"
+  }
+];
+
+// ── MISSION 4 DATA ──
+var offlineSteps=[
+  {id:'os1',text:'Open Google Chrome browser (offline access requires Chrome)',correctPos:0},
+  {id:'os2',text:'Navigate to drive.google.com and sign in to your UVA Google account',correctPos:1},
+  {id:'os3',text:'Install the "Google Docs Offline" Chrome extension if not already installed',correctPos:2},
+  {id:'os4',text:'Click the ⚙️ Settings gear icon in the top-right of Google Drive',correctPos:3},
+  {id:'os5',text:'Toggle ON "Offline: Create, open and edit your recent Google Docs, Sheets, and Slides files on this device while offline"',correctPos:4},
+  {id:'os6',text:'Right-click specific files → toggle "Available offline" for priority documents',correctPos:5}
+];
+
+// ── DRAG & DROP ANSWERS ──
+var correctAnswers={d1:'local',d2:'cloud',d3:'local',d4:'cloud',d5:'cloud',d6:'cloud',d7:'local',d8:'cloud'};
+var itemTexts={d1:'Hard Drive Space Used',d2:'Accessible from any device',d3:'Works without internet',d4:'Auto-syncs across devices',d5:"Stored on Google's servers",d6:'Frees up local disk space',d7:'Requires physical device',d8:'15 GB free storage included'};
+
+// ── INIT ──
+function startActivity(){goToScreen(1);}
+
+function goToScreen(n){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById('screen-'+n).classList.add('active');
+  currentScreen=n;
+  updateProgress();
+  window.scrollTo(0,0);
+  if(n===1) initDragDrop();
+  if(n===2) initMission2();
+  if(n===4) initMission4();
+  if(n===5) showResults();
+}
+
+function updateProgress(){
+  var pct=(currentScreen/5)*100;
+  document.getElementById('progress-bar').style.width=pct+'%';
+}
+
+function addScore(pts){
+  var oldRank=getRank(score).label;
+  score+=pts;
+  document.getElementById('score-display').textContent=score+' pts';
+  var newRank=getRank(score);
+  document.getElementById('rank-badge').textContent=newRank.label;
+  if(newRank.label!==oldRank){
+    showBadge(newRank.badge,'Rank Up! '+newRank.label,newRank.desc);
+  }
+}
+
+function addStreak(){
+  streak++;
+  if(streak>maxStreak) maxStreak=streak;
+  document.getElementById('streak-display').textContent=streak+' streak';
+  if(streak>=3){
+    var banners=['streak-banner','streak-banner-2'];
+    banners.forEach(function(id){
+      var el=document.getElementById(id);
+      if(el){
+        document.getElementById(id.replace('banner','text')||'streak-text').textContent=streak+' in a row! 🔥';
+        el.style.display='block';
+        setTimeout(function(){el.style.display='none';},2500);
+      }
+    });
+    var sb=document.getElementById('streak-banner');
+    if(sb){
+      document.getElementById('streak-text').textContent=streak+' in a row! 🔥';
+      sb.style.display='block';
+      setTimeout(function(){sb.style.display='none';},2500);
+    }
+    var sb2=document.getElementById('streak-banner-2');
+    if(sb2){
+      document.getElementById('streak-text-2').textContent=streak+' in a row! 🔥';
+      sb2.style.display='block';
+      setTimeout(function(){sb2.style.display='none';},2500);
+    }
+  }
+}
+
+function resetStreak(){streak=0;document.getElementById('streak-display').textContent='0 streak';}
+
+function showFeedback(id,type,title,body){
+  var el=document.getElementById(id);
+  el.className='feedback-box '+type+' show';
+  el.innerHTML='<strong>'+(type==='correct'?'✅ ':'❌ ')+title+'</strong>'+(body?'<span>'+body+'</span>':'');
+}
+
+// ── MISSION 1: DRAG & DROP ──
+function initDragDrop(){
+  attachDragEvents();
+  document.querySelectorAll('.drop-target').forEach(function(target){
+    target.addEventListener('dragover',function(e){e.preventDefault();target.classList.add('drag-over');});
+    target.addEventListener('dragleave',function(){target.classList.remove('drag-over');});
+    target.addEventListener('drop',function(e){
+      e.preventDefault();
+      target.classList.remove('drag-over');
+      var id=e.dataTransfer.getData('text/plain');
+      if(!id) return;
+      var zone=target.dataset.target;
+      ['local','cloud'].forEach(function(z){
+        var idx=droppedItems[z].indexOf(id);
+        if(idx>-1) droppedItems[z].splice(idx,1);
+      });
+      droppedItems[zone].push(id);
+      var dragEl=document.querySelector('[data-id="'+id+'"]');
+      if(dragEl) dragEl.remove();
+      renderDroppedItems();
+    });
+  });
+}
+
+function attachDragEvents(){
+  document.querySelectorAll('.drag-item').forEach(function(item){
+    item.addEventListener('dragstart',function(e){
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain',item.dataset.id);
+    });
+    item.addEventListener('dragend',function(){item.classList.remove('dragging');});
+  });
+}
+
+function renderDroppedItems(){
+  ['local','cloud'].forEach(function(zone){
+    var container=document.getElementById('dropped-'+zone);
+    container.innerHTML='';
+    droppedItems[zone].forEach(function(id){
+      var chip=document.createElement('div');
+      chip.className='dropped-chip';
+      chip.textContent=itemTexts[id]||id;
+      chip.title='Click to return to source';
+      (function(cid,czone,ctext){
+        chip.onclick=function(){returnToSource(cid,czone,ctext);};
+      })(id,zone,itemTexts[id]);
+      container.appendChild(chip);
+    });
+  });
+}
+
+function returnToSource(id,zone,text){
+  var idx=droppedItems[zone].indexOf(id);
+  if(idx>-1) droppedItems[zone].splice(idx,1);
+  var source=document.getElementById('drag-source');
+  var item=document.createElement('div');
+  item.className='drag-item';
+  item.draggable=true;
+  item.dataset.id=id;
+  item.textContent=text;
+  item.addEventListener('dragstart',function(e){
+    item.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('text/plain',id);
+  });
+  item.addEventListener('dragend',function(){item.classList.remove('dragging');});
+  source.appendChild(item);
+  renderDroppedItems();
+}
+
+function checkMission1(){
+  if(m1Done) return;
+  var total=droppedItems.local.length+droppedItems.cloud.length;
+  if(total<8){showFeedback('m1-feedback','incorrect','Please classify all 8 items before checking!','');return;}
+  var correct=0;
+  ['local','cloud'].forEach(function(zone){
+    droppedItems[zone].forEach(function(id){if(correctAnswers[id]===zone) correct++;});
+  });
+  ['local','cloud'].forEach(function(zone){
+    var target=document.getElementById('drop-'+zone);
+    var allOk=droppedItems[zone].every(function(id){return correctAnswers[id]===zone;});
+    target.classList.add(allOk?'correct':'incorrect');
+  });
+  var pts=correct>=7?100:correct>=5?60:correct>=3?30:0;
+  addScore(pts);
+  m1Done=true;
+  if(correct===8){
+    addStreak();
+    showFeedback('m1-feedback','correct','Perfect Score! All 8 items correctly classified! (+'+pts+' pts)','Key insight: Cloud storage uses Google\'s servers and syncs across devices. Local storage uses your device\'s hard drive — works offline but takes up physical space.');
+    triggerConfetti();
+  } else {
+    resetStreak();
+    showFeedback('m1-feedback','incorrect','You got '+correct+'/8 correct. (+'+pts+' pts)','Remember: Local = your device\'s hard drive (works offline, uses disk space). Cloud = Google\'s servers (syncs everywhere, frees local space, needs internet by default).');
+  }
+  document.getElementById('m1-points').classList.remove('hidden');
+  document.getElementById('m1-points').textContent='✅ +'+pts+' pts earned!';
+  document.getElementById('m1-check-btn').classList.add('hidden');
+  document.getElementById('m1-next-btn').classList.remove('hidden');
+}
+
+// ── MISSION 2: SCENARIOS ──
+function initMission2(){m2QIdx=0;m2Score=0;renderM2Question();}
+
+function renderM2Question(){
+  var q=m2Questions[m2QIdx];
+  var letters=['A','B','C','D'];
+  var html='<div style="font-size:.76rem;font-weight:700;color:#888;margin-bottom:7px">Question '+(m2QIdx+1)+' of '+m2Questions.length+'</div>';
+  html+='<div class="scenario-box"><div class="scenario-label">📋 Scenario</div>'+q.scenario+'</div>';
+  html+='<p style="font-weight:700;font-size:.92rem;margin-bottom:10px;color:var(--blue)">'+q.question+'</p>';
+  html+='<div class="choices">';
+  q.choices.forEach(function(c,i){
+    html+='<button class="choice-btn" onclick="answerM2('+i+')" id="m2-choice-'+i+'">';
+    html+='<span class="choice-letter">'+letters[i]+'</span>';
+    html+='<span>'+c.text+'</span></button>';
+  });
+  html+='</div><div class="feedback-box" id="m2-feedback"></div>';
+  document.getElementById('m2-container').innerHTML=html;
+}
+
+function answerM2(idx){
+  var q=m2Questions[m2QIdx];
+  var correct=q.choices[idx].correct;
+  document.querySelectorAll('.choice-btn').forEach(function(btn){btn.disabled=true;});
+  var chosen=document.getElementById('m2-choice-'+idx);
+  if(correct){
+    chosen.classList.add('correct');
+    m2Score+=25;
+    addScore(25);
+    addStreak();
+    showFeedback('m2-feedback','correct',q.feedbackCorrect,'');
+    if(streak>=3){
+      var sb2=document.getElementById('streak-banner-2');
+      document.getElementById('streak-text-2').textContent=streak+' in a row! 🔥';
+      sb2.style.display='block';
+      setTimeout(function(){sb2.style.display='none';},2500);
+    }
+  } else {
+    chosen.classList.add('incorrect');
+    resetStreak();
+    q.choices.forEach(function(c,i){if(c.correct) document.getElementById('m2-choice-'+i).classList.add('correct');});
+    showFeedback('m2-feedback','incorrect',q.feedbackWrong,'');
+  }
+  setTimeout(function(){
+    m2QIdx++;
+    if(m2QIdx<m2Questions.length){
+      renderM2Question();
+    } else {
+      m2Done=true;
+      document.getElementById('m2-points').classList.remove('hidden');
+      document.getElementById('m2-points').textContent='✅ Mission 2 Complete! +'+m2Score+' pts';
+      document.getElementById('m2-next-btn').classList.remove('hidden');
+      if(m2Score===75) triggerConfetti();
+    }
+  },2200);
+}
+
+// ── MISSION 3: SIMULATION ──
+function simAction(action){
+  if(action==='select'&&simStep===1){
+    document.getElementById('sim-file-1').classList.add('selected');
+    document.getElementById('sim-file-1').style.animation='none';
+    document.getElementById('sim-file-1').style.cursor='default';
+    document.getElementById('sim-file-1').onclick=null;
+    document.getElementById('sim-btn-menu').disabled=false;
+    document.getElementById('sim-btn-menu').classList.add('highlight-btn');
+    document.getElementById('sdot-1').classList.remove('active');
+    document.getElementById('sdot-1').classList.add('done');
+    document.getElementById('sdot-2').classList.add('active');
+    document.getElementById('sim-instruction').innerHTML='✅ File selected! Step 2: Click <strong>⋮ More Actions</strong> in the toolbar.';
+    simStep=2;
+  } else if(action==='menu'&&simStep===2){
+    document.getElementById('sim-btn-menu').classList.remove('highlight-btn');
+    document.getElementById('sim-btn-menu').disabled=true;
+    document.getElementById('sim-btn-version').disabled=false;
+    document.getElementById('sim-btn-version').classList.add('highlight-btn');
+    document.getElementById('sdot-2').classList.remove('active');
+    document.getElementById('sdot-2').classList.add('done');
+    document.getElementById('sdot-3').classList.add('active');
+    document.getElementById('sim-instruction').innerHTML='✅ Menu opened! Step 3: Click <strong>🕐 Version History</strong> to view all saved versions.';
+    simStep=3;
+  } else if(action==='version'&&simStep===3){
+    document.getElementById('sim-btn-version').classList.remove('highlight-btn');
+    document.getElementById('sim-btn-version').disabled=true;
+    document.getElementById('sim-version-panel').classList.remove('hidden');
+    document.getElementById('sdot-3').classList.remove('active');
+    document.getElementById('sdot-3').classList.add('done');
+    document.getElementById('sdot-4').classList.add('active');
+    document.getElementById('sim-instruction').innerHTML='✅ Version History opened! Step 4: Click <strong>Restore</strong> next to "Yesterday, 11:15 PM — Completed draft ✓"';
+    simStep=4;
+  } else if(action==='restore-version'&&simStep===4){
+    document.getElementById('sdot-4').classList.remove('active');
+    document.getElementById('sdot-4').classList.add('done');
+    document.getElementById('restore-target-btn').style.animation='none';
+    document.getElementById('restore-target-btn').style.background='var(--green)';
+    document.getElementById('restore-target-btn').style.color='#fff';
+    document.getElementById('restore-target-btn').textContent='✓ Restored!';
+    document.getElementById('restore-target-btn').onclick=null;
+    document.getElementById('sim-instruction').innerHTML='🎉 Version successfully restored! Your completed draft is back.';
+    document.getElementById('sim-instruction').style.background='var(--green-light)';
+    document.getElementById('sim-instruction').style.color='var(--green)';
+    addScore(100);
+    addStreak();
+    m3Done=true;
+    showFeedback('m3-feedback','correct','Version Restored! (+100 pts)','Key insight: Google Drive automatically saves version history for all Google Docs, Sheets, and Slides. You can access it via File → Version History → See version history, or right-click → Manage versions. Always restore the version with the most complete work!');
+    document.getElementById('m3-points').classList.remove('hidden');
+    document.getElementById('m3-next-btn').classList.remove('hidden');
+    triggerConfetti();
+    simStep=5;
+  } else if(action==='wrong-restore'){
+    showFeedback('m3-feedback','incorrect','Wrong version!','That version only has the outline. Look for "Yesterday, 11:15 PM — Completed draft ✓" — that\'s the one with your full paper!');
+  }
+}
+
+// ── MISSION 4: ORDERING ──
+function initMission4(){
+  orderItems=offlineSteps.slice().sort(function(){return Math.random()-.5;});
+  renderOrderList();
+}
+
+function renderOrderList(){
+  var list=document.getElementById('order-list');
+  list.innerHTML='';
+  orderItems.forEach(function(item,i){
+    var div=document.createElement('div');
+    div.className='order-item';
+    div.draggable=true;
+    div.dataset.idx=i;
+    div.innerHTML='<div class="order-num">'+(i+1)+'</div><span>'+item.text+'</span>';
+    div.addEventListener('dragstart',function(e){
+      orderDragSrc=i;
+      div.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain',String(i));
+    });
+    div.addEventListener('dragend',function(){div.classList.remove('dragging');});
+    div.addEventListener('dragover',function(e){e.preventDefault();div.classList.add('drag-over-item');});
+    div.addEventListener('dragleave',function(){div.classList.remove('drag-over-item');});
+    div.addEventListener('drop',function(e){
+      e.preventDefault();
+      div.classList.remove('drag-over-item');
+      var from=parseInt(e.dataTransfer.getData('text/plain'));
+      var to=i;
+      if(from===to) return;
+      var moved=orderItems.splice(from,1)[0];
+      orderItems.splice(to,0,moved);
+      renderOrderList();
+    });
+    list.appendChild(div);
+  });
+}
+
+function checkMission4(){
+  if(m4Done) return;
+  var correct=0;
+  orderItems.forEach(function(item,i){if(item.correctPos===i) correct++;});
+  var items=document.querySelectorAll('.order-item');
+  orderItems.forEach(function(item,i){
+    items[i].classList.add(item.correctPos===i?'correct-pos':'wrong-pos');
+  });
+  var pts=correct===6?100:correct>=4?60:correct>=2?30:0;
+  addScore(pts);
+  m4Done=true;
+  if(correct===6){
+    addStreak();
+    showFeedback('m4-feedback','correct','Perfect Order! All 6 steps correct! (+'+pts+' pts)','You\'ve mastered the Google Drive offline setup procedure. Remember: Chrome is required, the offline extension must be installed, and you must toggle the setting in Drive\'s Settings gear before individual files can be made available offline.');
+    triggerConfetti();
+  } else {
+    resetStreak();
+    showFeedback('m4-feedback','incorrect',correct+'/6 steps in correct order. (+'+pts+' pts)',
