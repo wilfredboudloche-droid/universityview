@@ -22,7 +22,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gray-light); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-/* Header & Branding */
 #app-header { background: var(--blue); color: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,.18); }
 .header-top { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; flex-wrap: wrap; gap: 8px; }
 .uva-logo { display: flex; align-items: center; gap: 10px; }
@@ -36,21 +35,18 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gray-light)
 .progress-bar-wrap { background: rgba(255,255,255,0.2); height: 6px; width: 100%; }
 .progress-bar-fill { height: 6px; background: var(--gold); transition: width 0.6s ease; width: 0%; }
 
-/* Layout */
 #main { max-width: 860px; margin: 0 auto; padding: 20px 14px 60px; }
 .screen { display: none; animation: fadeIn 0.4s ease; }
 .screen.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .card { background: #fff; border-radius: 14px; box-shadow: var(--shadow); padding: 24px; margin-bottom: 18px; }
 
-/* Mission Intro */
 .mission-banner { background: linear-gradient(135deg, var(--blue) 60%, var(--blue-dark)); color: #fff; border-radius: 14px; padding: 28px 24px; text-align: center; margin-bottom: 18px; }
 .domain-tag { display: inline-block; background: var(--gold); color: #1a2340; border-radius: 20px; padding: 3px 14px; font-size: .73rem; font-weight: 700; margin-bottom: 14px; }
 .mission-list { text-align: left; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 14px 18px; margin: 12px 0; list-style: none; }
 .mission-list li { padding: 5px 0; font-size: .88rem; display: flex; align-items: flex-start; gap: 8px; }
 .mission-list li::before { content: '🎯'; }
 
-/* Buttons */
 .btn { display: inline-block; padding: 11px 24px; border-radius: 8px; font-size: .95rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; text-align: center; text-decoration: none; }
 .btn-primary { background: var(--gold); color: #1a2340; }
 .btn-primary:hover { background: #e09510; transform: translateY(-1px); }
@@ -58,12 +54,10 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gray-light)
 .btn-green { background: var(--green); color: #fff; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Rank Progression UI */
 .rank-progress { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 .rank-card { flex: 1; min-width: 90px; text-align: center; padding: 9px; background: var(--gray); border-radius: 8px; transition: all 0.3s; }
 .rank-card.active-rank { background: linear-gradient(135deg, var(--blue), var(--green)); color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-/* Mission 1: Drag and Drop */
 .drag-zone { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: var(--gray-light); border-radius: 10px; min-height: 60px; margin-bottom: 16px; border: 2px dashed var(--gray); }
 .drag-item { background: var(--blue); color: #fff; border-radius: 8px; padding: 8px 14px; font-size: .85rem; font-weight: 600; cursor: grab; user-select: none; }
 .drop-targets { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -72,13 +66,11 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gray-light)
 .dropped-items { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
 .dropped-chip { background: #fff; border: 1px solid var(--blue); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
 
-/* Feedback */
 .feedback-box { border-radius: 10px; padding: 12px 16px; margin-top: 12px; display: none; }
 .feedback-box.show { display: block; }
 .feedback-box.correct { background: var(--green-light); border-left: 4px solid var(--green); color: #155c2e; }
 .feedback-box.incorrect { background: var(--red-light); border-left: 4px solid var(--red); color: #922b21; }
 
-/* Simulation UI */
 .sim-ui { background: #f8f9fa; border: 1px solid var(--gray); border-radius: 10px; overflow: hidden; margin: 15px 0; }
 .sim-toolbar { background: #fff; border-bottom: 1px solid var(--gray); padding: 8px; display: flex; gap: 8px; }
 .sim-body { padding: 15px; min-height: 150px; }
@@ -89,9 +81,27 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gray-light)
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(245,166,35,0.7); } 70% { box-shadow: 0 0 0 10px rgba(245,166,35,0); } 100% { box-shadow: 0 0 0 0 rgba(245,166,35,0); } }
 
 .hidden { display: none !important; }
+
+/* Confetti canvas */
+#confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+
+/* Master rank celebration */
+.master-banner { background: linear-gradient(135deg, #1B5EAF, #1E7A3E); border-radius: 16px; padding: 28px 20px; text-align: center; color: #fff; margin-bottom: 18px; animation: popIn 0.6s ease; }
+@keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 70% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
+.master-trophy { font-size: 5rem; display: block; margin-bottom: 10px; animation: bounce 1s infinite alternate; }
+@keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+.master-title { font-size: 2rem; font-weight: 900; color: #F5A623; text-shadow: 0 2px 8px rgba(0,0,0,0.3); margin-bottom: 6px; }
+.master-subtitle { font-size: 1rem; opacity: 0.9; margin-bottom: 14px; }
+.rank-stars { font-size: 1.6rem; letter-spacing: 6px; margin-bottom: 10px; }
+.score-big { font-size: 3.5rem; font-weight: 900; color: #F5A623; line-height: 1; }
+.score-big-label { font-size: .85rem; opacity: .8; margin-bottom: 16px; }
+.obj-list { text-align: left; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 14px 18px; margin: 12px 0; }
+.obj-list li { list-style: none; padding: 5px 0; font-size: .88rem; display: flex; gap: 8px; }
+.obj-list li::before { content: '✅'; flex-shrink: 0; }
 </style>
 </head>
 <body>
+<canvas id="confetti-canvas"></canvas>
 
 <div id="app-header">
   <div class="header-top">
@@ -126,10 +136,9 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gray-light)
       </ul>
       <button class="btn btn-primary" onclick="goToScreen(1)">🚀 Begin Your Mission</button>
     </div>
-
     <div class="card">
       <div style="font-weight:700; margin-bottom:10px;">🏆 Rank Progression</div>
-      <div class="rank-progress" id="rank-progression-ui">
+      <div class="rank-progress">
         <div class="rank-card active-rank" id="rank-card-0">🎓<br>Trainee</div>
         <div class="rank-card" id="rank-card-1">⚙️<br>Apprentice</div>
         <div class="rank-card" id="rank-card-2">🔬<br>Expert</div>
@@ -143,14 +152,12 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gray-light)
     <div class="card">
       <h2>Mission 1: Storage HQ</h2>
       <p style="margin-bottom:15px;">Drag items to the correct storage type.</p>
-
       <div class="drag-zone" id="drag-source">
         <div class="drag-item" draggable="true" ondragstart="drag(event)" id="i1">Hard Drive Space</div>
         <div class="drag-item" draggable="true" ondragstart="drag(event)" id="i2">Any Device Access</div>
         <div class="drag-item" draggable="true" ondragstart="drag(event)" id="i3">Works Offline</div>
         <div class="drag-item" draggable="true" ondragstart="drag(event)" id="i4">Auto-Sync</div>
       </div>
-
       <div class="drop-targets">
         <div class="drop-target" ondrop="drop(event, 'local')" ondragover="allowDrop(event)">
           <strong>💾 Local</strong>
@@ -161,7 +168,6 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gray-light)
           <div class="dropped-items" id="drop-cloud"></div>
         </div>
       </div>
-
       <div id="m1-feedback" class="feedback-box"></div>
       <div style="margin-top:20px; display:flex; justify-content:space-between;">
         <button class="btn btn-blue" onclick="checkMission1()">Check Answers</button>
@@ -220,11 +226,30 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gray-light)
 
   <!-- SCREEN 5: RESULTS -->
   <div id="screen-5" class="screen">
+    <div class="master-banner">
+      <span class="master-trophy">🏆</span>
+      <div class="rank-stars">⭐⭐⭐⭐⭐</div>
+      <div class="master-title" id="result-rank-title">🏆 MASTER RANK ACHIEVED!</div>
+      <div class="master-subtitle">University View Academy · Google Drive Mastery</div>
+      <div class="score-big" id="final-score">0</div>
+      <div class="score-big-label">/ 400 pts · Mission Complete</div>
+      <ul class="obj-list">
+        <li>Differentiated local vs. cloud file storage</li>
+        <li>Managed workspaces across multiple subjects</li>
+        <li>Restored files using Version History</li>
+        <li>Configured Google Drive for offline access</li>
+      </ul>
+    </div>
     <div class="card" style="text-align:center">
-      <h1>Mission Accomplished!</h1>
-      <div style="font-size:3rem; margin:20px 0;" id="final-score">0</div>
-      <p>Final Rank: <span id="final-rank" style="font-weight:700">Trainee</span></p>
-      <button class="btn btn-primary" style="margin-top:20px" onclick="location.reload()">Restart Activity</button>
+      <div style="font-weight:700; margin-bottom:10px;">🏆 Rank Progression</div>
+      <div class="rank-progress">
+        <div class="rank-card" id="res-rank-0">🎓<br><small>Trainee</small></div>
+        <div class="rank-card" id="res-rank-1">⚙️<br><small>Apprentice</small></div>
+        <div class="rank-card" id="res-rank-2">🔬<br><small>Expert</small></div>
+        <div class="rank-card" id="res-rank-3">🏆<br><small>Master</small></div>
+      </div>
+      <p style="margin-top:16px; color:#555; font-size:.88rem;">✦ Virtue · Vigor · Vision ✦ University View Academy</p>
+      <button class="btn btn-primary" style="margin-top:16px" onclick="location.reload()">🔄 Restart Activity</button>
     </div>
   </div>
 </div>
@@ -232,11 +257,14 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gray-light)
 <script>
 let score = 0;
 const ranks = ["Trainee", "Apprentice", "Expert", "Master"];
+const rankTitles = ["🎓 TRAINEE RANK", "⚙️ APPRENTICE RANK", "🔬 EXPERT RANK", "🏆 MASTER RANK ACHIEVED!"];
 
 function goToScreen(n) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen-' + n).classList.add('active');
     document.getElementById('progress-bar').style.width = (n * 20) + "%";
+    window.scrollTo(0, 0);
+    if (n === 5) showResults();
 }
 
 function updateScore(pts) {
@@ -244,8 +272,6 @@ function updateScore(pts) {
     document.getElementById('score-display').innerText = score + " pts";
     let rankIdx = Math.min(Math.floor(score / 100), 3);
     document.getElementById('rank-badge').innerText = "🎓 " + ranks[rankIdx];
-
-    // Update Rank Cards
     document.querySelectorAll('.rank-card').forEach((c, i) => {
         c.classList.toggle('active-rank', i === rankIdx);
     });
@@ -268,11 +294,9 @@ function checkMission1() {
     Object.keys(answers).forEach(id => {
         if (document.getElementById(id).getAttribute('data-zone') === answers[id]) correct++;
     });
-
     let fb = document.getElementById('m1-feedback');
     fb.className = 'feedback-box show ' + (correct === 4 ? 'correct' : 'incorrect');
     fb.innerText = correct === 4 ? "Perfect! +100 pts" : "Some items are misplaced. Try again!";
-
     if (correct === 4) {
         updateScore(100);
         document.getElementById('m1-next').classList.remove('hidden');
@@ -318,10 +342,55 @@ function answerM4(isCorrect) {
     }
 }
 
-window.onload = () => {
+// Confetti
+function launchConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const colors = ['#F5A623','#1B5EAF','#1E7A3E','#fff','#e74c3c','#9b59b6','#f39c12'];
+    const pieces = Array.from({length: 200}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: Math.random() * 14 + 6,
+        h: Math.random() * 7 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 7,
+        vx: (Math.random() - 0.5) * 3,
+        vy: Math.random() * 4 + 2
+    }));
+    let frame = 0;
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+            ctx.save();
+            ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
+            ctx.rotate(p.rot * Math.PI / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+            p.x += p.vx; p.y += p.vy; p.rot += p.rotSpeed;
+            if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
+        });
+        frame++;
+        if (frame < 260) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    draw();
+}
+
+// Show results screen
+function showResults() {
+    const rankIdx = Math.min(Math.floor(score / 100), 3);
     document.getElementById('final-score').innerText = score;
-    document.getElementById('final-rank').innerText = ranks[Math.min(Math.floor(score / 100), 3)];
-};
+    document.getElementById('result-rank-title').innerText = rankTitles[rankIdx];
+    ['res-rank-0','res-rank-1','res-rank-2','res-rank-3'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('active-rank', i === rankIdx);
+    });
+    setTimeout(launchConfetti, 500);
+}
 </script>
 </body>
 </html>
