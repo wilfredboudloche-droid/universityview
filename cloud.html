@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lesson 8B: Cloud Concepts – UVA Academy</title>
+<style>
+  :root {
+    --blue: #1B5EAF;
+    --blue-dark: #134a8a;
+    --blue-light: #d6e4f7;
+    --green: #1E7A3E;
+    --green-light: #d4edda;
+    --gold: #F5A623;
+    --red: #C0392B;
+    --red-light: #fdecea;
+    --white: #ffffff;
+    --gray: #f4f6fb;
+    --text: #1a1a2e;
+    --shadow: 0 4px 18px rgba(27,94,175,0.13);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--gray);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--blue);
+    color: white;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .uva-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .uva-shield {
+    width: 48px; height: 56px;
+  }
+  .uva-title h1 { font-size: 1.25rem; font-weight: 800; letter-spacing: 1px; }
+  .uva-title p { font-size: 0.72rem; opacity: 0.85; letter-spacing: 2px; text-transform: uppercase; }
+  .header-meta { text-align: right; font-size: 0.78rem; opacity: 0.85; }
+  .header-meta strong { display: block; font-size: 1rem; }
+
+  /* Motto ribbon */
+  .motto-ribbon {
+    background: var(--green);
+    text-align: center;
+    padding: 6px 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: white;
+  }
+
+  /* ── HUD BAR ── */
+  .hud {
+    background: var(--blue-dark);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 28px;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.85rem;
+  }
+  .hud-rank {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .rank-badge {
+    background: var(--gold);
+    color: #333;
+    font-weight: 800;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    transition: all 0.4s;
+  }
+  .hud-score { font-weight: 700; font-size: 1rem; }
+  .hud-streak {
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 3px 12px;
+    font-size: 0.82rem;
+  }
+  .streak-fire { color: #ff9800; }
+  .progress-bar-wrap {
+    width: 100%;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    height: 7px;
+    margin-top: 4px;
+  }
+  .progress-bar-fill {
+    height: 7px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--gold), #ff9800);
+    transition: width 0.5s ease;
+  }
+
+  /* ── MAIN CONTENT ── */
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* Mission card */
+  .mission-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    border-left: 6px solid var(--blue);
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+  .mission-card.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .mission-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+  }
+  .mission-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--blue-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+  }
+  .mission-label {
+    font-size: 0.72rem; font-weight: 700; color: var(--blue);
+    text-transform: uppercase; letter-spacing: 2px;
+  }
+  .mission-title { font-size: 1.15rem; font-weight: 800; color: var(--text); }
+
+  .mission-desc {
+    font-size: 0.92rem; color: #444; margin-bottom: 20px; line-height: 1.6;
+  }
+
+  /* ── DRAG & DROP ── */
+  .dnd-container {
+    display: flex; gap: 20px; flex-wrap: wrap;
+  }
+  .dnd-terms {
+    flex: 1; min-width: 200px;
+  }
+  .dnd-zones {
+    flex: 2; min-width: 280px;
+  }
+  .dnd-terms h3, .dnd-zones h3 {
+    font-size: 0.8rem; font-weight: 700; color: var(--blue);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+  }
+  .drag-item {
+    background: var(--blue);
+    color: white;
+    border-radius: 8px;
+    padding: 9px 14px;
+    margin-bottom: 8px;
+    cursor: grab;
+    font-size: 0.88rem;
+    font-weight: 600;
+    user-select: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 2px solid transparent;
+  }
+  .drag-item:hover { transform: scale(1.03); box-shadow: 0 4px 12px rgba(27,94,175,0.3); }
+  .drag-item.dragging { opacity: 0.5; cursor: grabbing; }
+  .drag-item.used { opacity: 0.35; pointer-events: none; }
+
+  .drop-zone {
+    background: var(--gray);
+    border: 2px dashed #b0c4de;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    min-height: 52px;
+    transition: background 0.2s, border-color 0.2s;
+    position: relative;
+  }
+  .drop-zone.drag-over { background: var(--blue-light); border-color: var(--blue); }
+  .drop-zone-label {
+    font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 6px;
+  }
+  .drop-zone-placeholder {
+    font-size: 0.78rem; color: #aaa; font-style: italic;
+  }
+  .dropped-item {
+    background: var(--green);
+    color: white;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+    cursor: pointer;
+  }
+  .drop-zone.correct { border-color: var(--green); background: var(--green-light); }
+  .drop-zone.incorrect { border-color: var(--red); background: var(--red-light); }
+
+  /* ── SCENARIO / MCQ ── */
+  .scenario-box {
+    background: var(--blue-light);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    border-left: 4px solid var(--blue);
+  }
+  .scenario-box .scenario-tag {
+    font-size: 0.72rem; font-weight: 700; color: var(--blue);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+  }
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    background: white;
+    border: 2px solid #d0dce8;
+    border-radius: 10px;
+    padding: 12px 16px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: var(--blue); background: var(--blue-light); }
+  .choice-btn.correct { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 700; }
+  .choice-btn.incorrect { border-color: var(--red); background: var(--red-light); color: var(--red); }
+  .choice-btn:disabled { cursor: default; }
+  .choice-letter {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--blue-light); color: var(--blue);
+    font-weight: 800; font-size: 0.82rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .choice-btn.correct .choice-letter { background: var(--green); color: white; }
+  .choice-btn.incorrect .choice-letter { background: var(--red); color: white; }
+
+  /* ── FEEDBACK ── */
+  .feedback-box {
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .feedback-box.show { display: block; }
+  .feedback-box.correct { background: var(--green-light); color: var(--green); border: 1.5px solid var(--green); }
+  .feedback-box.incorrect { background: var(--red-light); color: var(--red); border: 1.5px solid var(--red); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 26px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.92rem;
+    font-weight: 700;
+    transition: all 0.2s;
+    margin-top: 16px;
+  }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+  .btn-success { background: var(--green); color: white; }
+  .btn-success:hover { background: #165e2f; transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ── STREAK POPUP ── */
+  .streak-popup {
+    position: fixed;
+    top: 80px; right: 20px;
+    background: var(--gold);
+    color: #333;
+    font-weight: 800;
+    font-size: 1.1rem;
+    padding: 12px 22px;
+    border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+    z-index: 9999;
+    display: none;
+    animation: popIn 0.4s ease;
+  }
+  @keyframes popIn {
+    0% { transform: scale(0.5) translateY(-20px); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ── CONFETTI ── */
+  .confetti-piece {
+    position: fixed;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    z-index: 9998;
+    pointer-events: none;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ── BADGE OVERLAY ── */
+  .badge-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+  }
+  .badge-overlay.show { display: flex; }
+  .badge-card {
+    background: white;
+    border-radius: 20px;
+    padding: 36px 44px;
+    text-align: center;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+    max-width: 360px;
+    animation: popIn 0.5s ease;
+  }
+  .badge-icon { font-size: 4rem; margin-bottom: 12px; }
+  .badge-title { font-size: 1.4rem; font-weight: 800; color: var(--blue); margin-bottom: 6px; }
+  .badge-sub { font-size: 0.9rem; color: #555; margin-bottom: 20px; }
+
+  /* ── RESULTS SCREEN ── */
+  #results-screen {
+    display: none;
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 36px 32px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+  }
+  #results-screen.show { display: block; }
+  .results-trophy { font-size: 4rem; margin-bottom: 12px; }
+  .results-title { font-size: 1.6rem; font-weight: 800; color: var(--blue); margin-bottom: 8px; }
+  .results-score { font-size: 2.5rem; font-weight: 900; color: var(--green); margin: 12px 0; }
+  .results-rank {
+    display: inline-block;
+    background: var(--gold);
+    color: #333;
+    font-weight: 800;
+    padding: 6px 22px;
+    border-radius: 20px;
+    font-size: 1rem;
+    margin-bottom: 18px;
+  }
+  .results-breakdown {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 20px 0;
+  }
+  .result-stat {
+    background: var(--gray);
+    border-radius: 12px;
+    padding: 14px 20px;
+    min-width: 110px;
+  }
+  .result-stat .stat-val { font-size: 1.6rem; font-weight: 900; color: var(--blue); }
+  .result-stat .stat-lbl { font-size: 0.75rem; color: #666; margin-top: 2px; }
+
+  /* ── INTRO SCREEN ── */
+  #intro-screen {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 36px 32px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .intro-icon { font-size: 3.5rem; margin-bottom: 12px; }
+  .intro-title { font-size: 1.5rem; font-weight: 800; color: var(--blue); margin-bottom: 8px; }
+  .intro-sub { font-size: 0.92rem; color: #555; margin-bottom: 20px; line-height: 1.6; }
+  .objectives-list {
+    text-align: left;
+    background: var(--blue-light);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--text);
+  }
+  .objectives-list li { margin-left: 18px; }
+
+  /* ── MISSION NAV ── */
+  .mission-nav {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .nav-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #dde4ef;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 700; color: #888;
+    transition: all 0.3s;
+  }
+  .nav-dot.done { background: var(--green); color: white; }
+  .nav-dot.active { background: var(--blue); color: white; transform: scale(1.15); }
+
+  /* ── LABELING DIAGRAM ── */
+  .diagram-wrap {
+    position: relative;
+    background: var(--blue-light);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .cloud-diagram {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .diagram-box {
+    background: white;
+    border: 2px dashed #b0c4de;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+    min-height: 80px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  .diagram-box.filled { border-style: solid; border-color: var(--green); background: var(--green-light); }
+  .diagram-box.wrong { border-color: var(--red); background: var(--red-light); }
+  .diagram-box-label { font-size: 0.72rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+  .diagram-box-content { font-size: 0.88rem; font-weight: 700; color: var(--green); }
+  .diagram-box-hint { font-size: 0.75rem; color: #aaa; font-style: italic; }
+
+  .label-options {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
+  }
+  .label-chip {
+    background: var(--blue);
+    color: white;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+  .label-chip:hover { background: var(--blue-dark); transform: scale(1.05); }
+  .label-chip.selected { background: var(--gold); color: #333; border-color: #c8860a; }
+  .label-chip.used { opacity: 0.3; pointer-events: none; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .header-top { padding: 10px 14px; }
+    main { padding: 14px 8px 50px; }
+    .mission-card { padding: 18px 14px; }
+    .dnd-container { flex-direction: column; }
+    .cloud-diagram { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-top">
+    <div class="uva-logo">
+      <svg class="uva-shield" viewBox="0 0 48 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 2L4 10V30C4 42 14 52 24 54C34 52 44 42 44 30V10L24 2Z" fill="#1E7A3E" stroke="white" stroke-width="2"/>
+        <path d="M24 8L10 14V30C10 39 17 47 24 49C31 47 38 39 38 30V14L24 8Z" fill="#1B5EAF"/>
+        <text x="24" y="34" text-anchor="middle" fill="white" font-size="14" font-weight="900" font-family="Arial">UVA</text>
+      </svg>
+      <div class="uva-title">
+        <h1>University View Academy</h1>
+        <p>Computer Architecture · Lesson 8B</p>
+      </div>
+    </div>
+    <div class="header-meta">
+      <strong>☁️ Cloud Concepts</strong>
+      A+ Core 2 – Domain 4.2
+    </div>
+  </div>
+  <div class="motto-ribbon">✦ Virtue  ·  Vigor  ·  Vision ✦</div>
+</header>
+
+<!-- HUD -->
+<div class="hud">
+  <div class="hud-rank">
+    🎖️ Rank: <span class="rank-badge" id="rank-label">Trainee</span>
+  </div>
+  <div class="hud-score">⭐ Score: <span id="score-display">0</span></div>
+  <div class="hud-streak" id="streak-display">🔥 Streak: 0</div>
+  <div style="width:100%">
+    <div style="font-size:0.72rem;opacity:0.7;margin-bottom:3px;">Mission Progress</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- STREAK POPUP -->
+<div class="streak-popup" id="streak-popup">🔥 3 in a Row!</div>
+
+<!-- BADGE OVERLAY -->
+<div class="badge-overlay" id="badge-overlay">
+  <div class="badge-card">
+    <div class="badge-icon" id="badge-icon">🏅</div>
+    <div class="badge-title" id="badge-title">Rank Up!</div>
+    <div class="badge-sub" id="badge-sub">You've earned a new rank!</div>
+    <button class="btn btn-primary" onclick="closeBadge()">Continue Mission ➜</button>
+  </div>
+</div>
+
+<main>
+  <!-- MISSION NAV DOTS -->
+  <div class="mission-nav" id="mission-nav"></div>
+
+  <!-- INTRO SCREEN -->
+  <div id="intro-screen">
+    <div class="intro-icon">☁️</div>
+    <div class="intro-title">Cloud Concepts: Mission Briefing</div>
+    <div class="intro-sub">
+      Welcome, UVA Cadet! Your mission is to master <strong>Cloud Computing Fundamentals</strong>.<br>
+      Complete all 7 missions to earn your Cloud Expert badge and prove your A+ readiness.
+    </div>
+    <ul class="objectives-list">
+      <li>Identify key cloud characteristics: elasticity & metered utilization</li>
+      <li>Compare public, private, hybrid, and community cloud models</li>
+      <li>Differentiate IaaS, PaaS, SaaS, and DaaS service models</li>
+      <li>Explain file synchronization and Content Delivery Networks (CDNs)</li>
+    </ul>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;">
+      <span style="background:var(--blue-light);color:var(--blue);border-radius:8px;padding:6px 14px;font-size:0.82rem;font-weight:700;">⏱ 10–15 min</span>
+      <span style="background:var(--green-light);color:var(--green);border-radius:8px;padding:6px 14px;font-size:0.82rem;font-weight:700;">7 Missions</span>
+      <span style="background:#fff3cd;color:#856404;border-radius:8px;padding:6px 14px;font-size:0.82rem;font-weight:700;">🏆 Earn Ranks</span>
+    </div>
+    <button class="btn btn-primary" onclick="startGame()" style="font-size:1rem;padding:14px 36px;">🚀 Begin Missions</button>
+  </div>
+
+  <!-- MISSION CARDS (generated by JS) -->
+  <div id="missions-container"></div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="results-screen">
+    <div class="results-trophy" id="results-trophy">🏆</div>
+    <div class="results-title">Mission Complete, Cadet!</div>
+    <div class="results-score" id="final-score">0 / 700</div>
+    <div class="results-rank" id="final-rank">Trainee</div>
+    <p style="color:#555;font-size:0.9rem;margin-bottom:16px;" id="results-msg">Keep training to reach Master rank!</p>
+    <div class="results-breakdown" id="results-breakdown"></div>
+    <div style="margin-top:8px;font-size:0.82rem;color:#888;">A+ Core 2 – Domain 4.2 · University View Academy</div>
+    <button class="btn btn-primary" onclick="restartGame()" style="margin-top:20px;">🔄 Retry Missions</button>
+  </div>
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════════════
+let score = 0;
+let streak = 0;
+let maxStreak = 0;
+let currentMission = 0;
+let missionResults = [];
+const MISSIONS_COUNT = 7;
+const RANKS = [
+  { name: 'Trainee',    min: 0,   icon: '🎓', msg: 'Keep studying, Cadet!' },
+  { name: 'Apprentice', min: 200, icon: '📘', msg: 'Good progress, Apprentice!' },
+  { name: 'Expert',     min: 400, icon: '⚡', msg: 'Impressive expertise!' },
+  { name: 'Master',     min: 600, icon: '🏆', msg: 'Cloud Master achieved!' },
+];
+
+function getRank(s) {
+  let r = RANKS[0];
+  for (const rank of RANKS) { if (s >= rank.min) r = rank; }
+  return r;
+}
+
+function updateHUD() {
+  document.getElementById('score-display').textContent = score;
+  document.getElementById('streak-display').textContent = `🔥 Streak: ${streak}`;
+  const rank = getRank(score);
+  document.getElementById('rank-label').textContent = rank.name;
+  const pct = Math.min(100, (currentMission / MISSIONS_COUNT) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function addScore(pts) {
+  const prev = getRank(score);
+  score += pts;
+  const next = getRank(score);
+  updateHUD();
+  if (next.name !== prev.name) {
+    setTimeout(() => showBadge(next.icon, `Rank Up: ${next.name}!`, next.msg), 600);
+  }
+}
+
+function handleStreak(correct) {
+  if (correct) {
+    streak++;
+    if (streak > maxStreak) maxStreak = streak;
+    if (streak === 3 || streak === 5 || streak === 7) showStreakPopup(streak);
+  } else {
+    streak = 0;
+  }
+  updateHUD();
+}
+
+function showStreakPopup(n) {
+  const el = document.getElementById('streak-popup');
+  el.textContent = `🔥 ${n} in a Row! +Bonus`;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 2200);
+}
+
+function showBadge(icon, title, sub) {
+  document.getElementById('badge-icon').textContent = icon;
+  document.getElementById('badge-title').textContent = title;
+  document.getElementById('badge-sub').textContent = sub;
+  document.getElementById('badge-overlay').classList.add('show');
+}
+
+function closeBadge() {
+  document.getElementById('badge-overlay').classList.remove('show');
+}
+
+function launchConfetti() {
+  const colors = ['#1B5EAF','#1E7A3E','#F5A623','#e74c3c','#9b59b6','#3498db'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.top = '-10px';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.width = (8 + Math.random() * 8) + 'px';
+    el.style.height = (8 + Math.random() * 8) + 'px';
+    el.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    el.style.animationDelay = Math.random() * 0.8 + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  MISSION DATA
+// ═══════════════════════════════════════════════════════
+const missions = [
+  // MISSION 1 – MCQ: Cloud Characteristics
+  {
+    type: 'mcq',
+    icon: '☁️',
+    label: 'Mission 1 of 7',
+    title: 'Cloud Characteristics Intel',
+    desc: 'A company\'s web app suddenly gets 10× more traffic during a product launch. The cloud platform automatically adds more servers, then removes them when traffic drops. Which cloud characteristic does this describe?',
+    scenario: '🏢 Scenario: TechCorp\'s e-commerce site goes viral. Traffic spikes from 1,000 to 10,000 users in minutes. The cloud responds instantly — no human intervention needed.',
+    choices: [
+      { text: 'Metered utilization — you pay only for what you use', correct: false },
+      { text: 'Elasticity — resources scale up/down automatically with demand', correct: true },
+      { text: 'Broad network access — available from any device', correct: false },
+      { text: 'Resource pooling — multiple customers share infrastructure', correct: false },
+    ],
+    feedback: {
+      correct: '✅ Correct! Elasticity means cloud resources automatically scale to match demand — up during spikes, down when quiet. This is a core NIST cloud characteristic.',
+      incorrect: '❌ Not quite. Elasticity is the ability to rapidly scale resources up or down automatically. Metered utilization is about pay-per-use billing.',
+    },
+    points: 100,
+  },
+  // MISSION 2 – MCQ: Metered Utilization
+  {
+    type: 'mcq',
+    icon: '💰',
+    label: 'Mission 2 of 7',
+    title: 'Billing Model Recon',
+    desc: 'A startup uses a cloud server for 3 hours to process data, then shuts it down. They are billed only for those 3 hours. What cloud concept is this?',
+    scenario: '💡 Scenario: DataStart Inc. runs a nightly batch job from 2 AM–5 AM. Their monthly bill reflects exactly 90 hours of compute time — nothing more.',
+    choices: [
+      { text: 'Elasticity — resources scale automatically', correct: false },
+      { text: 'On-demand self-service — provision without human interaction', correct: false },
+      { text: 'Metered utilization — pay only for resources consumed', correct: true },
+      { text: 'Rapid elasticity — instant provisioning', correct: false },
+    ],
+    feedback: {
+      correct: '✅ Exactly! Metered utilization (pay-as-you-go) means you\'re billed only for what you consume — like a utility bill for electricity.',
+      incorrect: '❌ Close! Metered utilization is the "pay-per-use" model. Think of it like a water meter — you only pay for what flows through.',
+    },
+    points: 100,
+  },
+  // MISSION 3 – DRAG & DROP: Deployment Models
+  {
+    type: 'dragdrop',
+    icon: '🗺️',
+    label: 'Mission 3 of 7',
+    title: 'Deployment Model Mapping',
+    desc: 'Match each cloud deployment model to its correct definition. Drag each term to the right zone.',
+    items: [
+      { id: 'pub', text: 'Public Cloud' },
+      { id: 'pri', text: 'Private Cloud' },
+      { id: 'hyb', text: 'Hybrid Cloud' },
+      { id: 'com', text: 'Community Cloud' },
+    ],
+    zones: [
+      { id: 'pub', label: 'Owned & operated by a 3rd-party provider (AWS, Azure, GCP). Open to the general public.', answer: 'pub' },
+      { id: 'pri', label: 'Dedicated infrastructure for a single organization. Hosted on-premises or by a provider.', answer: 'pri' },
+      { id: 'hyb', label: 'Combines public + private clouds, allowing data/apps to move between them.', answer: 'hyb' },
+      { id: 'com', label: 'Shared by several organizations with common concerns (e.g., government agencies, hospitals).', answer: 'com' },
+    ],
+    points: 100,
+  },
+  // MISSION 4 – LABELING: Service Models
+  {
+    type: 'label',
+    icon: '🧩',
+    label: 'Mission 4 of 7',
+    title: 'Service Model Classification',
+    desc: 'Select the correct service model label for each scenario below. Click a label, then click the matching scenario box.',
+    labels: ['IaaS', 'PaaS', 'SaaS', 'DaaS'],
+    boxes: [
+      { id: 'iaas', hint: 'A company rents virtual machines, storage, and networking. They manage the OS and apps themselves.', answer: 'IaaS', example: 'e.g., AWS EC2, Azure VMs' },
+      { id: 'paas', hint: 'Developers deploy their code without managing servers or OS. The platform handles runtime and middleware.', answer: 'PaaS', example: 'e.g., Google App Engine, Heroku' },
+      { id: 'saas', hint: 'Users access a fully managed application via browser. No installation needed.', answer: 'SaaS', example: 'e.g., Google Workspace, Microsoft 365' },
+      { id: 'daas', hint: 'A virtual desktop is streamed to any device. The OS and apps run in the cloud data center.', answer: 'DaaS', example: 'e.g., Amazon WorkSpaces, Citrix' },
+    ],
+    points: 100,
+  },
+  // MISSION 5 – MCQ: IaaS vs PaaS vs SaaS
+  {
+    type: 'mcq',
+    icon: '🔧',
+    label: 'Mission 5 of 7',
+    title: 'Service Model Field Test',
+    desc: 'A hospital uses a cloud-hosted electronic health records (EHR) system. Doctors log in via browser — no software to install, no servers to manage. Which service model is this?',
+    scenario: '🏥 Scenario: MedCenter Hospital subscribes to CloudEHR. Staff access patient records from any device. The vendor handles all updates, backups, and security patches.',
+    choices: [
+      { text: 'IaaS — the hospital rents virtual machines from the vendor', correct: false },
+      { text: 'PaaS — developers build the EHR on a cloud platform', correct: false },
+      { text: 'SaaS — fully managed software delivered over the internet', correct: true },
+      { text: 'DaaS — virtual desktops stream the EHR to devices', correct: false },
+    ],
+    feedback: {
+      correct: '✅ Correct! SaaS delivers complete, ready-to-use applications over the internet. The vendor manages everything — infrastructure, platform, and software.',
+      incorrect: '❌ Not quite. When users access a fully managed application via browser with no installation, that\'s SaaS (Software as a Service).',
+    },
+    points: 100,
+  },
+  // MISSION 6 – MCQ: File Sync
+  {
+    type: 'mcq',
+    icon: '🔄',
+    label: 'Mission 6 of 7',
+    title: 'File Sync Intelligence',
+    desc: 'A student edits a document on their laptop. Seconds later, the updated file appears on their phone and tablet automatically. What technology enables this?',
+    scenario: '📱 Scenario: Alex saves "CloudReport.docx" on her school laptop. She opens her phone on the bus — the latest version is already there. No USB, no email.',
+    choices: [
+      { text: 'CDN — content is cached at edge servers near the user', correct: false },
+      { text: 'Cloud file synchronization — files sync across devices via the cloud', correct: true },
+      { text: 'Elasticity — resources scale to match file size', correct: false },
+      { text: 'DaaS — a virtual desktop streams the file', correct: false },
+    ],
+    feedback: {
+      correct: '✅ Right! Cloud file synchronization (e.g., Google Drive, OneDrive, Dropbox) keeps files updated across all linked devices in real time.',
+      incorrect: '❌ This is cloud file synchronization — services like Google Drive or OneDrive automatically sync changes across all your devices.',
+    },
+    points: 100,
+  },
+  // MISSION 7 – MCQ: CDN
+  {
+    type: 'mcq',
+    icon: '🌐',
+    label: 'Mission 7 of 7',
+    title: 'CDN Final Ops',
+    desc: 'A video streaming company serves users in 50 countries. Instead of all traffic hitting one central server, copies of videos are stored at servers worldwide. Users connect to the nearest one. What is this system called?',
+    scenario: '🎬 Scenario: StreamFlix has 200M users globally. A user in Tokyo loads a video in 0.3 seconds. A user in Brazil loads the same video just as fast — from a local server.',
+    choices: [
+      { text: 'Cloud file synchronization — files sync across devices', correct: false },
+      { text: 'Private cloud — dedicated servers for StreamFlix', correct: false },
+      { text: 'Content Delivery Network (CDN) — distributed edge servers cache content near users', correct: true },
+      { text: 'Hybrid cloud — combining on-premises and cloud servers', correct: false },
+    ],
+    feedback: {
+      correct: '✅ Excellent! A CDN distributes cached content to edge servers worldwide, reducing latency by serving users from the nearest location. Examples: Cloudflare, Akamai, AWS CloudFront.',
+      incorrect: '❌ A Content Delivery Network (CDN) caches content at geographically distributed edge servers, so users load content from the nearest server — minimizing latency.',
+    },
+    points: 100,
+  },
+];
+
+// ═══════════════════════════════════════════════════════
+//  RENDER ENGINE
+// ═══════════════════════════════════════════════════════
+function buildMissionNav() {
+  const nav = document.getElementById('mission-nav');
+  nav.innerHTML = '';
+  for (let i = 0; i < MISSIONS_COUNT; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot' + (i === currentMission ? ' active' : '') + (missionResults[i] !== undefined ? ' done' : '');
+    dot.textContent = i + 1;
+    nav.appendChild(dot);
+  }
+}
+
+function renderMission(idx) {
+  const container = document.getElementById('missions-container');
+  container.innerHTML = '';
+  const m = missions[idx];
+  const card = document.createElement('div');
+  card.className = 'mission-card active';
+  card.id = 'mission-card-' + idx;
+
+  let inner = `
+    <div class="mission-header">
+      <div class="mission-icon">${m.icon}</div>
+      <div>
+        <div class="mission-label">${m.label}</div>
+        <div class="mission-title">${m.title}</div>
+      </div>
+    </div>
+    <div class="mission-desc">${m.desc}</div>
+  `;
+
+  if (m.type === 'mcq') {
+    inner += renderMCQ(m, idx);
+  } else if (m.type === 'dragdrop') {
+    inner += renderDragDrop(m, idx);
+  } else if (m.type === 'label') {
+    inner += renderLabel(m, idx);
+  }
+
+  card.innerHTML = inner;
+  container.appendChild(card);
+
+  if (m.type === 'dragdrop') initDragDrop(m, idx);
+  if (m.type === 'label') initLabel(m, idx);
+}
+
+// ── MCQ ──
+function renderMCQ(m, idx) {
+  let html = `<div class="scenario-box"><div class="scenario-tag">📋 Scenario</div>${m.scenario}</div>`;
+  html += `<div class="choices" id="choices-${idx}">`;
+  const letters = ['A','B','C','D'];
+  m.choices.forEach((c, ci) => {
+    html += `<button class="choice-btn" onclick="selectChoice(${idx},${ci})" id="choice-${idx}-${ci}">
+      <span class="choice-letter">${letters[ci]}</span>${c.text}
+    </button>`;
+  });
+  html += `</div>`;
+  html += `<div class="feedback-box" id="feedback-${idx}"></div>`;
+  html += `<button class="btn btn-success" id="next-btn-${idx}" style="display:none" onclick="nextMission()">Next Mission ➜</button>`;
+  return html;
+}
+
+function selectChoice(mIdx, cIdx) {
+  const m = missions[mIdx];
+  const correct = m.choices[cIdx].correct;
+  const btns = document.querySelectorAll(`#choices-${mIdx} .choice-btn`);
+  btns.forEach(b => b.disabled = true);
+  btns[cIdx].classList.add(correct ? 'correct' : 'incorrect');
+  if (!correct) {
+    m.choices.forEach((c, i) => { if (c.correct) btns[i].classList.add('correct'); });
+  }
+  const fb = document.getElementById(`feedback-${mIdx}`);
+  fb.textContent = correct ? m.feedback.correct : m.feedback.incorrect;
+  fb.className = 'feedback-box show ' + (correct ? 'correct' : 'incorrect');
+  handleStreak(correct);
+  if (correct) { addScore(m.points); launchConfetti(); }
+  missionResults[mIdx] = correct;
+  document.getElementById(`next-btn-${mIdx}`).style.display = 'inline-flex';
+  buildMissionNav();
+}
+
+// ── DRAG & DROP ──
+function renderDragDrop(m, idx) {
+  let html = `<div class="dnd-container">`;
+  html += `<div class="dnd-terms"><h3>☁️ Cloud Models</h3>`;
+  m.items.forEach(item => {
+    html += `<div class="drag-item" id="drag-${idx}-${item.id}" draggable="true" data-id="${item.id}">${item.text}</div>`;
+  });
+  html += `</div><div class="dnd-zones"><h3>📋 Definitions</h3>`;
+  m.zones.forEach(zone => {
+    html += `<div class="drop-zone" id="zone-${idx}-${zone.id}" data-answer="${zone.answer}">
+      <div class="drop-zone-label">${zone.label}</div>
+      <div class="drop-zone-placeholder" id="placeholder-${idx}-${zone.id}">Drop here…</div>
+    </div>`;
+  });
+  html += `</div></div>`;
+  html += `<div class="feedback-box" id="feedback-${idx}"></div>`;
+  html += `<button class="btn btn-primary" id="check-btn-${idx}" onclick="checkDragDrop(${idx})" style="margin-right:8px">✅ Check Answers</button>`;
+  html += `<button class="btn btn-success" id="next-btn-${idx}" style="display:none" onclick="nextMission()">Next Mission ➜</button>`;
+  return html;
+}
+
+function initDragDrop(m, idx) {
+  let draggedId = null;
+  document.querySelectorAll(`[id^="drag-${idx}-"]`).forEach(el => {
+    el.addEventListener('dragstart', e => {
+      draggedId = e.target.dataset.id;
+      e.target.classList.add('dragging');
+    });
+    el.addEventListener('dragend', e => e.target.classList.remove('dragging'));
+  });
+  document.querySelectorAll(`[id^="zone-${idx}-"]`).forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const zoneId = zone.id.split('-').pop();
+      // Remove from previous zone if any
+      document.querySelectorAll(`[id^="zone-${idx}-"]`).forEach(z => {
+        const prev = z.querySelector('.dropped-item');
+        if (prev && prev.dataset.id === draggedId) {
+          prev.remove();
+          const ph = document.getElementById(`placeholder-${idx}-${z.id.split('-').pop()}`);
+          if (ph) ph.style.display = 'block';
+          const origDrag = document.getElementById(`drag-${idx}-${draggedId}`);
+          if (origDrag) origDrag.classList.remove('used');
+        }
+      });
+      // Place in new zone
+      const existing = zone.querySelector('.dropped-item');
+      if (existing) {
+        const exId = existing.dataset.id;
+        existing.remove();
+        const origDrag = document.getElementById(`drag-${idx}-${exId}`);
+        if (origDrag) origDrag.classList.remove('used');
+        const ph2 = document.getElementById(`placeholder-${idx}-${zoneId}`);
+        if (ph2) ph2.style.display = 'block';
+      }
+      const ph = document.getElementById(`placeholder-${idx}-${zoneId}`);
+      if (ph) ph.style.display = 'none';
+      const chip = document.createElement('div');
+      chip.className = 'dropped-item';
+      chip.dataset.id = draggedId;
+      chip.textContent = m.items.find(i => i.id === draggedId).text;
+      chip.onclick = () => {
+        chip.remove();
+        if (ph) ph.style.display = 'block';
+        const origDrag = document.getElementById(`drag-${idx}-${draggedId}`);
+        if (origDrag) origDrag.classList.remove('used');
+      };
+      zone.appendChild(chip);
+      const origDrag = document.getElementById(`drag-${idx}-${draggedId}`);
+      if (origDrag) origDrag.classList.add('used');
+    });
+  });
+}
+
+function checkDragDrop(idx) {
+  const m = missions[idx];
+  let correct = 0;
+  m.zones.forEach(zone => {
+    const zoneEl = document.getElementById(`zone-${idx}-${zone.id}`);
+    const dropped = zoneEl.querySelector('.dropped-item');
+    if (dropped && dropped.dataset.id === zone.answer) {
+      zoneEl.classList.add('correct');
+      correct++;
+    } else {
+      zoneEl.classList.add('incorrect');
+    }
+  });
+  const allCorrect = correct === m.zones.length;
+  const fb = document.getElementById(`feedback-${idx}`);
+  fb.className = 'feedback-box show ' + (allCorrect ? 'correct' : 'incorrect');
+  fb.textContent = allCorrect
+    ? `✅ Perfect! All 4 deployment models correctly matched! Public = open to all; Private = single org; Hybrid = mixed; Community = shared sector.`
+    : `❌ ${correct}/4 correct. Review: Public (AWS/Azure) = open; Private = dedicated; Hybrid = both; Community = shared org group.`;
+  handleStreak(allCorrect);
+  if (allCorrect) { addScore(m.points); launchConfetti(); }
+  else if (correct >= 2) addScore(Math.round(m.points * 0.5));
+  missionResults[idx] = allCorrect;
+  document.getElementById(`check-btn-${idx}`).disabled = true;
+  document.getElementById(`next-btn-${idx}`).style.display = 'inline-flex';
+  buildMissionNav();
+}
+
+// ── LABEL ──
+let selectedLabel = null;
+function renderLabel(m, idx) {
+  let html = `<div class="label-options" id="label-opts-${idx}">`;
+  m.labels.forEach(lbl => {
+    html += `<div class="label-chip" id="lchip-${idx}-${lbl}" onclick="selectLabel('${lbl}',${idx})">${lbl}</div>`;
+  });
+  html += `</div>`;
+  html += `<div class="cloud-diagram" id="diagram-${idx}">`;
+  m.boxes.forEach(box => {
+    html += `<div class="diagram-box" id="dbox-${idx}-${box.id}" onclick="placeLabel('${box.id}',${idx})">
+      <div class="diagram-box-label">${box.example}</div>
+      <div class="diagram-box-hint" id="dhint-${idx}-${box.id}">${box.hint}</div>
+      <div class="diagram-box-content" id="dcontent-${idx}-${box.id}"></div>
+    </div>`;
+  });
+  html += `</div>`;
+  html += `<div class="feedback-box" id="feedback-${idx}"></div>`;
+  html += `<button class="btn btn-primary" id="check-btn-${idx}" onclick="checkLabel(${idx})">✅ Check Labels</button>`;
+  html += `<button class="btn btn-success" id="next-btn-${idx}" style="display:none" onclick="nextMission()">Next Mission ➜</button>`;
+  return html;
+}
+
+const labelState = {};
+function initLabel(m, idx) {
+  labelState[idx] = {};
+  selectedLabel = null;
+}
+
+function selectLabel(lbl, idx) {
+  selectedLabel = lbl;
+  document.querySelectorAll(`[id^="lchip-${idx}-"]`).forEach(el => el.classList.remove('selected'));
+  document.getElementById(`lchip-${idx}-${lbl}`).classList.add('selected');
+}
+
+function placeLabel(boxId, idx) {
+  if (!selectedLabel) return;
+  const m = missions[idx];
+  // Remove from previous box if same label used
+  Object.keys(labelState[idx]).forEach(k => {
+    if (labelState[idx][k] === selectedLabel && k !== boxId) {
+      delete labelState[idx][k];
+      document.getElementById(`dcontent-${idx}-${k}`).textContent = '';
+      document.getElementById(`dbox-${idx}-${k}`).classList.remove('filled','wrong');
+    }
+  });
+  labelState[idx][boxId] = selectedLabel;
+  document.getElementById(`dcontent-${idx}-${boxId}`).textContent = selectedLabel;
+  document.getElementById(`dbox-${idx}-${boxId}`).classList.add('filled');
+  // Deselect chip
+  document.getElementById(`lchip-${idx}-${selectedLabel}`).classList.remove('selected');
+  selectedLabel = null;
+}
+
+function checkLabel(idx) {
+  const m = missions[idx];
+  let correct = 0;
+  m.boxes.forEach(box => {
+    const placed = labelState[idx][box.id];
+    const boxEl = document.getElementById(`dbox-${idx}-${box.id}`);
+    if (placed === box.answer) {
+      boxEl.classList.remove('wrong'); boxEl.classList.add('filled');
+      correct++;
+    } else {
+      boxEl.classList.remove('filled'); boxEl.classList.add('wrong');
+      document.getElementById(`dcontent-${idx}-${box.id}`).textContent = placed ? `✗ ${placed} → ${box.answer}` : `→ ${box.answer}`;
+    }
+  });
+  const allCorrect = correct === m.boxes.length;
+  const fb = document.getElementById(`feedback-${idx}`);
+  fb.className = 'feedback-box show ' + (allCorrect ? 'correct' : 'incorrect');
+  fb.textContent = allCorrect
+    ? '✅ All 4 service models correctly labeled! IaaS=infrastructure, PaaS=platform, SaaS=software, DaaS=desktop — all delivered as a service.'
+    : `❌ ${correct}/4 correct. Remember: IaaS=VMs/storage, PaaS=dev platform, SaaS=ready-to-use apps, DaaS=virtual desktops.`;
+  handleStreak(allCorrect);
+  if (allCorrect) { addScore(m.points); launchConfetti(); }
+  else if (correct >= 2) addScore(Math.round(m.points * 0.5));
+  missionResults[idx] = allCorrect;
+  document.getElementById(`check-btn-${idx}`).disabled = true;
+  document.getElementById(`next-btn-${idx}`).style.display = 'inline-flex';
+  buildMissionNav();
+}
+
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════
+function startGame() {
+  document.getElementById('intro-screen').style.display = 'none';
+  document.getElementById('mission-nav').style.display = 'flex';
+  currentMission = 0;
+  buildMissionNav();
+  renderMission(0);
+  updateHUD();
+}
+
+function nextMission() {
+  currentMission++;
+  if (currentMission >= MISSIONS_COUNT) {
+    showResults();
+  } else {
+    buildMissionNav();
+    renderMission(currentMission);
+    updateHUD();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function showResults() {
+  document.getElementById('missions-container').innerHTML = '';
+  document.getElementById('mission-nav').style.display = 'none';
+  const rs = document.getElementById('results-screen');
+  rs.classList.add('show');
+  const rank = getRank(score);
+  const pct = Math.round((score / (MISSIONS_COUNT * 100)) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${MISSIONS_COUNT * 100}`;
+  document.getElementById('final-rank').textContent = `${rank.icon} ${rank.name}`;
+  document.getElementById('results-trophy').textContent = rank.icon;
+  document.getElementById('results-msg').textContent = rank.msg;
+  const correct = missionResults.filter(Boolean).length;
+  document.getElementById('results-breakdown').innerHTML = `
+    <div class="result-stat"><div class="stat-val">${correct}/${MISSIONS_COUNT}</div><div class="stat-lbl">Missions Passed</div></div>
+    <div class="result-stat"><div class="stat-val">${pct}%</div><div class="stat-lbl">Accuracy</div></div>
+    <div class="result-stat"><div class="stat-val">${maxStreak}</div><div class="stat-lbl">Best Streak</div></div>
+    <div class="result-stat"><div class="stat-val">${score}</div><div class="stat-lbl">Total Score</div></div>
+  `;
+  launchConfetti();
+  if (score >= 600) setTimeout(() => showBadge('🏆', 'Cloud Master!', 'You\'ve mastered all cloud concepts. A+ ready!'), 1000);
+  else if (score >= 400) setTimeout(() => showBadge('⚡', 'Cloud Expert!', 'Strong performance! Review any missed missions.'), 1000);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restartGame() {
+  score = 0; streak = 0; maxStreak = 0; currentMission = 0; missionResults = [];
+  selectedLabel = null;
+  document.getElementById('results-screen').classList.remove('show');
+  document.getElementById('intro-screen').style.display = 'block';
+  document.getElementById('mission-nav').style.display = 'none';
+  document.getElementById('missions-container').innerHTML = '';
+  updateHUD();
+}
+
+// Init
+document.getElementById('mission-nav').style.display = 'none';
+updateHUD();
+</script>
+</body>
+</html>
