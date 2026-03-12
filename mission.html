@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UVA | Google Drive Mastery Mission</title>
+<style>
+  :root {
+    --uva-blue: #1B5EAF;
+    --uva-blue-dark: #134a8a;
+    --uva-blue-light: #d6e4f7;
+    --uva-green: #1E7A3E;
+    --uva-green-light: #d4edda;
+    --gold: #F5A623;
+    --red: #D0021B;
+    --white: #ffffff;
+    --gray-light: #f4f6fb;
+    --gray-mid: #dde3ef;
+    --gray-dark: #444;
+    --font: 'Segoe UI', Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--gray-light);
+    color: var(--gray-dark);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--uva-blue);
+    color: white;
+    padding: 14px 24px 0;
+    text-align: center;
+    position: relative;
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .school-name { font-size: 1.25rem; font-weight: 800; letter-spacing: 1px; }
+  .school-sub  { font-size: 0.75rem; opacity: .8; }
+  .rank-badge {
+    background: var(--gold);
+    color: #222;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .rank-icon { font-size: 1.1rem; }
+  .motto-ribbon {
+    background: var(--uva-green);
+    color: white;
+    font-style: italic;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    padding: 5px 0;
+    margin-top: 10px;
+    text-transform: uppercase;
+  }
+
+  /* ── SCORE BAR ── */
+  .score-bar {
+    background: var(--uva-blue-dark);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 24px; flex-wrap: wrap; gap: 8px;
+  }
+  .score-item { color: white; font-size: 0.82rem; display: flex; align-items: center; gap: 6px; }
+  .score-val  { font-weight: 700; font-size: 1rem; color: var(--gold); }
+  .streak-badge {
+    background: #ff6b35;
+    color: white;
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: none;
+    animation: pulse 0.5s ease;
+  }
+  .streak-badge.show { display: inline-block; }
+  @keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap { background: var(--gray-mid); height: 8px; }
+  .progress-fill {
+    height: 8px;
+    background: linear-gradient(90deg, var(--uva-green), #34c97a);
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* ── MISSION CARD ── */
+  .mission-card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(27,94,175,0.10);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .mission-header {
+    background: linear-gradient(135deg, var(--uva-blue), var(--uva-blue-dark));
+    color: white;
+    padding: 16px 22px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .mission-num {
+    background: var(--gold);
+    color: #222;
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1rem; flex-shrink: 0;
+  }
+  .mission-title { font-size: 1rem; font-weight: 700; }
+  .mission-subtitle { font-size: 0.78rem; opacity: .8; margin-top: 2px; }
+  .mission-body { padding: 22px; }
+
+  /* ── SCENARIO TEXT ── */
+  .scenario-box {
+    background: var(--uva-blue-light);
+    border-left: 4px solid var(--uva-blue);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+  .scenario-box strong { color: var(--uva-blue); }
+
+  /* ── CHOICES ── */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    background: white;
+    border: 2px solid var(--gray-mid);
+    border-radius: 10px;
+    padding: 13px 16px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    transition: all 0.2s;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--uva-blue);
+    background: var(--uva-blue-light);
+    transform: translateX(3px);
+  }
+  .choice-btn.correct  { border-color: var(--uva-green); background: var(--uva-green-light); }
+  .choice-btn.wrong    { border-color: var(--red); background: #fde8eb; }
+  .choice-btn:disabled { cursor: default; }
+  .choice-letter {
+    background: var(--uva-blue);
+    color: white;
+    border-radius: 6px;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+  }
+  .choice-btn.correct .choice-letter { background: var(--uva-green); }
+  .choice-btn.wrong   .choice-letter { background: var(--red); }
+
+  /* ── DRAG & DROP ── */
+  .drag-area { display: flex; gap: 18px; flex-wrap: wrap; }
+  .drag-col  { flex: 1; min-width: 200px; }
+  .drag-col h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1px; color: var(--uva-blue); margin-bottom: 10px; }
+  .drag-items { display: flex; flex-direction: column; gap: 8px; }
+  .drag-item {
+    background: var(--uva-blue);
+    color: white;
+    border-radius: 8px;
+    padding: 9px 13px;
+    font-size: 0.85rem;
+    cursor: grab;
+    user-select: none;
+    transition: opacity 0.2s, transform 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .drag-item:active { cursor: grabbing; opacity: 0.7; transform: scale(0.97); }
+  .drag-item.dragging { opacity: 0.4; }
+  .drop-zone {
+    border: 2px dashed var(--gray-mid);
+    border-radius: 8px;
+    padding: 10px;
+    min-height: 52px;
+    display: flex; flex-direction: column; gap: 6px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .drop-zone.over { border-color: var(--uva-blue); background: var(--uva-blue-light); }
+  .drop-zone.correct-zone { border-color: var(--uva-green); background: var(--uva-green-light); }
+  .drop-zone.wrong-zone   { border-color: var(--red); background: #fde8eb; }
+  .drop-label { font-size: 0.82rem; font-weight: 700; color: var(--gray-dark); margin-bottom: 4px; }
+
+  /* ── FEEDBACK ── */
+  .feedback-box {
+    border-radius: 10px;
+    padding: 13px 16px;
+    margin-top: 16px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback-box.show { display: block; animation: fadeIn 0.3s ease; }
+  .feedback-box.correct-fb { background: var(--uva-green-light); border-left: 4px solid var(--uva-green); color: #145a2e; }
+  .feedback-box.wrong-fb   { background: #fde8eb; border-left: 4px solid var(--red); color: #8b0011; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 22px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--uva-blue); color: white; }
+  .btn-primary:hover { background: var(--uva-blue-dark); transform: translateY(-1px); }
+  .btn-green   { background: var(--uva-green); color: white; }
+  .btn-green:hover { background: #165e30; transform: translateY(-1px); }
+  .btn-gold    { background: var(--gold); color: #222; }
+  .btn-gold:hover { background: #e09510; transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+  .btn-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── INTRO SCREEN ── */
+  .intro-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(27,94,175,0.12);
+    padding: 36px 32px;
+    text-align: center;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .intro-icon { font-size: 3.5rem; margin-bottom: 12px; }
+  .intro-card h1 { color: var(--uva-blue); font-size: 1.6rem; margin-bottom: 8px; }
+  .intro-card p  { color: #555; font-size: 0.93rem; line-height: 1.7; margin-bottom: 16px; }
+  .objectives-list {
+    background: var(--gray-light);
+    border-radius: 10px;
+    padding: 16px 20px;
+    text-align: left;
+    margin-bottom: 22px;
+  }
+  .objectives-list h3 { color: var(--uva-blue); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .objectives-list li { font-size: 0.88rem; line-height: 1.6; margin-left: 18px; color: #444; }
+  .rank-ladder { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+  .rank-step {
+    background: var(--uva-blue-light);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--uva-blue);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .rank-step.active-rank { background: var(--gold); color: #222; }
+
+  /* ── RESULTS SCREEN ── */
+  .results-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(27,94,175,0.12);
+    padding: 36px 32px;
+    text-align: center;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .results-badge { font-size: 4rem; margin-bottom: 10px; }
+  .results-card h2 { color: var(--uva-blue); font-size: 1.5rem; margin-bottom: 6px; }
+  .results-rank { font-size: 1.1rem; font-weight: 700; color: var(--uva-green); margin-bottom: 16px; }
+  .score-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 20px 0; }
+  .score-cell { background: var(--gray-light); border-radius: 10px; padding: 14px 10px; }
+  .score-cell .val { font-size: 1.6rem; font-weight: 800; color: var(--uva-blue); }
+  .score-cell .lbl { font-size: 0.75rem; color: #777; margin-top: 3px; }
+  .standards-note {
+    background: var(--uva-blue-light);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.82rem;
+    color: var(--uva-blue-dark);
+    margin-top: 16px;
+    text-align: left;
+  }
+
+  /* ── CONFETTI ── */
+  #confetti-canvas {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    top: 80px; right: 20px;
+    background: var(--uva-blue);
+    color: white;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    z-index: 1000;
+    transform: translateX(200px);
+    opacity: 0;
+    transition: all 0.4s ease;
+    max-width: 260px;
+  }
+  .toast.show { transform: translateX(0); opacity: 1; }
+  .toast.gold  { background: var(--gold); color: #222; }
+  .toast.green { background: var(--uva-green); }
+
+  /* ── DRAG SUBMIT ── */
+  .drag-submit-row { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:600px){
+    .header-top { flex-direction: column; text-align: center; }
+    .score-bar   { justify-content: center; }
+    .drag-area   { flex-direction: column; }
+    .score-grid  { grid-template-columns: 1fr 1fr; }
+    .intro-card, .results-card { padding: 24px 16px; }
+  }
+
+  /* ── PERMISSION TABLE ── */
+  .perm-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 10px; }
+  .perm-table th { background: var(--uva-blue); color: white; padding: 8px 10px; text-align: left; }
+  .perm-table td { padding: 8px 10px; border-bottom: 1px solid var(--gray-mid); }
+  .perm-table tr:nth-child(even) td { background: var(--gray-light); }
+
+  /* ── STEP INDICATOR ── */
+  .step-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 18px; }
+  .step-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--gray-mid);
+    transition: background 0.3s;
+  }
+  .step-dot.done    { background: var(--uva-green); }
+  .step-dot.current { background: var(--uva-blue); transform: scale(1.3); }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  HEADER                                               -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="school-name">🎓 University View Academy</div>
+      <div class="school-sub">Computer Tech Literacy · Google Drive Mastery</div>
+    </div>
+    <div class="rank-badge">
+      <span class="rank-icon" id="rankIcon">🔰</span>
+      <span id="rankLabel">Trainee</span>
+    </div>
+  </div>
+  <div class="motto-ribbon">✦ Virtue · Vigor · Vision ✦</div>
+</div>
+
+<div class="score-bar">
+  <div class="score-item">⭐ Score: <span class="score-val" id="scoreDisplay">0</span></div>
+  <div class="score-item">
+    🔥 Streak: <span class="score-val" id="streakDisplay">0</span>
+    <span class="streak-badge" id="streakBadge">🔥 On Fire!</span>
+  </div>
+  <div class="score-item">📋 Mission: <span class="score-val" id="missionDisplay">0</span>/7</div>
+</div>
+<div class="progress-wrap">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  SCREENS                                              -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- ── INTRO ── -->
+  <div class="screen active" id="screen-intro">
+    <div class="intro-card">
+      <div class="intro-icon">☁️</div>
+      <h1>Google Drive Mastery Mission</h1>
+      <p>Welcome, UVA Cadet! You've been assigned to the <strong>Digital Collaboration Task Force</strong>. Complete 7 missions to earn your rank and prove your Google Drive expertise.</p>
+      <div class="objectives-list">
+        <h3>🎯 Mission Objectives</h3>
+        <ul>
+          <li>Analyze sharing permission levels for peer collaboration</li>
+          <li>Use revision history & suggesting mode for document management</li>
+          <li>Explain benefits of integrated tools: Gmail & Google Calendar</li>
+        </ul>
+      </div>
+      <div class="rank-ladder">
+        <div class="rank-step active-rank">🔰 Trainee</div>
+        <div style="align-self:center;color:#aaa">→</div>
+        <div class="rank-step">⚙️ Apprentice</div>
+        <div style="align-self:center;color:#aaa">→</div>
+        <div class="rank-step">🛡️ Expert</div>
+        <div style="align-self:center;color:#aaa">→</div>
+        <div class="rank-step">👑 Master</div>
+      </div>
+      <p style="font-size:0.8rem;color:#888;margin-bottom:20px;">📌 Aligned to Digital Literacy & Career Readiness Standards</p>
+      <button class="btn btn-primary" onclick="startGame()">🚀 Begin Missions</button>
+    </div>
+  </div>
+
+  <!-- ── GAME ── -->
+  <div class="screen" id="screen-game">
+    <div class="step-dots" id="stepDots"></div>
+    <div id="missionContainer"></div>
+  </div>
+
+  <!-- ── RESULTS ── -->
+  <div class="screen" id="screen-results">
+    <div class="results-card">
+      <div class="results-badge" id="resultsBadge">🏆</div>
+      <h2 id="resultsTitle">Mission Complete!</h2>
+      <div class="results-rank" id="resultsRank"></div>
+      <div class="score-grid">
+        <div class="score-cell"><div class="val" id="finalScore">0</div><div class="lbl">Total Score</div></div>
+        <div class="score-cell"><div class="val" id="finalCorrect">0</div><div class="lbl">Correct</div></div>
+        <div class="score-cell"><div class="val" id="finalStreak">0</div><div class="lbl">Best Streak</div></div>
+      </div>
+      <div class="standards-note">
+        📚 <strong>Standards Connection:</strong> This activity addresses Digital Literacy & Career Readiness Standards — specifically cloud collaboration, document version control, and integrated productivity workflows.
+      </div>
+      <div class="btn-row" style="justify-content:center;margin-top:22px;">
+        <button class="btn btn-gold" onclick="restartGame()">🔄 Retry Missions</button>
+        <button class="btn btn-green" onclick="showCertificate()">🎓 View Certificate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CERTIFICATE ── -->
+  <div class="screen" id="screen-cert">
+    <div class="results-card" style="border:3px solid var(--uva-blue);">
+      <div style="border:2px solid var(--gold);border-radius:10px;padding:24px;">
+        <div style="font-size:2rem;margin-bottom:6px;">🎓</div>
+        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--uva-blue);margin-bottom:4px;">University View Academy</div>
+        <div style="font-size:0.7rem;font-style:italic;color:var(--uva-green);margin-bottom:16px;">Virtue · Vigor · Vision</div>
+        <h2 style="color:var(--uva-blue);font-size:1.3rem;margin-bottom:6px;">Certificate of Achievement</h2>
+        <p style="font-size:0.85rem;color:#555;margin-bottom:12px;">This certifies that a UVA Cadet has successfully completed</p>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--uva-blue);margin-bottom:6px;">Google Drive Mastery Mission</div>
+        <div style="font-size:0.85rem;color:#555;margin-bottom:16px;">Computer Tech Literacy · Digital Collaboration</div>
+        <div style="background:var(--gold);display:inline-block;border-radius:20px;padding:6px 20px;font-weight:700;font-size:0.9rem;" id="certRank"></div>
+        <div style="margin-top:16px;font-size:0.75rem;color:#aaa;">Score: <span id="certScore"></span> pts · Digital Literacy & Career Readiness Standards</div>
+      </div>
+      <div class="btn-row" style="justify-content:center;margin-top:20px;">
+        <button class="btn btn-primary" onclick="restartGame()">🔄 Play Again</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  JAVASCRIPT                                           -->
+<!-- ══════════════════════════════════════════════════════ -->
+<script>
+// ── STATE ──────────────────────────────────────────────
+let score = 0, streak = 0, bestStreak = 0, correct = 0;
+let currentMission = 0;
+let missionAnswered = false;
+let dragAnswered = false;
+
+const RANKS = [
+  { min:0,   label:'Trainee',    icon:'🔰' },
+  { min:150, label:'Apprentice', icon:'⚙️' },
+  { min:300, label:'Expert',     icon:'🛡️' },
+  { min:500, label:'Master',     icon:'👑' },
+];
+
+// ── MISSIONS DATA ───────────────────────────────────────
+const missions = [
+
+  // 1 — Scenario: Sharing Permissions
+  {
+    type: 'scenario',
+    num: 1,
+    title: 'Permission Protocol',
+    subtitle: 'Sharing & Access Control',
+    scenario: `Your UVA study group is working on a group research paper in Google Docs. You want your teammates to be able to <strong>edit the document</strong>, but you don't want anyone outside the group to accidentally change anything. Which sharing permission should you assign to your teammates?`,
+    choices: [
+      { letter:'A', text:'Viewer — Can only read the document, cannot make changes.' },
+      { letter:'B', text:'Commenter — Can add comments and suggestions but cannot directly edit text.' },
+      { letter:'C', text:'Editor — Can make direct changes, add content, and format the document.' },
+      { letter:'D', text:'Owner — Transfers full ownership including the ability to delete the file.' },
+    ],
+    correct: 2,
+    feedback: {
+      correct: '✅ Correct! <strong>Editor</strong> permission allows teammates to directly type, edit, and format the document — perfect for active group collaboration. Viewer is read-only, Commenter allows feedback without edits, and Owner transfers full control.',
+      wrong: '❌ Not quite. For active group editing, you need <strong>Editor</strong> permission (Option C). Viewer = read only, Commenter = feedback only, Owner = full control transfer.'
+    }
+  },
+
+  // 2 — Scenario: Suggesting Mode
+  {
+    type: 'scenario',
+    num: 2,
+    title: 'Revision Recon',
+    subtitle: 'Suggesting Mode & Version Control',
+    scenario: `Your UVA English teacher asks you to peer-review a classmate's essay in Google Docs. You want to propose changes to their writing <strong>without permanently altering their original text</strong> — so they can accept or reject each change. What should you do?`,
+    choices: [
+      { letter:'A', text:'Switch to Editing mode and type your changes directly into their document.' },
+      { letter:'B', text:'Switch to Suggesting mode — your edits appear as tracked suggestions the author can accept or reject.' },
+      { letter:'C', text:'Download the file, edit it in Microsoft Word, and email it back.' },
+      { letter:'D', text:'Use the Comments panel to retype the entire revised paragraph.' },
+    ],
+    correct: 1,
+    feedback: {
+      correct: '✅ Excellent! <strong>Suggesting mode</strong> (the pencil icon → "Suggesting") creates tracked changes shown in green. The document owner sees each suggestion and can click ✓ to accept or ✗ to reject — preserving their original work.',
+      wrong: '❌ The best tool here is <strong>Suggesting mode</strong> (Option B). It tracks every proposed change so the author retains full control over what gets accepted into their document.'
+    }
+  },
+
+  // 3 — Drag & Drop: Permission Levels
+  {
+    type: 'drag',
+    num: 3,
+    title: 'Permission Sorting Station',
+    subtitle: 'Match actions to the correct permission level',
+    instruction: 'Drag each action card into the correct Google Drive permission bucket.',
+    items: [
+      { id:'d1', text:'📖 Read the document only',         correct:'viewer'    },
+      { id:'d2', text:'💬 Add a comment to a paragraph',   correct:'commenter' },
+      { id:'d3', text:'✏️ Type and format text directly',  correct:'editor'    },
+      { id:'d4', text:'🗑️ Permanently delete the file',    correct:'owner'     },
+      { id:'d5', text:'📝 Suggest a tracked change',       correct:'commenter' },
+      { id:'d6', text:'📤 Share with new people',          correct:'editor'    },
+    ],
+    zones: [
+      { id:'viewer',    label:'👁️ Viewer' },
+      { id:'commenter', label:'💬 Commenter' },
+      { id:'editor',    label:'✏️ Editor' },
+      { id:'owner',     label:'👑 Owner' },
+    ]
+  },
+
+  // 4 — Scenario: Version History
+  {
+    type: 'scenario',
+    num: 4,
+    title: 'Time Machine Tactics',
+    subtitle: 'Revision History',
+    scenario: `You've been editing your UVA science lab report in Google Docs for two hours. You accidentally delete an entire section and save. You need to <strong>recover the deleted content</strong>. Where do you go in Google Docs?`,
+    choices: [
+      { letter:'A', text:'File → Download → Microsoft Word (.docx) to find an older copy.' },
+      { letter:'B', text:'File → Version history → See version history — browse and restore a previous version.' },
+      { letter:'C', text:'Edit → Undo (Ctrl+Z) repeatedly until the section reappears.' },
+      { letter:'D', text:'Tools → Spelling and grammar to check for missing content.' },
+    ],
+    correct: 1,
+    feedback: {
+      correct: '✅ Right on target! <strong>File → Version history → See version history</strong> (or Ctrl+Alt+Shift+H) shows a timestamped log of every saved version. You can preview and restore any previous state — even from days ago!',
+      wrong: '❌ The correct path is <strong>File → Version history → See version history</strong> (Option B). Google automatically saves versions so you can always roll back to recover lost content.'
+    }
+  },
+
+  // 5 — Scenario: Gmail Integration
+  {
+    type: 'scenario',
+    num: 5,
+    title: 'Inbox Intelligence',
+    subtitle: 'Gmail + Google Drive Integration',
+    scenario: `A classmate emails you a Google Doc link via Gmail. Instead of opening a separate browser tab for Drive, you want to <strong>preview and comment on the document directly inside Gmail</strong>. What feature makes this possible?`,
+    choices: [
+      { letter:'A', text:'Gmail has no document preview — you must always open Drive separately.' },
+      { letter:'B', text:'Google Workspace integration allows Drive file previews and commenting directly within the Gmail interface.' },
+      { letter:'C', text:'You must download the file attachment first, then re-upload it to Drive.' },
+      { letter:'D', text:'Only Google Slides files can be previewed in Gmail, not Docs.' },
+    ],
+    correct: 1,
+    feedback: {
+      correct: '✅ Correct! Google Workspace\'s <strong>integrated ecosystem</strong> lets you preview Docs, Sheets, and Slides directly in Gmail — and even add comments — without leaving your inbox. This is a key productivity benefit of the Google suite.',
+      wrong: '❌ Google Workspace\'s integration (Option B) allows Drive file previews inside Gmail. This seamless connection between apps is one of the biggest advantages of using Google\'s ecosystem for collaboration.'
+    }
+  },
+
+  // 6 — Scenario: Google Calendar Integration
+  {
+    type: 'scenario',
+    num: 6,
+    title: 'Calendar Command',
+    subtitle: 'Google Calendar + Drive Workflow',
+    scenario: `Your UVA project team has a presentation due Friday. You want to schedule a study session in Google Calendar and <strong>attach your shared Google Slides directly to the calendar event</strong> so everyone has instant access. How do you attach the file?`,
+    choices: [
+      { letter:'A', text:'You cannot attach Google Drive files to Calendar events — only external URLs.' },
+      { letter:'B', text:'Email the Slides link to everyone separately and ask them to save it.' },
+      { letter:'C', text:'In the Calendar event editor, click the Google Drive attachment icon (📎) to link your Slides file directly to the event.' },
+      { letter:'D', text:'Download the Slides as a PDF and attach it as a file upload to the event.' },
+    ],
+    correct: 2,
+    feedback: {
+      correct: '✅ Perfect! Google Calendar\'s <strong>Drive attachment feature</strong> (the 📎 icon in the event editor) lets you link any Drive file directly to an event. Attendees see the file in the event details and can open it with one click — no separate emails needed!',
+      wrong: '❌ The correct answer is Option C. Google Calendar has a built-in Drive attachment button in the event editor. This integration means your team always has the right files linked to the right meetings.'
+    }
+  },
+
+  // 7 — Scenario: Organizing Drive
+  {
+    type: 'scenario',
+    num: 7,
+    title: 'Drive Organization HQ',
+    subtitle: 'Shared Drives & File Management',
+    scenario: `Your UVA class is creating a yearbook. You need a Google Drive folder where <strong>all team members own the files collectively</strong> — so files aren't lost if one person leaves the project. Which Drive feature should you use?`,
+    choices: [
+      { letter:'A', text:'My Drive — Create a personal folder and share it with the team.' },
+      { letter:'B', text:'Shared Drive (formerly Team Drive) — Files are owned by the group, not individuals, and persist even if members leave.' },
+      { letter:'C', text:'Google Photos — Upload all files there for group access.' },
+      { letter:'D', text:'Google Sites — Build a website to host all the files.' },
+    ],
+    correct: 1,
+    feedback: {
+      correct: '✅ Outstanding! <strong>Shared Drives</strong> (found in the left sidebar of Google Drive) are owned by the organization/group — not an individual. Files stay in the Shared Drive even if a member leaves, making it ideal for long-term team projects like a yearbook.',
+      wrong: '❌ The answer is <strong>Shared Drive</strong> (Option B). Unlike "My Drive" folders, Shared Drives are collectively owned — files belong to the group, not one person, ensuring continuity for team projects.'
+    }
+  },
+];
+
+// ── HELPERS ────────────────────────────────────────────
+function getRank(s) {
+  let r = RANKS[0];
+  for(const rank of RANKS) { if(s >= rank.min) r = rank; }
+  return r;
+}
+
+function updateHUD() {
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('streakDisplay').textContent = streak;
+  document.getElementById('missionDisplay').textContent = currentMission;
+  const pct = (currentMission / missions.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  const rank = getRank(score);
+  document.getElementById('rankLabel').textContent = rank.label;
+  document.getElementById('rankIcon').textContent = rank.icon;
+  // streak badge
+  const sb = document.getElementById('streakBadge');
+  if(streak >= 3) {
+    sb.textContent = `🔥 ${streak} in a row!`;
+    sb.classList.add('show');
+  } else {
+    sb.classList.remove('show');
+  }
+  // step dots
+  const dots = document.getElementById('stepDots');
+  dots.innerHTML = '';
+  for(let i=0;i<missions.length;i++){
+    const d = document.createElement('div');
+    d.className = 'step-dot' + (i < currentMission ? ' done' : (i === currentMission ? ' current' : ''));
+    dots.appendChild(d);
+  }
+}
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(()=>{ t.className = 'toast'; }, 2800);
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+
+// ── CONFETTI ───────────────────────────────────────────
+function launchConfetti(duration=2000) {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const pieces = [];
+  const colors = ['#1B5EAF','#1E7A3E','#F5A623','#ff6b35','#ffffff','#34c97a'];
+  for(let i=0;i<120;i++){
+    pieces.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height - canvas.height,
+      w: Math.random()*10+5,
+      h: Math.random()*6+3,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      rot: Math.random()*360,
+      vx: (Math.random()-0.5)*3,
+      vy: Math.random()*4+2,
+      vr: (Math.random()-0.5)*6,
+    });
+  }
+  const end = Date.now()+duration;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+    });
+    if(Date.now()<end) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+// ── GAME FLOW ──────────────────────────────────────────
+function startGame() {
+  score=0; streak=0; bestStreak=0; correct=0; currentMission=0;
+  updateHUD();
+  showScreen('game');
+  renderMission();
+}
+
+function restartGame() {
+  showScreen('intro');
+}
+
+function renderMission() {
+  if(currentMission >= missions.length) { endGame(); return; }
+  missionAnswered = false;
+  dragAnswered = false;
+  const m = missions[currentMission];
+  updateHUD();
+  const container = document.getElementById('missionContainer');
+  if(m.type === 'scenario') container.innerHTML = buildScenario(m);
+  else if(m.type === 'drag') container.innerHTML = buildDrag(m);
+  if(m.type === 'drag') initDrag(m);
+}
+
+// ── SCENARIO BUILDER ───────────────────────────────────
+function buildScenario(m) {
+  const choicesHTML = m.choices.map((c,i)=>`
+    <button class="choice-btn" onclick="answerScenario(${i},${m.correct},this)" id="choice-${i}">
+      <span class="choice-letter">${c.letter}</span>
+      <span>${c.text}</span>
+    </button>
+  `).join('');
+  return `
+    <div class="mission-card">
+      <div class="mission-header">
+        <div class="mission-num">${m.num}</div>
+        <div>
+          <div class="mission-title">🎯 Mission ${m.num}: ${m.title}</div>
+          <div class="mission-subtitle">${m.subtitle}</div>
+        </div>
+      </div>
+      <div class="mission-body">
+        <div class="scenario-box">${m.scenario}</div>
+        <div class="choices">${choicesHTML}</div>
+        <div class="feedback-box" id="feedbackBox"></div>
+        <div class="btn-row" id="nextRow" style="display:none;">
+          <button class="btn btn-primary" onclick="nextMission()">
+            ${currentMission < missions.length-1 ? '➡️ Next Mission' : '🏁 Finish Missions'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function answerScenario(chosen, correctIdx, btn) {
+  if(missionAnswered) return;
+  missionAnswered = true;
+  const allBtns = document.querySelectorAll('.choice-btn');
+  allBtns.forEach(b=>b.disabled=true);
+  const fb = document.getElementById('feedbackBox');
+  const m = missions[currentMission];
+  if(chosen === correctIdx) {
+    btn.classList.add('correct');
+    allBtns[correctIdx].classList.add('correct');
+    fb.className = 'feedback-box show correct-fb';
+    fb.innerHTML = m.feedback.correct;
+    addScore(true);
+  } else {
+    btn.classList.add('wrong');
+    allBtns[correctIdx].classList.add('correct');
+    fb.className = 'feedback-box show wrong-fb';
+    fb.innerHTML = m.feedback.wrong;
+    addScore(false);
+  }
+  document.getElementById('nextRow').style.display='flex';
+}
+
+// ── DRAG & DROP BUILDER ────────────────────────────────
+function buildDrag(m) {
+  const itemsHTML = m.items.map(item=>`
+    <div class="drag-item" draggable="true" id="${item.id}" data-correct="${item.correct}">
+      <span>⠿</span> ${item.text}
+    </div>
+  `).join('');
+  const zonesHTML = m.zones.map(z=>`
+    <div style="margin-bottom:14px;">
+      <div class="drop-label">${z.label}</div>
+      <div class="drop-zone" id="zone-${z.id}" data-zone="${z.id}"></div>
+    </div>
+  `).join('');
+  return `
+    <div class="mission-card">
+      <div class="mission-header">
+        <div class="mission-num">${m.num}</div>
+        <div>
+          <div class="mission-title">🎯 Mission ${m.num}: ${m.title}</div>
+          <div class="mission-subtitle">${m.subtitle}</div>
+        </div>
+      </div>
+      <div class="mission-body">
+        <div class="scenario-box">${m.instruction}</div>
+        <div class="drag-area">
+          <div class="drag-col">
+            <h4>📦 Action Cards</h4>
+            <div class="drag-items" id="dragSource">${itemsHTML}</div>
+          </div>
+          <div class="drag-col">
+            <h4>🗂️ Permission Buckets</h4>
+            ${zonesHTML}
+          </div>
+        </div>
+        <div class="feedback-box" id="feedbackBox"></div>
+        <div class="drag-submit-row">
+          <button class="btn btn-primary" id="dragSubmitBtn" onclick="checkDrag()">✅ Check Answers</button>
+        </div>
+        <div class="btn-row" id="nextRow" style="display:none;">
+          <button class="btn btn-primary" onclick="nextMission()">➡️ Next Mission</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function initDrag(m) {
+  let dragged = null;
+  document.querySelectorAll('.drag-item').forEach(item=>{
+    item.addEventListener('dragstart', e=>{
+      dragged = item;
+      setTimeout(()=>item.classList.add('dragging'),0);
+    });
+    item.addEventListener('dragend', ()=>item.classList.remove('dragging'));
+  });
+  document.querySelectorAll('.drop-zone').forEach(zone=>{
+    zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('over'); });
+    zone.addEventListener('dragleave', ()=>zone.classList.remove('over'));
+    zone.addEventListener('drop', e=>{
+      e.preventDefault();
+      zone.classList.remove('over');
+      if(dragged) {
+        zone.appendChild(dragged);
+        dragged = null;
+      }
+    });
+  });
+  // touch support
+  let touchItem = null, clone = null;
+  document.querySelectorAll('.drag-item').forEach(item=>{
+    item.addEventListener('touchstart', e=>{
+      touchItem = item;
+      clone = item.cloneNode(true);
+      clone.style.cssText = `position:fixed;opacity:0.8;pointer-events:none;z-index:9998;width:${item.offsetWidth}px;`;
+      document.body.appendChild(clone);
+    },{passive:true});
+    item.addEventListener('touchmove', e=>{
+      if(!clone) return;
+      const t = e.touches[0];
+      clone.style.left = (t.clientX - item.offsetWidth/2)+'px';
+      clone.style.top  = (t.clientY - 20)+'px';
+    },{passive:true});
+    item.addEventListener('touchend', e=>{
+      if(clone) { document.body.removeChild(clone); clone=null; }
+      if(!touchItem) return;
+      const t = e.changedTouches[0];
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const zone = el ? el.closest('.drop-zone') : null;
+      if(zone) zone.appendChild(touchItem);
+      touchItem = null;
+    });
+  });
+}
+
+function checkDrag() {
+  if(dragAnswered) return;
+  dragAnswered = true;
+  const m = missions[currentMission];
+  let totalCorrect = 0;
+  m.items.forEach(item=>{
+    const el = document.getElementById(item.id);
+    if(!el) return;
+    const zone = el.closest('.drop-zone');
+    if(zone && zone.dataset.zone === item.correct) totalCorrect++;
+  });
+  // color zones
+  m.zones.forEach(z=>{
+    const zone = document.getElementById('zone-'+z.id);
+    const itemsInZone = zone.querySelectorAll('.drag-item');
+    let zoneOk = true;
+    itemsInZone.forEach(it=>{
+      if(it.dataset.correct !== z.id) zoneOk = false;
+    });
+    // also check all correct items are here
+    const shouldBeHere = m.items.filter(i=>i.correct===z.id).length;
+    if(itemsInZone.length === shouldBeHere && zoneOk) {
+      zone.classList.add('correct-zone');
+    } else {
+      zone.classList.add('wrong-zone');
+    }
+  });
+  const fb = document.getElementById('feedbackBox');
+  const pct = Math.round((totalCorrect/m.items.length)*100);
+  if(pct >= 80) {
+    fb.className = 'feedback-box show correct-fb';
+    fb.innerHTML = `✅ <strong>Great sorting!</strong> You correctly placed ${totalCorrect}/${m.items.length} cards (${pct}%). Remember: Viewer=read only, Commenter=feedback+suggestions, Editor=direct edits+sharing, Owner=delete+transfer.`;
+    addScore(true);
+  } else {
+    fb.className = 'feedback-box show wrong-fb';
+    fb.innerHTML = `❌ <strong>${totalCorrect}/${m.items.length} correct (${pct}%).</strong> Key rule: <em>Suggesting mode</em> is a Commenter-level action. Editors can share files. Only Owners can delete permanently.`;
+    addScore(false);
+  }
+  document.getElementById('dragSubmitBtn').disabled = true;
+  document.getElementById('nextRow').style.display='flex';
+}
+
+// ── SCORING ────────────────────────────────────────────
+function addScore(isCorrect) {
+  if(isCorrect) {
+    correct++;
+    streak++;
+    if(streak > bestStreak) bestStreak = streak;
+    let pts = 100;
+    if(streak >= 5) pts = 200;
+    else if(streak >= 3) pts = 150;
+    score += pts;
+    if(streak === 3) showToast('🔥 3 in a row! +150pts', 'gold');
+    else if(streak === 5) showToast('⚡ 5 in a row! +200pts', 'green');
+    else showToast(`✅ Correct! +${pts}pts`);
+    // rank up check
+    const rank = getRank(score);
+    const prevRank = getRank(score - pts);
+    if(rank.label !== prevRank.label) {
+      setTimeout(()=>{
+        showToast(`${rank.icon} Rank Up: ${rank.label}!`, 'gold');
+        launchConfetti(1500);
+      }, 600);
+    }
+  } else {
+    streak = 0;
+    showToast('❌ Not quite — check the feedback!');
+  }
+  currentMission++;
+  updateHUD();
+}
+
+function nextMission() {
+  renderMission();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── END GAME ───────────────────────────────────────────
+function endGame() {
+  const rank = getRank(score);
+  const pct = Math.round((correct/missions.length)*100);
+  let badge = '🏅', title = 'Mission Complete!';
+  if(pct === 100) { badge='🏆'; title='Perfect Score! Outstanding Cadet!'; launchConfetti(3000); }
+  else if(pct >= 80) { badge='🥇'; title='Excellent Work, Cadet!'; launchConfetti(2000); }
+  else if(pct >= 60) { badge='🥈'; title='Good Effort, Cadet!'; }
+  else { badge='🥉'; title='Keep Practicing, Cadet!'; }
+  document.getElementById('resultsBadge').textContent = badge;
+  document.getElementById('resultsTitle').textContent = title;
+  document.getElementById('resultsRank').textContent = `${rank.icon} Final Rank: ${rank.label}`;
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalCorrect').textContent = `${correct}/${missions.length}`;
+  document.getElementById('finalStreak').textContent = bestStreak;
+  document.getElementById('certRank').textContent = `${rank.icon} ${rank.label}`;
+  document.getElementById('certScore').textContent = score;
+  showScreen('results');
+  updateHUD();
+}
+
+function showCertificate() {
+  showScreen('cert');
+}
+</script>
+</body>
+</html>
