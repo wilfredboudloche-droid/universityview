@@ -1,0 +1,562 @@
+html_content = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 9C: Laptop Hardware | University View Academy</title>
+<style>
+:root{--blue:#1B5EAF;--green:#1E7A3E;--gold:#f0c040;--bg:#0d1b2a;--card:#1a2a3a;--text:#e8f0fe;--red:#e53935;--orange:#ff9800;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+#header{background:linear-gradient(135deg,var(--blue),var(--green));padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;box-shadow:0 4px 15px rgba(0,0,0,.5);}
+#header img{width:54px;height:54px;border-radius:50%;border:2px solid white;}
+.logo-area{display:flex;align-items:center;gap:10px;}
+.school-info h1{font-size:.95rem;font-weight:700;color:white;}
+.school-info p{font-size:.65rem;color:#c8e6c9;letter-spacing:2px;}
+.lesson-title{font-size:.78rem;color:#fff;text-align:right;}
+.lesson-title strong{display:block;font-size:.9rem;}
+.ribbon{background:var(--green);text-align:center;padding:5px;font-size:.7rem;letter-spacing:3px;color:white;font-weight:700;border-bottom:2px solid var(--gold);}
+#rank-bar{background:var(--card);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:2px solid var(--blue);}
+.rank-badge{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--blue),#0d3a6e);padding:5px 12px;border-radius:20px;border:2px solid var(--gold);}
+.rank-icon{font-size:1.3rem;}.rank-text{font-size:.75rem;color:var(--gold);font-weight:700;}
+.score-display{font-size:1rem;font-weight:700;color:var(--gold);}
+.streak-display{font-size:.8rem;color:#ff9800;font-weight:700;}
+.progress-wrap{flex:1;min-width:100px;max-width:180px;}
+.progress-label{font-size:.65rem;color:#aaa;margin-bottom:2px;}
+.progress-bar{background:#333;border-radius:10px;height:9px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:10px;transition:width .5s;}
+#main{display:flex;flex-direction:column;align-items:center;padding:16px;gap:16px;}
+
+/* INTRO */
+#intro-screen{text-align:center;padding:18px;max-width:620px;margin:0 auto;}
+#intro-screen img{width:80px;margin-bottom:10px;}
+#intro-screen h2{font-size:1.4rem;color:var(--gold);margin-bottom:6px;}
+#intro-screen p{font-size:.83rem;color:#aaa;margin-bottom:14px;line-height:1.6;}
+.objective-list{text-align:left;background:var(--card);border-radius:11px;padding:12px;margin-bottom:14px;}
+.objective-list li{font-size:.74rem;color:#c8d8f0;padding:4px 0;border-bottom:1px solid #2a3a4a;list-style:none;display:flex;gap:7px;}
+.objective-list li:last-child{border-bottom:none;}
+.start-btn{background:linear-gradient(135deg,var(--blue),var(--green));color:white;border:none;padding:13px 38px;border-radius:13px;font-size:1.05rem;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(27,94,175,.4);transition:transform .2s;}
+.start-btn:hover{transform:scale(1.05);}
+
+/* GAME AREA */
+#game-area{width:100%;max-width:980px;display:none;}
+.mission-header{text-align:center;margin-bottom:14px;}
+.mission-tag{display:inline-block;background:var(--blue);color:white;font-size:.65rem;padding:2px 10px;border-radius:12px;letter-spacing:2px;margin-bottom:4px;}
+.mission-header h2{font-size:1.3rem;color:var(--gold);margin-bottom:3px;}
+.mission-header p{font-size:.8rem;color:#aaa;}
+
+/* LAPTOP VISUAL */
+.laptop-container{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;justify-content:center;}
+.laptop-visual-wrap{flex:0 0 auto;width:340px;}
+.laptop-svg-wrap{position:relative;width:340px;}
+.laptop-svg-wrap svg{width:100%;height:auto;display:block;}
+.hotspot{cursor:pointer;transition:all .2s;}
+.hotspot circle{transition:all .2s;}
+.hotspot:hover circle{r:14;opacity:1;}
+.hotspot.solved circle{fill:#1E7A3E;opacity:1;}
+.hotspot.active circle{fill:#f0c040;opacity:1;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{r:12;}50%{r:15;}}
+.component-label{font-size:9px;fill:white;font-weight:700;pointer-events:none;text-anchor:middle;dominant-baseline:middle;}
+
+/* MISSION PANEL */
+.mission-panel{flex:1;min-width:270px;max-width:420px;}
+.mission-card{background:var(--card);border-radius:14px;border:2px solid var(--blue);padding:14px;box-shadow:0 4px 18px rgba(27,94,175,.2);}
+.mission-number{font-size:.62rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;}
+.mission-card h3{font-size:.95rem;color:white;margin-bottom:5px;}
+.mission-card p{font-size:.76rem;color:#aaa;margin-bottom:10px;line-height:1.5;}
+.mission-instruction{background:rgba(27,94,175,.2);border-left:3px solid var(--blue);padding:7px 9px;border-radius:0 7px 7px 0;font-size:.74rem;color:#c8d8f0;margin-bottom:10px;}
+.quiz-options{display:flex;flex-direction:column;gap:7px;}
+.quiz-option{background:rgba(255,255,255,.05);border:2px solid #333;border-radius:9px;padding:9px 12px;cursor:pointer;font-size:.76rem;color:#ddd;transition:all .2s;text-align:left;width:100%;}
+.quiz-option:hover:not(.disabled){border-color:var(--blue);background:rgba(27,94,175,.15);color:white;}
+.quiz-option.correct{border-color:var(--green);background:rgba(30,122,62,.25);color:#90ee90;}
+.quiz-option.wrong{border-color:var(--red);background:rgba(229,57,53,.15);color:#ff8a80;}
+.quiz-option.disabled{cursor:not-allowed;opacity:.7;}
+.feedback-box{margin-top:9px;padding:9px 11px;border-radius:9px;font-size:.76rem;line-height:1.5;display:none;}
+.feedback-box.show{display:block;}
+.feedback-box.correct{background:rgba(30,122,62,.2);border:1px solid var(--green);color:#90ee90;}
+.feedback-box.wrong{background:rgba(229,57,53,.1);border:1px solid var(--red);color:#ff8a80;}
+.next-btn{display:none;margin-top:9px;background:linear-gradient(135deg,var(--blue),var(--green));color:white;border:none;padding:9px 18px;border-radius:9px;cursor:pointer;font-size:.82rem;font-weight:700;width:100%;transition:opacity .2s;}
+.next-btn:hover{opacity:.9;}
+.next-btn.show{display:block;}
+
+/* DRAG DROP */
+.drag-zone{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;padding:8px;background:rgba(255,255,255,.03);border-radius:9px;border:1px dashed #444;}
+.drag-item{background:var(--blue);color:white;padding:5px 10px;border-radius:7px;font-size:.68rem;cursor:grab;user-select:none;border:2px solid transparent;transition:all .2s;}
+.drag-item:hover{border-color:var(--gold);transform:scale(1.05);}
+.drag-item.used{opacity:.3;cursor:not-allowed;pointer-events:none;}
+.drag-item.dragging{opacity:.5;transform:scale(.95);}
+.drop-targets{display:flex;flex-direction:column;gap:6px;}
+.drop-target{background:rgba(255,255,255,.04);border:2px dashed #555;border-radius:9px;padding:7px 9px;min-height:40px;font-size:.68rem;color:#888;transition:all .2s;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.drop-target.drag-over{border-color:var(--gold);background:rgba(240,192,64,.1);}
+.drop-target.correct-drop{border-color:var(--green);background:rgba(30,122,62,.2);color:#90ee90;}
+.drop-target.wrong-drop{border-color:var(--red);background:rgba(229,57,53,.1);color:#ff8a80;}
+.drop-label{font-size:.6rem;color:#aaa;min-width:80px;flex-shrink:0;font-weight:600;}
+.dropped-tag{background:rgba(255,255,255,.15);padding:2px 7px;border-radius:5px;font-size:.62rem;margin:1px;}
+.check-btn{background:var(--green);color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.78rem;font-weight:700;margin-top:8px;width:100%;transition:opacity .2s;}
+.check-btn:hover{opacity:.9;}
+
+/* STEP SEQUENCE */
+.step-list{display:flex;flex-direction:column;gap:6px;}
+.step-item{background:rgba(255,255,255,.04);border:2px solid #333;border-radius:9px;padding:8px 11px;font-size:.74rem;color:#ddd;cursor:grab;user-select:none;display:flex;align-items:center;gap:8px;transition:all .2s;}
+.step-item:hover{border-color:var(--blue);}
+.step-item.dragging{opacity:.4;}
+.step-item.correct-pos{border-color:var(--green);background:rgba(30,122,62,.15);color:#90ee90;}
+.step-item.wrong-pos{border-color:var(--red);background:rgba(229,57,53,.1);color:#ff8a80;}
+.step-num{background:var(--blue);color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0;}
+
+/* ANTENNA ROUTING */
+.antenna-board{background:#1a2a1a;border-radius:12px;padding:10px;position:relative;margin-bottom:10px;}
+.antenna-path{display:flex;flex-direction:column;gap:5px;}
+.antenna-slot{background:#0d1a0d;border:2px dashed #2a4a2a;border-radius:7px;padding:6px 9px;font-size:.65rem;color:#4a7a4a;min-height:34px;display:flex;align-items:center;gap:5px;transition:all .2s;}
+.antenna-slot.drag-over{border-color:var(--gold);background:rgba(240,192,64,.08);}
+.antenna-slot.correct-drop{border-color:var(--green);background:rgba(30,122,62,.2);color:#90ee90;}
+.antenna-slot.wrong-drop{border-color:var(--red);background:rgba(229,57,53,.1);color:#ff8a80;}
+.antenna-wire{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+.wire-item{padding:4px 9px;border-radius:6px;font-size:.65rem;cursor:grab;user-select:none;border:2px solid transparent;transition:all .2s;font-weight:700;}
+.wire-item:hover{transform:scale(1.05);}
+.wire-main{background:#1a1a1a;color:white;border-color:#555;}
+.wire-aux{background:#333;color:#aaa;border-color:#666;}
+.wire-item.used{opacity:.3;pointer-events:none;}
+
+/* TOOL MATCHING */
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+.tool-card{background:rgba(255,255,255,.04);border:2px solid #333;border-radius:9px;padding:8px;text-align:center;cursor:pointer;transition:all .2s;}
+.tool-card:hover{border-color:var(--blue);}
+.tool-card.selected{border-color:var(--gold);background:rgba(240,192,64,.1);}
+.tool-card.correct{border-color:var(--green);background:rgba(30,122,62,.2);}
+.tool-card.wrong{border-color:var(--red);background:rgba(229,57,53,.1);}
+.tool-icon{font-size:1.6rem;margin-bottom:3px;}
+.tool-name{font-size:.62rem;color:#ddd;}
+.scenario-box{background:rgba(27,94,175,.15);border:2px solid var(--blue);border-radius:9px;padding:9px;margin-bottom:9px;font-size:.76rem;color:#c8d8f0;line-height:1.5;}
+
+/* COMPLETION */
+#completion-screen{display:none;text-align:center;padding:28px 18px;max-width:580px;margin:0 auto;}
+#completion-screen.show{display:block;}
+.completion-badge{font-size:3.8rem;margin-bottom:8px;}
+.completion-title{font-size:1.7rem;color:var(--gold);font-weight:700;margin-bottom:6px;}
+.completion-subtitle{font-size:.95rem;color:#aaa;margin-bottom:18px;}
+.final-stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:18px;}
+.stat-box{background:var(--card);border:2px solid var(--blue);border-radius:11px;padding:12px 18px;min-width:90px;}
+.stat-box .stat-val{font-size:1.7rem;font-weight:700;color:var(--gold);}
+.stat-box .stat-label{font-size:.65rem;color:#aaa;}
+.restart-btn{background:linear-gradient(135deg,var(--blue),var(--green));color:white;border:none;padding:11px 28px;border-radius:11px;font-size:.95rem;font-weight:700;cursor:pointer;transition:opacity .2s;}
+.restart-btn:hover{opacity:.9;}
+
+/* POPUPS */
+.streak-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:linear-gradient(135deg,#ff9800,#f44336);color:white;padding:14px 26px;border-radius:18px;font-size:1.1rem;font-weight:700;z-index:9998;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.5);transition:transform .3s;pointer-events:none;}
+.streak-popup.show{transform:translate(-50%,-50%) scale(1);}
+.badge-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:linear-gradient(135deg,var(--blue),var(--green));color:white;padding:18px 28px;border-radius:18px;font-size:.95rem;font-weight:700;z-index:9998;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.5);border:3px solid var(--gold);transition:transform .3s;pointer-events:none;}
+.badge-popup.show{transform:translate(-50%,-50%) scale(1);}
+.badge-popup .badge-icon{font-size:2.3rem;display:block;margin-bottom:5px;}
+.confetti-piece{position:fixed;width:9px;height:9px;border-radius:2px;animation:confettiFall 2s ease-in forwards;pointer-events:none;z-index:9999;}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+.hidden{display:none!important;}
+.info-tooltip{background:rgba(27,94,175,.25);border:1px solid var(--blue);border-radius:7px;padding:6px 9px;font-size:.68rem;color:#c8d8f0;margin-top:6px;line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo-area">
+    <img src="https://cdn.abacus.ai/images/99e38b4c-9d03-4b72-a4bc-e563cf424f8.png" alt="UVA Logo" onerror="this.style.display='none'">
+    <div class="school-info">
+      <h1>University View Academy</h1>
+      <p>VIRTUE &bull; VIGOR &bull; VISION</p>
+    </div>
+  </div>
+  <div class="lesson-title">
+    <strong>Lesson 9C: Laptop Hardware</strong>
+    Computer Architecture | A+ Core 1 &ndash; Domain 1.1
+  </div>
+</div>
+<div class="ribbon">&#10022; VIRTUE &bull; VIGOR &bull; VISION &#10022;</div>
+
+<div id="rank-bar">
+  <div class="rank-badge">
+    <span class="rank-icon" id="rank-icon">&#127891;</span>
+    <div>
+      <div class="rank-text" id="rank-label">TRAINEE</div>
+      <div style="font-size:.58rem;color:#aaa;">UVA Tech Cadet</div>
+    </div>
+  </div>
+  <div class="score-display">&#11088; <span id="score-val">0</span> pts</div>
+  <div class="streak-display hidden" id="streak-display">&#128293; <span id="streak-val">0</span> streak!</div>
+  <div class="progress-wrap">
+    <div class="progress-label">Progress: <span id="progress-text">0/8</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div id="main">
+
+<!-- INTRO -->
+<div id="intro-screen">
+  <img src="https://cdn.abacus.ai/images/99e38b4c-9d03-4b72-a4bc-e563cf424f8.png" alt="UVA Logo" onerror="this.style.display='none'">
+  <h2>&#128295; Operation: Laptop Overhaul</h2>
+  <p>Welcome back, UVA Tech Cadet! The Academy's laptop fleet has arrived in the repair bay — cracked screens, dead batteries, missing RAM, and tangled antenna wires. Your mission: diagnose, disassemble, and repair 8 laptops using your A+ Core 1 knowledge. Complete all missions to earn your Master Technician badge!</p>
+  <ul class="objective-list">
+    <li>&#128295; <span>Identify specialized laptop hardware components inside the chassis</span></li>
+    <li>&#128736;&#65039; <span>Follow safe disassembly procedures and select the correct tools</span></li>
+    <li>&#128267; <span>Understand laptop power sources: batteries, AC adapters, and DC jacks</span></li>
+    <li>&#129504; <span>Classify and replace SO-DIMM memory modules correctly</span></li>
+    <li>&#128190; <span>Compare storage form factors: 2.5" HDD, M.2 NVMe, M.2 SATA, mSATA</span></li>
+    <li>&#128246; <span>Route wireless adapter antenna cables (Main/Aux) correctly</span></li>
+    <li>&#128421;&#65039; <span>Distinguish between integrated vs. replaceable GPU configurations</span></li>
+    <li>&#128268; <span>Identify laptop display types and inverter/backlight components</span></li>
+  </ul>
+  <button class="start-btn" onclick="startGame()">&#128640; Begin Repair Missions</button>
+</div>
+
+<!-- GAME AREA -->
+<div id="game-area">
+  <div class="mission-header">
+    <div class="mission-tag" id="mission-tag">MISSION 1 OF 8</div>
+    <h2 id="mission-title">Mission Title</h2>
+    <p id="mission-desc">Mission description</p>
+  </div>
+
+  <div class="laptop-container">
+    <!-- LAPTOP SVG VISUAL -->
+    <div class="laptop-visual-wrap">
+      <div class="laptop-svg-wrap" id="laptop-svg-wrap">
+        <!-- SVG injected by JS -->
+      </div>
+      <div id="laptop-caption" style="text-align:center;font-size:.65rem;color:#888;margin-top:5px;"></div>
+    </div>
+
+    <!-- MISSION PANEL -->
+    <div class="mission-panel">
+      <div class="mission-card" id="mission-card">
+        <div class="mission-number" id="mission-number">MISSION 1 OF 8</div>
+        <h3 id="mc-title">Loading...</h3>
+        <p id="mc-desc">Loading...</p>
+        <div class="mission-instruction" id="mc-instruction">Loading...</div>
+        <div id="mc-content"></div>
+        <div class="feedback-box" id="feedback-box"></div>
+        <button class="next-btn" id="next-btn" onclick="nextMission()">Next Mission &#8594;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPLETION -->
+<div id="completion-screen">
+  <div class="completion-badge">&#127942;</div>
+  <div class="completion-title" id="comp-title">Repair Bay Cleared!</div>
+  <div class="completion-subtitle">You have completed Operation: Laptop Overhaul</div>
+  <div class="final-stats">
+    <div class="stat-box"><div class="stat-val" id="final-score">0</div><div class="stat-label">Points</div></div>
+    <div class="stat-box"><div class="stat-val" id="final-correct">0</div><div class="stat-label">Correct</div></div>
+    <div class="stat-box"><div class="stat-val" id="final-rank">&#127891;</div><div class="stat-label">Final Rank</div></div>
+    <div class="stat-box"><div class="stat-val" id="final-streak">0</div><div class="stat-label">Best Streak</div></div>
+  </div>
+  <div style="background:var(--card);border-radius:12px;padding:14px;margin-bottom:16px;font-size:.8rem;color:#aaa;line-height:1.7">
+    <strong style="color:var(--gold)">A+ Core 1 Domain 1.1 Topics Covered:</strong><br>
+    &#9989; Laptop hardware components &amp; chassis internals<br>
+    &#9989; Safe disassembly tools and ESD precautions<br>
+    &#9989; Power sources: battery, AC adapter, DC jack<br>
+    &#9989; SO-DIMM memory modules and installation<br>
+    &#9989; Storage form factors: 2.5" HDD, M.2 NVMe/SATA, mSATA<br>
+    &#9989; Wireless antenna routing (Main/Aux/MIMO)<br>
+    &#9989; Integrated vs. MXM GPU configurations<br>
+    &#9989; Display types: LCD, IPS, OLED, inverter/backlight
+  </div>
+  <button class="restart-btn" onclick="restartGame()">&#128260; Replay Missions</button>
+</div>
+
+</div><!-- end main -->
+
+<div class="streak-popup" id="streak-popup"></div>
+<div class="badge-popup" id="badge-popup"><span class="badge-icon" id="badge-icon">&#127885;</span><br><span id="badge-text">Achievement!</span></div>
+
+<script>
+// ===================== STATE =====================
+var score=0,streak=0,bestStreak=0,correctCount=0,currentMission=0;
+var dragItem=null,dragItemEl=null;
+var dropAnswers={};
+var stepOrder=[];
+var selectedTool=null;
+var missionDone=false;
+
+// ===================== RANKS =====================
+var ranks=[
+  {min:0,label:"TRAINEE",icon:"&#127891;",title:"UVA Tech Cadet"},
+  {min:3,label:"APPRENTICE",icon:"&#128295;",title:"Junior Technician"},
+  {min:5,label:"EXPERT",icon:"&#9881;&#65039;",title:"Senior Technician"},
+  {min:7,label:"MASTER",icon:"&#127942;",title:"Master Technician"}
+];
+
+// ===================== SVGs =====================
+var svgLaptopOpen = `<svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg">
+  <!-- Screen lid -->
+  <rect x="30" y="10" width="280" height="185" rx="8" fill="#1a1a2e" stroke="#444" stroke-width="2"/>
+  <rect x="38" y="18" width="264" height="169" rx="4" fill="#0d1b2a"/>
+  <!-- Screen bezel top camera -->
+  <circle cx="170" cy="22" r="3" fill="#333"/>
+  <!-- Screen content - laptop internals diagram -->
+  <rect x="42" y="22" width="256" height="161" rx="3" fill="#0a1520"/>
+  <!-- Motherboard outline -->
+  <rect x="55" y="35" width="230" height="135" rx="5" fill="#0d2a1a" stroke="#1E7A3E" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="170" y="48" text-anchor="middle" fill="#1E7A3E" font-size="7" font-family="monospace">MOTHERBOARD</text>
+  <!-- CPU -->
+  <rect x="70" y="55" width="45" height="40" rx="3" fill="#1B5EAF" stroke="#4a8adf" stroke-width="1"/>
+  <text x="92" y="72" text-anchor="middle" fill="white" font-size="6" font-family="monospace">CPU</text>
+  <text x="92" y="82" text-anchor="middle" fill="#aaa" font-size="5" font-family="monospace">i7-1260P</text>
+  <!-- CPU fan -->
+  <circle cx="92" cy="75" r="18" fill="none" stroke="#4a8adf" stroke-width="1" stroke-dasharray="3,2" opacity="0.4"/>
+  <!-- RAM slots -->
+  <rect x="130" y="55" width="55" height="12" rx="2" fill="#2a1a4a" stroke="#7a5aaf" stroke-width="1"/>
+  <text x="157" y="63" text-anchor="middle" fill="#c8a0ff" font-size="5.5" font-family="monospace">SO-DIMM x2</text>
+  <rect x="130" y="70" width="55" height="12" rx="2" fill="#2a1a4a" stroke="#7a5aaf" stroke-width="1"/>
+  <text x="157" y="78" text-anchor="middle" fill="#c8a0ff" font-size="5.5" font-family="monospace">SO-DIMM x2</text>
+  <!-- M.2 slot -->
+  <rect x="200" y="55" width="70" height="10" rx="2" fill="#1a2a1a" stroke="#1E7A3E" stroke-width="1"/>
+  <text x="235" y="62" text-anchor="middle" fill="#90ee90" font-size="5.5" font-family="monospace">M.2 NVMe SSD</text>
+  <!-- Battery -->
+  <rect x="60" y="110" width="100" height="45" rx="4" fill="#1a2a0a" stroke="#4a7a1a" stroke-width="1.5"/>
+  <text x="110" y="130" text-anchor="middle" fill="#90ee90" font-size="6" font-family="monospace">BATTERY</text>
+  <text x="110" y="142" text-anchor="middle" fill="#aaa" font-size="5" font-family="monospace">72Wh Li-Ion 4-cell</text>
+  <!-- WiFi card -->
+  <rect x="200" y="80" width="50" height="25" rx="2" fill="#1a1a3a" stroke="#1B5EAF" stroke-width="1"/>
+  <text x="225" y="91" text-anchor="middle" fill="#88aaff" font-size="5.5" font-family="monospace">Wi-Fi 6E</text>
+  <text x="225" y="100" text-anchor="middle" fill="#aaa" font-size="5" font-family="monospace">AX211</text>
+  <!-- Antenna lines -->
+  <line x1="225" y1="80" x2="100" y2="22" stroke="white" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+  <line x1="220" y1="80" x2="240" y2="22" stroke="#aaa" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+  <!-- DC Jack -->
+  <rect x="260" y="110" width="20" height="15" rx="2" fill="#2a1a0a" stroke="#f0c040" stroke-width="1"/>
+  <text x="270" y="120" text-anchor="middle" fill="#f0c040" font-size="5" font-family="monospace">DC</text>
+  <!-- GPU -->
+  <rect x="200" y="115" width="55" height="35" rx="3" fill="#2a0a0a" stroke="#ff5555" stroke-width="1"/>
+  <text x="227" y="130" text-anchor="middle" fill="#ff9999" font-size="6" font-family="monospace">GPU</text>
+  <text x="227" y="141" text-anchor="middle" fill="#aaa" font-size="5" font-family="monospace">RTX 3050</text>
+  <!-- Hotspot markers -->
+  <g class="hotspot" id="hs-ram" onclick="hotspotClick('ram')" transform="translate(157,63)">
+    <circle r="10" fill="#7a5aaf" opacity="0.85"/>
+    <text class="component-label" x="0" y="0">RAM</text>
+  </g>
+  <g class="hotspot" id="hs-ssd" onclick="hotspotClick('ssd')" transform="translate(235,62)">
+    <circle r="10" fill="#1E7A3E" opacity="0.85"/>
+    <text class="component-label" x="0" y="0">SSD</text>
+  </g>
+  <g class="hotspot" id="hs-bat" onclick="hotspotClick('bat')" transform="translate(110,130)">
+    <circle r="10" fill="#4a7a1a" opacity="0.85"/>
+    <text class="component-label" x="0" y="0">BAT</text>
+  </g>
+  <g class="hotspot" id="hs-wifi" onclick="hotspotClick('wifi')" transform="translate(225,91)">
+    <circle r="10" fill="#1B5EAF" opacity="0.85"/>
+    <text class="component-label" x="0" y="0">WiFi</text>
+  </g>
+  <g class="hotspot" id="hs-gpu" onclick="hotspotClick('gpu')" transform="translate(227,130)">
+    <circle r="10" fill="#aa2222" opacity="0.85"/>
+    <text class="component-label" x="0" y="0">GPU</text>
+  </g>
+  <g class="hotspot" id="hs-dc" onclick="hotspotClick('dc')" transform="translate(270,120)">
+    <circle r="10" fill="#b08000" opacity="0.85"/>
+    <text class="component-label" x="0" y="0">DC</text>
+  </g>
+  <!-- Base -->
+  <rect x="20" y="195" width="300" height="18" rx="4" fill="#222" stroke="#444" stroke-width="1.5"/>
+  <rect x="100" y="213" width="140" height="6" rx="3" fill="#333"/>
+  <!-- Hinge -->
+  <rect x="28" y="193" width="284" height="5" rx="2" fill="#333"/>
+</svg>`;
+
+var svgDisassembly = `<svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg">
+  <!-- Laptop base open, screws visible -->
+  <rect x="20" y="30" width="300" height="200" rx="8" fill="#1a1a1a" stroke="#555" stroke-width="2"/>
+  <rect x="30" y="40" width="280" height="180" rx="5" fill="#111" stroke="#333" stroke-width="1"/>
+  <!-- Bottom panel with screws -->
+  <text x="170" y="60" text-anchor="middle" fill="#888" font-size="8" font-family="monospace">LAPTOP BOTTOM PANEL</text>
+  <!-- Screw positions -->
+  <circle cx="50" cy="75" r="5" fill="#555" stroke="#888" stroke-width="1"/>
+  <line x1="47" y1="75" x2="53" y2="75" stroke="#aaa" stroke-width="1"/>
+  <line x1="50" y1="72" x2="50" y2="78" stroke="#aaa" stroke-width="1"/>
+  <circle cx="290" cy="75" r="5" fill="#555" stroke="#888" stroke-width="1"/>
+  <line x1="287" y1="75" x2="293" y2="75" stroke="#aaa" stroke-width="1"/>
+  <line x1="290" y1="72" x2="290" y2="78" stroke="#aaa" stroke-width="1"/>
+  <circle cx="50" cy="200" r="5" fill="#555" stroke="#888" stroke-width="1"/>
+  <line x1="47" y1="200" x2="53" y2="200" stroke="#aaa" stroke-width="1"/>
+  <line x1="50" y1="197" x2="50" y2="203" stroke="#aaa" stroke-width="1"/>
+  <circle cx="290" cy="200" r="5" fill="#555" stroke="#888" stroke-width="1"/>
+  <line x1="287" y1="200" x2="293" y2="200" stroke="#aaa" stroke-width="1"/>
+  <line x1="290" y1="197" x2="290" y2="203" stroke="#aaa" stroke-width="1"/>
+  <circle cx="170" cy="75" r="5" fill="#555" stroke="#888" stroke-width="1"/>
+  <line x1="167" y1="75" x2="173" y2="75" stroke="#aaa" stroke-width="1"/>
+  <line x1="170" y1="72" x2="170" y2="78" stroke="#aaa" stroke-width="1"/>
+  <!-- Tools scattered -->
+  <!-- Screwdriver -->
+  <rect x="60" y="100" width="60" height="8" rx="3" fill="#c0392b" transform="rotate(-20,90,104)"/>
+  <rect x="115" y="97" width="15" height="6" rx="1" fill="#888" transform="rotate(-20,122,100)"/>
+  <text x="90" y="130" text-anchor="middle" fill="#e74c3c" font-size="7" font-family="monospace">Phillips #0</text>
+  <!-- Spudger -->
+  <rect x="170" y="95" width="55" height="7" rx="2" fill="#f0c040" transform="rotate(10,197,98)"/>
+  <text x="197" y="125" text-anchor="middle" fill="#f0c040" font-size="7" font-family="monospace">Spudger</text>
+  <!-- ESD mat -->
+  <rect x="40" y="150" width="120" height="40" rx="3" fill="#1a3a1a" stroke="#1E7A3E" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="100" y="168" text-anchor="middle" fill="#1E7A3E" font-size="7" font-family="monospace">ESD Mat</text>
+  <text x="100" y="180" text-anchor="middle" fill="#4a9a4a" font-size="6" font-family="monospace">Anti-Static</text>
+  <!-- Wrist strap -->
+  <path d="M 200 155 Q 230 145 250 160 Q 270 175 250 185 Q 230 195 200 185 Z" fill="none" stroke="#1B5EAF" stroke-width="2"/>
+  <text x="230" y="172" text-anchor="middle" fill="#1B5EAF" font-size="6.5" font-family="monospace">ESD Strap</text>
+  <!-- Warning label -->
+  <rect x="100" y="90" width="70" height="20" rx="3" fill="#f0c040" opacity="0.9"/>
+  <text x="135" y="103" text-anchor="middle" fill="#000" font-size="7" font-weight="bold" font-family="monospace">⚠ ESD RISK</text>
+</svg>`;
+
+var svgBattery = `<svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg">
+  <!-- Laptop with battery highlighted -->
+  <rect x="20" y="10" width="300" height="200" rx="8" fill="#111" stroke="#444" stroke-width="2"/>
+  <!-- Battery pack large -->
+  <rect x="40" y="30" width="260" height="90" rx="6" fill="#1a2a0a" stroke="#4a9a1a" stroke-width="2"/>
+  <text x="170" y="55" text-anchor="middle" fill="#90ee90" font-size="9" font-family="monospace" font-weight="bold">LAPTOP BATTERY PACK</text>
+  <!-- Cells visualization -->
+  <rect x="55" y="65" width="35" height="40" rx="3" fill="#2a4a0a" stroke="#5aaa2a" stroke-width="1"/>
+  <text x="72" y="82" text-anchor="middle" fill="#90ee90" font-size="6" font-family="monospace">Cell 1</text>
+  <text x="72" y="92" text-anchor="middle" fill="#aaa" font-size="5" font-family="monospace">Li-Ion</text>
+  <rect x="100" y="65" width="35" height="40" rx="3" fill="#2a4a0a" stroke="#5aaa2a" stroke-width="1"/>
+  <text x="117" y="82" text-anchor="middle" fill="#90ee90" font-size="6" font-family="monospace">Cell 2</text>
+  <text x="117" y="92" text-anchor="middle" fill="#aaa" font-size="5" font-family="monospace">Li-Ion</text>
+  <rect x="145" y="65" width="35" height="40" rx="3" fill="#2a4a0a" stroke="#5aaa2a" stroke-width="1"/>
+  <text x="162" y="82" text-anchor="middle" fill="#90ee90" font-size="6" font-family="monospace">Cell 3</text>
+  <text x="162" y="92" text-anchor="middle" fill="#aaa" font-size="5" font-family="monospace">Li-Ion</text>
+  <rect x="190" y="65" width="35" height="40" rx="3" fill="#2a4a0a" stroke="#5aaa2a" stroke-width="1"/>
+  <text x="207" y="82" text-anchor="middle" fill="#90ee90" font-size="6" font-family="monospace">Cell 4</text>
+  <text x="207" y="92" text-anchor="middle" fill="#aaa" font-size="5" font-family="monospace">Li-Ion</text>
+  <!-- Specs -->
+  <text x="170" y="115" text-anchor="middle" fill="#aaa" font-size="7" font-family="monospace">72Wh | 11.4V | 6300mAh | 4-cell</text>
+  <!-- AC Adapter -->
+  <rect x="40" y="140" width="80" height="50" rx="5" fill="#1a1a2a" stroke="#1B5EAF" stroke-width="1.5"/>
+  <text x="80" y="160" text-anchor="middle" fill="#88aaff" font-size="7" font-family="monospace">AC Adapter</text>
+  <text x="80" y="172" text-anchor="middle" fill="#aaa" font-size="6" font-family="monospace">65W / 19.5V</text>
+  <text x="80" y="182" text-anchor="middle" fill="#aaa" font-size="5.5" font-family="monospace">AC→DC Converter</text>
+  <!-- DC Jack -->
+  <rect x="150" y="150" width="60" height="35" rx="4" fill="#2a1a0a" stroke="#f0c040" stroke-width="1.5"/>
+  <text x="180" y="165" text-anchor="middle" fill="#f0c040" font-size="7" font-family="monospace">DC Jack</text>
+  <text x="180" y="177" text-anchor="middle" fill="#aaa" font-size="5.5" font-family="monospace">Barrel / USB-C PD</text>
+  <!-- CMOS -->
+  <circle cx="270" cy="165" r="22" fill="#1a1a0a" stroke="#f0c040" stroke-width="1.5"/>
+  <text x="270" y="162" text-anchor="middle" fill="#f0c040" font-size="7" font-family="monospace">CMOS</text>
+  <text x="270" y="173" text-anchor="middle" fill="#aaa" font-size="5.5" font-family="monospace">CR2032</text>
+  <!-- Connection lines -->
+  <line x1="120" y1="165" x2="150" y2="165" stroke="#1B5EAF" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <line x1="210" y1="165" x2="248" y2="165" stroke="#f0c040" stroke-width="1" stroke-dasharray="3,2"/>
+</svg>`;
+
+var svgRAM = `<svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg">
+  <!-- SO-DIMM module detailed -->
+  <text x="170" y="20" text-anchor="middle" fill="#c8a0ff" font-size="9" font-family="monospace" font-weight="bold">SO-DIMM Memory Module</text>
+  <!-- Module body -->
+  <rect x="30" y="30" width="280" height="60" rx="4" fill="#1a0a2a" stroke="#7a5aaf" stroke-width="2"/>
+  <!-- Chips on module -->
+  <rect x="45" y="40" width="22" height="18" rx="2" fill="#2a1a4a" stroke="#9a7acf" stroke-width="1"/>
+  <rect x="75" y="40" width="22" height="18" rx="2" fill="#2a1a4a" stroke="#9a7acf" stroke-width="1"/>
+  <rect x="105" y="40" width="22" height="18" rx="2" fill="#2a1a4a" stroke="#9a7acf" stroke-width="1"/>
+  <rect x="135" y="40" width="22" height="18" rx="2" fill="#2a1a4a" stroke="#9a7acf" stroke-width="1"/>
+  <rect x="165" y="40" width="22" height="18" rx="2" fill="#2a1a4a" stroke="#9a7acf" stroke-width="1"/>
+  <rect x="195" y="40" width="22" height="18" rx="2" fill="#2a1a4a" stroke="#9a7acf" stroke-width="1"/>
+  <rect x="225" y="40" width="22" height="18" rx="2" fill="#2a1a4a" stroke="#9a7acf" stroke-width="1"/>
+  <rect x="255" y="40" width="22" height="18" rx="2" fill="#2a1a4a" stroke="#9a7acf" stroke-width="1"/>
+  <!-- Notch -->
+  <rect x="148" y="78" width="12" height="12" rx="1" fill="#0d0a1a"/>
+  <!-- Gold contacts -->
+  <rect x="35" y="72" width="270" height="8" rx="1" fill="#b08000"/>
+  <text x="170" y="78" text-anchor="middle" fill="#000" font-size="5" font-family="monospace">GOLD EDGE CONTACTS (260-pin DDR4)</text>
+  <!-- Label -->
+  <text x="170" y="55" text-anchor="middle" fill="#c8a0ff" font-size="6.5" font-family="monospace">16GB DDR4-3200 SO-DIMM</text>
+  <!-- Slot diagram -->
+  <text x="170" y="115" text-anchor="middle" fill="#888" font-size="8" font-family="monospace">LAPTOP MEMORY SLOTS</text>
+  <rect x="40" y="125" width="120" height="30" rx="3" fill="#0d0a1a" stroke="#7a5aaf" stroke-width="1.5"/>
+  <text x="100" y="138" text-anchor="middle" fill="#c8a0ff" font-size="6.5" font-family="monospace">SLOT A: 16GB DDR4</text>
+  <text x="100" y="148" text-anchor="middle" fill="#aaa" font-size="5.5" font-family="monospace">Installed ✓</text>
+  <rect x="180" y="125" width="120" height="30" rx="3" fill="#0d0a1a" stroke="#555" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="240" y="138" text-anchor="middle" fill="#888" font-size="6.5" font-family="monospace">SLOT B: EMPTY</text>
+  <text x="240" y="148" text-anchor="middle" fill="#555" font-size="5.5" font-family="monospace">Available</text>
+  <!-- Angle install diagram -->
+  <text x="170" y="185" text-anchor="middle" fill="#888" font-size="7" font-family="monospace">Install at 45° → press down to lock</text>
+  <line x1="80" y1="220" x2="140" y2="195" stroke="#7a5aaf" stroke-width="2"/>
+  <polygon points="140,195 130,200 135,190" fill="#7a5aaf"/>
+  <rect x="140" y="205" width="120" height="20" rx="2" fill="#1a0a2a" stroke="#7a5aaf" stroke-width="1"/>
+  <text x="200" y="218" text-anchor="middle" fill="#c8a0ff" font-size="6" font-family="monospace">Locked flat in slot</text>
+</svg>`;
+
+var svgStorage = `<svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg">
+  <text x="170" y="18" text-anchor="middle" fill="#90ee90" font-size="9" font-family="monospace" font-weight="bold">Storage Form Factors</text>
+  <!-- 2.5" HDD -->
+  <rect x="15" y="28" width="90" height="65" rx="4" fill="#1a1a1a" stroke="#888" stroke-width="1.5"/>
+  <circle cx="60" cy="55" r="18" fill="#222" stroke="#555" stroke-width="1"/>
+  <circle cx="60" cy="55" r="5" fill="#333"/>
+  <text x="60" y="82" text-anchor="middle" fill="#aaa" font-size="6.5" font-family="monospace">2.5" HDD</text>
+  <text x="60" y="90" text-anchor="middle" fill="#888" font-size="5.5" font-family="monospace">SATA | 5400/7200rpm</text>
+  <!-- M.2 2280 NVMe -->
+  <rect x="120" y="28" width="22" height="65" rx="2" fill="#1a0a0a" stroke="#ff5555" stroke-width="1.5"/>
+  <rect x="122" y="30" width="18" height="8" rx="1" fill="#2a0a0a" stroke="#ff7777" stroke-width="1"/>
+  <rect x="122" y="42" width="18" height="8" rx="1" fill="#2a0a0a" stroke="#ff7777" stroke-width="1"/>
+  <rect x="122" y="54" width="18" height="8" rx="1" fill="#2a0a0a" stroke="#ff7777" stroke-width="1"/>
+  <rect x="122" y="84" width="18" height="5" rx="1" fill="#b08000"/>
+  <text x="131" y="105" text-anchor="middle" fill="#ff9999" font-size="6" font-family="monospace">M.2</text>
+  <text x="131" y="113" text-anchor="middle" fill="#ff9999" font-size="5.5" font-family="monospace">NVMe</text>
+  <text x="131" y="121" text-anchor="middle" fill="#888" font-size="5" font-family="monospace">PCIe</text>
+  <!-- M.2 SATA -->
+  <rect x="158" y="28" width="22" height="65" rx="2" fill="#0a1a0a" stroke="#1E7A3E" stroke-width="1.5"/>
+  <rect x="160" y="30" width="18" height="8" rx="1" fill="#0a2a0a" stroke="#2aaa2a" stroke-width="1"/>
+  <rect x="160" y="42" width="18" height="8" rx="1" fill="#0a2a0a" stroke="#2aaa2a" stroke-width="1"/>
+  <rect x="160" y="54" width="18" height="8" rx="1" fill="#0a2a0a" stroke="#2aaa2a" stroke-width="1"/>
+  <rect x="160" y="84" width="18" height="5" rx="1" fill="#b08000"/>
+  <text x="169" y="105" text-anchor="middle" fill="#90ee90" font-size="6" font-family="monospace">M.2</text>
+  <text x="169" y="113" text-anchor="middle" fill="#90ee90" font-size="5.5" font-family="monospace">SATA</text>
+  <text x="169" y="121" text-anchor="middle" fill="#888" font-size="5" font-family="monospace">SATA</text>
+  <!-- mSATA -->
+  <rect x="196" y="28" width="30" height="50" rx="2" fill="#0a0a2a" stroke="#1B5EAF" stroke-width="1.5"/>
+  <rect x="198" y="30" width="26" height="8" rx="1" fill="#0a0a3a" stroke="#3a6acf" stroke-width="1"/>
+  <rect x="198" y="42" width="26" height="8" rx="1" fill="#0a0a3a" stroke="#3a6acf" stroke-width="1"/>
+  <rect x="198" y="70" width="26" height="5" rx="1" fill="#b08000"/>
+  <text x="211" y="90" text-anchor="middle" fill="#88aaff" font-size="6" font-family="monospace">mSATA</text>
+  <text x="211" y="100" text-anchor="middle" fill="#888" font-size="5" font-family="monospace">Legacy</text>
+  <!-- 2.5" SSD -->
+  <rect x="240" y="28" width="90" height="65" rx="4" fill="#0a1a0a" stroke="#1E7A3E" stroke-width="1.5"/>
+  <rect x="250" y="38" width="70" height="35" rx="2" fill="#0d2a0d" stroke="#2aaa2a" stroke-width="1"/>
+  <text x="285" y="52" text-anchor="middle" fill="#90ee90" font-size="6.5" font-family="monospace">NAND Flash</text>
+  <text x="285" y="62" text-anchor="middle" fill="#aaa" font-size="5.5" font-family="monospace">No moving parts</text>
+  <text x="285" y="82" text-anchor="middle" fill="#90ee90" font-size="6.5" font-family="monospace">2.5" SATA SSD</text>
+  <text x="285" y="90" text-anchor="middle" fill="#888" font-size="5.5" font-family="monospace">SATA III | 550MB/s</text>
+  <!-- Speed comparison bar -->
+  <text x="170" y="140" text-anchor="middle" fill="#888" font-size="7.5" font-family="monospace">Speed Comparison</text>
+  <text x="30" y="158" fill="#aaa" font-size="6.5" font-family="monospace">HDD</text>
+  <rect x="65" y="150" width="20" height="10" rx="2" fill="#888"/>
+  <text x="90" y="158" fill="#888" font-size="6" font-family="monospace">~150 MB/s</text>
+  <text x="30" y="175" fill="#90ee90" font-size="6.5" font-family="monospace">SATA SSD</text>
+  <rect x="85" y="167" width="60" height="10" rx="2" fill="#1E7A3E"/>
+  <text x="150" y="175" fill="#888" font-size="6" font-family="monospace">~550 MB/s</text>
+  <text x="30" y="192" fill="#ff9999" font-size="6.5" font-family="monospace">NVMe SSD</text>
+  <rect x="85" y="184" width="180" height="10" rx="2" fill="#c0392b"/>
+  <text x="270" y="192" fill="#888" font-size="6" font-family="monospace">~7000 MB/s</text>
+  <!-- Key notch difference -->
+  <text x="170" y="220" text-anchor="middle" fill="#f0c040" font-size="7" font-family="monospace">M.2 Key: B+M = SATA | M-only = NVMe</text>
+</svg>`;
+
+var svgAntenna = `<svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg">
+  <!-- Laptop open showing antenna routing -->
+  <text x="170" y="16" text-anchor="middle" fill="#88aaff" font-size="8.5" font-family="monospace" font-weight="bold">Wireless Antenna Routing</text>
+  <!-- Screen lid outline -->
+  <rect x="25" y="22" width="290" height="140" rx="6" fill="#0d1b2a" stroke="#444" stroke-width="2"/>
+  <!-- Screen bezel -->
+  <rect x="33" y="28" width="274" height="128" rx="4" fill="#0a1015" stroke="#333" stroke-width="1"/>
+  <!-- Antenna paths -->
+  <!-- Main antenna (white) - routes along top of lid -->
+  <path d="M 170 155 L 170 130 L 60 130 L 60 35 L 170 35" stroke="white" stroke-width="2.5" fill="none" stroke-dasharray="5,3"/>
+  <!-- Aux antenna (black/grey) - routes other side -->
+  <path d="M 170 155 L 170 130 L 280 130 L 280 35 L 170 35" stroke="#aaa" stroke-width="2.5" fill="none" stroke-dasharray="5,3"/>
+  <!-- WiFi card in base -->
+  <rect x="140" y="148" width="60" height="30" rx="3" fill="#1a1a3a" stroke="#1B5EAF" stroke-width="1.5"/>
+  <text x="170" y="161" text-anchor="middle" fill="#88aaff" font-size="6.5" font-family="monospace">Wi-Fi Card</text>
+  <text x="170" y="171" text-anchor="middle" fill="#aaa" font-size="5.5" font-family="monospace">AX211 (Wi-Fi 6E)</text>
+  <!-- Antenna connectors on card -->
+  <circle cx="155" cy="148" r="4" fill="white" stroke="#888" stroke-width="1"/>
+  <text x="155" y="144" text-anchor="middle" fill="white" font-size="5.5" font-family="monospace">MAIN</text>
+  <circle cx="185" cy="148" r="4" fill="#888" stroke="#555" stroke-width="1"/>
+  <text x="185" y="144" text-anchor="middle" fill="#aaa" font-size="5.5" font-family="monospace">AUX</text>
+  <!-- Antenna labels in lid -->
+  <circle cx="60" cy="35" r="8" fill="white" stroke="#ccc" stroke-width="1"/>
+  <text x="60" y="38" text-anchor="middle" fill="#000" font-size="6" font-family="monospace" font-weight="bold">M</text>
+  <text x="60" y="5
