@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 9A: Mobile Devices & Peripherals | University View Academy</title>
+<style>
+:root{--blue:#1B5EAF;--green:#1E7A3E;--gold:#f0c040;--bg:#0d1b2a;--card:#1a2a3a;--text:#e8f0fe;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+#header{background:linear-gradient(135deg,var(--blue),var(--green));padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;box-shadow:0 4px 15px rgba(0,0,0,.5);}
+#header img{width:54px;height:54px;border-radius:50%;border:2px solid white;}
+.logo-area{display:flex;align-items:center;gap:10px;}
+.school-info h1{font-size:.95rem;font-weight:700;color:white;}
+.school-info p{font-size:.65rem;color:#c8e6c9;letter-spacing:2px;}
+.lesson-title{font-size:.78rem;color:#fff;text-align:right;}
+.lesson-title strong{display:block;font-size:.9rem;}
+.ribbon{background:var(--green);text-align:center;padding:5px;font-size:.7rem;letter-spacing:3px;color:white;font-weight:700;border-bottom:2px solid var(--gold);}
+#rank-bar{background:var(--card);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:2px solid var(--blue);}
+.rank-badge{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--blue),#0d3a6e);padding:5px 12px;border-radius:20px;border:2px solid var(--gold);}
+.rank-icon{font-size:1.3rem;}.rank-text{font-size:.75rem;color:var(--gold);font-weight:700;}
+.score-display{font-size:1rem;font-weight:700;color:var(--gold);}
+.streak-display{font-size:.8rem;color:#ff9800;font-weight:700;}
+.progress-wrap{flex:1;min-width:100px;max-width:180px;}
+.progress-label{font-size:.65rem;color:#aaa;margin-bottom:2px;}
+.progress-bar{background:#333;border-radius:10px;height:9px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:10px;transition:width .5s;}
+#main{display:flex;flex-direction:column;align-items:center;padding:16px;gap:16px;}
+.mission-header{text-align:center;max-width:680px;}
+.mission-tag{display:inline-block;background:var(--blue);color:white;font-size:.65rem;padding:2px 10px;border-radius:12px;letter-spacing:2px;margin-bottom:4px;}
+.mission-header h2{font-size:1.3rem;color:var(--gold);margin-bottom:3px;}
+.mission-header p{font-size:.8rem;color:#aaa;}
+#phone-wrap{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;justify-content:center;width:100%;max-width:880px;}
+.phone-device{width:272px;min-width:252px;background:#1a1a1a;border-radius:34px;border:3px solid #333;box-shadow:0 0 0 2px #555,0 20px 50px rgba(0,0,0,.8);position:relative;padding:18px 10px 22px;flex-shrink:0;}
+.phone-notch{width:76px;height:20px;background:#111;border-radius:0 0 12px 12px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;gap:5px;}
+.phone-notch .camera{width:7px;height:7px;background:#222;border-radius:50%;border:1px solid #444;}
+.phone-notch .speaker{width:28px;height:4px;background:#222;border-radius:2px;}
+.phone-screen{background:#1a1a2e;border-radius:18px;min-height:470px;overflow:hidden;position:relative;}
+.phone-home-btn{width:38px;height:5px;background:#444;border-radius:3px;margin:8px auto 0;}
+.phone-side-btn{position:absolute;right:-4px;top:95px;width:4px;height:38px;background:#444;border-radius:2px;}
+.phone-vol-btn{position:absolute;left:-4px;top:85px;width:4px;height:28px;background:#444;border-radius:2px;}
+.phone-vol-btn2{position:absolute;left:-4px;top:122px;width:4px;height:28px;background:#444;border-radius:2px;}
+.status-bar{background:#0d0d1a;padding:3px 10px;display:flex;justify-content:space-between;align-items:center;font-size:.6rem;color:#ccc;}
+.status-icons{display:flex;gap:3px;align-items:center;}
+.phone-screen-view{display:none;flex-direction:column;}
+.phone-screen-view.active{display:flex;}
+.home-screen-bg{background:linear-gradient(160deg,#0d1b3e 0%,#1a2a1a 100%);flex:1;padding:8px;}
+.home-time{text-align:center;color:white;font-size:1.9rem;font-weight:300;margin:8px 0 2px;}
+.home-date{text-align:center;color:#aaa;font-size:.65rem;margin-bottom:10px;}
+.app-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 2px;}
+.app-icon{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:3px;border-radius:8px;transition:background .2s;}
+.app-icon:hover{background:rgba(255,255,255,.1);}
+.icon-bg{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.app-icon span{font-size:.5rem;color:#ddd;text-align:center;}
+.settings-screen{background:#f2f2f7;flex:1;overflow-y:auto;}
+.settings-header{background:#f2f2f7;padding:8px 10px 5px;border-bottom:1px solid #ddd;}
+.settings-header h3{font-size:.95rem;color:#000;font-weight:700;}
+.settings-search{background:#e5e5ea;border-radius:7px;padding:4px 8px;font-size:.65rem;color:#888;margin:5px 0;display:flex;align-items:center;gap:4px;}
+.settings-row{background:white;padding:7px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background .15s;}
+.settings-row:hover{background:#f8f8f8;}
+.settings-row-left{display:flex;align-items:center;gap:7px;}
+.settings-row-icon{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:white;}
+.settings-row-text{font-size:.68rem;color:#000;}
+.settings-row-sub{font-size:.57rem;color:#888;}
+.settings-row-right{display:flex;align-items:center;gap:3px;font-size:.6rem;color:#888;}
+.chevron{color:#c7c7cc;font-size:.65rem;}
+.toggle{width:34px;height:19px;background:#ccc;border-radius:10px;position:relative;cursor:pointer;transition:background .3s;flex-shrink:0;}
+.toggle.on{background:#34c759;}
+.toggle::after{content:'';position:absolute;width:15px;height:15px;background:white;border-radius:50%;top:2px;left:2px;transition:left .3s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.toggle.on::after{left:17px;}
+.nav-bar{background:#f2f2f7;padding:7px 10px;display:flex;align-items:center;gap:7px;border-bottom:1px solid #ddd;}
+.back-btn{color:#007aff;font-size:.7rem;cursor:pointer;}
+.nav-title{font-size:.8rem;font-weight:600;color:#000;flex:1;text-align:center;}
+.wifi-screen{background:#f2f2f7;flex:1;overflow-y:auto;}
+.wifi-list{padding:6px;}
+.wifi-network{background:white;border-radius:7px;margin-bottom:5px;padding:7px 9px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:2px solid transparent;transition:all .2s;}
+.wifi-network:hover{border-color:#007aff;}
+.wifi-network.connected{border-color:#34c759;background:#f0fff4;}
+.wifi-network-info{display:flex;align-items:center;gap:5px;}
+.wifi-name{font-size:.68rem;color:#000;font-weight:500;}
+.wifi-security{font-size:.55rem;color:#888;}
+.wifi-signal{font-size:.6rem;color:#888;}
+.bt-device{background:white;border-radius:7px;margin-bottom:5px;padding:7px 9px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:2px solid transparent;transition:all .2s;}
+.bt-device:hover{border-color:#007aff;}
+.bt-device.paired{border-color:#1B5EAF;background:#f0f4ff;}
+.bt-device-info{display:flex;align-items:center;gap:5px;}
+.bt-name{font-size:.68rem;color:#000;font-weight:500;}
+.bt-type{font-size:.55rem;color:#888;}
+.bt-status{font-size:.58rem;color:#007aff;}
+.cell-info-box{background:white;border-radius:7px;margin:5px 7px;padding:9px;}
+.cell-info-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f0f0f0;}
+.cell-info-row:last-child{border-bottom:none;}
+.cell-info-label{font-size:.62rem;color:#888;}
+.cell-info-value{font-size:.62rem;color:#000;font-weight:500;}
+.sim-card-visual{background:linear-gradient(135deg,#1B5EAF,#0d3a6e);border-radius:9px;margin:7px;padding:10px;color:white;}
+.sim-chip{width:26px;height:18px;background:linear-gradient(135deg,#d4a017,#f0c040);border-radius:3px;margin-bottom:6px;}
+.sim-number{font-size:.6rem;letter-spacing:1px;color:#aaa;}
+.sim-carrier{font-size:.75rem;font-weight:700;}
+.sim-type-badge{display:inline-block;background:rgba(255,255,255,.15);padding:2px 7px;border-radius:9px;font-size:.57rem;margin-top:3px;}
+.port-diagram{background:#1a1a2e;border-radius:9px;padding:8px;margin:5px 7px;}
+.laptop-edge{background:#2a2a3e;border-radius:5px;padding:7px;display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-bottom:5px;}
+.port-slot{background:#111;border:2px solid #444;border-radius:3px;padding:3px 5px;font-size:.57rem;color:#888;cursor:pointer;transition:all .2s;text-align:center;min-width:36px;}
+.port-slot:hover{border-color:#f0c040;color:#f0c040;}
+.port-slot.selected{border-color:#1B5EAF;color:#1B5EAF;background:rgba(27,94,175,.2);}
+.nfc-waves{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px;}
+.nfc-wave{border:2px solid #1B5EAF;border-radius:50%;animation:nfcPulse 1.5s ease-out infinite;opacity:0;}
+@keyframes nfcPulse{0%{transform:scale(.5);opacity:.8;}100%{transform:scale(1.5);opacity:0;}}
+.nfc-wave:nth-child(2){width:18px;height:18px;animation-delay:0s;}
+.nfc-wave:nth-child(3){width:32px;height:32px;animation-delay:.3s;}
+.nfc-wave:nth-child(4){width:46px;height:46px;animation-delay:.6s;}
+#mission-panel{flex:1;min-width:270px;max-width:400px;}
+.mission-card{background:var(--card);border-radius:14px;border:2px solid var(--blue);padding:14px;margin-bottom:10px;box-shadow:0 4px 18px rgba(27,94,175,.2);}
+.mission-number{font-size:.62rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;}
+.mission-card h3{font-size:.95rem;color:white;margin-bottom:5px;}
+.mission-card p{font-size:.76rem;color:#aaa;margin-bottom:10px;line-height:1.5;}
+.mission-instruction{background:rgba(27,94,175,.2);border-left:3px solid var(--blue);padding:7px 9px;border-radius:0 7px 7px 0;font-size:.74rem;color:#c8d8f0;margin-bottom:10px;}
+.quiz-options{display:flex;flex-direction:column;gap:7px;}
+.quiz-option{background:rgba(255,255,255,.05);border:2px solid #333;border-radius:9px;padding:9px 12px;cursor:pointer;font-size:.76rem;color:#ddd;transition:all .2s;text-align:left;width:100%;}
+.quiz-option:hover:not(.disabled){border-color:var(--blue);background:rgba(27,94,175,.15);color:white;}
+.quiz-option.correct{border-color:var(--green);background:rgba(30,122,62,.25);color:#90ee90;}
+.quiz-option.wrong{border-color:#e53935;background:rgba(229,57,53,.15);color:#ff8a80;}
+.quiz-option.disabled{cursor:not-allowed;opacity:.7;}
+.feedback-box{margin-top:9px;padding:9px 11px;border-radius:9px;font-size:.76rem;line-height:1.5;display:none;}
+.feedback-box.show{display:block;}
+.feedback-box.correct{background:rgba(30,122,62,.2);border:1px solid var(--green);color:#90ee90;}
+.feedback-box.wrong{background:rgba(229,57,53,.1);border:1px solid #e53935;color:#ff8a80;}
+.next-btn{display:none;margin-top:9px;background:linear-gradient(135deg,var(--blue),var(--green));color:white;border:none;padding:9px 18px;border-radius:9px;cursor:pointer;font-size:.82rem;font-weight:700;width:100%;transition:opacity .2s;}
+.next-btn:hover{opacity:.9;}
+.next-btn.show{display:block;}
+.drag-zone{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px;}
+.drag-item{background:var(--blue);color:white;padding:4px 9px;border-radius:7px;font-size:.68rem;cursor:grab;user-select:none;border:2px solid transparent;transition:all .2s;}
+.drag-item:hover{border-color:var(--gold);transform:scale(1.05);}
+.drag-item.used{opacity:.3;cursor:not-allowed;pointer-events:none;}
+.drop-targets{display:flex;flex-direction:column;gap:5px;}
+.drop-target{background:rgba(255,255,255,.05);border:2px dashed #555;border-radius:9px;padding:7px 9px;min-height:36px;font-size:.68rem;color:#888;transition:all .2s;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.drop-target.drag-over{border-color:var(--gold);background:rgba(240,192,64,.1);}
+.drop-target.correct-drop{border-color:var(--green);background:rgba(30,122,62,.2);color:#90ee90;}
+.drop-target.wrong-drop{border-color:#e53935;background:rgba(229,57,53,.1);color:#ff8a80;}
+.drop-label{font-size:.6rem;color:#aaa;min-width:75px;flex-shrink:0;font-weight:600;}
+.dropped-tag{background:rgba(255,255,255,.15);padding:2px 6px;border-radius:5px;font-size:.62rem;margin:1px;}
+.confetti-piece{position:fixed;width:9px;height:9px;border-radius:2px;animation:confettiFall 2s ease-in forwards;pointer-events:none;z-index:9999;}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+.streak-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:linear-gradient(135deg,#ff9800,#f44336);color:white;padding:14px 26px;border-radius:18px;font-size:1.1rem;font-weight:700;z-index:9998;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.5);transition:transform .3s;pointer-events:none;}
+.streak-popup.show{transform:translate(-50%,-50%) scale(1);}
+.badge-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:linear-gradient(135deg,var(--blue),var(--green));color:white;padding:18px 28px;border-radius:18px;font-size:.95rem;font-weight:700;z-index:9998;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.5);border:3px solid var(--gold);transition:transform .3s;pointer-events:none;}
+.badge-popup.show{transform:translate(-50%,-50%) scale(1);}
+.badge-popup .badge-icon{font-size:2.3rem;display:block;margin-bottom:5px;}
+#completion-screen{display:none;text-align:center;padding:28px 18px;max-width:580px;margin:0 auto;}
+#completion-screen.show{display:block;}
+.completion-badge{font-size:3.8rem;margin-bottom:8px;}
+.completion-title{font-size:1.7rem;color:var(--gold);font-weight:700;margin-bottom:6px;}
+.completion-subtitle{font-size:.95rem;color:#aaa;margin-bottom:18px;}
+.final-stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:18px;}
+.stat-box{background:var(--card);border:2px solid var(--blue);border-radius:11px;padding:12px 18px;min-width:90px;}
+.stat-box .stat-val{font-size:1.7rem;font-weight:700;color:var(--gold);}
+.stat-box .stat-label{font-size:.65rem;color:#aaa;}
+.restart-btn{background:linear-gradient(135deg,var(--blue),var(--green));color:white;border:none;padding:11px 28px;border-radius:11px;font-size:.95rem;font-weight:700;cursor:pointer;transition:opacity .2s;}
+.restart-btn:hover{opacity:.9;}
+#intro-screen{text-align:center;padding:18px;max-width:580px;margin:0 auto;}
+#intro-screen img{width:76px;margin-bottom:8px;}
+#intro-screen h2{font-size:1.35rem;color:var(--gold);margin-bottom:5px;}
+#intro-screen p{font-size:.82rem;color:#aaa;margin-bottom:14px;line-height:1.6;}
+.objective-list{text-align:left;background:var(--card);border-radius:11px;padding:12px;margin-bottom:14px;}
+.objective-list li{font-size:.74rem;color:#c8d8f0;padding:3px 0;border-bottom:1px solid #2a3a4a;list-style:none;display:flex;gap:7px;}
+.objective-list li:last-child{border-bottom:none;}
+.start-btn{background:linear-gradient(135deg,var(--blue),var(--green));color:white;border:none;padding:13px 38px;border-radius:13px;font-size:1.05rem;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(27,94,175,.4);transition:transform .2s;}
+.start-btn:hover{transform:scale(1.05);}
+.hidden{display:none!important;}
+.check-btn{background:var(--green);color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.78rem;font-weight:700;margin-top:8px;width:100%;transition:opacity .2s;}
+.check-btn:hover{opacity:.9;}
+.action-needed{background:rgba(240,192,64,.15);border:2px solid var(--gold);border-radius:9px;padding:8px 10px;font-size:.72rem;color:var(--gold);margin-bottom:8px;text-align:center;}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo-area">
+    <img src="https://cdn.abacus.ai/images/99e38b4c-9d03-4b72-a4bc-e563cf4264f8.png" alt="UVA Logo" onerror="this.style.display='none'">
+    <div class="school-info">
+      <h1>University View Academy</h1>
+      <p>VIRTUE &bull; VIGOR &bull; VISION</p>
+    </div>
+  </div>
+  <div class="lesson-title">
+    <strong>Lesson 9A: Mobile Devices &amp; Peripherals</strong>
+    Computer Architecture | A+ Core 1 &ndash; 1.2 &amp; 1.3
+  </div>
+</div>
+<div class="ribbon">&#10022; VIRTUE &bull; VIGOR &bull; VISION &#10022;</div>
+
+<div id="rank-bar">
+  <div class="rank-badge">
+    <span class="rank-icon" id="rank-icon">&#127891;</span>
+    <div>
+      <div class="rank-text" id="rank-label">TRAINEE</div>
+      <div style="font-size:.58rem;color:#aaa;">UVA Tech Cadet</div>
+    </div>
+  </div>
+  <div class="score-display">&#11088; <span id="score-val">0</span> pts</div>
+  <div class="streak-display hidden" id="streak-display">&#128293; <span id="streak-val">0</span> streak!</div>
+  <div class="progress-wrap">
+    <div class="progress-label">Progress: <span id="progress-text">0/8</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div id="main">
+
+<div id="intro-screen">
+  <img src="https://cdn.abacus.ai/images/99e38b4c-9d03-4b72-a4bc-e563cf4264f8.png" alt="UVA Logo" onerror="this.style.display='none'">
+  <h2>&#128241; Operation: Mobile Command</h2>
+  <p>Welcome, UVA Tech Cadet! You have been assigned to configure and troubleshoot a fleet of mobile devices for the Academy. Complete 8 interactive missions on a simulated smartphone to earn your rank and prove your A+ Core 1 knowledge.</p>
+  <ul class="objective-list">
+    <li>&#128246; <span>Configure Wi-Fi networking and identify security types</span></li>
+    <li>&#9992;&#65039; <span>Enable Airplane Mode and understand its effects</span></li>
+    <li>&#128309; <span>Pair Bluetooth peripherals including headsets and styluses</span></li>
+    <li>&#128225; <span>Identify cellular data technologies (4G LTE / 5G NR)</span></li>
+    <li>&#128179; <span>Understand SIM vs. eSIM card functions</span></li>
+    <li>&#128394;&#65039; <span>Classify mobile input and output accessories</span></li>
+    <li>&#128268; <span>Compare laptop ports, port replicators &amp; docking stations</span></li>
+    <li>&#128242; <span>Set up NFC connections and understand use cases</span></li>
+  </ul>
+  <button class="start-btn" onclick="startGame()">&#128640; Begin Mission Briefing</button>
+</div>
+
+<div id="game-area" class="hidden">
+  <div class="mission-header">
+    <div class="mission-tag" id="mission-tag">MISSION 1 OF 8</div>
+    <h2 id="mission-title">Mission Title</h2>
+    <p id="mission-desc">Mission description</p>
+  </div>
+
+  <div id="phone-wrap">
+    <div class="phone-device">
+      <div class="phone-notch"><div class="camera"></div><div class="speaker"></div></div>
+      <div class="phone-side-btn"></div>
+      <div class="phone-vol-btn"></div>
+      <div class="phone-vol-btn2"></div>
+      <div class="phone-screen" id="phone-screen">
+        <div class="status-bar">
+          <span>9:41</span>
+          <div class="status-icons">
+            <span id="status-wifi">&#128246;</span>
+            <span id="status-cell">&#128225;</span>
+            <span id="status-bt">&#128309;</span>
+            <span>&#128267;</span>
+          </div>
+        </div>
+        <!-- HOME -->
+        <div class="phone-screen-view active" id="screen-home">
+          <div class="home-screen-bg">
+            <div class="home-time">9:41</div>
+            <div class="home-date">Friday, March 13</div>
+            <div class="app-grid">
+              <div class="app-icon" onclick="openApp('settings')"><div class="icon-bg" style="background:#8e8e93">&#9881;&#65039;</div><span>Settings</span></div>
+              <div class="app-icon" onclick="openApp('wifi')"><div class="icon-bg" style="background:#007aff">&#128246;</div><span>Wi-Fi</span></div>
+              <div class="app-icon" onclick="openApp('bluetooth')"><div class="icon-bg" style="background:#1B5EAF">&#128309;</div><span>Bluetooth</span></div>
+              <div class="app-icon" onclick="openApp('cellular')"><div class="icon-bg" style="background:#1E7A3E">&#128225;</div><span>Cellular</span></div>
+              <div class="app-icon" onclick="openApp('airplane')"><div class="icon-bg" style="background:#ff9500">&#9992;&#65039;</div><span>Airplane</span></div>
+              <div class="app-icon" onclick="openApp('nfc')"><div class="icon-bg" style="background:#5856d6">&#128242;</div><span>NFC</span></div>
+              <div class="app-icon" onclick="openApp('ports')"><div class="icon-bg" style="background:#ff3b30">&#128268;</div><span>Ports</span></div>
+              <div class="app-icon" onclick="openApp('accessories')"><div class="icon-bg" style="background:#34c759">&#128394;&#65039;</div><span>Accessories</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- SETTINGS -->
+        <div class="phone-screen-view" id="screen-settings">
+          <div class="settings-screen">
+            <div class="settings-header"><h3>Settings</h3><div class="settings-search">&#128269; Search</div></div>
+            <div style="padding:6px">
+              <div class="settings-row" onclick="openApp('airplane')" style="border-radius:7px 7px 0 0">
+                <div class="settings-row-left"><div class="settings-row-icon" style="background:#ff9500">&#9992;&#65039;</div><div><div class="settings-row-text">Airplane Mode</div></div></div>
+                <div class="settings-row-right"><div class="toggle" id="airplane-toggle-settings" onclick="event.stopPropagation();toggleAirplane()"></div></div>
+              </div>
+              <div class="settings-row" onclick="openApp('wifi')">
+                <div class="settings-row-left"><div class="settings-row-icon" style="background:#007aff">&#128246;</div><div><div class="settings-row-text">Wi-Fi</div><div class="settings-row-sub" id="wifi-sub">UVA_Secure_5G</div></div></div>
+                <div class="settings-row-right"><span class="chevron">&#8250;</span></div>
+              </div>
+              <div class="settings-row" onclick="openApp('bluetooth')">
+                <div class="settings-row-left"><div class="settings-row-icon" style="background:#1B5EAF">&#128309;</div><div><div class="settings-row-text">Bluetooth</div><div class="settings-row-sub" id="bt-sub">On</div></div></div>
+                <div class="settings-row-right"><span class="chevron">&#8250;</span></div>
+              </div>
+              <div class="settings-row" onclick="openApp('cellular')" style="border-radius:0 0 7px 7px;border-bottom:none">
+                <div class="settings-row-left"><div class="settings-row-icon" style="background:#1E7A3E">&#128225;</div><div><div class="settings-row-text">Cellular</div></div></div>
+                <div class="settings-row-right"><span class="chevron">&#8250;</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- WIFI -->
+        <div class="phone-screen-view" id="screen-wifi">
+          <div class="wifi-screen">
+            <div class="nav-bar"><span class="back-btn" onclick="openApp('settings')">&#8249; Settings</span><span class="nav-title">Wi-Fi</span></div>
+            <div style="padding:7px"><div class="settings-row" style="border-radius:7px"><div class="settings-row-left"><div class="settings-row-text">Wi-Fi</div></div><div class="toggle on"></div></div></div>
+            <div class="wifi-list">
+              <div style="font-size:.62rem;color:#888;padding:0 3px 3px">AVAILABLE NETWORKS</div>
+              <div class="wifi-network connected" id="wifi-uva" onclick="wifiAction('uva')">
+                <div class="wifi-network-info"><span>&#128246;</span><div><div class="wifi-name">UVA_Secure_5G</div><div class="wifi-security">&#128274; WPA3 &bull; Connected</div></div></div>
+                <span style="color:#34c759;font-size:.62rem">&#10003;</span>
+              </div>
+              <div class="wifi-network" id="wifi-open" onclick="wifiAction('open')">
+                <div class="wifi-network-info"><span>&#128246;</span><div><div class="wifi-name">CoffeeShop_Free</div><div class="wifi-security">&#128275; Open Network</div></div></div>
+                <span class="wifi-signal">&#9650;&#9650;&#9650;</span>
+              </div>
+              <div class="wifi-network" id="wifi-home" onclick="wifiAction('home')">
+                <div class="wifi-network-info"><span>&#128246;</span><div><div class="wifi-name">HomeNetwork_2.4G</div><div class="wifi-security">&#128274; WPA2</div></div></div>
+                <span class="wifi-signal">&#9650;&#9650;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- BLUETOOTH -->
+        <div class="phone-screen-view" id="screen-bluetooth">
+          <div class="wifi-screen">
+            <div class="nav-bar"><span class="back-btn" onclick="openApp('settings')">&#8249; Settings</span><span class="nav-title">Bluetooth</span></div>
+            <div style="padding:7px"><div class="settings-row" style="border-radius:7px"><div class="settings-row-left"><div class="settings-row-text">Bluetooth</div></div><div class="toggle on"></div></div></div>
+            <div style="padding:0 7px">
+              <div style="font-size:.62rem;color:#888;padding:0 3px 3px">MY DEVICES</div>
+              <div class="bt-device paired"><div class="bt-device-info"><span>&#127911;</span><div><div class="bt-name">UVA BT Headset Pro</div><div class="bt-type">Headset &bull; Audio Output + Mic</div></div></div><span class="bt-status">Connected</span></div>
+              <div style="font-size:.62rem;color:#888;padding:5px 3px 3px">OTHER DEVICES</div>
+              <div class="bt-device" id="bt-stylus" onclick="pairDevice('stylus')"><div class="bt-device-info"><span>&#128394;&#65039;</span><div><div class="bt-name">Smart Stylus S2</div><div class="bt-type">Input Device &bull; Stylus</div></div></div><span class="bt-status" id="bt-stylus-status">Tap to Pair</span></div>
+              <div class="bt-device" id="bt-keyboard" onclick="pairDevice('keyboard')"><div class="bt-device-info"><span>&#9000;&#65039;</span><div><div class="bt-name">BT Keyboard Ultra</div><div class="bt-type">Input Device &bull; Keyboard</div></div></div><span class="bt-status" id="bt-keyboard-status">Tap to Pair</span></div>
+              <div class="bt-device" id="bt-speaker" onclick="pairDevice('speaker')"><div class="bt-device-info"><span>&#128266;</span><div><div class="bt-name">Portable Speaker X1</div><div class="bt-type">Output Device &bull; Speaker</div></div></div><span class="bt-status" id="bt-speaker-status">Tap to Pair</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- CELLULAR -->
+        <div class="phone-screen-view" id="screen-cellular">
+          <div class="wifi-screen">
+            <div class="nav-bar"><span class="back-btn" onclick="openApp('settings')">&#8249; Settings</span><span class="nav-title">Cellular</span></div>
+            <div class="sim-card-visual">
+              <div class="sim-chip"></div>
+              <div class="sim-carrier">UVA Mobile</div>
+              <div class="sim-number">SIM: 8901 2600 0000 0000</div>
+              <div class="sim-type-badge" id="sim-type-badge">Physical SIM</div>
+            </div>
+            <div class="cell-info-box">
+              <div class="cell-info-row"><span class="cell-info-label">Network Type</span><span class="cell-info-value" id="cell-network-type">5G NR</span></div>
+              <div class="cell-info-row"><span class="cell-info-label">Carrier</span><span class="cell-info-value">UVA Mobile</span></div>
+              <div class="cell-info-row"><span class="cell-info-label">Signal</span><span class="cell-info-value">&#128246; Excellent</span></div>
+              <div class="cell-info-row"><span class="cell-info-label">Data Roaming</span><span class="cell-info-value">Off</span></div>
+            </div>
+            <div style="padding:0 7px">
+              <div class="settings-row" style="border-radius:7px;margin-bottom:5px" onclick="switchSimType()">
+                <div class="settings-row-left"><div class="settings-row-icon" style="background:#1B5EAF">&#128179;</div><div><div class="settings-row-text">Switch SIM Type</div><div class="settings-row-sub" id="sim-switch-sub">Tap to activate eSIM</div></div></div>
+                <span class="chevron">&#8250;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- AIRPLANE -->
+        <div class="phone-screen-view" id="screen-airplane">
+          <div class="wifi-screen">
+            <div class="nav-bar"><span class="back-btn" onclick="openApp('settings')">&#8249; Settings</span><span class="nav-title">Airplane Mode</span></div>
+            <div style="padding:9px 7px">
+              <div style="background:white;border-radius:7px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+                <div style="font-size:.68rem;color:#000;display:flex;align-items:center;gap:5px;">&#9992;&#65039; Airplane Mode</div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                  <div style="font-size:.58rem;color:#888" id="airplane-status-text">Off</div>
+                  <div class="toggle" id="airplane-toggle-main" onclick="toggleAirplane()"></div>
+                </div>
+              </div>
+              <div class="cell-info-box" style="margin:0 0 7px">
+                <div class="cell-info-row"><span class="cell-info-label">Wi-Fi</span><span class="cell-info-value" id="ap-wifi-status">Active</span></div>
+                <div class="cell-info-row"><span class="cell-info-label">Cellular</span><span class="cell-info-value" id="ap-cell-status">Active</span></div>
+                <div class="cell-info-row"><span class="cell-info-label">Bluetooth</span><span class="cell-info-value" id="ap-bt-status">Active</span></div>
+                <div class="cell-info-row"><span class="cell-info-label">NFC</span><span class="cell-info-value" id="ap-nfc-status">Active</span></div>
+              </div>
+              <div style="font-size:.62rem;color:#888;padding:3px;line-height:1.5">Airplane Mode disables all wireless transmissions. Wi-Fi and Bluetooth can be manually re-enabled after activating Airplane Mode.</div>
+            </div>
+          </div>
+        </div>
+        <!-- NFC -->
+        <div class="phone-screen-view" id="screen-nfc">
+          <div class="wifi-screen">
+            <div class="nav-bar"><span class="back-btn" onclick="openApp('settings')">&#8249; Settings</span><span class="nav-title">NFC &amp; Payments</span></div>
+            <div style="padding:7px">
+              <div class="settings-row" style="border-radius:7px;margin-bottom:7px">
+                <div class="settings-row-left"><div class="settings-row-icon" style="background:#5856d6">&#128242;</div><div><div class="settings-row-text">NFC</div><div class="settings-row-sub">Near Field Communication</div></div></div>
+                <div class="toggle on" id="nfc-toggle" onclick="toggleNFC(this)"></div>
+              </div>
+            </div>
+            <div class="nfc-waves" id="nfc-waves">
+              <div style="font-size:1.4rem;margin-bottom:3px">&#128242;</div>
+              <div class="nfc-wave"></div><div class="nfc-wave"></div><div class="nfc-wave"></div>
+              <div style="font-size:.62rem;color:#888;margin-top:5px">Ready to scan &mdash; hold near NFC tag (&lt;4cm)</div>
+            </div>
+            <div style="padding:0 7px">
+              <div class="settings-row" style="border-radius:7px;margin-bottom:5px">
+                <div class="settings-row-left"><div class="settings-row-icon" style="background:#ff9500">&#128179;</div><div><div class="settings-row-text">Tap to Pay</div><div class="settings-row-sub">UVA Campus Card</div></div></div>
+                <span class="chevron">&#8250;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- PORTS -->
+        <div class="phone-screen-view" id="screen-ports">
+          <div class="wifi-screen">
+            <div class="nav-bar"><span class="back-btn" onclick="openApp('home')">&#8249; Home</span><span class="nav-title">Laptop Ports</span></div>
+            <div class="port-diagram">
+              <div style="font-size:.62rem;color:#aaa;margin-bottom:3px">LEFT SIDE PORTS</div>
+              <div class="laptop-edge">
+                <div class="port-slot" id="port-usbc" onclick="selectPort('usbc')">USB-C</div>
+                <div class="port-slot" id="port-hdmi" onclick="selectPort('hdmi')">HDMI</div>
+                <div class="port-slot" id="port-usba" onclick="selectPort('usba')">USB-A</div>
+                <div class="port-slot" id="port-sd" onclick="selectPort('sd')">SD</div>
+              </div>
+              <div style="font-size:.62rem;color:#aaa;margin-bottom:3px">RIGHT SIDE PORTS</div>
+              <div class="laptop-edge">
+                <div class="port-slot" id="port-usba2" onclick="selectPort('usba2')">USB-A</div>
+                <div class="port-slot" id="port-audio" onclick="selectPort('audio')">3.5mm</div>
+                <div class="port-slot" id="port-rj45" onclick="selectPort('rj45')">RJ-45</div>
+                <div class="port-slot" id="port-tb" onclick="selectPort('tb')">TB4</div>
+              </div>
+              <div id="port-info" style="font-size:.62rem;color:#aaa;padding:5px;background:#111;border-radius:5px;margin-top:5px;min-height:28px">Tap a port to learn more</div>
+            </div>
+            <div style="padding:0 7px">
+              <div class="settings-row" style="border-radius:7px;margin-bottom:5px" onclick="selectDockType('replicator')">
+                <div class="settings-row-left"><div class="settings-row-icon" style="background:#ff3b30">&#128268;</div><div><div class="settings-row-text">Port Replicator</div><div class="settings-row-sub">Extends existing ports only</div></div></div>
+                <span class="chevron">&#8250;</span>
+              </div>
+              <div class="settings-row" style="border-radius:7px" onclick="selectDockType('docking')">
+                <div class="settings-row-left"><div class="settings-row-icon" style="background:#1B5EAF">&#128421;&#65039;</div><div><div class="settings-row-text">Docking Station</div><div class="settings-row-sub">Full desktop expansion hub</div></div></div>
+                <span class="chevron">&#8250;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ACCESSORIES -->
+        <div class="phone-screen-view" id="screen-accessories">
+          <div class="wifi-screen">
+            <div class="nav-bar"><span class="back-btn" onclick="openApp('home')">&#8249; Home</span><span class="nav-title">Accessories</span></div>
+            <div style="padding:7px">
+              <div style="font-size:.62rem;color:#888;padding:0 3px 3px">INPUT ACCESSORIES</div>
+              <div class="bt-device"><div class="bt-device-info"><span>&#128394;&#65039;</span><div><div class="bt-name">Active Stylus</div><div class="bt-type">Pressure-sensitive, Bluetooth</div></div></div><span class="bt-status">Input</span></div>
+              <div class="bt-device"><div class="bt-device-info"><span>&#9999;&#65039;</span><div><div class="bt-name">Passive Stylus</div><div class="bt-type">Capacitive touch, no battery</div></div></div><span class="bt-status">Input</span></div>
+              <div style="font-size:.62rem;color:#888;padding:5px 3px 3px">OUTPUT ACCESSORIES</div>
+              <div class="bt-device"><div class="bt-device-info"><span>&#127911;</span><div><div class="bt-name">BT Headset</div><div class="bt-type">Audio output + mic input</div></div></div><span class="bt-status">I/O</span></div>
+              <div class="bt-device"><div class="bt-device-info"><span>&#128421;&#65039;</span><div><div class="bt-name">External Monitor</div><div class="bt-type">Display output via HDMI/USB-C</div></div></div><span class="bt-status">Output</span></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- end phone-screen -->
+      <div class="phone-home-btn"></div>
+    </div><!-- end phone-device -->
+
+    <div id="mission-panel">
+      <div class="mission-card" id="mission-card">
+        <div class="mission-number" id="mission-number">MISSION 1 OF 8</div>
+        <h3 id="mc-title">Loading...</h3>
+        <p id="mc-desc">Loading...</p>
+        <div class="mission-instruction" id="mc-instruction">Loading...</div>
+        <div id="mc-content"></div>
+        <div class="feedback-box" id="feedback-box"></div>
+        <button class="next-btn" id="next-btn" onclick="nextMission()">Next Mission &#8594;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="completion-screen">
+  <div class="completion-badge">&#127942;</div>
+  <div class="completion-title" id="comp-title">Mission Complete!</div>
+  <div class="completion-subtitle">You have completed Operation: Mobile Command</div>
+  <div class="final-stats">
+    <div class="stat-box"><div class="stat-val" id="final-score">0</div><div class="stat-label">Points</div></div>
+    <div class="stat-box"><div class="stat-val" id="final-correct">0</div><div class="stat-label">Correct</div></div>
+    <div class="stat-box"><div class="stat-val" id="final-rank">&#127891;</div><div class="stat-label">Final Rank</div></div>
+    <div class="stat-box"><div class="stat-val" id="final-streak">0</div><div class="stat-label">Best Streak</div></div>
+  </div>
+  <div style="background:var(--card);border-radius:12px;padding:14px;margin-bottom:16px;font-size:.8rem;color:#aaa;line-height:1.7">
+    <strong style="color:var(--gold)">A+ Core 1 Domains Covered:</strong><br>
+    &#9989; 1.2 &ndash; Mobile Device Connectivity (Wi-Fi, BT, NFC, Cellular)<br>
+    &#9989; 1.3 &ndash; Mobile Device Accessories (Stylus, Headset, Ports, Docking)
+  </div>
+  <button class="restart-btn" onclick="restartGame()">&#128260; Replay Missions</button>
+</div>
+
+</div>
+
+<div class="streak-popup" id="streak-popup"></div>
+<div class="badge-popup" id="badge-popup"><span class="badge-icon" id="badge-icon">&#127885;</span><br><span id="badge-text">Achievement!</span></div>
+
+<script>
+var score=0,streak=0,bestStreak=0,correctCount=0,currentMission=0;
+var airplaneOn=false,simIsESIM=false;
+var missionActionDone=false;
+var dragItemName=null;
+var dropAnswers={};
+
+var portInfoMap={
+  usbc:"USB-C: Universal reversible connector. Supports data (USB 3.2), video (DisplayPort/Thunderbolt), and power delivery up to 100W.",
+  hdmi:"HDMI: High-Definition Multimedia Interface. Carries uncompressed audio + video. HDMI 2.1 supports 8K@60Hz.",
+  usba:"USB-A: Standard rectangular USB. USB 3.0 (blue) = 5 Gbps. USB 2.0 (black) = 480 Mbps.",
+  sd:"SD Card Reader: Reads SDHC/SDXC memory cards. Used for cameras and media transfer.",
+  usba2:"USB-A: Additional USB-A port. Used for mice, keyboards, flash drives, and other peripherals.",
+  audio:"3.5mm Audio Jack: Analog audio. TRRS = stereo + mic. TRS = stereo only.",
+  rj45:"RJ-45 (Ethernet): Wired network port. Cat5e = 1 Gbps, Cat6 = 10 Gbps. More stable than Wi-Fi.",
+  tb:"Thunderbolt 4: Up to 40 Gbps. Supports daisy-chaining up to 6 devices, dual 4K displays, and PCIe tunneling."
+};
+
+var missions=[
+  {id:"wifi",app:"wifi",actionTarget:"uva",title:"Mission 1: Secure the Network",emoji:"📶",
+   desc:"The Academy device needs to connect to the correct Wi-Fi network. Open Wi-Fi settings and confirm the secure school network.",
+   instruction:"👆 Tap the Wi-Fi app on the phone, then tap UVA_Secure_5G to confirm the connection. Then answer the question below.",
+   type:"mcq",
+   question:"Which security protocol does WPA3 improve upon, and what is its key advantage?",
+   options:["WPA2 — WPA3 uses SAE (Simultaneous Authentication of Equals), preventing offline dictionary attacks","WEP — WPA3 adds a firewall to block all incoming connections","WPA — WPA3 simply increases the password length requirement","WPA2 — WPA3 removes encryption for faster connection speeds"],
+   correct:0,
+   feedback:"✅ Correct! WPA3 replaces WPA2 PSK handshake with SAE (Dragonfly handshake), which prevents offline brute-force attacks. A+ Core 1: WPA3 = most secure current Wi-Fi standard.",
+   wrongFeedback:"❌ WPA3 improves on WPA2 by using SAE (Simultaneous Authentication of Equals), preventing offline dictionary attacks. Key A+ Core 1 Domain 1.2 topic!"},
+  {id:"airplane",app:"airplane",actionTarget:"airplane-on",title:"Mission 2: Flight Prep Protocol",emoji:"✈️",
+   desc:"A student is boarding a flight. Enable Airplane Mode on the device to comply with FAA regulations.",
+   instruction:"👆 Open the Airplane Mode screen and toggle Airplane Mode ON. Then answer the question below.",
+   type:"mcq",
+   question:"After enabling Airplane Mode, which wireless features can a user manually re-enable?",
+   options:["Wi-Fi and Bluetooth only — Cellular remains disabled in Airplane Mode","All features automatically re-enable after 30 seconds","Only NFC — Wi-Fi and Bluetooth stay off","Cellular only — Wi-Fi and Bluetooth stay off"],
+   correct:0,
+   feedback:"✅ Correct! Airplane Mode disables ALL wireless radios. However, most modern devices allow you to manually re-enable Wi-Fi and Bluetooth while Airplane Mode is still active.",
+   wrongFeedback:"❌ Airplane Mode disables all radios, but Wi-Fi and Bluetooth can be manually re-enabled afterward. Cellular stays off. A+ Core 1 Domain 1.2!"},
+  {id:"bluetooth",app:"bluetooth",actionTarget:"stylus",title:"Mission 3: Peripheral Pairing",emoji:"🔵",
+   desc:"The Academy needs to pair a Smart Stylus to the device for digital note-taking. Complete the Bluetooth pairing process.",
+   instruction:"👆 Open Bluetooth settings and tap Smart Stylus S2 to pair it. Then answer the question below.",
+   type:"mcq",
+   question:"What is the maximum range of standard Bluetooth Class 2 (most common in mobile devices)?",
+   options:["~10 meters (33 feet)","~100 meters (330 feet)","~1 meter (3 feet)","~50 meters (165 feet)"],
+   correct:0,
+   feedback:"✅ Correct! Bluetooth Class 2 (most common in phones/tablets) has a range of ~10 meters. Class 1 = ~100m. Class 3 = ~1m. A+: Class 2 = 10m = mobile devices.",
+   wrongFeedback:"❌ Standard Bluetooth Class 2 (used in most mobile devices) has a range of approximately 10 meters. Class 1 = 100m, Class 3 = 1m."},
+  {id:"cellular",app:"cellular",actionTarget:"esim",title:"Mission 4: Signal Intelligence",emoji:"📡",
+   desc:"Identify the cellular technology in use and understand SIM card functions for the Academy mobile fleet.",
+   instruction:"👆 Open the Cellular screen. Tap Switch SIM Type to toggle between Physical SIM and eSIM. Then answer the question below.",
+   type:"mcq",
+   question:"What is the PRIMARY function of a SIM (Subscriber Identity Module) card?",
+   options:["Store the subscriber IMSI and authenticate them to the carrier network","Increase cellular signal strength and data speeds","Store photos, contacts, and application data","Control the phone processor clock speed"],
+   correct:0,
+   feedback:"✅ Correct! A SIM card stores the IMSI (International Mobile Subscriber Identity) and authentication keys to identify and authenticate the subscriber to the carrier network. An eSIM is a digital/embedded version.",
+   wrongFeedback:"❌ A SIM card primary function is to store subscriber identity (IMSI) and authentication credentials. An eSIM does the same thing digitally. A+ Core 1 Domain 1.2!"},
+  {id:"accessories",app:"accessories",actionTarget:null,title:"Mission 5: Accessory Classification",emoji:"🖊️",
+   desc:"Sort the mobile accessories into the correct categories: Input, Output, or Input/Output.",
+   instruction:"👆 Drag each accessory chip to its correct category drop zone below.",
+   type:"drag-drop",
+   items:["Active Stylus","Passive Stylus","BT Headset","External Monitor","Webcam"],
+   targets:["Input Device","Output Device","Input/Output Device"],
+   answers:{"Active Stylus":"Input Device","Passive Stylus":"Input Device","BT Headset":"Input/Output Device","External Monitor":"Output Device","Webcam":"Input Device"},
+   feedback:"✅ Excellent! Active/Passive Stylus = Input. External Monitor = Output. BT Headset = Input/Output (speakers output, mic inputs). Webcam = Input. Key A+ concept: classify peripherals by data direction!",
+   wrongFeedback:"❌ Remember: Input = sends data TO the device. Output = receives data FROM the device. A headset is both (speakers = output, microphone = input)."},
+  {id:"ports",app:"ports",actionTarget:null,title:"Mission 6: Port Identification",emoji:"🔌",
+   desc:"The Academy is setting up a laptop lab. Identify the correct port for each use case.",
+   instruction:"👆 Tap each port on the laptop diagram to learn about it. Then answer the question below.",
+   type:"mcq",
+   question:"A teacher needs to connect a laptop to a projector AND charge the laptop simultaneously using ONE cable. Which port should they use?",
+   options:["USB-C / Thunderbolt 4 — supports video output AND power delivery simultaneously","HDMI — carries video and can charge the laptop","RJ-45 — fastest data transfer for video streaming","USB-A — standard port for all peripherals"],
+   correct:0,
+   feedback:"✅ Correct! USB-C (especially Thunderbolt 4) supports DisplayPort Alt Mode for video AND USB Power Delivery (up to 100W) simultaneously over a single cable. Key A+ Core 1 Domain 1.3 concept.",
+   wrongFeedback:"❌ USB-C / Thunderbolt 4 is the correct answer. It supports both video output (DisplayPort Alt Mode) and power delivery simultaneously over one cable."},
+  {id:"docking",app:"ports",actionTarget:"docking",title:"Mission 7: Docking vs. Replicating",emoji:"🖥️",
+   desc:"The IT department needs to choose between a port replicator and a docking station for the teacher workstations.",
+   instruction:"👆 Tap Port Replicator and Docking Station on the phone to read about each. Then answer the question below.",
+   type:"mcq",
+   question:"What is the KEY difference between a Port Replicator and a Docking Station?",
+   options:["A docking station adds NEW ports/features (USB hubs, audio, Ethernet, video); a port replicator only mirrors existing laptop ports","A port replicator is always faster than a docking station","A docking station only works with desktop computers","They are identical — just different brand names for the same device"],
+   correct:0,
+   feedback:"✅ Correct! A port replicator simply duplicates the laptop existing ports. A docking station EXPANDS connectivity by adding new ports and features not present on the laptop itself. Key A+ Core 1 Domain 1.3!",
+   wrongFeedback:"❌ A docking station adds new ports and features; a port replicator only duplicates existing ones. A+ Core 1 Domain 1.3!"},
+  {id:"nfc",app:"nfc",actionTarget:"nfc-on",title:"Mission 8: Contactless Connectivity",emoji:"💳",
+   desc:"Enable NFC to allow students to use their digital UVA Campus Cards for tap-to-pay and building access.",
+   instruction:"👆 Open the NFC screen and toggle NFC ON. Then answer the question below.",
+   type:"mcq",
+   question:"What is the typical maximum effective range for an NFC (Near Field Communication) connection?",
+   options:["4 centimeters (1.5 inches)","4 meters (13 feet)","40 meters (130 feet)","4 millimeters (0.15 inches)"],
+   correct:0,
+   feedback:"✅ Correct! NFC is designed for very short-range communication, typically 4cm or less. This provides security by requiring physical proximity. A+ Core 1 Domain 1.2!",
+   wrongFeedback:"❌ NFC is very short range, typically 4cm (1.5 inches) or less. This is why it is used for secure tap-to-pay transactions."}
+];
+
+function startGame(){
+  document.getElementById('intro-screen').classList.add('hidden');
+  document.getElementById('game-area').classList.remove('hidden');
+  loadMission(0);
+}
+
+function loadMission(idx){
+  currentMission = idx;
+  missionActionDone = false;
+  var m = missions[idx];
+
+  document.getElementById('mission-tag').innerText = "MISSION " + (idx+1) + " OF 8";
+  document.getElementById('mission-title').innerText = m.title;
+  document.getElementById('mission-desc').innerText = m.desc;
+
+  document.getElementById('mission-number').innerText = "MISSION " + (idx+1) + " OF 8";
+  document.getElementById('mc-title').innerText = m.title;
+  document.getElementById('mc-desc').innerText = m.desc;
+  document.getElementById('mc-instruction').innerText = m.instruction;
+
+  var content = document.getElementById('mc-content');
+  content.innerHTML = "";
+
+  if(m.type === 'mcq'){
+    var q = document.createElement('div');
+    q.style.fontSize = ".8rem";
+    q.style.fontWeight = "600";
+    q.style.marginBottom = "8px";
+    q.innerText = m.question;
+    content.appendChild(q);
+
+    var opts = document.createElement('div');
+    opts.className = "quiz-options";
+    m.options.forEach((opt, i) => {
+      var btn = document.createElement('button');
+      btn.className = "quiz-option";
+      btn.innerText = opt;
+      btn.onclick = () => checkAnswer(i);
+      opts.appendChild(btn);
+    });
+    content.appendChild(opts);
+  } else if(m.type === 'drag-drop'){
+    var dz = document.createElement('div');
+    dz.className = "drag-zone";
+    m.items.forEach(item => {
+      var d = document.createElement('div');
+      d.className = "drag-item";
+      d.innerText = item;
+      d.draggable = true;
+      d.ondragstart = (e) => { dragItemName = item; e.target.classList.add('dragging'); };
+      dz.appendChild(d);
+    });
+    content.appendChild(dz);
+
+    var targets = document.createElement('div');
+    targets.className = "drop-targets";
+    dropAnswers = {};
+    m.targets.forEach(t => {
+      var dt = document.createElement('div');
+      dt.className = "drop-target";
+      dt.innerHTML = `<span class="drop-label">${t}:</span>`;
+      dt.ondragover = (e) => e.preventDefault();
+      dt.ondrop = (e) => {
+        e.preventDefault();
+        if(!dragItemName) return;
+        var tag = document.createElement('span');
+        tag.className = "dropped-tag";
+        tag.innerText = dragItemName;
+        dt.appendChild(tag);
+        dropAnswers[dragItemName] = t;
+        // Mark item as used
+        document.querySelectorAll('.drag-item').forEach(di => {
+          if(di.innerText === dragItemName) di.classList.add('used');
+        });
+        dragItemName = null;
+      };
+      targets.appendChild(dt);
+    });
+    content.appendChild(targets);
+
+    var check = document.createElement('button');
+    check.className = "check-btn";
+    check.innerText = "Check Classification";
+    check.onclick = checkDragDrop;
+    content.appendChild(check);
+  }
+
+  document.getElementById('feedback-box').classList.remove('show');
+  document.getElementById('next-btn').classList.remove('show');
+
+  openApp('home');
+  updateProgress();
+}
+
+function checkAnswer(idx){
+  var m = missions[currentMission];
+  var feedback = document.getElementById('feedback-box');
+  var options = document.querySelectorAll('.quiz-option');
+
+  options.forEach(o => o.classList.add('disabled'));
+
+  if(idx === m.correct){
+    options[idx].classList.add('correct');
+    feedback.innerText = m.feedback;
+    feedback.className = "feedback-box show correct";
+    addScore(100);
+    correctCount++;
+    addStreak();
+    spawnConfetti();
+  } else {
+    options[idx].classList.add('wrong');
+    options[m.correct].classList.add('correct');
+    feedback.innerText = m.wrongFeedback;
+    feedback.className = "feedback-box show wrong";
+    resetStreak();
+  }
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function checkDragDrop(){
+  var m = missions[currentMission];
+  var feedback = document.getElementById('feedback-box');
+  var isCorrect = true;
+
+  m.items.forEach(item => {
+    if(dropAnswers[item] !== m.answers[item]) isCorrect = false;
+  });
+
+  if(isCorrect){
+    feedback.innerText = m.feedback;
+    feedback.className = "feedback-box show correct";
+    addScore(150);
+    correctCount++;
+    addStreak();
+    spawnConfetti();
+  } else {
+    feedback.innerText = m.wrongFeedback;
+    feedback.className = "feedback-box show wrong";
+    resetStreak();
+  }
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextMission(){
+  if(currentMission < missions.length - 1){
+    loadMission(currentMission + 1);
+  } else {
+    showCompletion();
+  }
+}
+
+function openApp(appId){
+  document.querySelectorAll('.phone-screen-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('screen-' + appId).classList.add('active');
+}
+
+function toggleAirplane(){
+  airplaneOn = !airplaneOn;
+  var toggles = [document.getElementById('airplane-toggle-settings'), document.getElementById('airplane-toggle-main')];
+  toggles.forEach(t => { if(t) airplaneOn ? t.classList.add('on') : t.classList.remove('on'); });
+
+  document.getElementById('airplane-status-text').innerText = airplaneOn ? "On" : "Off";
+  document.getElementById('status-wifi').style.opacity = airplaneOn ? "0.3" : "1";
+  document.getElementById('status-cell').style.opacity = airplaneOn ? "0.3" : "1";
+  document.getElementById('status-bt').style.opacity = airplaneOn ? "0.3" : "1";
+
+  var statusVals = airplaneOn ? "Disabled" : "Active";
+  document.getElementById('ap-wifi-status').innerText = statusVals;
+  document.getElementById('ap-cell-status').innerText = statusVals;
+  document.getElementById('ap-bt-status').innerText = statusVals;
+  document.getElementById('ap-nfc-status').innerText = statusVals;
+}
+
+function wifiAction(type){
+  if(type === 'uva'){
+    document.getElementById('wifi-uva').classList.add('connected');
+    document.getElementById('wifi-sub').innerText = "UVA_Secure_5G";
+  }
+}
+
+function pairDevice(id){
+  var el = document.getElementById('bt-' + id);
+  var status = document.getElementById('bt-' + id + '-status');
+  el.classList.add('paired');
+  status.innerText = "Paired";
+}
+
+function switchSimType(){
+  simIsESIM = !simIsESIM;
+  document.getElementById('sim-type-badge').innerText = simIsESIM ? "eSIM Active" : "Physical SIM";
+  document.getElementById('sim-switch-sub').innerText = simIsESIM ? "Tap to use Physical SIM" : "Tap to activate eSIM";
+}
+
+function toggleNFC(el){
+  el.classList.toggle('on');
+  document.getElementById('nfc-waves').style.opacity = el.classList.contains('on') ? "1" : "0.2";
+}
+
+function selectPort(id){
+  document.querySelectorAll('.port-slot').forEach(p => p.classList.remove('selected'));
+  document.getElementById('port-' + id).classList.add('selected');
+  document.getElementById('port-info').innerText = portInfoMap[id];
+}
+
+function selectDockType(type){
+  var info = type === 'replicator' ? "Port Replicator: Simple device that plugs into a port and provides multiple identical ports. Does not add new functionality." : "Docking Station: Sophisticated hub that adds new ports (Video, LAN, Audio) and often powers the laptop.";
+  document.getElementById('port-info').innerText = info;
+}
+
+function addScore(pts){
+  score += pts;
+  document.getElementById('score-val').innerText = score;
+}
+
+function addStreak(){
+  streak++;
+  if(streak > bestStreak) bestStreak = streak;
+  if(streak >= 2){
+    var s = document.getElementById('streak-display');
+    s.classList.remove('hidden');
+    document.getElementById('streak-val').innerText = streak;
+    showStreakPopup();
+  }
+}
+
+function resetStreak(){
+  streak = 0;
+  document.getElementById('streak-display').classList.add('hidden');
+}
+
+function updateProgress(){
+  var p = ((currentMission + 1) / 8) * 100;
+  document.getElementById('progress-fill').style.width = p + "%";
+  document.getElementById('progress-text').innerText = (currentMission + 1) + "/8";
+
+  if(score >= 700) updateRank("MASTER", "🎓", "UVA Tech Master");
+  else if(score >= 500) updateRank("EXPERT", "🏆", "UVA Tech Expert");
+  else if(score >= 300) updateRank("APPRENTICE", "🛠️", "UVA Tech Apprentice");
+}
+
+function updateRank(label, icon, sub){
+  document.getElementById('rank-label').innerText = label;
+  document.getElementById('rank-icon').innerText = icon;
+  document.querySelector('#rank-bar div div:last-child').innerText = sub;
+}
+
+function showStreakPopup(){
+  var p = document.getElementById('streak-popup');
+  p.innerText = "🔥 " + streak + " MISSION STREAK!";
+  p.classList.add('show');
+  setTimeout(() => p.classList.remove('show'), 1500);
+}
+
+function spawnConfetti(){
+  for(var i=0; i<30; i++){
+    var c = document.createElement('div');
+    c.className = "confetti-piece";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.backgroundColor = ["#1B5EAF","#1E7A3E","#f0c040","#ffffff"][Math.floor(Math.random()*4)];
+    c.style.transform = "rotate(" + Math.random()*360 + "deg)";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 2000);
+  }
+}
+
+function showCompletion(){
+  document.getElementById('game-area').classList.add('hidden');
+  document.getElementById('completion-screen').classList.add('show');
+  document.getElementById('final-score').innerText = score;
+  document.getElementById('final-correct').innerText = correctCount + "/8";
+  document.getElementById('final-streak').innerText = bestStreak;
+  document.getElementById('final-rank').innerText = document.getElementById('rank-icon').innerText;
+}
+
+function restartGame(){
+  location.reload();
+}
+</script>
+</body>
+</html>
