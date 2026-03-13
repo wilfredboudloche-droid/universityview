@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 9B: Mobile Apps and Data | UVA</title>
+<style>
+:root{--uva-blue:#1B5EAF;--uva-green:#1E7A3E;--uva-gold:#F5A623;--uva-dark:#0d2d54;--uva-bg:#f0f4fb}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--uva-bg);color:#222;min-height:100vh}
+.header{background:linear-gradient(135deg,var(--uva-dark) 0%,var(--uva-blue) 100%);color:#fff}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding:14px 24px 8px;flex-wrap:wrap;gap:8px}
+.uva-logo{display:flex;align-items:center;gap:12px}
+.uva-name{font-size:1.1rem;font-weight:700;line-height:1.2}
+.uva-sub{font-size:.75rem;opacity:.85}
+.rank-display,.score-display{background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);border-radius:12px;padding:8px 16px;text-align:center;min-width:130px}
+.rank-label,.score-label{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:1px}
+.rank-value{font-size:1.1rem;font-weight:700;color:var(--uva-gold)}
+.score-value{font-size:1.4rem;font-weight:700;color:var(--uva-gold)}
+.motto-ribbon{background:var(--uva-green);text-align:center;padding:6px;font-size:.85rem;font-style:italic;letter-spacing:2px;font-weight:600;color:#fff}
+.lesson-title-bar{background:rgba(0,0,0,.2);padding:10px 24px;font-size:1rem;font-weight:600}
+.progress-section{background:#fff;padding:10px 24px;border-bottom:2px solid #dde4f0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.progress-label{font-size:.8rem;color:#555;font-weight:600;white-space:nowrap}
+.progress-bar-wrap{flex:1;min-width:120px;background:#dde4f0;border-radius:20px;height:12px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--uva-blue),var(--uva-green));border-radius:20px;transition:width .5s ease;width:0%}
+.streak-badge{background:var(--uva-gold);color:#333;border-radius:20px;padding:4px 12px;font-size:.78rem;font-weight:700;display:none}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.main{max-width:860px;margin:0 auto;padding:20px 16px 40px}
+.mission-card{background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(27,94,175,.12);overflow:hidden;margin-bottom:20px;display:none}
+.mission-card.active{display:block;animation:slideIn .4s ease}
+.mission-header{background:linear-gradient(135deg,var(--uva-blue),var(--uva-dark));color:#fff;padding:16px 20px;display:flex;align-items:center;gap:12px}
+.mission-icon{font-size:1.8rem}
+.mission-meta{flex:1}
+.mission-number{font-size:.72rem;text-transform:uppercase;letter-spacing:1px;opacity:.8}
+.mission-title{font-size:1.1rem;font-weight:700}
+.mission-pts{background:var(--uva-gold);color:#333;border-radius:20px;padding:4px 12px;font-size:.8rem;font-weight:700;white-space:nowrap}
+.mission-body{padding:20px}
+.mission-scenario{background:#f0f4fb;border-left:4px solid var(--uva-blue);border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:16px;font-size:.92rem;line-height:1.6;color:#333}
+.mission-question{font-size:1rem;font-weight:600;margin-bottom:14px;color:var(--uva-dark)}
+.drag-container{display:flex;gap:16px;flex-wrap:wrap}
+.drag-pool{flex:1;min-width:180px}
+.drag-pool-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--uva-blue);margin-bottom:8px}
+.drag-item{background:var(--uva-blue);color:#fff;border-radius:8px;padding:8px 12px;margin-bottom:8px;cursor:grab;font-size:.83rem;font-weight:600;user-select:none;transition:transform .15s,box-shadow .15s}
+.drag-item:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(27,94,175,.3)}
+.drag-item.used{background:#9ab;cursor:default;pointer-events:none}
+.drop-zones{flex:2;min-width:240px}
+.drop-col-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--uva-blue);margin-bottom:6px;text-align:center}
+.drop-zone{min-height:120px;border:2px dashed #aac0e0;border-radius:8px;background:#f7f9fd;display:flex;flex-direction:column;align-items:flex-start;padding:8px;transition:background .2s,border-color .2s;gap:4px}
+.drop-zone.drag-over{background:#ddeeff;border-color:var(--uva-blue)}
+.placed-chip{background:var(--uva-blue);color:#fff;border-radius:6px;padding:4px 10px;font-size:.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;width:100%}
+.placed-chip .rx{opacity:.7;font-size:.75rem;margin-left:auto}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.options-grid{grid-template-columns:1fr}}
+.option-btn{background:#f0f4fb;border:2px solid #c5d5ee;border-radius:10px;padding:12px 14px;text-align:left;cursor:pointer;font-size:.88rem;font-weight:500;color:#333;transition:all .2s;line-height:1.4;width:100%}
+.option-btn:hover:not(:disabled){background:#ddeeff;border-color:var(--uva-blue);color:var(--uva-dark)}
+.option-btn.correct{background:#d4edda;border-color:#1E7A3E;color:#145228}
+.option-btn.incorrect{background:#fde8e8;border-color:#c0392b;color:#7b1a1a}
+.option-btn:disabled{cursor:default}
+.order-list{list-style:none}
+.order-item{background:#f0f4fb;border:2px solid #c5d5ee;border-radius:8px;padding:10px 14px;margin-bottom:8px;cursor:grab;display:flex;align-items:center;gap:10px;font-size:.88rem;font-weight:500;user-select:none;transition:box-shadow .15s}
+.order-item:hover{box-shadow:0 2px 8px rgba(27,94,175,.2)}
+.order-item.dragging{opacity:.4}
+.order-handle{color:#aaa;font-size:1.1rem}
+.order-num{background:var(--uva-blue);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0}
+.feedback-box{margin-top:14px;padding:12px 16px;border-radius:10px;font-size:.88rem;line-height:1.5;display:none}
+.feedback-box.show{display:block;animation:fadeIn .3s ease}
+.feedback-box.correct-fb{background:#d4edda;border:1.5px solid #1E7A3E;color:#145228}
+.feedback-box.incorrect-fb{background:#fde8e8;border:1.5px solid #c0392b;color:#7b1a1a}
+.btn{display:inline-block;padding:10px 24px;border-radius:8px;border:none;cursor:pointer;font-size:.9rem;font-weight:700;transition:all .2s}
+.btn-primary{background:var(--uva-blue);color:#fff}
+.btn-primary:hover{background:var(--uva-dark);transform:translateY(-1px)}
+.btn-success{background:var(--uva-green);color:#fff}
+.btn-success:hover{background:#155c2e;transform:translateY(-1px)}
+.btn-gold{background:var(--uva-gold);color:#333}
+.btn-gold:hover{background:#e09510}
+.submit-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.scenario-choices{display:flex;flex-direction:column;gap:10px}
+.scenario-choice{background:#f0f4fb;border:2px solid #c5d5ee;border-radius:10px;padding:14px 16px;cursor:pointer;font-size:.88rem;font-weight:500;transition:all .2s;text-align:left;width:100%}
+.scenario-choice:hover:not(:disabled){background:#ddeeff;border-color:var(--uva-blue)}
+.scenario-choice.chosen-correct{background:#d4edda;border-color:#1E7A3E}
+.scenario-choice.chosen-incorrect{background:#fde8e8;border-color:#c0392b}
+.protocol-table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:10px}
+.protocol-table th{background:var(--uva-blue);color:#fff;padding:8px 10px;text-align:left}
+.protocol-table td{padding:7px 10px;border-bottom:1px solid #dde4f0}
+.protocol-table tr:nth-child(even) td{background:#f7f9fd}
+.answer-select{border:2px solid #c5d5ee;border-radius:6px;padding:5px 8px;font-size:.85rem;background:#fff;color:#333;cursor:pointer}
+.answer-select.correct-sel{border-color:#1E7A3E;background:#d4edda}
+.answer-select.incorrect-sel{border-color:#c0392b;background:#fde8e8}
+.mission-dots{display:flex;justify-content:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.mission-dot{width:32px;height:32px;border-radius:50%;background:#dde4f0;border:2px solid #c5d5ee;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#888;transition:all .3s}
+.mission-dot.completed{background:#1E7A3E;border-color:#1E7A3E;color:#fff}
+.mission-dot.active{background:var(--uva-blue);border-color:var(--uva-blue);color:#fff;transform:scale(1.15)}
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.badge-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:#fff;border-radius:20px;padding:30px 40px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);z-index:10000;transition:transform .4s cubic-bezier(.175,.885,.32,1.275);border:4px solid var(--uva-gold);min-width:260px}
+.badge-popup.show{transform:translate(-50%,-50%) scale(1)}
+.badge-emoji{font-size:3.5rem;display:block;margin-bottom:8px}
+.badge-title{font-size:1.3rem;font-weight:700;color:var(--uva-dark);margin-bottom:4px}
+.badge-sub{font-size:.88rem;color:#666}
+.badge-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none}
+.badge-overlay.show{display:block}
+#intro-screen{background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(27,94,175,.12);overflow:hidden;text-align:center}
+.intro-header{background:linear-gradient(135deg,var(--uva-dark),var(--uva-blue));color:#fff;padding:30px 20px}
+.intro-icon{font-size:3.5rem;display:block;margin-bottom:10px}
+.intro-title{font-size:1.5rem;font-weight:700;margin-bottom:6px}
+.intro-sub{font-size:.9rem;opacity:.85}
+.intro-body{padding:24px 20px}
+.intro-objectives{text-align:left;background:#f0f4fb;border-radius:10px;padding:16px;margin:16px 0}
+.intro-objectives h4{font-size:.85rem;color:var(--uva-blue);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.intro-obj-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;font-size:.83rem;color:#333}
+.rank-ladder{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:16px 0}
+.rank-step{background:#f0f4fb;border:2px solid #c5d5ee;border-radius:8px;padding:8px 14px;font-size:.8rem;font-weight:600;color:#555;text-align:center}
+.rank-step .ri{display:block;font-size:1.2rem;margin-bottom:2px}
+#results-screen{display:none;background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(27,94,175,.12);overflow:hidden;text-align:center}
+#results-screen.show{display:block;animation:slideIn .5s ease}
+.results-header{background:linear-gradient(135deg,var(--uva-dark),var(--uva-blue));color:#fff;padding:30px 20px}
+.results-trophy{font-size:4rem;display:block;margin-bottom:10px}
+.results-title{font-size:1.6rem;font-weight:700;margin-bottom:6px}
+.results-rank{font-size:1rem;color:var(--uva-gold);font-weight:600}
+.results-body{padding:24px 20px}
+.results-score-big{font-size:3rem;font-weight:700;color:var(--uva-blue);margin:10px 0}
+.results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.results-stat{background:#f0f4fb;border-radius:10px;padding:14px 10px}
+.results-stat-val{font-size:1.5rem;font-weight:700;color:var(--uva-blue)}
+.results-stat-lbl{font-size:.75rem;color:#666;margin-top:2px}
+.objectives-list{text-align:left;background:#f0f4fb;border-radius:10px;padding:16px;margin:16px 0}
+.objectives-list h4{font-size:.85rem;color:var(--uva-blue);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.obj-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;font-size:.83rem;color:#333}
+.obj-check{color:#1E7A3E;font-weight:700;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div class="uva-logo">
+      <svg width="48" height="56" viewBox="0 0 48 56" fill="none">
+        <path d="M24 2L4 10V28C4 40 14 50 24 54C34 50 44 40 44 28V10L24 2Z" fill="#1E7A3E" stroke="#F5A623" stroke-width="2"/>
+        <path d="M24 8L10 14V28C10 37 17 45 24 48C31 45 38 37 38 28V14L24 8Z" fill="#1B5EAF"/>
+        <text x="24" y="34" text-anchor="middle" fill="white" font-size="13" font-weight="bold" font-family="Arial">UVA</text>
+      </svg>
+      <div>
+        <div class="uva-name">University View Academy</div>
+        <div class="uva-sub">Computer Architecture · Lesson 9B</div>
+      </div>
+    </div>
+    <div class="rank-display">
+      <div class="rank-label">Current Rank</div>
+      <div class="rank-value" id="rank-display">🎓 Trainee</div>
+    </div>
+    <div class="score-display">
+      <div class="score-label">Mission Score</div>
+      <div class="score-value" id="score-display">0 pts</div>
+    </div>
+  </div>
+  <div class="motto-ribbon">✦ Virtue · Vigor · Vision ✦</div>
+  <div class="lesson-title-bar">📱 Lesson 9B: Mobile Apps and Data — Field Operations Training</div>
+</div>
+
+<div class="progress-section" id="progress-section" style="display:none">
+  <span class="progress-label" id="progress-label">Mission 1 of 7</span>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar"></div></div>
+  <span class="streak-badge" id="streak-badge">🔥 Streak!</span>
+</div>
+
+<div class="main">
+  <div class="mission-dots" id="mission-dots" style="display:none">
+    <div class="mission-dot active" id="dot-0">1</div>
+    <div class="mission-dot" id="dot-1">2</div>
+    <div class="mission-dot" id="dot-2">3</div>
+    <div class="mission-dot" id="dot-3">4</div>
+    <div class="mission-dot" id="dot-4">5</div>
+    <div class="mission-dot" id="dot-5">6</div>
+    <div class="mission-dot" id="dot-6">7</div>
+  </div>
+
+  <div id="intro-screen">
+    <div class="intro-header">
+      <span class="intro-icon">📱</span>
+      <div class="intro-title">Mobile Apps & Data — Field Operations</div>
+      <div class="intro-sub">A+ Core 2 · Domain 1.3 · CompTIA Certification Prep</div>
+    </div>
+    <div class="intro-body">
+      <p style="font-size:.92rem;color:#444;line-height:1.6;margin-bottom:16px">
+        Welcome, UVA Cadet! You have been assigned to the <strong>Mobile Device Support Unit</strong>. Complete 7 field missions to earn your certification and rise through the ranks. Build answer streaks for bonus rewards!
+      </p>
+      <div class="intro-objectives">
+        <h4>🎯 Mission Objectives</h4>
+        <div class="intro-obj-item"><span style="color:var(--uva-blue)">►</span> Differentiate iOS vs Android app distribution models</div>
+        <div class="intro-obj-item"><span style="color:var(--uva-blue)">►</span> Configure email using IMAP, POP3, and SMTP protocols</div>
+        <div class="intro-obj-item"><span style="color:var(--uva-blue)">►</span> Explain synchronization for contacts, calendars, and media</div>
+        <div class="intro-obj-item"><span style="color:var(--uva-blue)">►</span> Identify Enterprise Mobility Management (EMM) functions</div>
+        <div class="intro-obj-item"><span style="color:var(--uva-blue)">►</span> Manage location services and app permissions for privacy</div>
+      </div>
+      <div class="rank-ladder">
+        <div class="rank-step"><span class="ri">🎓</span>Trainee<br><small>0-99 pts</small></div>
+        <div class="rank-step"><span class="ri">⚙️</span>Apprentice<br><small>100-199 pts</small></div>
+        <div class="rank-step"><span class="ri">🛡️</span>Expert<br><small>200-299 pts</small></div>
+        <div class="rank-step"><span class="ri">🏆</span>Master<br><small>300+ pts</small></div>
+      </div>
+      <button class="btn btn-primary" style="font-size:1rem;padding:14px 36px;margin-top:8px" onclick="startMissions()">🚀 Begin Field Operations</button>
+    </div>
+  </div>
+
+  <!-- MISSION 1 -->
+  <div class="mission-card" id="mission-0">
+    <div class="mission-header">
+      <span class="mission-icon">🏪</span>
+      <div class="mission-meta">
+        <div class="mission-number">Mission 1 of 7 · App Distribution Intel</div>
+        <div class="mission-title">Sort the App Store Features</div>
+      </div>
+      <span class="mission-pts">+50 pts</span>
+    </div>
+    <div class="mission-body">
+      <div class="mission-scenario">📋 <strong>Field Briefing:</strong> A new recruit is confused about how iOS and Android distribute apps differently. Drag each feature card to the correct platform column.</div>
+      <div class="mission-question">Drag each feature to the correct platform (iOS or Android):</div>
+      <div class="drag-container">
+        <div class="drag-pool">
+          <div class="drag-pool-title">📦 Feature Cards</div>
+          <div id="pool-items">
+            <div class="drag-item" draggable="true" data-id="f1" data-ans="ios" ondragstart="dragStart(event)">App Store only distribution</div>
+            <div class="drag-item" draggable="true" data-id="f2" data-ans="android" ondragstart="dragStart(event)">Google Play + Sideloading</div>
+            <div class="drag-item" draggable="true" data-id="f3" data-ans="ios" ondragstart="dragStart(event)">Strict Apple review process</div>
+            <div class="drag-item" draggable="true" data-id="f4" data-ans="android" ondragstart="dragStart(event)">APK file installation</div>
+            <div class="drag-item" draggable="true" data-id="f5" data-ans="ios" ondragstart="dragStart(event)">TestFlight for beta testing</div>
+            <div class="drag-item" draggable="true" data-id="f6" data-ans="android" ondragstart="dragStart(event)">"Unknown sources" toggle</div>
+          </div>
+        </div>
+        <div class="drop-zones">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <div class="drop-col-title">🍎 iOS</div>
+              <div class="drop-zone" id="dz-ios" data-target="ios" ondragover="allowDrop(event)" ondrop="dropItem(event)">
+                <span class="ph" style="color:#bbb;font-size:.8rem">Drop iOS features here</span>
+              </div>
+            </div>
+            <div>
+              <div class="drop-col-title">🤖 Android</div>
+              <div class="drop-zone" id="dz-android" data-target="android" ondragover="allowDrop(event)" ondrop="dropItem(event)">
+                <span class="ph" style="color:#bbb;font-size:.8rem">Drop Android features here</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="feedback-box" id="fb-0"></div>
+      <div class="submit-row">
+        <button class="btn btn-primary" id="submit-0" onclick="checkMission0()">🔍 Verify Intel</button>
+        <button class="btn btn-success" id="next-0" style="display:none" onclick="nextMission(1)">Next Mission →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSION 2 -->
+  <div class="mission-card" id="mission-1">
+    <div class="mission-header">
+      <span class="mission-icon">📧</span>
+      <div class="mission-meta">
+        <div class="mission-number">Mission 2 of 7 · Email Protocol Configuration</div>
+        <div class="mission-title">Configure the Field Agent's Email</div>
+      </div>
+      <span class="mission-pts">+40 pts</span>
+    </div>
+    <div class="mission-body">
+      <div class="mission-scenario">📋 <strong>Field Briefing:</strong> Agent Rivera needs to set up email on her new Android device. She wants to access her messages from multiple devices simultaneously and keep them synced on the server. Which protocol should you configure?</div>
+      <div class="mission-question">Which email protocol allows messages to remain on the server and sync across multiple devices?</div>
+      <div class="options-grid" id="opts-1">
+        <button class="option-btn" onclick="checkMCQ(1,this,false)"><strong>POP3</strong><br><small>Downloads & removes from server</small></button>
+        <button class="option-btn" onclick="checkMCQ(1,this,true)"><strong>IMAP</strong><br><small>Syncs messages across all devices</small></button>
+        <button class="option-btn" onclick="checkMCQ(1,this,false)"><strong>SMTP</strong><br><small>Used for sending outgoing mail</small></button>
+        <button class="option-btn" onclick="checkMCQ(1,this,false)"><strong>FTP</strong><br><small>File transfer - not for email</small></button>
+      </div>
+      <div class="feedback-box" id="fb-1"></div>
+      <div class="submit-row"><button class="btn btn-success" id="next-1" style="display:none" onclick="nextMission(2)">Next Mission →</button></div>
+    </div>
+  </div>
+
+  <!-- MISSION 3 -->
+  <div class="mission-card" id="mission-2">
+    <div class="mission-header">
+      <span class="mission-icon">🔄</span>
+      <div class="mission-meta">
+        <div class="mission-number">Mission 3 of 7 · Data Synchronization</div>
+        <div class="mission-title">Sequence the Sync Operation</div>
+      </div>
+      <span class="mission-pts">+60 pts</span>
+    </div>
+    <div class="mission-body">
+      <div class="mission-scenario">📋 <strong>Field Briefing:</strong> A field agent's contacts are not syncing to their new device. Walk them through the correct synchronization sequence.</div>
+      <div class="mission-question">Arrange the contact synchronization steps in the correct order (drag to reorder):</div>
+      <ul class="order-list" id="order-list-2">
+        <li class="order-item" draggable="true" data-correct="3" ondragstart="orderDragStart(event)" ondragover="orderDragOver(event)" ondrop="orderDrop(event)"><span class="order-handle">≡</span><span class="order-num">1</span><span>Device sends changed records to the sync server</span></li>
+        <li class="order-item" draggable="true" data-correct="1" ondragstart="orderDragStart(event)" ondragover="orderDragOver(event)" ondrop="orderDrop(event)"><span class="order-handle">≡</span><span class="order-num">2</span><span>User enables sync in account settings (e.g., Google Account)</span></li>
+        <li class="order-item" draggable="true" data-correct="4" ondragstart="orderDragStart(event)" ondragover="orderDragOver(event)" ondrop="orderDrop(event)"><span class="order-handle">≡</span><span class="order-num">3</span><span>Server merges data and pushes updates to all linked devices</span></li>
+        <li class="order-item" draggable="true" data-correct="2" ondragstart="orderDragStart(event)" ondragover="orderDragOver(event)" ondrop="orderDrop(event)"><span class="order-handle">≡</span><span class="order-num">4</span><span>Device authenticates with the sync server using credentials</span></li>
+        <li class="order-item" draggable="true" data-correct="5" ondragstart="orderDragStart(event)" ondragover="orderDragOver(event)" ondrop="orderDrop(event)"><span class="order-handle">≡</span><span class="order-num">5</span><span>Conflict resolution: server timestamp wins for duplicate entries</span></li>
+      </ul>
+      <div class="feedback-box" id="fb-2"></div>
+      <div class="submit-row">
+        <button class="btn btn-primary" id="submit-2" onclick="checkOrdering()">🔍 Verify Sequence</button>
+        <button class="btn btn-success" id="next-2" style="display:none" onclick="nextMission(3)">Next Mission →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSION 4 -->
+  <div class="mission-card" id="mission-3">
+    <div class="mission-header">
+      <span class="mission-icon">🔌</span>
+      <div class="mission-meta">
+        <div class="mission-number">Mission 4 of 7 · Protocol Port Assignment</div>
+        <div class="mission-title">Assign the Correct Ports</div>
+      </div>
+      <span class="mission-pts">+50 pts</span>
+    </div>
+    <div class="mission-body">
+      <div class="mission-scenario">📋 <strong>Field Briefing:</strong> You are configuring a mobile email client for the entire UVA field team. The firewall admin needs the exact port numbers for each protocol.</div>
+      <div class="mission-question">Select the correct port number for each email protocol:</div>
+      <table class="protocol-table">
+        <thead><tr><th>Protocol</th><th>Purpose</th><th>Port</th></tr></thead>
+        <tbody>
+          <tr><td><strong>IMAP</strong></td><td>Receive mail (server sync, unencrypted)</td><td><select class="answer-select" id="sel-imap"><option value="">--</option><option>25</option><option>110</option><option>143</option><option>465</option><option>587</option><option>993</option></select></td></tr>
+          <tr><td><strong>IMAP (SSL/TLS)</strong></td><td>Secure receive (encrypted)</td><td><select class="answer-select" id="sel-imaps"><option value="">--</option><option>25</option><option>110</option><option>143</option><option>465</option><option>587</option><option>993</option></select></td></tr>
+          <tr><td><strong>POP3</strong></td><td>Receive mail (download to device)</td><td><select class="answer-select" id="sel-pop3"><option value="">--</option><option>25</option><option>110</option><option>143</option><option>465</option><option>587</option><option>993</option></select></td></tr>
+          <tr><td><strong>SMTP</strong></td><td>Send mail (outgoing, server-to-server)</td><td><select class="answer-select" id="sel-smtp"><option value="">--</option><option>25</option><option>110</option><option>143</option><option>465</option><option>587</option><option>993</option></select></td></tr>
+          <tr><td><strong>SMTP (TLS/Submission)</strong></td><td>Secure send (client submission)</td><td><select class="answer-select" id="sel-smtptls"><option value="">--</option><option>25</option><option>110</option><option>143</option><option>465</option><option>587</option><option>993</option></select></td></tr>
+        </tbody>
+      </table>
+      <div class="feedback-box" id="fb-3"></div>
+      <div class="submit-row">
+        <button class="btn btn-primary" id="submit-3" onclick="checkPorts()">🔍 Verify Ports</button>
+        <button class="btn btn-success" id="next-3" style="display:none" onclick="nextMission(4)">Next Mission →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSION 5 -->
+  <div class="mission-card" id="mission-4">
+    <div class="mission-header">
+      <span class="mission-icon">🏢</span>
+      <div class="mission-meta">
+        <div class="mission-number">Mission 5 of 7 · Enterprise Mobility Management</div>
+        <div class="mission-title">EMM Incident Response</div>
+      </div>
+      <span class="mission-pts">+40 pts each</span>
+    </div>
+    <div class="mission-body">
+      <div id="emm-a">
+        <div class="mission-scenario">📋 <strong>Incident A:</strong> An employee's company-issued phone has been reported stolen. The device contains sensitive client data. As the EMM administrator, what is your FIRST action?</div>
+        <div class="scenario-choices" id="emm-choices-a">
+          <button class="scenario-choice" onclick="checkEMM('a',this,false)">📞 Call the employee to confirm the device is lost</button>
+          <button class="scenario-choice" onclick="checkEMM('a',this,true)">🔒 Issue a remote wipe command through the EMM console</button>
+          <button class="scenario-choice" onclick="checkEMM('a',this,false)">📧 Send an email to IT asking them to handle it</button>
+          <button class="scenario-choice" onclick="checkEMM('a',this,false)">⌛ Wait 24 hours to see if the device is recovered</button>
+        </div>
+        <div class="feedback-box" id="fb-emm-a"></div>
+      </div>
+      <div id="emm-b" style="display:none;margin-top:20px;border-top:2px dashed #dde4f0;padding-top:16px">
+        <div class="mission-scenario">📋 <strong>Incident B:</strong> A new employee brings their personal iPhone to work (BYOD policy). Which EMM feature allows the company to manage only work apps/data without touching personal content?</div>
+        <div class="scenario-choices" id="emm-choices-b">
+          <button class="scenario-choice" onclick="checkEMM('b',this,false)">Full Device Enrollment (MDM) - manages entire device</button>
+          <button class="scenario-choice" onclick="checkEMM('b',this,true)">Containerization / Work Profile (MAM) - isolates work data only</button>
+          <button class="scenario-choice" onclick="checkEMM('b',this,false)">Remote Wipe the entire device including personal data</button>
+          <button class="scenario-choice" onclick="checkEMM('b',this,false)">Disable the device camera system-wide via policy</button>
+        </div>
+        <div class="feedback-box" id="fb-emm-b"></div>
+      </div>
+      <div class="submit-row"><button class="btn btn-success" id="next-4" style="display:none" onclick="nextMission(5)">Next Mission →</button></div>
+    </div>
+  </div>
+
+  <!-- MISSION 6 -->
+  <div class="mission-card" id="mission-5">
+    <div class="mission-header">
+      <span class="mission-icon">📍</span>
+      <div class="mission-meta">
+        <div class="mission-number">Mission 6 of 7 · Privacy & Permissions</div>
+        <div class="mission-title">Protect the Agent's Privacy</div>
+      </div>
+      <span class="mission-pts">+40 pts</span>
+    </div>
+    <div class="mission-body">
+      <div class="mission-scenario">📋 <strong>Field Briefing:</strong> A UVA student downloaded a flashlight app requesting access to contacts, microphone, camera, and precise location. They ask if this is normal. What is the BEST privacy practice to advise?</div>
+      <div class="mission-question">What is the best advice regarding app permissions for this flashlight app?</div>
+      <div class="options-grid" id="opts-5">
+        <button class="option-btn" onclick="checkMCQ(5,this,false)">Grant all permissions - the app needs them to function properly</button>
+        <button class="option-btn" onclick="checkMCQ(5,this,true)">Deny all unnecessary permissions; a flashlight only needs camera/flash access</button>
+        <button class="option-btn" onclick="checkMCQ(5,this,false)">Grant location only - it is needed for flashlight brightness adjustment</button>
+        <button class="option-btn" onclick="checkMCQ(5,this,false)">Uninstall immediately without reviewing what permissions are actually needed</button>
+      </div>
+      <div class="feedback-box" id="fb-5"></div>
+      <div class="submit-row"><button class="btn btn-success" id="next-5" style="display:none" onclick="nextMission(6)">Next Mission →</button></div>
+    </div>
+  </div>
+
+  <!-- MISSION 7 -->
+  <div class="mission-card" id="mission-6">
+    <div class="mission-header">
+      <span class="mission-icon">🏆</span>
+      <div class="mission-meta">
+        <div class="mission-number">Mission 7 of 7 · FINAL CHALLENGE · A+ Core 2 Exam Simulation</div>
+        <div class="mission-title">CompTIA A+ Domain 1.3 Scenario</div>
+      </div>
+      <span class="mission-pts">+60 pts</span>
+    </div>
+    <div class="mission-body">
+      <div class="mission-scenario">📋 <strong>Final Briefing:</strong> This is your A+ Core 2 Domain 1.3 simulation. A technician is configuring a new employee's Android device for corporate use. Answer as you would on the CompTIA exam.</div>
+      <div class="mission-question">A technician needs to configure a corporate Android device so that: (1) email stays synced across all devices, (2) the company can remotely wipe it if lost, and (3) the employee cannot install apps from unknown sources. Which combination of solutions addresses ALL three requirements?</div>
+      <div style="display:flex;flex-direction:column;gap:10px" id="opts-6">
+        <button class="option-btn" onclick="checkMCQ(6,this,false)">POP3 email + manual device policy + user education only</button>
+        <button class="option-btn" onclick="checkMCQ(6,this,true)">IMAP email + EMM/MDM enrollment + device restriction policy</button>
+        <button class="option-btn" onclick="checkMCQ(6,this,false)">SMTP email + Google Play Protect + screen lock PIN</button>
+        <button class="option-btn" onclick="checkMCQ(6,this,false)">IMAP email + antivirus app + disabling Bluetooth</button>
+      </div>
+      <div class="feedback-box" id="fb-6"></div>
+      <div class="submit-row"><button class="btn btn-gold" id="next-6" style="display:none;font-size:1rem;padding:12px 28px" onclick="showResults()">🎓 View Final Results</button></div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results-screen">
+    <div class="results-header">
+      <span class="results-trophy" id="results-trophy">🏆</span>
+      <div class="results-title" id="results-title">Field Operations Complete!</div>
+      <div class="results-rank" id="results-rank-display">Rank: Master</div>
+    </div>
+    <div class="results-body">
+      <p style="color:#555;font-size:.9rem">UVA Field Operations Final Score</p>
+      <div class="results-score-big" id="results-score-big">0 pts</div>
+      <div class="results-grid">
+        <div class="results-stat"><div class="results-stat-val" id="res-correct">0</div><div class="results-stat-lbl">Correct Answers</div></div>
+        <div class="results-stat"><div class="results-stat-val" id="res-streak">0</div><div class="results-stat-lbl">Best Streak</div></div>
+        <div class="results-stat"><div class="results-stat-val" id="res-rank">🎓</div><div class="results-stat-lbl">Final Rank</div></div>
+      </div>
+      <div class="objectives-list">
+        <h4>✅ A+ Core 2 · Domain 1.3 Objectives Covered</h4>
+        <div class="obj-item"><span class="obj-check">✔</span> iOS vs Android app distribution (App Store, Google Play, sideloading, APK)</div>
+        <div class="obj-item"><span class="obj-check">✔</span> Email protocols: IMAP (143/993), POP3 (110), SMTP (25/587)</div>
+        <div class="obj-item"><span class="obj-check">✔</span> Contact/calendar sync process and conflict resolution</div>
+        <div class="obj-item"><span class="obj-check">✔</span> EMM/MDM: remote wipe, containerization (MAM), device policies</div>
+        <div class="obj-item"><span class="obj-check">✔</span> App permissions and location services privacy management</div>
+      </div>
+      <p style="font-size:.82rem;color:#888;font-style:italic;margin-bottom:16px">✦ Virtue · Vigor · Vision ✦ — University View Academy</p>
+      <button class="btn btn-primary" onclick="restartActivity()">🔄 Retry Missions</button>
+    </div>
+  </div>
+</div>
+
+<div class="confetti-container" id="confetti-container"></div>
+<div class="badge-overlay" id="badge-overlay" onclick="closeBadge()"></div>
+<div class="badge-popup" id="badge-popup">
+  <span class="badge-emoji" id="badge-emoji">🏆</span>
+  <div class="badge-title" id="badge-title">Rank Up!</div>
+  <div class="badge-sub" id="badge-sub">You earned a new rank!</div>
+  <button class="btn btn-primary" style="margin-top:14px" onclick="closeBadge()">Continue Mission</button>
+</div>
+
+<script>
+var score=0,streak=0,bestStreak=0,correctCount=0;
+var emmADone=false,emmBDone=false,emmACorrect=false,emmBCorrect=false;
+var draggedEl=null,orderDragSrc=null;
+var m0checked=false,m2checked=false,m3checked=false;
+
+var RANKS=[
+  {min:0,label:"Trainee",emoji:"🎓",name:"Trainee"},
+  {min:100,label:"Apprentice",emoji:"⚙️",name:"Apprentice"},
+  {min:200,label:"Expert",emoji:"🛡️",name:"Expert"},
+  {min:300,label:"Master",emoji:"🏆",name:"Master"}
+];
+
+function getRank(s){var r=RANKS[0];for(var i=0;i<RANKS.length;i++){if(s>=RANKS[i].min)r=RANKS[i];}return r;}
+
+function updateHUD(){
+  var r=getRank(score);
+  document.getElementById("rank-display").innerHTML=r.emoji+" "+r.name;
+  document.getElementById("score-display").textContent=score+" pts";
+}
+
+function addScore(pts,correct){
+  var prevRank=getRank(score).name;
+  if(correct){
+    score+=pts;streak++;correctCount++;
+    if(streak>bestStreak)bestStreak=streak;
+    updateHUD();
+    var newRank=getRank(score).name;
+    if(newRank!==prevRank)setTimeout(function(){showBadge(getRank(score));},500);
+    updateStreak();
+  }else{
+    streak=0;
+    document.getElementById("streak-badge").style.display="none";
+  }
+}
+
+function updateStreak(){
+  var sb=document.getElementById("streak-badge");
+  if(streak>=2){
+    sb.style.display="inline-block";
+    sb.textContent="🔥 "+streak+" in a row!";
+  }else{sb.style.display="none";}
+}
+
+function updateProgress(n){
+  document.getElementById("progress-bar").style.width=Math.round((n/7)*100)+"%";
+  document.getElementById("progress-label").textContent="Mission "+(n+1)+" of 7";
+  for(var i=0;i<7;i++){
+    var d=document.getElementById("dot-"+i);
+    d.className="mission-dot";
+    if(i<n)d.className="mission-dot completed";
+    else if(i===n)d.className="mission-dot active";
+  }
+}
+
+function startMissions(){
+  document.getElementById("intro-screen").style.display="none";
+  document.getElementById("progress-section").style.display="flex";
+  document.getElementById("mission-dots").style.display="flex";
+  showMission(0);
+}
+
+function showMission(n){
+  for(var i=0;i<7;i++)document.getElementById("mission-"+i).className="mission-card";
+  document.getElementById("mission-"+n).className="mission-card active";
+  updateProgress(n);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function nextMission(n){if(n<7)showMission(n);else showResults();}
+
+function dragStart(e){draggedEl=e.target;e.dataTransfer.effectAllowed="move";}
+function allowDrop(e){e.preventDefault();e.currentTarget.classList.add("drag-over");}
+document.addEventListener("dragleave",function(e){if(e.target.classList&&e.target.classList.contains("drop-zone"))e.target.classList.remove("drag-over");});
+
+function dropItem(e){
+  e.preventDefault();
+  var zone=e.currentTarget;
+  zone.classList.remove("drag-over");
+  if(!draggedEl||draggedEl.classList.contains("used"))return;
+  var ph=zone.querySelector(".ph");
+  if(ph)ph.remove();
+  var chip=document.createElement("div");
+  chip.className="placed-chip";
+  chip.dataset.id=draggedEl.dataset.id;
+  chip.dataset.ans=draggedEl.dataset.ans;
+  chip.innerHTML=draggedEl.textContent+' <span class="rx" onclick="removeChip(this)">✕</span>';
+  zone.appendChild(chip);
+  draggedEl.classList.add("used");
+  draggedEl=null;
+}
+
+function removeChip(x){
+  if(m0checked)return;
+  var chip=x.parentElement;
+  var id=chip.dataset.id;
+  var zone=chip.parentElement;
+  chip.remove();
+  var pi=document.querySelector('[data-id="'+id+'"]');
+  if(pi)pi.classList.remove("used");
+  if(!zone.querySelector(".placed-chip")){
+    var ph=document.createElement("span");
+    ph.className="ph";ph.style.cssText="color:#bbb;font-size:.8rem";
+    ph.textContent=zone.id==="dz-ios"?"Drop iOS features here":"Drop Android features here";
+    zone.appendChild(ph);
+  }
+}
+
+function checkMission0(){
+  if(m0checked)return;
+  m0checked=true;
+  var iosChips=Array.from(document.getElementById("dz-ios").querySelectorAll(".placed-chip"));
+  var andChips=Array.from(document.getElementById("dz-android").querySelectorAll(".placed-chip"));
+  var correct=0;
+  iosChips.forEach(function(c){if(c.dataset.ans==="ios")correct++;});
+  andChips.forEach(function(c){if(c.dataset.ans==="android")correct++;});
+  var total=6;
+  var fb=document.getElementById("fb-0");
+  if(correct===total){
+    fb.className="feedback-box show correct-fb";
+    fb.innerHTML="✅ <strong>Outstanding!</strong> All 6 features correctly sorted! iOS = App Store only (strict review, TestFlight for beta). Android = Google Play + APK sideloading via 'Unknown sources'.";
+    addScore(50,true);launchConfetti();
+    document.getElementById("next-0").style.display="inline-block";
+  }else{
+    fb.className="feedback-box show incorrect-fb";
+    fb.innerHTML="⚠️ <strong>"+correct+"/"+total+" correct.</strong> iOS = App Store only. Android = Google Play + APK sideloading. Review your placements!";
+    addScore(0,false);
+    var sub=document.getElementById("submit-0");
+    sub.textContent="🔄 Reset & Retry";
+    sub.onclick=function(){resetMission0();};
+    if(correct>=4)document.getElementById("next-0").style.display="inline-block";
+  }
+}
+
+function resetMission0(){
+  m0checked=false;
+  document.querySelectorAll("#pool-items .drag-item").forEach(function(el){el.classList.remove("used");});
+  ["dz-ios","dz-android"].forEach(function(id){
+    var z=document.getElementById(id);z.innerHTML="";z.className="drop-zone";
+    var ph=document.createElement("span");ph.className="ph";ph.style.cssText="color:#bbb;font-size:.8rem";
+    ph.textContent=id==="dz-ios"?"Drop iOS features here":"Drop Android features here";
+    z.appendChild(ph);
+  });
+  document.getElementById("fb-0").className="feedback-box";
+  var sub=document.getElementById("submit-0");sub.textContent="🔍 Verify Intel";sub.onclick=checkMission0;
+  document.getElementById("next-0").style.display="none";
+}
+
+function checkMCQ(idx,btn,isCorrect){
+  var container=btn.parentElement;
+  var btns=container.querySelectorAll(".option-btn");
+  btns.forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById("fb-"+idx);
+  if(isCorrect){
+    btn.classList.add("correct");
+    var msgs={
+      1:"✅ <strong>Correct!</strong> IMAP keeps messages on the server and syncs across all devices. POP3 downloads and typically deletes from server. SMTP is for sending only.",
+      5:"✅ <strong>Correct!</strong> Principle of least privilege: a flashlight only needs camera/flash. Requesting contacts, microphone, and location is a red flag for spyware.",
+      6:"✅ <strong>Excellent!</strong> IMAP handles multi-device sync (port 143/993), EMM/MDM enables remote wipe and device policies including blocking unknown sources."
+    };
+    fb.className="feedback-box show correct-fb";
+    fb.innerHTML=msgs[idx]||"✅ Correct!";
+    addScore(idx===6?60:40,true);launchConfetti();
+    document.getElementById("next-"+idx).style.display="inline-block";
+  }else{
+    btn.classList.add("incorrect");
+    var wrongMsgs={
+      1:"❌ IMAP is correct - it keeps mail on the server and syncs across devices. POP3 downloads and removes from server. SMTP is for sending. FTP is for file transfer.",
+      5:"❌ Best practice: deny unnecessary permissions. A flashlight has no need for contacts, microphone, or location. Apply the principle of least privilege.",
+      6:"❌ Review: IMAP = multi-device sync, EMM/MDM = remote wipe + device policies. POP3 only downloads to one device. SMTP is for sending."
+    };
+    fb.className="feedback-box show incorrect-fb";
+    fb.innerHTML=wrongMsgs[idx]||"❌ Incorrect. Review the material.";
+    addScore(0,false);
+    document.getElementById("next-"+idx).style.display="inline-block";
+  }
+}
+
+function orderDragStart(e){orderDragSrc=e.currentTarget;e.currentTarget.classList.add("dragging");e.dataTransfer.effectAllowed="move";}
+function orderDragOver(e){e.preventDefault();return false;}
+function orderDrop(e){
+  e.stopPropagation();
+  var target=e.currentTarget;
+  if(orderDragSrc===target)return;
+  var list=document.getElementById("order-list-2");
+  var items=Array.from(list.children);
+  var si=items.indexOf(orderDragSrc),ti=items.indexOf(target);
+  if(si<ti)list.insertBefore(orderDragSrc,target.nextSibling);
+  else list.insertBefore(orderDragSrc,target);
+  Array.from(list.children).forEach(function(li,i){li.querySelector(".order-num").textContent=i+1;});
+  orderDragSrc.classList.remove("dragging");
+  return false;
+}
+
+function checkOrdering(){
+  if(m2checked)return;m2checked=true;
+  var list=document.getElementById("order-list-2");
+  var items=Array.from(list.children);
+  var userOrder=items.map(function(li){return parseInt(li.dataset.correct);});
+  var isCorrect=JSON.stringify(userOrder)===JSON.stringify([1,2,3,4,5]);
+  var fb=document.getElementById("fb-2");
+  if(isCorrect){
+    fb.className="feedback-box show correct-fb";
+    fb.innerHTML="✅ <strong>Perfect sequence!</strong> (1) Enable sync → (2) Authenticate → (3) Send changed records → (4) Server merges & pushes → (5) Conflict resolution.";
+    addScore(60,true);launchConfetti();
+    document.getElementById("next-2").style.display="inline-block";
+    document.getElementById("submit-2").disabled=true;
+  }else{
+    fb.className="feedback-box show incorrect-fb";
+    fb.innerHTML="❌ Not quite. Correct order: (1) Enable sync → (2) Authenticate → (3) Device sends records → (4) Server merges & pushes → (5) Conflict resolution. Try again!";
+    addScore(0,false);
+    m2checked=false;
+    document.getElementById("next-2").style.display="inline-block";
+  }
+}
+
+function checkPorts(){
+  if(m3checked)return;m3checked=true;
+  var answers={imap:"143",imaps:"993",pop3:"110",smtp:"25",smtptls:"587"};
+  var correct=0,total=5;
+  Object.keys(answers).forEach(function(k){
+    var sel=document.getElementById("sel-"+k);
+    sel.disabled=true;
+    if(sel.value===answers[k]){correct++;sel.className="answer-select correct-sel";}
+    else{sel.className="answer-select incorrect-sel";}
+  });
+  var fb=document.getElementById("fb-3");
+  if(correct===total){
+    fb.className="feedback-box show correct-fb";
+    fb.innerHTML="✅ <strong>All ports correct!</strong> IMAP=143, IMAP SSL=993, POP3=110, SMTP=25, SMTP TLS=587. These are critical A+ exam facts!";
+    addScore(50,true);launchConfetti();
+  }else{
+    fb.className="feedback-box show incorrect-fb";
+    fb.innerHTML="❌ <strong>"+correct+"/"+total+" correct.</strong> Key ports: IMAP=143, IMAP SSL=993, POP3=110, SMTP=25, SMTP TLS/Submission=587. Red = incorrect.";
+    addScore(0,false);
+  }
+  document.getElementById("next-3").style.display="inline-block";
+}
+
+function checkEMM(part,btn,isCorrect){
+  var choices=document.getElementById("emm-choices-"+part).querySelectorAll(".scenario-choice");
+  choices.forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById("fb-emm-"+part);
+  if(isCorrect){
+    btn.classList.add("chosen-correct");
+    if(part==="a"){
+      emmACorrect=true;
+      fb.className="feedback-box show correct-fb";
+      fb.innerHTML="✅ <strong>Correct!</strong> Remote wipe is the immediate priority to protect sensitive data on a stolen device. Time is critical - every minute the device is accessible is a security risk.";
+      addScore(40,true);launchConfetti();
+      emmADone=true;
+      setTimeout(function(){document.getElementById("emm-b").style.display="block";},600);
+    }else{
+      emmBCorrect=true;
+      fb.className="feedback-box show correct-fb";
+      fb.innerHTML="✅ <strong>Correct!</strong> Containerization (MAM/Work Profile) creates a secure work container on personal devices. The company manages only work data while personal content remains private.";
+      addScore(40,true);launchConfetti();
+      emmBDone=true;
+      document.getElementById("next-4").style.display="inline-block";
+    }
+  }else{
+    btn.classList.add("chosen-incorrect");
+    if(part==="a"){
+      fb.className="feedback-box show incorrect-fb";
+      fb.innerHTML="❌ Incorrect. Remote wipe is the FIRST priority for a stolen device with sensitive data.";
+      addScore(0,false);
+      emmADone=true;
+      setTimeout(function(){document.getElementById("emm-b").style.display="block";},600);
+    }else{
+      fb.className="feedback-box show incorrect-fb";
+      fb.innerHTML="❌ Incorrect. Containerization (MAM) is the standard for BYOD to isolate work data.";
+      addScore(0,false);
+      emmBDone=true;
+      document.getElementById("next-4").style.display="inline-block";
+    }
+  }
+}
+
+function launchConfetti(){
+  var container=document.getElementById("confetti-container");
+  for(var i=0;i<40;i++){
+    var c=document.createElement("div");
+    c.style.cssText="position:absolute;width:8px;height:8px;background:"+["#1B5EAF","#1E7A3E","#F5A623","#fff"][Math.floor(Math.random()*4)]+";left:"+Math.random()*100+"%;top:-10px;border-radius:50%;animation:confettiFall "+(2+Math.random()*3)+"s linear forwards";
+    container.appendChild(c);
+    setTimeout(function(el){el.remove();},5000,c);
+  }
+}
+
+function showBadge(rank){
+  document.getElementById("badge-emoji").innerHTML=rank.emoji;
+  document.getElementById("badge-title").textContent="Rank Up: "+rank.name+"!";
+  document.getElementById("badge-sub").textContent="Your expertise is growing, Cadet!";
+  document.getElementById("badge-overlay").className="badge-overlay show";
+  document.getElementById("badge-popup").className="badge-popup show";
+}
+
+function closeBadge(){
+  document.getElementById("badge-overlay").className="badge-overlay";
+  document.getElementById("badge-popup").className="badge-popup";
+}
+
+function showResults(){
+  for(var i=0;i<7;i++)document.getElementById("mission-"+i).style.display="none";
+  document.getElementById("progress-section").style.display="none";
+  document.getElementById("mission-dots").style.display="none";
+  var res=document.getElementById("results-screen");
+  res.className="show";
+  var r=getRank(score);
+  document.getElementById("results-rank-display").textContent="Final Rank: "+r.name;
+  document.getElementById("results-score-big").textContent=score+" pts";
+  document.getElementById("res-correct").textContent=correctCount;
+  document.getElementById("res-streak").textContent=bestStreak;
+  document.getElementById("res-rank").innerHTML=r.emoji;
+  launchConfetti();
+}
+
+function restartActivity(){location.reload();}
+</script>
+</body>
+</html>
