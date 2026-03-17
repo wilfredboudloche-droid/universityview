@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 9D: Mobile Device Troubleshooting | UVA</title>
+<style>
+  :root {
+    --uva-blue: #1B5EAF;
+    --uva-green: #1E7A3E;
+    --uva-light-blue: #2a7fd4;
+    --uva-gold: #F5A623;
+    --uva-red: #C0392B;
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --border: #d1d5db;
+    --success: #16a34a;
+    --danger: #dc2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  .header { background: var(--uva-blue); color: white; padding: 0; position: relative; overflow: hidden; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; }
+  .logo-area { display: flex; align-items: center; gap: 12px; }
+  .logo-shield { width: 48px; height: 56px; }
+  .school-name { font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
+  .school-sub { font-size: 0.72rem; opacity: 0.85; letter-spacing: 0.5px; }
+  .motto-ribbon { background: var(--uva-green); text-align: center; padding: 7px 24px; font-size: 0.82rem; font-weight: 600; letter-spacing: 2px; color: white; text-transform: uppercase; }
+  .lesson-title { text-align: center; padding: 14px 24px 18px; }
+  .lesson-title h1 { font-size: 1.35rem; font-weight: 800; }
+  .lesson-title p { font-size: 0.82rem; opacity: 0.8; margin-top: 4px; }
+
+  /* HUD */
+  .hud { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: white; border-bottom: 3px solid var(--uva-blue); padding: 10px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .hud-rank { display: flex; align-items: center; gap: 8px; }
+  .rank-badge { background: var(--uva-blue); color: white; border-radius: 20px; padding: 4px 14px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.5px; }
+  .rank-icon { font-size: 1.4rem; }
+  .hud-score { font-size: 1.1rem; font-weight: 800; color: var(--uva-blue); }
+  .hud-score span { font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+  .streak-display { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; color: var(--uva-gold); }
+  .streak-fire { font-size: 1.2rem; }
+  .progress-bar-wrap { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; margin-top: 4px; }
+  .progress-bar { height: 8px; background: linear-gradient(90deg, var(--uva-blue), var(--uva-green)); border-radius: 4px; transition: width 0.5s ease; }
+  .hud-mission { font-size: 0.75rem; color: var(--muted); }
+
+  /* MAIN */
+  .main { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* INTRO SCREEN */
+  .intro-screen { text-align: center; }
+  .intro-card { background: white; border-radius: 16px; padding: 36px 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-top: 5px solid var(--uva-blue); }
+  .intro-icon { font-size: 4rem; margin-bottom: 12px; }
+  .intro-card h2 { font-size: 1.6rem; color: var(--uva-blue); margin-bottom: 10px; }
+  .intro-card p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; font-size: 0.95rem; }
+  .objectives { text-align: left; background: #f0f7ff; border-radius: 10px; padding: 16px 20px; margin: 18px 0; }
+  .objectives h3 { color: var(--uva-blue); font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .objectives li { font-size: 0.88rem; color: var(--text); margin-bottom: 6px; padding-left: 4px; list-style: none; }
+  .objectives li::before { content: "🎯 "; }
+  .comptia-badge { display: inline-block; background: var(--uva-green); color: white; border-radius: 8px; padding: 6px 14px; font-size: 0.78rem; font-weight: 700; margin-bottom: 18px; }
+  .btn-start { background: linear-gradient(135deg, var(--uva-blue), var(--uva-light-blue)); color: white; border: none; border-radius: 12px; padding: 14px 40px; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 14px rgba(27,94,175,0.35); }
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(27,94,175,0.45); }
+
+  /* MISSION CARD */
+  .mission-card { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-left: 5px solid var(--uva-blue); margin-bottom: 20px; }
+  .mission-label { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .mission-tag { background: var(--uva-blue); color: white; border-radius: 6px; padding: 3px 10px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .mission-category { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+  .scenario-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 18px; }
+  .scenario-box .device-icon { font-size: 2rem; margin-bottom: 6px; }
+  .scenario-box h3 { font-size: 1rem; color: var(--uva-blue); margin-bottom: 6px; font-weight: 700; }
+  .scenario-box p { font-size: 0.9rem; color: var(--text); line-height: 1.55; }
+  .question-text { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+
+  /* OPTIONS */
+  .options-grid { display: grid; gap: 10px; }
+  .option-btn { background: white; border: 2px solid var(--border); border-radius: 10px; padding: 13px 16px; text-align: left; cursor: pointer; font-size: 0.9rem; color: var(--text); transition: all 0.18s; display: flex; align-items: flex-start; gap: 10px; line-height: 1.45; }
+  .option-btn:hover:not(:disabled) { border-color: var(--uva-blue); background: #f0f7ff; transform: translateX(3px); }
+  .option-btn.correct { border-color: var(--success); background: #f0fdf4; color: var(--success); }
+  .option-btn.wrong { border-color: var(--danger); background: #fef2f2; color: var(--danger); }
+  .option-btn.reveal { border-color: var(--success); background: #f0fdf4; opacity: 0.7; }
+  .option-btn:disabled { cursor: default; }
+  .option-letter { font-weight: 800; min-width: 22px; color: var(--uva-blue); }
+  .option-btn.correct .option-letter { color: var(--success); }
+  .option-btn.wrong .option-letter { color: var(--danger); }
+
+  /* FEEDBACK */
+  .feedback-box { border-radius: 10px; padding: 14px 16px; margin-top: 14px; font-size: 0.9rem; line-height: 1.5; display: none; }
+  .feedback-box.show { display: block; }
+  .feedback-box.correct { background: #f0fdf4; border: 1px solid #86efac; color: #166534; }
+  .feedback-box.wrong { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+  .feedback-title { font-weight: 800; font-size: 1rem; margin-bottom: 4px; }
+  .feedback-tip { margin-top: 6px; font-size: 0.83rem; opacity: 0.85; }
+
+  /* DRAG DROP */
+  .drag-area { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .drag-column h4 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 10px; }
+  .drag-items { display: flex; flex-direction: column; gap: 8px; }
+  .drag-item { background: var(--uva-blue); color: white; border-radius: 8px; padding: 9px 13px; font-size: 0.85rem; cursor: grab; user-select: none; transition: transform 0.15s, box-shadow 0.15s; font-weight: 600; }
+  .drag-item:active { cursor: grabbing; transform: scale(1.04); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+  .drag-item.dragging { opacity: 0.5; }
+  .drop-zone { min-height: 44px; border: 2px dashed var(--border); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.2s, background 0.2s; }
+  .drop-zone.drag-over { border-color: var(--uva-blue); background: #f0f7ff; }
+  .drop-zone.correct-zone { border-color: var(--success); background: #f0fdf4; }
+  .drop-zone.wrong-zone { border-color: var(--danger); background: #fef2f2; }
+  .drop-label { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .drop-placeholder { font-size: 0.78rem; color: var(--muted); font-style: italic; padding: 4px; }
+
+  /* NEXT BTN */
+  .btn-next { background: linear-gradient(135deg, var(--uva-green), #27ae60); color: white; border: none; border-radius: 10px; padding: 12px 30px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 14px; display: none; transition: transform 0.15s; }
+  .btn-next.show { display: inline-block; }
+  .btn-next:hover { transform: translateY(-2px); }
+  .btn-check { background: var(--uva-blue); color: white; border: none; border-radius: 10px; padding: 12px 30px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 14px; transition: transform 0.15s; }
+  .btn-check:hover { transform: translateY(-2px); }
+
+  /* STREAK POPUP */
+  .streak-popup { position: fixed; top: 80px; right: 20px; background: var(--uva-gold); color: white; border-radius: 12px; padding: 12px 20px; font-weight: 800; font-size: 1rem; z-index: 999; transform: translateX(200px); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+  .streak-popup.show { transform: translateX(0); }
+
+  /* RANK UP POPUP */
+  .rank-popup { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+  .rank-popup.show { opacity: 1; pointer-events: all; }
+  .rank-popup-card { background: white; border-radius: 20px; padding: 40px 36px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); border-top: 6px solid var(--uva-blue); }
+  .rank-popup.show .rank-popup-card { transform: scale(1); }
+  .rank-popup-icon { font-size: 4rem; margin-bottom: 10px; }
+  .rank-popup h2 { color: var(--uva-blue); font-size: 1.5rem; margin-bottom: 6px; }
+  .rank-popup p { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+  .btn-dismiss { background: var(--uva-blue); color: white; border: none; border-radius: 10px; padding: 10px 28px; font-weight: 700; cursor: pointer; font-size: 0.95rem; }
+
+  /* CONFETTI */
+  .confetti-piece { position: fixed; width: 10px; height: 10px; border-radius: 2px; pointer-events: none; z-index: 9999; animation: confettiFall linear forwards; }
+  @keyframes confettiFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+
+  /* RESULTS */
+  .results-screen { text-align: center; }
+  .results-card { background: white; border-radius: 16px; padding: 36px 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-top: 5px solid var(--uva-green); }
+  .results-icon { font-size: 4rem; margin-bottom: 12px; }
+  .results-card h2 { font-size: 1.6rem; color: var(--uva-blue); margin-bottom: 8px; }
+  .score-circle { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--uva-blue), var(--uva-green)); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px auto; box-shadow: 0 6px 20px rgba(27,94,175,0.35); }
+  .score-circle .big-num { font-size: 2.2rem; font-weight: 900; line-height: 1; }
+  .score-circle .score-label { font-size: 0.72rem; opacity: 0.85; }
+  .final-rank { display: inline-block; background: var(--uva-blue); color: white; border-radius: 20px; padding: 8px 24px; font-size: 1rem; font-weight: 700; margin: 10px 0 18px; }
+  .results-breakdown { text-align: left; background: #f8fafc; border-radius: 10px; padding: 16px; margin: 16px 0; }
+  .results-breakdown h3 { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .breakdown-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+  .breakdown-item:last-child { border-bottom: none; }
+  .breakdown-result { font-weight: 700; }
+  .breakdown-result.c { color: var(--success); }
+  .breakdown-result.w { color: var(--danger); }
+  .btn-restart { background: linear-gradient(135deg, var(--uva-blue), var(--uva-light-blue)); color: white; border: none; border-radius: 12px; padding: 13px 36px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; transition: transform 0.15s; }
+  .btn-restart:hover { transform: translateY(-2px); }
+
+  /* HIDDEN */
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    .drag-area { grid-template-columns: 1fr; }
+    .hud { gap: 6px; }
+    .mission-card { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="logo-area">
+      <svg class="logo-shield" viewBox="0 0 48 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 2L4 10V28C4 40 14 50 24 54C34 50 44 40 44 28V10L24 2Z" fill="white" fill-opacity="0.15" stroke="white" stroke-width="2"/>
+        <text x="24" y="34" text-anchor="middle" fill="white" font-size="18" font-weight="900" font-family="Arial">U</text>
+      </svg>
+      <div>
+        <div class="school-name">University View Academy</div>
+        <div class="school-sub">Computer Architecture · Lesson 9D</div>
+      </div>
+    </div>
+    <div style="text-align:right; font-size:0.75rem; opacity:0.8; line-height:1.5;">
+      CompTIA A+<br>Core 1 · Obj 5.4
+    </div>
+  </div>
+  <div class="motto-ribbon">✦ Virtue · Vigor · Vision ✦</div>
+  <div class="lesson-title">
+    <h1>📱 Mobile Device Troubleshooting</h1>
+    <p>Field Agent Training Program · 10 Missions · CompTIA A+ 220-1101</p>
+  </div>
+</div>
+
+<!-- HUD -->
+<div class="hud" id="hud" style="display:none;">
+  <div class="hud-rank">
+    <span class="rank-icon" id="rankIcon">🔰</span>
+    <span class="rank-badge" id="rankBadge">TRAINEE</span>
+  </div>
+  <div>
+    <div class="hud-score">⭐ <span id="scoreDisplay">0</span> pts <span>/ <span id="maxScore">0</span></span></div>
+    <div class="hud-mission" id="missionCounter">Mission 0 of 10</div>
+  </div>
+  <div class="streak-display">
+    <span class="streak-fire">🔥</span>
+    <span id="streakDisplay">0</span> streak
+  </div>
+  <div style="width:100%;">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- STREAK POPUP -->
+<div class="streak-popup" id="streakPopup">🔥 <span id="streakPopupText">3 in a row!</span></div>
+
+<!-- RANK UP POPUP -->
+<div class="rank-popup" id="rankPopup">
+  <div class="rank-popup-card">
+    <div class="rank-popup-icon" id="rankPopupIcon">⭐</div>
+    <h2>Rank Up!</h2>
+    <p id="rankPopupText">You've been promoted!</p>
+    <button class="btn-dismiss" onclick="dismissRankUp()">Continue Mission →</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- INTRO -->
+  <div class="intro-screen" id="introScreen">
+    <div class="intro-card">
+      <div class="intro-icon">📱🔧</div>
+      <h2>Field Agent Training: Mobile Diagnostics</h2>
+      <div class="comptia-badge">🏆 CompTIA A+ Core 1 · Objective 5.4</div>
+      <p>Welcome, Cadet! You've been assigned to the UVA Mobile Device Diagnostic Unit. Your mission: diagnose and resolve real-world mobile device issues reported by users across campus.</p>
+      <p style="margin-top:8px;">Complete all 10 missions to earn your <strong>Master Technician</strong> badge and prove your readiness for the CompTIA A+ exam.</p>
+      <div class="objectives">
+        <h3>Mission Objectives</h3>
+        <ul>
+          <li>Identify common power and battery issues</li>
+          <li>Diagnose hardware failures (overheating, liquid damage)</li>
+          <li>Troubleshoot screen and digitizer malfunctions</li>
+          <li>Resolve connectivity and communication problems</li>
+          <li>Recognize signs of malware infections</li>
+        </ul>
+      </div>
+      <p style="font-size:0.82rem; color:var(--muted); margin-bottom:20px;">🎯 Earn points · Build streaks · Rank up from Trainee → Master</p>
+      <button class="btn-start" onclick="startGame()">🚀 Begin Field Training</button>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" class="hidden">
+    <div id="missionContainer"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultsScreen" class="hidden results-screen">
+    <div class="results-card">
+      <div class="results-icon" id="resultsIcon">🏆</div>
+      <h2 id="resultsTitle">Mission Complete!</h2>
+      <div class="score-circle">
+        <div class="big-num" id="finalScore">0</div>
+        <div class="score-label">POINTS</div>
+      </div>
+      <div class="final-rank" id="finalRank">🔰 Trainee</div>
+      <p id="resultsMessage" style="color:var(--muted); font-size:0.9rem; margin-bottom:16px;"></p>
+      <div class="results-breakdown">
+        <h3>Mission Debrief</h3>
+        <div id="breakdownList"></div>
+      </div>
+      <button class="btn-restart" onclick="restartGame()">🔄 Retake Training</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===================== DATA =====================
+const missions = [
+  {
+    id: 1,
+    type: "mcq",
+    category: "Power & Battery",
+    icon: "🔋",
+    title: "The Dead Phone",
+    scenario: "A student brings in their Android phone saying it won't turn on at all. They say it was working fine yesterday. The phone shows no response when the power button is pressed, even after being plugged in for 10 minutes.",
+    question: "What is the FIRST troubleshooting step you should perform?",
+    options: [
+      "Immediately replace the battery",
+      "Perform a hard reset by holding Power + Volume Down for 10–15 seconds",
+      "Open the device and inspect the motherboard",
+      "Declare the device dead and recommend a new phone"
+    ],
+    correct: 1,
+    explanation: "A hard reset (force restart) is always the first step for an unresponsive device. It clears temporary software states without data loss. Battery replacement and hardware inspection come only after software-level steps fail.",
+    tip: "CompTIA A+ Tip: Always try the least invasive fix first — software before hardware!"
+  },
+  {
+    id: 2,
+    type: "mcq",
+    category: "Battery Issues",
+    icon: "⚡",
+    title: "The Swollen Battery",
+    scenario: "A student's iPhone screen appears to be slightly lifting away from the body of the phone. The back of the phone feels warm even when idle, and the battery drains from 100% to 20% in under 2 hours.",
+    question: "What does a bulging/swollen battery indicate, and what is the correct action?",
+    options: [
+      "Normal wear — advise the student to update iOS",
+      "A software bug causing false battery readings — factory reset the device",
+      "A dangerous lithium battery failure — do NOT charge it; handle carefully and recycle properly",
+      "The phone case is too tight — remove the case and monitor"
+    ],
+    correct: 2,
+    explanation: "A swollen battery is a serious safety hazard. Lithium-ion batteries can swell due to gas buildup from chemical breakdown. The device should NOT be charged or used. It must be handled carefully (no puncturing) and taken to a certified recycling center.",
+    tip: "CompTIA A+ Tip: Swollen batteries are a physical safety issue — never ignore them or attempt DIY removal without proper training."
+  },
+  {
+    id: 3,
+    type: "mcq",
+    category: "Overheating",
+    icon: "🌡️",
+    title: "The Burning Hot Tablet",
+    scenario: "A teacher reports their iPad gets extremely hot during video calls and sometimes shuts down automatically. They use it plugged in all day. The device is 3 years old.",
+    question: "Which combination of factors is MOST likely causing the overheating?",
+    options: [
+      "The Wi-Fi signal is too strong, causing the antenna to overheat",
+      "Continuous charging while under heavy CPU load, combined with possible battery degradation",
+      "The screen brightness is set too high",
+      "Too many wallpaper apps are installed"
+    ],
+    correct: 1,
+    explanation: "Keeping a device plugged in while running CPU-intensive tasks (like video calls) generates significant heat. After 3 years, battery degradation means it charges less efficiently, generating more heat. The automatic shutdown is a thermal protection feature.",
+    tip: "CompTIA A+ Tip: Thermal shutdown is a safety feature. Advise users to unplug during heavy use and ensure ventilation."
+  },
+  {
+    id: 4,
+    type: "mcq",
+    category: "Liquid Damage",
+    icon: "💧",
+    title: "The Wet Phone",
+    scenario: "A student dropped their phone in a sink. The phone was on when it fell in. They immediately dried it with a paper towel and brought it to you. The screen flickers and the speaker sounds muffled.",
+    question: "What is the CORRECT immediate response to liquid damage?",
+    options: [
+      "Power it on immediately to test all functions before water gets deeper inside",
+      "Put it in a bag of rice for 24 hours — this is the industry-standard fix",
+      "Power it OFF immediately if still on, do NOT charge it, and allow it to dry in a warm area with airflow for 24–48 hours",
+      "Use a hair dryer on high heat to evaporate the water quickly"
+    ],
+    correct: 2,
+    explanation: "Electricity + water = short circuit. Power off immediately to prevent damage. Rice is a myth — it's ineffective and can introduce dust. High heat can warp components. Proper drying with airflow (or silica gel packets) for 24–48 hours is correct. Check the Liquid Contact Indicator (LCI) for warranty purposes.",
+    tip: "CompTIA A+ Tip: Look for the Liquid Contact Indicator (LCI) — a small sticker that turns red when wet, used to determine warranty eligibility."
+  },
+  {
+    id: 5,
+    type: "mcq",
+    category: "Screen & Digitizer",
+    icon: "📺",
+    title: "The Ghost Touches",
+    scenario: "A student's Android phone is opening apps and typing on its own. The screen responds to their touches but also registers phantom touches they didn't make. The phone has a cracked screen protector.",
+    question: "What is the MOST likely cause of the phantom/ghost touches?",
+    options: [
+      "The phone has a virus that is controlling the touchscreen",
+      "A damaged or poorly fitted screen protector interfering with the digitizer",
+      "The phone's RAM is full, causing input lag",
+      "The student's fingers are too dry"
+    ],
+    correct: 1,
+    explanation: "A cracked or improperly fitted screen protector can press against the digitizer and register false touches. The digitizer is the touch-sensing layer separate from the display. Remove the screen protector first — if ghost touches stop, that was the cause. If they continue, the digitizer itself may be damaged.",
+    tip: "CompTIA A+ Tip: The digitizer and LCD are separate components. Ghost touches = digitizer issue. No display = LCD issue."
+  },
+  {
+    id: 6,
+    type: "drag",
+    category: "Symptom Matching",
+    icon: "🔍",
+    title: "Diagnostic Sorting",
+    scenario: "The UVA help desk has received multiple device complaints. Sort each symptom into the correct diagnostic category to route them to the right repair team.",
+    question: "Drag each symptom to its correct diagnostic category:",
+    items: [
+      { id: "s1", text: "Screen lifts from body, warm when idle" },
+      { id: "s2", text: "Apps open randomly, no user input" },
+      { id: "s3", text: "No cellular signal in known coverage area" },
+      { id: "s4", text: "Device shuts down at 40% battery" },
+      { id: "s5", text: "Muffled audio after rain exposure" },
+      { id: "s6", text: "Half the screen is black, other half works" }
+    ],
+    zones: [
+      { id: "z1", label: "🔋 Battery / Power", accepts: ["s1", "s4"] },
+      { id: "z2", label: "📺 Screen / Digitizer", accepts: ["s2", "s6"] },
+      { id: "z3", label: "📡 Connectivity", accepts: ["s3"] },
+      { id: "z4", label: "💧 Liquid Damage", accepts: ["s5"] }
+    ],
+    explanation: "Swollen battery & early shutdown = Battery issues. Ghost touches & partial display = Screen/Digitizer. No signal = Connectivity. Muffled audio after rain = Liquid damage."
+  },
+  {
+    id: 7,
+    type: "mcq",
+    category: "Connectivity",
+    icon: "📡",
+    title: "No Signal Zone",
+    scenario: "A student's phone shows 'No Service' even though other students' phones work fine in the same classroom. The student recently dropped their phone. Wi-Fi works normally.",
+    question: "What is the MOST likely cause of cellular signal loss while Wi-Fi works?",
+    options: [
+      "The SIM card is damaged or dislodged from the drop, or the cellular antenna is damaged",
+      "The carrier network is down nationwide",
+      "The phone needs a software update to connect to towers",
+      "Wi-Fi Calling is interfering with the cellular radio"
+    ],
+    correct: 0,
+    explanation: "Wi-Fi and cellular use different antennas and radios. If Wi-Fi works but cellular doesn't after a drop, the cellular antenna or SIM card is likely damaged or dislodged. Check: reseat the SIM card first. If that fails, the internal antenna may need replacement.",
+    tip: "CompTIA A+ Tip: Wi-Fi = 2.4/5GHz radio. Cellular = separate radio. They fail independently. Always check the SIM card first!"
+  },
+  {
+    id: 8,
+    type: "mcq",
+    category: "Connectivity",
+    icon: "🔵",
+    title: "Bluetooth Blues",
+    scenario: "A student can't connect their Bluetooth headphones to their phone. The headphones work with other devices. The phone can see the headphones in the Bluetooth scan list but fails to pair, showing 'Pairing unsuccessful.'",
+    question: "What troubleshooting steps should you perform IN ORDER?",
+    options: [
+      "Replace the headphones immediately — they must be defective",
+      "1) Remove the old pairing from both devices, 2) Toggle Bluetooth off/on, 3) Put headphones in pairing mode, 4) Re-pair",
+      "Factory reset the phone — Bluetooth issues always require a full reset",
+      "Update the headphone firmware only — the phone software is never the issue"
+    ],
+    correct: 1,
+    explanation: "Bluetooth pairing failures are often caused by corrupted pairing data. The correct order: forget the device on both ends, toggle Bluetooth (clears the radio state), ensure headphones are in fresh pairing mode, then re-pair. Factory reset is a last resort, not a first step.",
+    tip: "CompTIA A+ Tip: 'Forget device' on both ends before re-pairing. Bluetooth issues are almost always pairing data corruption, not hardware failure."
+  },
+  {
+    id: 9,
+    type: "mcq",
+    category: "Malware",
+    icon: "🦠",
+    title: "The Suspicious Phone",
+    scenario: "A student reports their phone is acting strangely: the battery drains in 3 hours, it gets hot even when idle, data usage has spiked dramatically, and they see ads appearing even when no apps are open. They recently installed a free 'battery optimizer' app from a third-party website.",
+    question: "Which combination of symptoms MOST strongly indicates a malware infection?",
+    options: [
+      "Battery drain and heat only — this is normal for older phones",
+      "Unexpected data usage spikes + ads outside of apps + battery drain + heat from idle processes — classic malware indicators",
+      "The ads are from the battery optimizer app working correctly",
+      "Data spikes are caused by automatic OS updates running in the background"
+    ],
+    correct: 1,
+    explanation: "The combination of: unexpected data usage (malware phoning home), ads outside apps (adware), battery drain + heat from idle (background malicious processes), and a recently sideloaded app from an untrusted source = strong malware indicators. Sideloading from third-party sites bypasses app store security checks.",
+    tip: "CompTIA A+ Tip: Malware red flags: unexpected data usage, ads outside apps, overheating at idle, unknown apps, and sideloaded software."
+  },
+  {
+    id: 10,
+    type: "mcq",
+    category: "Malware Response",
+    icon: "🛡️",
+    title: "Malware Removal Protocol",
+    scenario: "You've confirmed the student's phone from Mission 9 has adware. The malicious app has been identified as 'BatteryBoostPro' installed from a third-party APK.",
+    question: "What is the CORRECT malware removal procedure for an Android device?",
+    options: [
+      "Delete all photos and contacts — malware hides in media files",
+      "1) Uninstall the malicious app, 2) Run a reputable mobile security scan, 3) Change passwords for accounts accessed on the device, 4) Enable Google Play Protect, 5) Factory reset if malware persists",
+      "Simply restart the phone — malware cannot survive a reboot",
+      "Only install a VPN — it will block all malware communication"
+    ],
+    correct: 1,
+    explanation: "Proper malware removal: Uninstall the offending app → Security scan → Change compromised passwords (malware may have logged keystrokes) → Enable Play Protect → Factory reset as last resort. Restarting does NOT remove malware. VPNs don't remove existing infections.",
+    tip: "CompTIA A+ Tip: After malware removal, ALWAYS change passwords — assume credentials were compromised. Enable Play Protect to prevent future infections."
+  }
+];
+
+// ===================== STATE =====================
+let currentMission = 0;
+let score = 0;
+let streak = 0;
+let maxStreak = 0;
+let answers = [];
+let rank = 0;
+let rankUpPending = false;
+const RANKS = [
+  { name: "Trainee", icon: "🔰", minScore: 0 },
+  { name: "Apprentice", icon: "🥉", minScore: 150 },
+  { name: "Expert", icon: "🥈", minScore: 350 },
+  { name: "Master", icon: "🏆", minScore: 600 }
+];
+const POINTS_CORRECT = 100;
+const POINTS_STREAK_BONUS = 25;
+
+// Drag state
+let draggedItem = null;
+let dragMission = null;
+let dropState = {};
+
+// ===================== INIT =====================
+function startGame() {
+  document.getElementById('introScreen').classList.add('hidden');
+  document.getElementById('hud').style.display = 'flex';
+  document.getElementById('gameScreen').classList.remove('hidden');
+  currentMission = 0;
+  score = 0;
+  streak = 0;
+  maxStreak = 0;
+  answers = [];
+  rank = 0;
+  updateHUD();
+  renderMission();
+}
+
+function updateHUD() {
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('maxScore').textContent = currentMission * POINTS_CORRECT;
+  document.getElementById('missionCounter').textContent = `Mission ${currentMission} of ${missions.length}`;
+  document.getElementById('streakDisplay').textContent = streak;
+  document.getElementById('progressBar').style.width = `${(currentMission / missions.length) * 100}%`;
+  const r = getCurrentRank();
+  document.getElementById('rankBadge').textContent = r.name.toUpperCase();
+  document.getElementById('rankIcon').textContent = r.icon;
+}
+
+function getCurrentRank() {
+  let r = RANKS[0];
+  for (let i = RANKS.length - 1; i >= 0; i--) {
+    if (score >= RANKS[i].minScore) { r = RANKS[i]; break; }
+  }
+  return r;
+}
+
+// ===================== RENDER =====================
+function renderMission() {
+  const m = missions[currentMission];
+  const container = document.getElementById('missionContainer');
+  if (m.type === 'mcq') {
+    container.innerHTML = renderMCQ(m);
+    attachMCQListeners(m);
+  } else if (m.type === 'drag') {
+    container.innerHTML = renderDrag(m);
+    attachDragListeners(m);
+  }
+}
+
+function renderMCQ(m) {
+  const letters = ['A','B','C','D'];
+  return `
+    <div class="mission-card">
+      <div class="mission-label">
+        <span class="mission-tag">Mission ${m.id} of ${missions.length}</span>
+        <span class="mission-category">${m.icon} ${m.category}</span>
+      </div>
+      <div class="scenario-box">
+        <div class="device-icon">${m.icon}</div>
+        <h3>${m.title}</h3>
+        <p>${m.scenario}</p>
+      </div>
+      <div class="question-text">${m.question}</div>
+      <div class="options-grid" id="optionsGrid">
+        ${m.options.map((opt, i) => `
+          <button class="option-btn" data-index="${i}" onclick="selectAnswer(${i})">
+            <span class="option-letter">${letters[i]}.</span>
+            <span>${opt}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="feedback-box" id="feedbackBox"></div>
+      <button class="btn-next" id="btnNext" onclick="nextMission()">Next Mission →</button>
+    </div>
+  `;
+}
+
+function attachMCQListeners(m) { /* handled inline */ }
+
+function selectAnswer(index) {
+  const m = missions[currentMission];
+  const btns = document.querySelectorAll('.option-btn');
+  const feedback = document.getElementById('feedbackBox');
+  const btnNext = document.getElementById('btnNext');
+  btns.forEach(b => b.disabled = true);
+  const isCorrect = index === m.correct;
+  btns[index].classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) btns[m.correct].classList.add('reveal');
+  if (isCorrect) {
+    streak++;
+    if (streak > maxStreak) maxStreak = streak;
+    const bonus = streak >= 3 ? POINTS_STREAK_BONUS : 0;
+    score += POINTS_CORRECT + bonus;
+    feedback.className = 'feedback-box correct show';
+    feedback.innerHTML = `<div class="feedback-title">✅ Correct! +${POINTS_CORRECT}${bonus ? ` +${bonus} streak bonus!` : ''}</div><div>${m.explanation}</div><div class="feedback-tip">💡 ${m.tip}</div>`;
+    if (streak >= 3) showStreakPopup(streak);
+    checkRankUp();
+  } else {
+    streak = 0;
+    feedback.className = 'feedback-box wrong show';
+    feedback.innerHTML = `<div class="feedback-title">❌ Not quite!</div><div>${m.explanation}</div><div class="feedback-tip">💡 ${m.tip}</div>`;
+  }
+  answers.push({ mission: m.title, correct: isCorrect });
+  updateHUD();
+  btnNext.classList.add('show');
+}
+
+// ===================== DRAG & DROP =====================
+function renderDrag(m) {
+  dragMission = m;
+  dropState = {};
+  m.zones.forEach(z => dropState[z.id] = []);
+  return `
+    <div class="mission-card">
+      <div class="mission-label">
+        <span class="mission-tag">Mission ${m.id} of ${missions.length}</span>
+        <span class="mission-category">${m.icon} ${m.category}</span>
+      </div>
+      <div class="scenario-box">
+        <div class="device-icon">${m.icon}</div>
+        <h3>${m.title}</h3>
+        <p>${m.scenario}</p>
+      </div>
+      <div class="question-text">${m.question}</div>
+      <div class="drag-area">
+        <div>
+          <div class="drag-column">
+            <h4>📋 Symptoms (drag these)</h4>
+            <div class="drag-items" id="dragSource">
+              ${m.items.map(item => `
+                <div class="drag-item" draggable="true" data-id="${item.id}" id="drag-${item.id}">${item.text}</div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="drag-column">
+            <h4>🗂️ Categories (drop here)</h4>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              ${m.zones.map(z => `
+                <div>
+                  <div class="drop-label">${z.label}</div>
+                  <div class="drop-zone" id="zone-${z.id}" data-zone="${z.id}">
+                    <div class="drop-placeholder" id="placeholder-${z.id}">Drop symptoms here...</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="feedback-box" id="feedbackBox"></div>
+      <button class="btn-check" id="btnCheck" onclick="checkDrag()">✅ Check Answers</button>
+      <button class="btn-next hidden" id="btnNext" onclick="nextMission()">Next Mission →</button>
+    </div>
+  `;
+}
+
+function attachDragListeners(m) {
+  setTimeout(() => {
+    document.querySelectorAll('.drag-item').forEach(item => {
+      item.addEventListener('dragstart', e => {
+        draggedItem = item;
+        item.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+        draggedItem = null;
+      });
+      // Touch support
+      item.addEventListener('touchstart', handleTouchStart, {passive:true});
+      item.addEventListener('touchmove', handleTouchMove, {passive:false});
+      item.addEventListener('touchend', handleTouchEnd);
+    });
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        if (draggedItem) dropItemToZone(draggedItem, zone);
+      });
+    });
+  }, 50);
+}
+
+let touchItem = null, touchClone = null;
+function handleTouchStart(e) {
+  touchItem = e.currentTarget;
+  const rect = touchItem.getBoundingClientRect();
+  touchClone = touchItem.cloneNode(true);
+  touchClone.style.cssText = `position:fixed;top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;opacity:0.8;z-index:9999;pointer-events:none;`;
+  document.body.appendChild(touchClone);
+}
+function handleTouchMove(e) {
+  e.preventDefault();
+  const t = e.touches[0];
+  if (touchClone) { touchClone.style.top = (t.clientY - 20) + 'px'; touchClone.style.left = (t.clientX - 60) + 'px'; }
+  document.querySelectorAll('.drop-zone').forEach(z => {
+    const r = z.getBoundingClientRect();
+    if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) z.classList.add('drag-over');
+    else z.classList.remove('drag-over');
+  });
+}
+function handleTouchEnd(e) {
+  if (touchClone) { document.body.removeChild(touchClone); touchClone = null; }
+  const t = e.changedTouches[0];
+  document.querySelectorAll('.drop-zone').forEach(z => {
+    z.classList.remove('drag-over');
+    const r = z.getBoundingClientRect();
+    if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
+      dropItemToZone(touchItem, z);
+    }
+  });
+  touchItem = null;
+}
+
+function dropItemToZone(item, zone) {
+  const zoneId = zone.dataset.zone;
+  const itemId = item.dataset.id;
+  // Remove from previous zone
+  Object.keys(dropState).forEach(zid => {
+    dropState[zid] = dropState[zid].filter(id => id !== itemId);
+  });
+  dropState[zoneId].push(itemId);
+  // Move DOM element
+  const placeholder = document.getElementById(`placeholder-${zoneId}`);
+  if (placeholder) placeholder.style.display = 'none';
+  zone.appendChild(item);
+  // Re-render all zones
+  rerenderZones();
+}
+
+function rerenderZones() {
+  dragMission.zones.forEach(z => {
+    const zone = document.getElementById(`zone-${z.id}`);
+    const ph = document.getElementById(`placeholder-${z.id}`);
+    if (dropState[z.id].length === 0) { if(ph) ph.style.display = ''; }
+    else { if(ph) ph.style.display = 'none'; }
+  });
+}
+
+function checkDrag() {
+  const m = dragMission;
+  let allCorrect = true;
+  let correctCount = 0;
+  let totalItems = m.items.length;
+  m.zones.forEach(z => {
+    const zone = document.getElementById(`zone-${z.id}`);
+    const placed = dropState[z.id];
+    const isZoneCorrect = placed.length === z.accepts.length && placed.every(id => z.accepts.includes(id));
+    if (isZoneCorrect) { zone.classList.add('correct-zone'); correctCount += placed.length; }
+    else { zone.classList.add('wrong-zone'); allCorrect = false; }
+  });
+  const feedback = document.getElementById('feedbackBox');
+  document.getElementById('btnCheck').style.display = 'none';
+  if (allCorrect) {
+    streak++;
+    if (streak > maxStreak) maxStreak = streak;
+    const bonus = streak >= 3 ? POINTS_STREAK_BONUS : 0;
+    score += POINTS_CORRECT + bonus;
+    feedback.className = 'feedback-box correct show';
+    feedback.innerHTML = `<div class="feedback-title">✅ Perfect Sort! +${POINTS_CORRECT}${bonus ? ` +${bonus} streak bonus!` : ''}</div><div>${m.explanation}</div>`;
+    if (streak >= 3) showStreakPopup(streak);
+    checkRankUp();
+    answers.push({ mission: m.title, correct: true });
+  } else {
+    streak = 0;
+    const partial = Math.round((correctCount / totalItems) * POINTS_CORRECT * 0.5);
+    score += partial;
+    feedback.className = 'feedback-box wrong show';
+    feedback.innerHTML = `<div class="feedback-title">⚠️ Partial — ${correctCount}/${totalItems} correct${partial ? ` (+${partial} pts)` : ''}</div><div>${m.explanation}</div>`;
+    answers.push({ mission: m.title, correct: false });
+  }
+  updateHUD();
+  document.getElementById('btnNext').classList.remove('hidden');
+  document.getElementById('btnNext').classList.add('show');
+  document.querySelectorAll('.drag-item').forEach(i => i.setAttribute('draggable','false'));
+}
+
+// ===================== NAVIGATION =====================
+function nextMission() {
+  currentMission++;
+  if (currentMission >= missions.length) { showResults(); return; }
+  updateHUD();
+  renderMission();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===================== STREAK POPUP =====================
+function showStreakPopup(n) {
+  const popup = document.getElementById('streakPopup');
+  const msgs = { 3: "3 in a row! 🔥", 4: "4 streak! You're on fire! 🔥🔥", 5: "5 streak! UNSTOPPABLE! 🔥🔥🔥" };
+  document.getElementById('streakPopupText').textContent = msgs[n] || `${n} streak! Amazing! 🔥`;
+  popup.classList.add('show');
+  setTimeout(() => popup.classList.remove('show'), 2500);
+}
+
+// ===================== RANK UP =====================
+function checkRankUp() {
+  const newRank = RANKS.findIndex((r, i) => {
+    const next = RANKS[i + 1];
+    return score >= r.minScore && (!next || score < next.minScore);
+  });
+  const currentRankIndex = RANKS.findIndex(r => r.name === getCurrentRank().name);
+  if (currentRankIndex > rank) {
+    rank = currentRankIndex;
+    const r = RANKS[rank];
+    document.getElementById('rankPopupIcon').textContent = r.icon;
+    document.getElementById('rankPopupText').textContent = `You've been promoted to ${r.name}! Keep up the excellent work, Cadet!`;
+    document.getElementById('rankPopup').classList.add('show');
+    launchConfetti();
+  }
+}
+
+function dismissRankUp() {
+  document.getElementById('rankPopup').classList.remove('show');
+}
+
+// ===================== CONFETTI =====================
+function launchConfetti() {
+  const colors = ['#1B5EAF','#1E7A3E','#F5A623','#ffffff','#e74c3c','#9b59b6'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*0.5}s;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }, i * 30);
+  }
+}
+
+// ===================== RESULTS =====================
+function showResults() {
+  document.getElementById('gameScreen').classList.add('hidden');
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('resultsScreen').classList.remove('hidden');
+  const pct = Math.round((score / (missions.length * POINTS_CORRECT)) * 100);
+  const r = getCurrentRank();
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalRank').textContent = `${r.icon} ${r.name}`;
+  const icons = { 0: '😓', 50: '🙂', 70: '😊', 85: '🌟', 95: '🏆' };
+  let icon = '😓';
+  for (const [k, v] of Object.entries(icons)) { if (pct >= parseInt(k)) icon = v; }
+  document.getElementById('resultsIcon').textContent = icon;
+  const msgs = {
+    0: "Keep studying — review the lesson material and try again!",
+    50: "Good effort! Review the missed missions and try again.",
+    70: "Solid performance! You're getting the hang of mobile diagnostics.",
+    85: "Excellent work! You're ready for the CompTIA A+ exam.",
+    95: "Outstanding! You've mastered mobile device troubleshooting!"
+  };
+  let msg = msgs[0];
+  for (const [k, v] of Object.entries(msgs)) { if (pct >= parseInt(k)) msg = v; }
+  document.getElementById('resultsMessage').textContent = msg;
+  document.getElementById('resultsTitle').textContent = pct >= 85 ? '🎉 Mission Accomplished!' : 'Mission Debrief';
+  const breakdown = document.getElementById('breakdownList');
+  breakdown.innerHTML = answers.map((a, i) => `
+    <div class="breakdown-item">
+      <span>Mission ${i+1}: ${a.mission}</span>
+      <span class="breakdown-result ${a.correct ? 'c' : 'w'}">${a.correct ? '✅ Correct' : '❌ Incorrect'}</span>
+    </div>
+  `).join('');
+  if (pct >= 70) launchConfetti();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restartGame() {
+  document.getElementById('resultsScreen').classList.add('hidden');
+  document.getElementById('introScreen').classList.remove('hidden');
+  document.getElementById('hud').style.display = 'none';
+  currentMission = 0; score = 0; streak = 0; maxStreak = 0; answers = []; rank = 0;
+}
+</script>
+</body>
+</html>
