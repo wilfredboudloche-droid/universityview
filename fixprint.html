@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 10C: Troubleshoot Print Devices | UVA</title>
+<style>
+  :root {
+    --blue: #1B5EAF;
+    --blue-dark: #134a8a;
+    --blue-light: #d6e4f7;
+    --green: #1E7A3E;
+    --green-light: #d4edda;
+    --red: #c0392b;
+    --red-light: #fdecea;
+    --gold: #f0a500;
+    --gray: #f4f6f9;
+    --dark: #1a1a2e;
+    --text: #2c3e50;
+    --border: #cdd5e0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--gray);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 60%, #2471c8 100%);
+    color: white;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .uva-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .uva-shield {
+    width: 48px; height: 56px;
+    background: #fff;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blue);
+    font-weight: 900;
+    font-size: 1.5rem;
+  }
+  .uva-name { line-height: 1.2; }
+  .uva-name .school { font-size: 1.15rem; font-weight: 800; letter-spacing: 1px; }
+  .uva-name .dept { font-size: 0.72rem; opacity: 0.85; letter-spacing: 0.5px; text-transform: uppercase; }
+  .header-meta { text-align: right; font-size: 0.78rem; opacity: 0.85; }
+  .header-meta .lesson-id { font-size: 1rem; font-weight: 700; opacity: 1; }
+
+  .motto-ribbon {
+    background: var(--green);
+    text-align: center;
+    padding: 6px 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .header-title-bar {
+    padding: 16px 28px 20px;
+    text-align: center;
+  }
+  .header-title-bar h1 {
+    font-size: 1.55rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+  .header-title-bar .subtitle {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+  .comptia-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 20px;
+    padding: 3px 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+
+  /* HUD BAR */
+  .hud-bar {
+    background: var(--dark);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 28px;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-bottom: 3px solid var(--blue);
+  }
+  .hud-item { display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+  .hud-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; }
+  .hud-value { font-size: 1.1rem; font-weight: 800; color: var(--gold); }
+  .hud-rank { font-size: 0.95rem; font-weight: 800; color: #7ecfff; }
+  .streak-badge {
+    background: linear-gradient(135deg, #ff6b35, #f7c59f);
+    color: #fff;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    display: none;
+    animation: pulse 0.6s ease;
+  }
+  .streak-badge.show { display: inline-block; }
+  @keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    background: #e0e7ef;
+    border-radius: 0;
+    height: 8px;
+    width: 100%;
+  }
+  .progress-fill {
+    height: 8px;
+    background: linear-gradient(90deg, var(--green), #27ae60);
+    border-radius: 0 4px 4px 0;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* MAIN CONTENT */
+  .main { max-width: 860px; margin: 0 auto; padding: 28px 16px 60px; }
+
+  /* MISSION CARD */
+  .mission-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(27,94,175,0.10);
+    border: 1.5px solid var(--border);
+    margin-bottom: 24px;
+    overflow: hidden;
+    display: none;
+  }
+  .mission-card.active { display: block; animation: slideIn 0.4s ease; }
+  @keyframes slideIn { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+
+  .mission-header {
+    background: linear-gradient(90deg, var(--blue) 0%, #2471c8 100%);
+    color: #fff;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .mission-num {
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; font-weight: 900;
+    flex-shrink: 0;
+  }
+  .mission-title-wrap .mission-type {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.8;
+  }
+  .mission-title-wrap .mission-name {
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+  .mission-body { padding: 22px; }
+  .scenario-box {
+    background: #eef4fb;
+    border-left: 4px solid var(--blue);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .scenario-box p { font-size: 0.95rem; line-height: 1.5; color: #34495e; }
+  .scenario-box strong { color: var(--blue-dark); font-size: 0.75rem; text-transform: uppercase; display: block; margin-bottom: 4px; }
+
+  /* INTERACTION ELEMENTS */
+  .options-grid { display: grid; gap: 12px; margin-top: 15px; }
+  .option-btn {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--blue); background: var(--blue-light); transform: translateX(4px); }
+  .option-btn.correct { border-color: var(--green); background: var(--green-light); color: #155724; }
+  .option-btn.wrong { border-color: var(--red); background: var(--red-light); color: #721c24; }
+  .option-btn:disabled { cursor: default; }
+
+  /* FEEDBACK BOX */
+  .feedback-box {
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 8px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .feedback-box.show { display: block; }
+  .feedback-box.correct-fb { background: var(--green-light); border: 1px solid var(--green); color: #155724; }
+  .feedback-box.wrong-fb { background: var(--red-light); border: 1px solid var(--red); color: #721c24; }
+  .fb-title { font-weight: 800; font-size: 0.9rem; margin-bottom: 6px; text-transform: uppercase; }
+  .fb-explain { font-size: 0.9rem; line-height: 1.5; }
+
+  /* BUTTONS */
+  .btn-primary {
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(27,94,175,0.25);
+  }
+  .btn-primary:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(27,94,175,0.35); }
+  .btn-next { margin-top: 20px; display: none; }
+
+  /* INTRO SCREEN */
+  .intro-screen {
+    background: #fff;
+    border-radius: 12px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    border: 1px solid var(--border);
+  }
+  .intro-icon { font-size: 4rem; margin-bottom: 20px; }
+  .intro-screen h2 { color: var(--blue-dark); font-size: 1.8rem; margin-bottom: 12px; font-weight: 900; }
+  .intro-screen p { color: #666; line-height: 1.6; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+  /* RESULTS SCREEN */
+  .results-screen {
+    display: none;
+    text-align: center;
+    animation: fadeIn 0.6s ease;
+  }
+  .results-screen.show { display: block; }
+  .results-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    border: 2px solid var(--blue);
+  }
+  .results-icon { font-size: 5rem; margin-bottom: 15px; }
+  .results-rank { font-size: 1.4rem; font-weight: 900; color: var(--blue); margin-bottom: 25px; }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 20px;
+    margin-bottom: 35px;
+  }
+  .stat-item { background: var(--gray); padding: 15px; border-radius: 10px; }
+  .stat-val { font-size: 1.5rem; font-weight: 900; color: var(--dark); display: block; }
+  .stat-lbl { font-size: 0.7rem; text-transform: uppercase; color: #777; font-weight: 700; }
+
+  /* CONFETTI */
+  .confetti-piece {
+    position: fixed;
+    width: 10px; height: 10px;
+    top: -20px;
+    z-index: 9999;
+    animation: fall linear forwards;
+  }
+  @keyframes fall { to { transform: translateY(105vh) rotate(720deg); } }
+
+  /* DRAG AND DROP STYLES */
+  .drop-zone-container { display: grid; gap: 15px; margin-top: 20px; }
+  .drop-row { display: flex; align-items: center; gap: 15px; }
+  .drop-label { flex: 1; font-size: 0.9rem; font-weight: 700; color: var(--blue-dark); }
+  .drop-zone {
+    flex: 2;
+    height: 50px;
+    background: #f8fafc;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .drop-zone.drag-over { background: var(--blue-light); border-color: var(--blue); }
+  .drop-zone.correct-drop { background: var(--green-light); border-color: var(--green); border-style: solid; }
+  .drop-zone.wrong-drop { background: var(--red-light); border-color: var(--red); border-style: solid; }
+  .drag-items { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding: 15px; background: #f1f5f9; border-radius: 8px; }
+  .drag-item {
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: grab;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .drag-item:active { cursor: grabbing; }
+
+  /* ORDERING STYLES */
+  .order-list { display: grid; gap: 10px; margin-top: 15px; }
+  .order-item {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    padding: 12px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: move;
+  }
+  .order-num {
+    width: 24px; height: 24px;
+    background: var(--blue);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 800;
+  }
+  .order-text { font-size: 0.9rem; font-weight: 600; }
+  .order-item.correct-order { border-color: var(--green); background: var(--green-light); }
+  .order-item.wrong-order { border-color: var(--red); background: var(--red-light); }
+
+  /* CHECKLIST STYLES */
+  .checklist { display: grid; gap: 10px; margin-top: 15px; }
+  .checklist-item {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    padding: 12px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .checklist-item:hover { border-color: var(--blue); background: #f8fafc; }
+  .checklist-item.selected { border-color: var(--blue); background: var(--blue-light); }
+  .check-box {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; color: var(--blue); font-weight: 900;
+  }
+  .checklist-item.selected .check-box { border-color: var(--blue); background: #fff; }
+  .checklist-item.correct-check { border-color: var(--green); background: var(--green-light); }
+  .checklist-item.wrong-check { border-color: var(--red); background: var(--red-light); }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="uva-logo">
+      <div class="uva-shield">U</div>
+      <div class="uva-name">
+        <div class="school">UNIVERSITY VIEW ACADEMY</div>
+        <div class="dept">Computer Architecture & Systems</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="lesson-id">LESSON 10C</div>
+      <div>Printer Systems Engineering</div>
+    </div>
+  </div>
+  <div class="motto-ribbon">DEDICATED • INNOVATIVE • SUCCESSFUL</div>
+  <div class="header-title-bar">
+    <h1>Troubleshoot Print Devices</h1>
+    <div class="subtitle">Interactive Field Training Simulation</div>
+    <div class="comptia-badge">COMPTIA A+ ALIGNED (220-1101)</div>
+  </div>
+</div>
+
+<div class="hud-bar">
+  <div class="hud-item">
+    <div class="hud-label">Current Mission</div>
+    <div class="hud-value" id="hud-mission">0 / 6</div>
+  </div>
+  <div class="hud-item">
+    <div class="hud-label">Training Score</div>
+    <div class="hud-value" id="hud-score">000</div>
+  </div>
+  <div class="hud-item">
+    <div class="hud-label">Current Rank</div>
+    <div class="hud-rank" id="hud-rank">TRAINEE</div>
+  </div>
+  <div class="streak-badge" id="streak-badge">🔥 3 STREAK!</div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-fill" id="progress-fill"></div>
+</div>
+
+<div class="main">
+  <!-- INTRO SCREEN -->
+  <div id="intro-screen" class="intro-screen">
+    <div class="intro-icon">🛠️</div>
+    <h2>Field Engineer Induction</h2>
+    <p>Welcome to the UVA Printer Systems Training Lab. You will be presented with 6 real-world troubleshooting scenarios. Your goal is to diagnose and resolve these issues with maximum efficiency.</p>
+    <button class="btn-primary" id="start-btn">⚡ BEGIN FIELD TRAINING</button>
+  </div>
+
+  <!-- MISSION 1: MULTIPLE CHOICE -->
+  <div id="mission-1" class="mission-card">
+    <div class="mission-header">
+      <div class="mission-num">01</div>
+      <div class="mission-title-wrap">
+        <div class="mission-type">Diagnostic Analysis</div>
+        <div class="mission-name">Connectivity Failure</div>
+      </div>
+    </div>
+    <div class="mission-body">
+      <div class="scenario-box">
+        <strong>Scenario</strong>
+        <p>A user reports that their network-attached laser printer is showing as "Offline" on their workstation. You ping the printer's IP address and receive a successful reply. Other users in the same department are printing successfully.</p>
+      </div>
+      <div class="options-grid">
+        <button class="option-btn" onclick="checkMC(1, 0, this)">Replace the printer's NIC (Network Interface Card)</button>
+        <button class="option-btn" onclick="checkMC(1, 1, this)">Check the user's local print queue and port configuration</button>
+        <button class="option-btn" onclick="checkMC(1, 2, this)">Restart the corporate network switch</button>
+        <button class="option-btn" onclick="checkMC(1, 3, this)">Reinstall the printer driver on the print server</button>
+      </div>
+      <div id="m1-feedback" class="feedback-box"></div>
+      <button id="m1-next" class="btn-primary btn-next" onclick="nextMission(2)">Next Mission →</button>
+    </div>
+  </div>
+
+  <!-- MISSION 2: DRAG TO ORDER -->
+  <div id="mission-2" class="mission-card">
+    <div class="mission-header">
+      <div class="mission-num">02</div>
+      <div class="mission-title-wrap">
+        <div class="mission-type">Procedural Logic</div>
+        <div class="mission-name">Paper Jam Clearance</div>
+      </div>
+    </div>
+    <div class="mission-body">
+      <div class="scenario-box">
+        <strong>Scenario</strong>
+        <p>A high-volume laser printer has a significant paper jam in the fuser area. Arrange the following steps in the correct safety and operational order.</p>
+      </div>
+      <div class="order-list" id="m2-order">
+        <div class="order-item" draggable="true" data-id="A">
+          <div class="order-num">1</div>
+          <div class="order-text">Power off the printer and unplug it</div>
+        </div>
+        <div class="order-item" draggable="true" data-id="B">
+          <div class="order-num">2</div>
+          <div class="order-text">Allow the fuser assembly to cool down</div>
+        </div>
+        <div class="order-item" draggable="true" data-id="C">
+          <div class="order-num">3</div>
+          <div class="order-text">Gently pull the paper in the direction of the paper path</div>
+        </div>
+        <div class="order-item" draggable="true" data-id="D">
+          <div class="order-num">4</div>
+          <div class="order-text">Inspect the path for small torn scraps of paper</div>
+        </div>
+      </div>
+      <div id="m2-feedback" class="feedback-box"></div>
+      <button class="btn-primary" style="margin-top:20px;" onclick="checkOrder(2)">Verify Procedure</button>
+      <button id="m2-next" class="btn-primary btn-next" onclick="nextMission(3)">Next Mission →</button>
+    </div>
+  </div>
+
+  <!-- MISSION 3: DRAG AND DROP MATCHING -->
+  <div id="mission-3" class="mission-card">
+    <div class="mission-header">
+      <div class="mission-num">03</div>
+      <div class="mission-title-wrap">
+        <div class="mission-type">Pattern Recognition</div>
+        <div class="mission-name">Print Quality Defects</div>
+      </div>
+    </div>
+    <div class="mission-body">
+      <div class="scenario-box">
+        <strong>Scenario</strong>
+        <p>Match the visual print defect to its most likely hardware cause.</p>
+      </div>
+      <div class="drop-zone-container">
+        <div class="drop-row">
+          <div class="drop-label">Vertical white streaks</div>
+          <div class="drop-zone" data-match="Toner">
+            <span class="drop-placeholder">Drop Cause Here</span>
+          </div>
+        </div>
+        <div class="drop-row">
+          <div class="drop-label">Speckled "ghost" images</div>
+          <div class="drop-zone" data-match="Drum">
+            <span class="drop-placeholder">Drop Cause Here</span>
+          </div>
+        </div>
+        <div class="drop-row">
+          <div class="drop-label">Smudging/Unfused toner</div>
+          <div class="drop-zone" data-match="Fuser">
+            <span class="drop-placeholder">Drop Cause Here</span>
+          </div>
+        </div>
+      </div>
+      <div class="drag-items">
+        <div class="drag-item" draggable="true" id="drag-toner">Low Toner / Transfer Roller</div>
+        <div class="drag-item" draggable="true" id="drag-drum">Damaged Imaging Drum</div>
+        <div class="drag-item" draggable="true" id="drag-fuser">Failing Fuser Assembly</div>
+      </div>
+      <div id="m3-feedback" class="feedback-box"></div>
+      <button class="btn-primary" style="margin-top:20px;" onclick="checkDnD(3)">Submit Analysis</button>
+      <button id="m3-next" class="btn-primary btn-next" onclick="nextMission(4)">Next Mission →</button>
+    </div>
+  </div>
+
+  <!-- MISSION 4: MULTIPLE CHOICE -->
+  <div id="mission-4" class="mission-card">
+    <div class="mission-header">
+      <div class="mission-num">04</div>
+      <div class="mission-title-wrap">
+        <div class="mission-type">OS Management</div>
+        <div class="mission-name">Print Spooler Recovery</div>
+      </div>
+    </div>
+    <div class="mission-body">
+      <div class="scenario-box">
+        <strong>Scenario</strong>
+        <p>Multiple print jobs are stuck in the Windows print queue and cannot be deleted. You need to clear the queue manually. What is the correct sequence of actions?</p>
+      </div>
+      <div class="options-grid">
+        <button class="option-btn" onclick="checkMC(4, 0, this)">Delete the printer from Device Manager and reboot</button>
+        <button class="option-btn" onclick="checkMC(4, 1, this)">Stop Spooler service, delete files in \System32\spool\PRINTERS, start Spooler</button>
+        <button class="option-btn" onclick="checkMC(4, 2, this)">Format the hard drive and reinstall Windows</button>
+        <button class="option-btn" onclick="checkMC(4, 3, this)">Update the printer firmware via the web interface</button>
+      </div>
+      <div id="m4-feedback" class="feedback-box"></div>
+      <button id="m4-next" class="btn-primary btn-next" onclick="nextMission(5)">Next Mission →</button>
+    </div>
+  </div>
+
+  <!-- MISSION 5: CHECKLIST -->
+  <div id="mission-5" class="mission-card">
+    <div class="mission-header">
+      <div class="mission-num">05</div>
+      <div class="mission-title-wrap">
+        <div class="mission-type">Hardware Triage</div>
+        <div class="mission-name">Finishing Unit Issues</div>
+      </div>
+    </div>
+    <div class="mission-body">
+      <div class="scenario-box">
+        <strong>Scenario</strong>
+        <p>A multi-function device is failing to staple or hole-punch documents. Select <strong>ALL</strong> valid troubleshooting steps for this finisher unit issue.</p>
+      </div>
+      <div class="checklist" id="m5-checklist">
+        <div class="checklist-item" onclick="toggleCheck(this)" data-correct="true">
+          <div class="check-box"></div>
+          <span>Verify the staple cartridge is not empty</span>
+        </div>
+        <div class="checklist-item" onclick="toggleCheck(this)" data-correct="true">
+          <div class="check-box"></div>
+          <span>Check for a paper jam in the finisher transport area</span>
+        </div>
+        <div class="checklist-item" onclick="toggleCheck(this)" data-correct="false">
+          <div class="check-box"></div>
+          <span>Replace the cyan toner cartridge</span>
+        </div>
+        <div class="checklist-item" onclick="toggleCheck(this)" data-correct="true">
+          <div class="check-box"></div>
+          <span>Ensure the finisher option is enabled in the driver settings</span>
+        </div>
+      </div>
+      <div id="m5-feedback" class="feedback-box"></div>
+      <button class="btn-primary" style="margin-top:20px;" onclick="checkChecklist(5)">Confirm Triage</button>
+      <button id="m5-next" class="btn-primary btn-next" onclick="nextMission(6)">Next Mission →</button>
+    </div>
+  </div>
+
+  <!-- MISSION 6: MULTIPLE CHOICE -->
+  <div id="mission-6" class="mission-card">
+    <div class="mission-header">
+      <div class="mission-num">06</div>
+      <div class="mission-title-wrap">
+        <div class="mission-type">Configuration</div>
+        <div class="mission-name">Unrecognized Paper Tray</div>
+      </div>
+    </div>
+    <div class="mission-body">
+      <div class="scenario-box">
+        <strong>Scenario</strong>
+        <p>A new optional 550-sheet paper tray (Tray 3) has been physically installed on a laser printer, but users cannot select it in their print preferences. What is the most likely cause?</p>
+      </div>
+      <div class="options-grid">
+        <button class="option-btn" onclick="checkMC(6, 0, this)">The tray is physically broken</button>
+        <button class="option-btn" onclick="checkMC(6, 1, this)">The printer needs a memory upgrade to support more trays</button>
+        <button class="option-btn" onclick="checkMC(6, 2, this)">The tray must be enabled in the 'Device Settings' tab of Printer Properties</button>
+        <button class="option-btn" onclick="checkMC(6, 3, this)">The user is using the wrong type of paper</button>
+      </div>
+      <div id="m6-feedback" class="feedback-box"></div>
+      <button id="m6-next" class="btn-primary btn-next" onclick="showResults()">Finalize Training →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="results-screen" class="results-screen">
+    <div class="results-card">
+      <div class="results-icon" id="results-icon">🏆</div>
+      <h2 id="results-title">Training Complete!</h2>
+      <div class="results-rank" id="results-rank">MASTER — Print Systems Specialist</div>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-val" id="res-score">0</span>
+          <span class="stat-lbl">Total Score</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-val" id="res-correct">0/6</span>
+          <span class="stat-lbl">Missions Passed</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-val" id="res-pct">0%</span>
+          <span class="stat-lbl">Accuracy</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-val" id="res-streak">0</span>
+          <span class="stat-lbl">Best Streak</span>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="restartActivity()">🔄 RESTART TRAINING</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== DATA & STATE =====================
+const totalMissions = 6;
+let currentMission = 0;
+let score = 0;
+let streak = 0;
+let bestStreak = 0;
+let correctCount = 0;
+let missionResults = {};
+let lastRank = 0;
+
+const RANKS = [
+  { name: 'TRAINEE', min: 0, icon: '👶' },
+  { name: 'APPRENTICE', min: 40, icon: '🔧' },
+  { name: 'EXPERT', min: 80, icon: '⚙️' },
+  { name: 'MASTER', min: 110, icon: '🏆' }
+];
+
+const FEEDBACK = {
+  m1: {
+    correct: "Excellent. Since the printer pings and others can print, the hardware and network are fine. The issue is specific to the user's local setup.",
+    wrong: "Incorrect. If the printer pings and others can print, the network and hardware are functional. Focus on the user's local configuration."
+  },
+  m2: {
+    correct: "Safety first. Powering down and cooling prevents burns and electrical issues, while pulling in the direction of the path prevents roller damage.",
+    wrong: "Incorrect. Always power down and cool the fuser first. Never pull paper against the path as it can damage the delicate rollers."
+  },
+  m3: {
+    correct: "Correct diagnosis. Streaks usually indicate toner/transfer issues, ghosting points to the drum, and smudging is a fuser failure.",
+    wrong: "Incorrect matching. Remember: Streaks = Toner/Transfer; Ghosting = Drum; Smudging = Fuser."
+  },
+  m4: {
+    correct: "Perfect. Stopping the service allows you to delete the temporary .SHD and .SPL files that are locking the queue.",
+    wrong: "Incorrect. You must stop the Spooler service before you can manually delete the stuck files in the System32 spool folder."
+  },
+  m5: {
+    correct: "Correct. Finisher issues are usually mechanical (jams/staples) or configuration-based (driver settings).",
+    wrong: "Incorrect. Toner color has no impact on the mechanical stapling or punching functions of a finisher unit."
+  },
+  m6: {
+    correct: "Exactly. Windows often doesn't 'auto-detect' hardware additions; they must be manually toggled in the driver's Device Settings.",
+    wrong: "Incorrect. Most modern printers require the administrator to manually enable optional trays within the driver properties."
+  }
+};
+
+// ===================== CORE LOGIC =====================
+
+// Initialize on load
+window.onload = () => {
+  console.log("Activity Initialized");
+  const startBtn = document.getElementById('start-btn');
+  if(startBtn) {
+    startBtn.addEventListener('click', startMissions);
+  }
+  initOrderDrag();
+  initDragDrop();
+};
+
+function startMissions() {
+  console.log("Starting Missions...");
+  document.getElementById('intro-screen').style.display = 'none';
+  nextMission(1);
+}
+
+function nextMission(num) {
+  // Hide all
+  document.querySelectorAll('.mission-card').forEach(c => c.classList.remove('active'));
+
+  // Show target
+  const target = document.getElementById('mission-' + num);
+  if(target) {
+    target.classList.add('active');
+    currentMission = num;
+    updateHUD();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function updateHUD() {
+  document.getElementById('hud-mission').textContent = currentMission + ' / ' + totalMissions;
+  document.getElementById('hud-score').textContent = score.toString().padStart(3, '0');
+
+  const rank = getCurrentRank();
+  const rankEl = document.getElementById('hud-rank');
+  rankEl.textContent = rank.name;
+
+  const progress = (currentMission / totalMissions) * 100;
+  document.getElementById('progress-fill').style.width = progress + '%';
+
+  const streakEl = document.getElementById('streak-badge');
+  if (streak >= 3) {
+    streakEl.textContent = '🔥 ' + streak + ' STREAK!';
+    streakEl.classList.add('show');
+  } else {
+    streakEl.classList.remove('show');
+  }
+}
+
+function getCurrentRank() {
+  let current = RANKS[0];
+  for (let r of RANKS) {
+    if (score >= r.min) current = r;
+  }
+  return current;
+}
+
+function addScore(pts, isCorrect) {
+  if (isCorrect) {
+    score += pts;
+    streak++;
+    correctCount++;
+    if (streak > bestStreak) bestStreak = streak;
+  } else {
+    streak = 0;
+  }
+  updateHUD();
+}
+
+// ===================== MC LOGIC =====================
+function checkMC(missionNum, choiceIdx, btn) {
+  const parent = btn.parentElement;
+  const buttons = parent.querySelectorAll('.option-btn');
+  const fb = document.getElementById('m' + missionNum + '-feedback');
+  const nextBtn = document.getElementById('m' + missionNum + '-next');
+
+  // Disable all
+  buttons.forEach(b => b.disabled = true);
+
+  const isCorrect = (missionNum === 1 && choiceIdx === 1) || 
+                    (missionNum === 4 && choiceIdx === 1) || 
+                    (missionNum === 6 && choiceIdx === 2);
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    fb.className = 'feedback-box correct-fb show';
+    fb.innerHTML = '<div class="fb-title">✅ CORRECT — +20 pts</div><div class="fb-explain">' + FEEDBACK['m'+missionNum].correct + '</div>';
+    addScore(20, true);
+    if (streak >= 3) launchConfetti();
+  } else {
+    btn.classList.add('wrong');
+    fb.className = 'feedback-box wrong-fb show';
+    fb.innerHTML = '<div class="fb-title">❌ INCORRECT</div><div class="fb-explain">' + FEEDBACK['m'+missionNum].wrong + '</div>';
+    addScore(0, false);
+    // Highlight correct
+    let correctIdx = (missionNum === 1) ? 1 : (missionNum === 4 ? 1 : 2);
+    buttons[correctIdx].classList.add('correct');
+  }
+
+  missionResults[missionNum] = isCorrect;
+  nextBtn.style.display = 'inline-block';
+}
+
+// ===================== ORDERING LOGIC =====================
+function initOrderDrag() {
+  const list = document.getElementById('m2-order');
+  let draggedItem = null;
+
+  list.addEventListener('dragstart', (e) => {
+    draggedItem = e.target;
+    e.target.style.opacity = '0.5';
+  });
+
+  list.addEventListener('dragend', (e) => {
+    e.target.style.opacity = '';
+  });
+
+  list.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    const afterElement = getDragAfterElement(list, e.clientY);
+    if (afterElement == null) {
+      list.appendChild(draggedItem);
+    } else {
+      list.insertBefore(draggedItem, afterElement);
+    }
+    updateOrderNumbers();
+  });
+}
+
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.order-item:not(.dragging)')];
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function updateOrderNumbers() {
+  document.querySelectorAll('#m2-order .order-num').forEach((num, idx) => {
+    num.textContent = idx + 1;
+  });
+}
+
+function checkOrder(missionNum) {
+  const items = document.querySelectorAll('#m2-order .order-item');
+  const correctOrder = ['A', 'B', 'C', 'D'];
+  let allCorrect = true;
+
+  items.forEach((item, idx) => {
+    if (item.getAttribute('data-id') === correctOrder[idx]) {
+      item.classList.add('correct-order');
+    } else {
+      item.classList.add('wrong-order');
+      allCorrect = false;
+    }
+    item.setAttribute('draggable', 'false');
+    item.style.cursor = 'default';
+  });
+
+  const fb = document.getElementById('m2-feedback');
+  if (allCorrect) {
+    fb.className = 'feedback-box correct-fb show';
+    fb.innerHTML = '<div class="fb-title">✅ PROCEDURE VERIFIED — +20 pts</div><div class="fb-explain">' + FEEDBACK.m2.correct + '</div>';
+    addScore(20, true);
+    if (streak >= 3) launchConfetti();
+  } else {
+    fb.className = 'feedback-box wrong-fb show';
+    fb.innerHTML = '<div class="fb-title">❌ INCORRECT SEQUENCE</div><div class="fb-explain">' + FEEDBACK.m2.wrong + '</div>';
+    addScore(0, false);
+  }
+  missionResults[missionNum] = allCorrect;
+  document.getElementById('m2-next').style.display = 'inline-block';
+  document.querySelector('[onclick="checkOrder(2)"]').disabled = true;
+}
+
+// ===================== DRAG & DROP LOGIC =====================
+function initDragDrop() {
+  const items = document.querySelectorAll('.drag-item');
+  const zones = document.querySelectorAll('.drop-zone');
+
+  items.forEach(item => {
+    item.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', e.target.id);
+    });
+  });
+
+  zones.forEach(zone => {
+    zone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', () => {
+      zone.classList.remove('drag-over');
+    });
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const id = e.dataTransfer.getData('text/plain');
+      const draggableElement = document.getElementById(id);
+
+      // Clear existing
+      const existing = zone.querySelector('.dropped-item');
+      if (existing) {
+        document.querySelector('.drag-items').appendChild(existing);
+      }
+
+      const newItem = draggableElement.cloneNode(true);
+      newItem.className = 'dropped-item';
+      newItem.style.cursor = 'default';
+      zone.querySelector('.drop-placeholder').style.display = 'none';
+      zone.appendChild(newItem);
+      draggableElement.style.display = 'none';
+    });
+  });
+}
+
+function checkDnD(missionNum) {
+  const zones = document.querySelectorAll('.drop-zone');
+  let allCorrect = true;
+
+  zones.forEach(zone => {
+    const dropped = zone.querySelector('.dropped-item');
+    const match = zone.getAttribute('data-match');
+    if (dropped && dropped.id.toLowerCase().includes(match.toLowerCase())) {
+      zone.classList.add('correct-drop');
+    } else {
+      zone.classList.add('wrong-drop');
+      allCorrect = false;
+    }
+    zone.style.pointerEvents = 'none';
+  });
+
+  const fb = document.getElementById('m3-feedback');
+  if (allCorrect) {
+    fb.className = 'feedback-box correct-fb show';
+    fb.innerHTML = '<div class="fb-title">✅ ANALYSIS ACCURATE — +20 pts</div><div class="fb-explain">' + FEEDBACK.m3.correct + '</div>';
+    addScore(20, true);
+    if (streak >= 3) launchConfetti();
+  } else {
+    fb.className = 'feedback-box wrong-fb show';
+    fb.innerHTML = '<div class="fb-title">❌ DIAGNOSTIC ERROR</div><div class="fb-explain">' + FEEDBACK.m3.wrong + '</div>';
+    addScore(0, false);
+  }
+  missionResults[missionNum] = allCorrect;
+  document.getElementById('m3-next').style.display = 'inline-block';
+  document.querySelector('[onclick="checkDnD(3)"]').disabled = true;
+}
+
+// ===================== CHECKLIST LOGIC =====================
+function toggleCheck(item) {
+  if (item.classList.contains('correct-check') || item.classList.contains('wrong-check')) return;
+  item.classList.toggle('selected');
+  const box = item.querySelector('.check-box');
+  box.textContent = item.classList.contains('selected') ? '✓' : '';
+}
+
+function checkChecklist(missionNum) {
+  const items = document.querySelectorAll('#m5-checklist .checklist-item');
+  let allCorrect = true;
+  items.forEach(item => {
+    const isCorrect = item.getAttribute('data-correct') === 'true';
+    const isSelected = item.classList.contains('selected');
+    if (isCorrect && isSelected) {
+      item.classList.add('correct-check');
+    } else if (!isCorrect && isSelected) {
+      item.classList.add('wrong-check');
+      allCorrect = false;
+    } else if (isCorrect && !isSelected) {
+      item.classList.add('wrong-check');
+      allCorrect = false;
+    }
+    item.style.pointerEvents = 'none';
+  });
+  const fb = document.getElementById('m5-feedback');
+  if (allCorrect) {
+    fb.className = 'feedback-box correct-fb show';
+    fb.innerHTML = '<div class="fb-title">✅ CORRECT SELECTIONS — +20 pts</div><div class="fb-explain">' + FEEDBACK.m5.correct + '</div>';
+    addScore(20, true);
+    if (streak >= 3) launchConfetti();
+  } else {
+    fb.className = 'feedback-box wrong-fb show';
+    fb.innerHTML = '<div class="fb-title">❌ INCORRECT SELECTIONS</div><div class="fb-explain">' + FEEDBACK.m5.wrong + '</div>';
+    addScore(0, false);
+  }
+  missionResults[missionNum] = allCorrect;
+  document.getElementById('m5-next').style.display = 'inline-block';
+  document.querySelector('[onclick="checkChecklist(5)"]').disabled = true;
+}
+
+// ===================== CONFETTI LOGIC =====================
+function launchConfetti() {
+  const colors = ['#1B5EAF','#1E7A3E','#f0a500','#e74c3c','#9b59b6','#2ecc71','#3498db'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+    piece.style.animationDelay = Math.random() * 0.5 + 's';
+    piece.style.width = (Math.random() * 8 + 6) + 'px';
+    piece.style.height = (Math.random() * 8 + 6) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 4000);
+  }
+}
+
+// ===================== RESULTS LOGIC =====================
+function showResults() {
+  document.querySelectorAll('.mission-card').forEach(c => c.classList.remove('active'));
+  const rs = document.getElementById('results-screen');
+  rs.classList.add('show');
+  document.getElementById('progress-fill').style.width = '100%';
+  currentMission = 6;
+  updateHUD();
+
+  const pct = Math.round((correctCount / totalMissions) * 100);
+  document.getElementById('res-score').textContent = score;
+  document.getElementById('res-correct').textContent = correctCount + '/' + totalMissions;
+  document.getElementById('res-pct').textContent = pct + '%';
+  document.getElementById('res-streak').textContent = bestStreak;
+
+  const rank = getCurrentRank();
+  document.getElementById('results-icon').textContent = rank.icon;
+  document.getElementById('results-rank').textContent = rank.name + ' — Print Systems Specialist';
+
+  if (pct >= 80) {
+    document.getElementById('results-title').textContent = '🎉 Mission Accomplished!';
+    launchConfetti();
+    setTimeout(launchConfetti, 800);
+  } else if (pct >= 50) {
+    document.getElementById('results-title').textContent = '✅ Training Complete';
+  } else {
+    document.getElementById('results-title').textContent = '📋 Training Session Complete';
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===================== RESTART LOGIC =====================
+function restartActivity() {
+  location.reload();
+}
+</script>
+</body>
+</html>
