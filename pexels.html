@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Printer Maintenance Mission | UVA Computer Architecture</title>
+<style>
+:root{--blue:#1B5EAF;--green:#1E7A3E;--gold:#F5A623;--lb:#E8F0FB;--lg:#E6F4EC;--dark:#1a1a2e;--gray:#f0f4f8;--red:#c0392b;--ok:#27ae60;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#0d1b3e 0%,#1B5EAF 50%,#1E7A3E 100%);min-height:100vh;color:#222;}
+#hdr{background:var(--blue);color:#fff;text-align:center;padding:10px 20px 0;box-shadow:0 4px 12px rgba(0,0,0,.3);}
+#hdr h1{font-size:1.4rem;font-weight:800;letter-spacing:1px;}
+#hdr p{font-size:.78rem;opacity:.85;margin-top:2px;}
+.ribbon{background:var(--gold);color:var(--dark);font-weight:700;font-size:.72rem;letter-spacing:3px;text-transform:uppercase;padding:5px 20px;margin-top:6px;display:inline-block;clip-path:polygon(8px 0%,calc(100% - 8px) 0%,100% 50%,calc(100% - 8px) 100%,8px 100%,0% 50%);min-width:260px;}
+#hud{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.55);color:#fff;padding:8px 20px;font-size:.82rem;flex-wrap:wrap;gap:6px;}
+.hi{display:flex;align-items:center;gap:6px;}
+.hl{opacity:.7;font-size:.7rem;text-transform:uppercase;}
+.hv{font-weight:700;font-size:1rem;}
+#rbadge{background:var(--gold);color:var(--dark);border-radius:20px;padding:3px 12px;font-weight:800;font-size:.78rem;letter-spacing:1px;}
+#sdisplay{background:#e74c3c;color:#fff;border-radius:20px;padding:3px 10px;font-weight:700;font-size:.78rem;display:none;animation:pulse .6s ease infinite alternate;}
+@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.08)}}
+#app{max-width:860px;margin:0 auto;padding:20px 16px 40px;}
+.screen{display:none;}.screen.active{display:block;}
+/* INTRO */
+#intro{background:#fff;border-radius:16px;padding:36px 28px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.25);margin-top:10px;}
+.avatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green));margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:2.8rem;box-shadow:0 4px 16px rgba(27,94,175,.4);border:4px solid var(--gold);}
+#intro h2{color:var(--blue);font-size:1.5rem;margin-bottom:6px;}
+#intro .tag{color:var(--green);font-weight:600;font-size:.95rem;margin-bottom:14px;}
+.ibox{background:var(--lb);border-left:4px solid var(--blue);border-radius:8px;padding:12px 16px;text-align:left;margin:14px 0;font-size:.88rem;line-height:1.6;}
+.mlist{list-style:none;padding:0;margin:10px 0;}
+.mlist li{padding:5px 0;font-size:.85rem;}.mlist li::before{content:"🎯 ";}
+.btnp{background:linear-gradient(135deg,var(--blue),#2471d4);color:#fff;border:none;border-radius:30px;padding:13px 38px;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(27,94,175,.4);transition:transform .15s;}
+.btnp:hover{transform:translateY(-2px);}
+.btng{background:linear-gradient(135deg,var(--green),#28a85a);color:#fff;border:none;border-radius:30px;padding:11px 28px;font-size:.9rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(30,122,62,.4);transition:transform .15s;}
+.btng:hover{transform:translateY(-2px);}
+/* CARD */
+.card{background:#fff;border-radius:16px;padding:26px 26px 22px;box-shadow:0 8px 32px rgba(0,0,0,.2);margin-top:10px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,var(--blue),var(--green));}
+.mtag{background:var(--blue);color:#fff;border-radius:20px;padding:4px 14px;font-size:.72rem;font-weight:700;letter-spacing:.5px;}
+.mhdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:6px;}
+.pbwrap{background:#e0e0e0;border-radius:10px;height:8px;margin-bottom:16px;overflow:hidden;}
+.pbfill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:10px;transition:width .5s ease;}
+.plbl{font-size:.72rem;color:#666;margin-bottom:4px;}
+.qtxt{font-size:1rem;font-weight:600;color:var(--dark);margin-bottom:8px;line-height:1.5;}
+.qctx{background:var(--lg);border-left:3px solid var(--green);border-radius:6px;padding:10px 14px;font-size:.83rem;color:#2c5f3a;margin-bottom:14px;line-height:1.5;}
+/* OPTIONS */
+.ogrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px;}
+@media(max-width:520px){.ogrid{grid-template-columns:1fr;}}
+.obtn{background:var(--gray);border:2px solid #dde3ec;border-radius:10px;padding:11px 13px;font-size:.85rem;cursor:pointer;text-align:left;transition:all .18s;line-height:1.4;font-weight:500;color:#333;}
+.obtn:hover:not(:disabled){border-color:var(--blue);background:var(--lb);transform:translateY(-1px);}
+.obtn.cor{background:#d4edda;border-color:var(--ok);color:#155724;}
+.obtn.wrg{background:#f8d7da;border-color:var(--red);color:#721c24;}
+.obtn:disabled{cursor:default;}
+/* DRAG ORDER */
+.olist{list-style:none;padding:0;}
+.oitem{display:flex;align-items:center;gap:9px;background:#fff;border:2px solid #dde3ec;border-radius:10px;padding:10px 13px;margin-bottom:7px;cursor:grab;transition:box-shadow .2s,border-color .2s;font-size:.86rem;font-weight:500;}
+.oitem:active{cursor:grabbing;}
+.oitem.dragging-o{opacity:.4;}
+.oitem.over-o{border-color:var(--blue);background:var(--lb);}
+.onum{background:var(--blue);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0;}
+.dhandle{color:#aaa;font-size:1rem;}
+/* MATCH */
+.dpool{display:flex;flex-wrap:wrap;gap:7px;padding:11px;background:var(--lb);border-radius:10px;min-height:55px;margin-bottom:12px;border:2px dashed #aac4e8;}
+.ditem{background:var(--blue);color:#fff;border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:600;cursor:grab;user-select:none;transition:transform .15s,opacity .15s;}
+.ditem:active{cursor:grabbing;transform:scale(1.05);}
+.ditem.dragging-d{opacity:.4;}
+.dzones{display:flex;flex-direction:column;gap:7px;}
+.dzone{display:flex;align-items:center;gap:9px;background:#fff;border:2px dashed #ccc;border-radius:10px;padding:9px 13px;min-height:48px;transition:border-color .2s,background .2s;}
+.dzone.dov{border-color:var(--blue);background:var(--lb);}
+.dzone.dok{border-color:var(--ok);background:#d4edda;}
+.dzone.dno{border-color:var(--red);background:#f8d7da;}
+.dzlbl{font-size:.8rem;font-weight:600;color:#555;min-width:130px;}
+.dzslot{flex:1;min-height:30px;display:flex;align-items:center;flex-wrap:wrap;gap:5px;}
+.dpit{background:var(--green);color:#fff;border-radius:20px;padding:4px 11px;font-size:.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:3px;}
+/* FEEDBACK */
+.fb{border-radius:10px;padding:11px 15px;margin-top:11px;font-size:.85rem;line-height:1.5;display:none;}
+.fb.show{display:block;}
+.fb.cfb{background:#d4edda;border-left:4px solid var(--ok);color:#155724;}
+.fb.wfb{background:#f8d7da;border-left:4px solid var(--red);color:#721c24;}
+.fb.ifb{background:var(--lb);border-left:4px solid var(--blue);color:#1a3a6b;}
+.nxtwrap{text-align:right;margin-top:12px;}
+.subbtn{background:linear-gradient(135deg,var(--green),#28a85a);color:#fff;border:none;border-radius:30px;padding:11px 28px;font-size:.9rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(30,122,62,.4);transition:transform .15s;margin-top:8px;}
+.subbtn:hover{transform:translateY(-2px);}
+.subbtn:disabled{opacity:.5;cursor:default;transform:none;}
+/* POPUPS */
+#spop{position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;border-radius:14px;padding:13px 18px;font-weight:800;font-size:1rem;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:999;display:none;animation:slin .4s ease;}
+@keyframes slin{from{transform:translateX(120%)}to{transform:translateX(0)}}
+#rup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;padding:30px 38px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.4);z-index:1000;display:none;border:4px solid var(--gold);}
+#rup h2{color:var(--blue);font-size:1.4rem;}
+#rup .ri{font-size:3.2rem;margin:8px 0;}
+#rup .rn{color:var(--gold);font-size:1.2rem;font-weight:800;}
+#ovl{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;display:none;}
+/* CONFETTI */
+.cp{position:fixed;width:10px;height:10px;border-radius:2px;animation:cf linear forwards;z-index:9999;pointer-events:none;}
+@keyframes cf{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+/* RESULTS */
+#results{background:#fff;border-radius:16px;padding:34px 28px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.25);margin-top:10px;}
+.rh{font-size:3.5rem;margin-bottom:8px;}
+#results h2{color:var(--blue);font-size:1.5rem;margin-bottom:5px;}
+.fsbox{background:linear-gradient(135deg,var(--blue),var(--green));color:#fff;border-radius:16px;padding:18px;margin:18px 0;font-size:2.2rem;font-weight:800;}
+.fsbox span{font-size:.9rem;display:block;opacity:.85;font-weight:400;}
+.srow{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:14px 0;}
+.sbox{background:var(--gray);border-radius:12px;padding:13px 18px;min-width:90px;}
+.sbox .sn{font-size:1.5rem;font-weight:800;color:var(--blue);}
+.sbox .sl{font-size:.72rem;color:#666;}
+.brow{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:14px 0;}
+.badge{background:var(--lb);border:2px solid var(--blue);border-radius:12px;padding:9px 14px;font-size:.78rem;font-weight:600;color:var(--blue);text-align:center;}
+.badge .bi{font-size:1.4rem;display:block;margin-bottom:3px;}
+.pixc{display:inline-block;font-size:1.8rem;animation:flt 2s ease-in-out infinite;}
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.tbub{background:var(--lb);border:2px solid var(--blue);border-radius:12px;padding:9px 13px;font-size:.82rem;color:#1a3a6b;margin-bottom:12px;display:flex;align-items:flex-start;gap:9px;line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <h1>🖨️ UVA Tech Academy — Printer Maintenance Mission</h1>
+  <p>Computer Architecture · Lesson 10B · CompTIA A+ Core 1 Domain 3.8</p>
+  <div style="padding-bottom:10px;margin-top:4px;"><span class="ribbon">✦ Virtue · Vigor · Vision ✦</span></div>
+</div>
+
+<div id="hud">
+  <div class="hi"><span class="hl">Score</span><span class="hv" id="hscore">0</span></div>
+  <div class="hi"><span id="rbadge">🎓 Trainee</span></div>
+  <div class="hi"><span class="hl">Mission</span><span class="hv" id="hmission">0 / 6</span></div>
+  <div class="hi"><span id="sdisplay">🔥 Streak!</span></div>
+</div>
+
+<div id="spop">🔥 <span id="stxt">3 in a row!</span></div>
+<div id="ovl"></div>
+<div id="rup">
+  <div class="ri" id="rupi">⭐</div>
+  <h2>RANK UP!</h2>
+  <div class="rn" id="rupn">Apprentice</div>
+  <p style="margin:10px 0;color:#555;font-size:.88rem;">You're leveling up your tech skills!</p>
+  <button class="btnp" onclick="closeRup()" style="margin-top:10px;">Continue Mission →</button>
+</div>
+
+<div id="app">
+
+  <!-- INTRO -->
+  <div id="intro" class="screen active">
+    <div class="avatar">🤖</div>
+    <h2>Meet PIXEL — Your Tech Guide!</h2>
+    <p class="tag">"I'll guide you through the world of printers and imaging!"</p>
+    <div class="ibox">
+      <strong>🎮 Mission Briefing:</strong><br>
+      The school's print lab is in chaos — printers are jamming, fading, and malfunctioning!
+      PIXEL needs your help. Complete <strong>6 missions</strong> to earn your
+      <strong>Master Technician</strong> badge and save the print lab!
+    </div>
+    <ul class="mlist">
+      <li>Mission 1: Order the Laser Imaging Process (Drag & Drop)</li>
+      <li>Mission 2: Laser Printer Stage Knowledge (Quiz)</li>
+      <li>Mission 3: Match Maintenance Tasks to Printer Types</li>
+      <li>Mission 4: Maintenance Kit Components (Quiz)</li>
+      <li>Mission 5: Multi-Function Device Scenarios</li>
+      <li>Mission 6: Final Boss — Master Technician Exam 🔥</li>
+    </ul>
+    <div style="margin-top:6px;font-size:.8rem;color:#666;">🏆 Ranks: Trainee → Apprentice → Expert → Master Technician</div>
+    <br>
+    <button class="btnp" onclick="startGame()">🚀 Begin Mission!</button>
+  </div>
+
+  <!-- MISSION -->
+  <div id="mscreen" class="screen">
+    <div class="card" id="mcard"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results" class="screen">
+    <div class="rh" id="remi">🏆</div>
+    <h2 id="rtitle">Mission Complete!</h2>
+    <p id="rsub" style="color:#555;margin-bottom:8px;"></p>
+    <div class="fsbox">
+      <span>Final Score</span>
+      <span id="fsnum">0</span>
+      <span id="fspct" style="font-size:.95rem;opacity:.9;"></span>
+    </div>
+    <div class="srow">
+      <div class="sbox"><div class="sn" id="stcor">0</div><div class="sl">Correct</div></div>
+      <div class="sbox"><div class="sn" id="strank">—</div><div class="sl">Final Rank</div></div>
+      <div class="sbox"><div class="sn" id="ststrk">0</div><div class="sl">Best Streak</div></div>
+    </div>
+    <div class="brow" id="brow"></div>
+    <div style="margin-top:10px;padding:13px;background:var(--lb);border-radius:10px;font-size:.83rem;color:#1a3a6b;line-height:1.6;">
+      <strong>📚 CompTIA A+ Core 1 – Domain 3.8 Recap:</strong><br>
+      You've covered the 7 laser imaging stages, inkjet/thermal maintenance, maintenance kit components, and MFD configuration — all key exam topics!
+    </div>
+    <br>
+    <button class="btnp" onclick="restartGame()">🔄 Play Again</button>
+  </div>
+
+</div>
+
+<script>
+// ── STATE ──
+var score=0,curM=0,streak=0,bestStreak=0,corCount=0,rankIdx=0;
+var mcQIdx=0,scIdx=0;
+var RANKS=[
+  {name:"Trainee",icon:"🎓",min:0},
+  {name:"Apprentice",icon:"🔧",min:100},
+  {name:"Expert",icon:"⚡",min:250},
+  {name:"Master Technician",icon:"🏆",min:450}
+];
+
+// ── MISSIONS ──
+var missions=[
+  // M1 ORDER
+  {type:"order",tag:"Mission 1 of 6 · Drag & Drop",title:"Restore the Laser Imaging Process!",
+   ctx:"🤖 PIXEL: \"The laser printer's control board got scrambled! The 7 imaging stages are all out of order. Drag them into the correct sequence to fix it!\"",
+   instr:"Drag the steps to arrange them in the correct order (1 = first, 7 = last):",
+   items:[{id:"a",text:"Processing"},{id:"b",text:"Charging"},{id:"c",text:"Exposing"},
+          {id:"d",text:"Developing"},{id:"e",text:"Transferring"},{id:"f",text:"Fusing"},{id:"g",text:"Cleaning"}],
+   correct:["a","b","c","d","e","f","g"],
+   fb:{ok:"✅ Perfect! The 7 stages: Processing → Charging → Exposing → Developing → Transferring → Fusing → Cleaning. The drum is charged, the laser exposes it, toner develops the image, it transfers to paper, heat fuses it, then the drum is cleaned!",
+       part:"Almost! The correct order is: Processing → Charging → Exposing → Developing → Transferring → Fusing → Cleaning.",
+       no:"The correct order is: Processing → Charging → Exposing → Developing → Transferring → Fusing → Cleaning."},
+   pts:100},
+
+  // M2 MC
+  {type:"mc",tag:"Mission 2 of 6 · Quick-Fire Quiz",title:"Laser Stage Knowledge Check!",
+   ctx:"🤖 PIXEL: \"Great work on the order! Now let's make sure you understand what each stage DOES. Answer 4 quick questions!\"",
+   qs:[
+    {q:"During the CHARGING stage, what component applies a uniform negative charge to the photosensitive drum?",
+     opts:["Transfer roller","Primary corona wire / charge roller","Fuser assembly","Laser scanning unit"],cor:1,
+     ex:"The primary corona wire (or charge roller in modern printers) applies a uniform high-voltage negative charge to the drum surface before the laser writes the image."},
+    {q:"In the EXPOSING stage, what does the laser beam do to the drum?",
+     opts:["Melts toner onto the drum","Applies a positive charge to the entire drum","Discharges specific areas to create a latent image","Transfers toner to paper"],cor:2,
+     ex:"The laser neutralizes (discharges) specific spots on the negatively charged drum, creating an invisible 'latent image' made of charge differences."},
+    {q:"What happens during the FUSING stage?",
+     opts:["Toner is electrostatically attracted to the drum","Heat and pressure permanently bond toner to the paper","The drum is cleaned of residual toner","A charge is applied to the paper"],cor:1,
+     ex:"The fuser assembly uses heat (typically 350–400°F) and pressure rollers to melt and permanently bond the toner particles to the paper fibers."},
+    {q:"After printing, the CLEANING stage removes residual toner from the drum using a:",
+     opts:["Fuser wand","Transfer belt","Rubber cleaning blade","Laser diode"],cor:2,
+     ex:"A rubber cleaning blade scrapes residual toner off the drum after each print cycle, depositing it into a waste toner reservoir."}
+   ],pts:25},
+
+  // M3 MATCH
+  {type:"match",tag:"Mission 3 of 6 · Drag & Match",title:"Match Maintenance Tasks to Printer Types!",
+   ctx:"🤖 PIXEL: \"The supply closet is a mess! Maintenance supplies are mixed up. Match each task to the correct printer type.\"",
+   items:[{id:"m1",text:"Replace thermal print head"},{id:"m2",text:"Run printhead cleaning cycle"},
+          {id:"m3",text:"Replace toner cartridge"},{id:"m4",text:"Clean platen roller with IPA"},
+          {id:"m5",text:"Align ink cartridges after replacement"},{id:"m6",text:"Replace fuser assembly"},
+          {id:"m7",text:"Replace thermal paper roll"},{id:"m8",text:"Clean corona wires"}],
+   cats:[{id:"inkjet",lbl:"🖨️ Inkjet Printer"},{id:"thermal",lbl:"🧾 Thermal Printer"},{id:"laser",lbl:"⚡ Laser Printer"}],
+   cmap:{m1:"thermal",m2:"inkjet",m3:"laser",m4:"thermal",m5:"inkjet",m6:"laser",m7:"thermal",m8:"laser"},
+   fb:{ok:"✅ Excellent! Inkjet: printhead cleaning & cartridge alignment. Thermal: print head, platen roller, paper roll. Laser: toner, fuser, corona wires.",
+       part:"Good effort! Some items were mismatched. Thermal printers use heat-sensitive paper; laser printers have fusers and corona wires; inkjets use liquid ink.",
+       no:"Thermal printers use heat (no ink/toner), inkjets use liquid ink cartridges, and laser printers use toner powder with fuser assemblies."},
+   pts:80},
+
+  // M4 MC
+  {type:"mc",tag:"Mission 4 of 6 · Maintenance Kit",title:"Maintenance Kit Component Challenge!",
+   ctx:"🤖 PIXEL: \"A laser printer maintenance kit just arrived but nobody knows what's inside or how to use it. Help me identify the components and procedures!\"",
+   qs:[
+    {q:"A laser printer maintenance kit typically includes which set of components?",
+     opts:["Ink cartridges, print heads, and alignment cards","Fuser assembly, transfer roller, and pickup rollers","Toner cartridge, drum unit, and waste toner box","Thermal print head, platen roller, and paper cutter"],cor:1,
+     ex:"A standard laser printer maintenance kit contains the fuser assembly, transfer roller, and pickup/separation rollers — the high-wear parts that degrade over time and cause print quality issues."},
+    {q:"When should a laser printer maintenance kit typically be installed?",
+     opts:["Every time you replace the toner cartridge","Only when the printer completely stops working","At the manufacturer-specified page count interval (e.g., every 200,000 pages)","Once per year regardless of usage"],cor:2,
+     ex:"Maintenance kits are installed at manufacturer-specified page count intervals (found in the printer manual). Installing too early wastes parts; too late causes print defects and paper jams."},
+    {q:"After installing a maintenance kit, what MUST you do in the printer's settings?",
+     opts:["Reinstall the printer driver","Reset the maintenance kit page counter","Perform a full factory reset","Recalibrate the color profile"],cor:1,
+     ex:"You must reset the maintenance kit page counter in the printer's service menu so the printer accurately tracks when the next kit is due."},
+    {q:"Which safety precaution is MOST important when replacing a fuser assembly?",
+     opts:["Wear anti-static gloves to prevent ESD damage","Allow the fuser to cool completely before handling — it operates at 350–400°F","Disconnect the network cable before starting","Remove all paper trays first"],cor:1,
+     ex:"The fuser assembly operates at extremely high temperatures (350–400°F / 175–200°C). Always allow it to cool for at least 30 minutes before handling to prevent serious burns."}
+   ],pts:25},
+
+  // M5 SCENARIO
+  {type:"scenario",tag:"Mission 5 of 6 · Scenario",title:"MFD Configuration Crisis!",
+   ctx:"🤖 PIXEL: \"The school's Multi-Function Device needs to be configured for the new semester. Make the right decisions to set it up correctly!\"",
+   scs:[
+    {sit:"A teacher wants to scan documents directly to their email. Which MFD feature should you configure?",
+     opts:[{t:"Scan-to-Email (SMTP configuration)",ok:true,ex:"Correct! Scan-to-Email requires configuring the SMTP server address, port (typically 25, 465, or 587), and authentication credentials in the MFD's network settings."},
+           {t:"Fax over IP (FoIP)",ok:false,ex:"FoIP is for faxing over internet, not emailing scans. You need Scan-to-Email with SMTP settings."},
+           {t:"USB direct print",ok:false,ex:"USB direct print is for printing from a USB drive, not scanning to email."},
+           {t:"AirPrint configuration",ok:false,ex:"AirPrint enables wireless printing from Apple devices — it doesn't configure scan-to-email functionality."}]},
+    {sit:"The IT admin wants to prevent unauthorized users from accessing the MFD's admin panel. What security feature should be enabled?",
+     opts:[{t:"Enable user authentication / PIN access control",ok:true,ex:"Correct! User authentication (PIN, card reader, or network login) restricts access to admin functions and tracks usage per user — a key MFD security practice."},
+           {t:"Disable the network interface",ok:false,ex:"Disabling the network would break all network printing and scanning features — too drastic!"},
+           {t:"Set paper tray to auto-select",ok:false,ex:"Paper tray settings are unrelated to access security."},
+           {t:"Enable duplex printing by default",ok:false,ex:"Duplex printing saves paper but doesn't address security access control."}]},
+    {sit:"Scanned documents are coming out blurry and skewed. What is the FIRST maintenance step to try?",
+     opts:[{t:"Replace the entire scanner assembly",ok:false,ex:"Replacing the whole assembly is expensive and premature. Always try cleaning first!"},
+           {t:"Clean the scanner glass and ADF rollers",ok:true,ex:"Correct! Dirty scanner glass causes blurry scans; worn or dirty ADF rollers cause skewing. Cleaning is always the first step."},
+           {t:"Reinstall the printer driver",ok:false,ex:"Driver issues cause software problems, not physical blurring or skewing of scanned images."},
+           {t:"Increase the scan DPI to 1200",ok:false,ex:"Higher DPI won't fix physical blurring caused by a dirty scanner glass — it may actually make smudges more visible!"}]}
+   ],pts:40},
+
+  // M6 FINAL BOSS
+  {type:"mc",tag:"Mission 6 of 6 · FINAL BOSS 🔥",title:"Final Boss: Master Technician Exam!",
+   ctx:"🤖 PIXEL: \"This is it — the FINAL BOSS! Answer these mixed questions to earn your Master Technician badge. You've got this!\"",
+   qs:[
+    {q:"A laser printer produces pages with a repeating smudge at regular intervals. Which component is MOST likely causing this?",
+     opts:["Toner cartridge running low","Damaged or dirty fuser roller (ghost image / offset defect)","Incorrect paper size setting","Outdated printer driver"],cor:1,
+     ex:"Repeating defects at regular intervals (matching the circumference of a roller) indicate a damaged fuser roller or drum. This is called 'ghosting' or 'offset' — a classic CompTIA A+ exam scenario."},
+    {q:"An inkjet printer has been sitting unused for 3 months. Print quality is poor with missing colors. What is the BEST first action?",
+     opts:["Replace all ink cartridges immediately","Run the built-in printhead cleaning utility","Update the printer firmware","Replace the printhead assembly"],cor:1,
+     ex:"Dried ink in the printhead nozzles is the most common cause after long periods of inactivity. The built-in cleaning utility flushes and clears clogged nozzles — always try this before replacing parts."},
+    {q:"Which of the following is a security concern UNIQUE to MFDs that single-function printers do NOT have?",
+     opts:["Paper jam frequency","Stored document images in the MFD's internal hard drive","Toner cartridge compatibility","Print resolution settings"],cor:1,
+     ex:"MFDs with hard drives store copies of scanned/printed/faxed documents. This is a major security risk — sensitive documents can be retrieved from a discarded MFD. Always wipe the HDD before disposal (CompTIA A+ Domain 3.8)."},
+    {q:"A thermal receipt printer is printing very faint text. What is the MOST likely cause?",
+     opts:["The thermal paper is loaded face-down (wrong side up)","The ink cartridge is empty","The toner drum needs replacement","The USB cable is damaged"],cor:0,
+     ex:"Thermal printers use heat-sensitive paper — only one side is coated. Loading it face-down means the heat element contacts the non-coated side, producing faint or blank output. No ink or toner is used!"},
+    {q:"When configuring scan-to-folder on an MFD, which protocol is used to send scanned files to a Windows shared folder?",
+     opts:["FTP","SMTP","SMB (Server Message Block)","SNMP"],cor:2,
+     ex:"SMB (Server Message Block) is the Windows file-sharing protocol used for scan-to-folder (scan-to-network-share). FTP is also possible but SMB is standard for Windows environments."}
+   ],pts:30}
+];
+
+// ── HELPERS ──
+function $(id){return document.getElementById(id);}
+function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});$(id).classList.add('active');}
+
+function updateHUD(){
+  $('hscore').textContent=score;
+  $('hmission').textContent=curM+' / '+missions.length;
+  var r=RANKS[rankIdx];
+  $('rbadge').textContent=r.icon+' '+r.name;
+  if(streak>=2){$('sdisplay').style.display='inline-block';$('sdisplay').textContent='🔥 '+streak+' in a row!';}
+  else{$('sdisplay').style.display='none';}
+}
+
+function checkRankUp(){
+  var nr=0;
+  for(var i=RANKS.length-1;i>=0;i--){if(score>=RANKS[i].min){nr=i;break;}}
+  if(nr>rankIdx){rankIdx=nr;showRup(RANKS[rankIdx]);}
+}
+
+function showRup(r){
+  $('rupi').textContent=r.icon;$('rupn').textContent=r.name;
+  $('ovl').style.display='block';$('rup').style.display='block';
+  confetti(60);
+}
+function closeRup(){$('ovl').style.display='none';$('rup').style.display='none';}
+
+function showStreak(n){
+  $('stxt').textContent=n+' in a row! 🔥';
+  $('spop').style.display='block';
+  setTimeout(function(){$('spop').style.display='none';},2200);
+}
+
+function addScore(pts,ok){
+  if(ok){score+=pts;streak++;corCount++;if(streak>bestStreak)bestStreak=streak;
+    if(streak===3||streak===5||streak===7)showStreak(streak);checkRankUp();}
+  else{streak=0;}
+  updateHUD();
+}
+
+function confetti(n){
+  var cols=['#1B5EAF','#1E7A3E','#F5A623','#e74c3c','#9b59b6','#3498db'];
+  for(var i=0;i<n;i++){
+    var el=document.createElement('div');el.className='cp';
+    el.style.left=Math.random()*100+'vw';el.style.top='-20px';
+    el.style.background=cols[Math.floor(Math.random()*cols.length)];
+    el.style.width=(Math.random()*8+6)+'px';el.style.height=(Math.random()*8+6)+'px';
+    el.style.animationDuration=(Math.random()*2+1.5)+'s';
+    el.style.animationDelay=Math.random()*0.8+'s';
+    document.body.appendChild(el);
+    setTimeout(function(){el.remove();},4000);
+  }
+}
+
+// ── GAME FLOW ──
+function startGame(){showScreen('mscreen');renderMission();}
+
+function nextMission(){
+  curM++;
+  if(curM>=missions.length){showResults();}
+  else{mcQIdx=0;scIdx=0;renderMission();}
+}
+
+function renderMission(){
+  var m=missions[curM];
+  var pct=(curM/missions.length)*100;
+  var card=$('mcard');
+  var hdr='<div class="mhdr"><span class="mtag">'+m.tag+'</span><span style="font-size:.78rem;color:#888;">+'+m.pts+' pts available</span></div>'+
+    '<div class="plbl">Overall Progress</div>'+
+    '<div class="pbwrap"><div class="pbfill" style="width:'+pct+'%"></div></div>'+
+    '<div class="tbub"><span class="pixc">🤖</span><span>'+m.ctx+'</span></div>'+
+    '<div class="qtxt">'+m.title+'</div>';
+  if(m.type==='order'){card.innerHTML=hdr+buildOrder(m);initOrderDrag();}
+  else if(m.type==='mc'){card.innerHTML=hdr+buildMC(m,0);}
+  else if(m.type==='match'){card.innerHTML=hdr+buildMatch(m);initMatchDrag(m);}
+  else if(m.type==='scenario'){card.innerHTML=hdr+buildScenario(m,0);}
+}
+
+// ── ORDER ──
+var orderItems=[];
+function buildOrder(m){
+  orderItems=[...m.items].sort(function(){return Math.random()-.5;});
+  var h='<p style="font-size:.83rem;color:#555;margin-bottom:9px;">'+m.instr+'</p><ul class="olist" id="olist">';
+  orderItems.forEach(function(item,i){
+    h+='<li class="oitem" draggable="true" data-id="'+item.id+'" id="oi-'+item.id+'">'+
+       '<span class="dhandle">⠿</span><span class="onum">'+(i+1)+'</span><span>'+item.text+'</span></li>';
+  });
+  h+='</ul><div class="fb" id="fb"></div><div class="nxtwrap"><button class="subbtn" id="osub" onclick="submitOrder()">✅ Submit Order</button></div>';
+  return h;
+}
+function initOrderDrag(){
+  var list=$('olist');var dragSrc=null;
+  list.querySelectorAll('.oitem').forEach(function(item){
+    item.addEventListener('dragstart',function(e){dragSrc=item;item.classList.add('dragging-o');e.dataTransfer.effectAllowed='move';});
+    item.addEventListener('dragend',function(){item.classList.remove('dragging-o');list.querySelectorAll('.oitem').forEach(function(i){i.classList.remove('over-o');});updateONums();});
+    item.addEventListener('dragover',function(e){e.preventDefault();if(item!==dragSrc)item.classList.add('over-o');});
+    item.addEventListener('dragleave',function(){item.classList.remove('over-o');});
+    item.addEventListener('drop',function(e){
+      e.preventDefault();
+      if(dragSrc&&item!==dragSrc){
+        var items=[...list.querySelectorAll('.oitem')];
+        var si=items.indexOf(dragSrc),ti=items.indexOf(item);
+        if(si<ti)list.insertBefore(dragSrc,item.nextSibling);else list.insertBefore(dragSrc,item);
+      }
+      item.classList.remove('over-o');
+    });
+  });
+}
+function updateONums(){document.querySelectorAll('#olist .oitem').forEach(function(item,i){item.querySelector('.onum').textContent=i+1;});}
+function submitOrder(){
+  var m=missions[curM];
+  var cur=[...$('olist').querySelectorAll('.oitem')].map(function(i){return i.dataset.id;});
+  var ok=JSON.stringify(cur)===JSON.stringify(m.correct);
+  var pc=0;cur.forEach(function(id,i){if(id===m.correct[i])pc++;});
+  var part=pc>=5;
+  var fb=$('fb');fb.classList.add('show');
+  if(ok){fb.className='fb show cfb';fb.innerHTML=m.fb.ok;addScore(m.pts,true);confetti(40);}
+  else if(part){fb.className='fb show ifb';fb.innerHTML=m.fb.part+' ('+pc+'/7 in correct position)';streak=0;updateHUD();}
+  else{fb.className='fb show wfb';fb.innerHTML=m.fb.no;streak=0;updateHUD();}
+  $('osub').disabled=true;
+  var nw=document.querySelector('.nxtwrap');
+  nw.innerHTML+='<button class="btng" style="margin-left:10px;" onclick="nextMission()">Next Mission →</button>';
+}
+
+// ── MC ──
+function buildMC(m,qi){
+  var q=m.qs[qi];
+  var h='<p style="font-size:.76rem;color:#888;margin-bottom:7px;">Question '+(qi+1)+' of '+m.qs.length+'</p>'+
+    '<div class="qctx">'+q.q+'</div><div class="ogrid" id="ogrid">';
+  q.opts.forEach(function(opt,i){h+='<button class="obtn" onclick="selectMC('+i+')">'+opt+'</button>';});
+  h+='</div><div class="fb" id="fb"></div>';
+  return h;
+}
+function selectMC(idx){
+  var m=missions[curM];var q=m.qs[mcQIdx];
+  var btns=document.querySelectorAll('.obtn');
+  btns.forEach(function(b){b.disabled=true;});
+  var ok=idx===q.cor;
+  btns[idx].classList.add(ok?'cor':'wrg');
+  if(!ok)btns[q.cor].classList.add('cor');
+  var fb=$('fb');fb.classList.add('show');
+  if(ok){fb.className='fb show cfb';fb.innerHTML='✅ Correct! '+q.ex;addScore(m.pts,true);if(streak>=3)confetti(20);}
+  else{fb.className='fb show wfb';fb.innerHTML='❌ Not quite. '+q.ex;addScore(0,false);}
+  mcQIdx++;
+  var nw=document.createElement('div');nw.className='nxtwrap';
+  if(mcQIdx<m.qs.length){nw.innerHTML='<button class="btng" onclick="advMC()">Next Question →</button>';}
+  else{nw.innerHTML='<button class="btng" onclick="nextMission()">Next Mission →</button>';}
+  $('mcard').appendChild(nw);
+}
+function advMC(){
+  var m=missions[curM];
+  var pct=(curM/missions.length)*100;
+  var hdr='<div class="mhdr"><span class="mtag">'+m.tag+'</span><span style="font-size:.78rem;color:#888;">+'+m.pts+' pts per question</span></div>'+
+    '<div class="plbl">Overall Progress</div>'+
+    '<div class="pbwrap"><div class="pbfill" style="width:'+pct+'%"></div></div>'+
+    '<div class="tbub"><span class="pixc">🤖</span><span>'+m.ctx+'</span></div>'+
+    '<div class="qtxt">'+m.title+'</div>';
+  $('mcard').innerHTML=hdr+buildMC(m,mcQIdx);
+}
+
+// ── MATCH ──
+var matchState={};var dragD=null;var dragFrom=null;
+function buildMatch(m){
+  matchState={};m.cats.forEach(function(c){matchState[c.id]=[];});
+  var shuffled=[...m.items].sort(function(){return Math.random()-.5;});
+  var h='<p style="font-size:.83rem;color:#555;margin-bottom:7px;">Drag each task to the correct printer type:</p>'+
+    '<div class="dpool" id="dpool">';
+  shuffled.forEach(function(item){
+    h+='<div class="ditem" draggable="true" data-id="'+item.id+'" id="di-'+item.id+'">'+item.text+'</div>';
+  });
+  h+='</div><div class="dzones" id="dzones">';
+  m.cats.forEach(function(cat){
+    h+='<div class="dzone" id="dz-'+cat.id+'" data-cat="'+cat.id+'">'+
+       '<span class="dzlbl">'+cat.lbl+'</span>'+
+       '<div class="dzslot" id="slot-'+cat.id+'"></div></div>';
+  });
+  h+='</div><div class="fb" id="fb"></div>'+
+    '<div class="nxtwrap"><button class="subbtn" id="msub" onclick="submitMatch()">✅ Check Matches</button></div>';
+  return h;
+}
+function initMatchDrag(m){
+  var pool=$('dpool');
+  function makeDraggable(el){
+    el.addEventListener('dragstart',function(e){
+      dragD=el;dragFrom=el.parentElement.id==='dpool'?null:el.parentElement.id.replace('slot-','');
+      el.classList.add('dragging-d');e.dataTransfer.effectAllowed='move';
+    });
+    el.addEventListener('dragend',function(){el.classList.remove('dragging-d');});
+  }
+  pool.querySelectorAll('.ditem').forEach(makeDraggable);
+  document.querySelectorAll('.dzone').forEach(function(zone){
+    zone.addEventListener('dragover',function(e){e.preventDefault();zone.classList.add('dov');});
+    zone.addEventListener('dragleave',function(){zone.classList.remove('dov');});
+    zone.addEventListener('drop',function(e){
+      e.preventDefault();zone.classList.remove('dov');
+      if(!dragD)return;
+      var cat=zone.dataset.cat;
+      var itemId=dragD.dataset.id;
+      // Remove from old location
+      if(dragFrom){
+        matchState[dragFrom]=matchState[dragFrom].filter(function(x){return x!==itemId;});
+        renderSlot(dragFrom,m);
+      } else {
+        // from pool — remove from pool
+        var old=document.getElementById('di-'+itemId);
+        if(old&&old.parentElement.id==='dpool')old.remove();
+      }
+      // Add to new zone
+      if(!matchState[cat])matchState[cat]=[];
+      matchState[cat].push(itemId);
+      renderSlot(cat,m);
+      dragD=null;dragFrom=null;
+    });
+  });
+}
+function renderSlot(catId,m){
+  var slot=$('slot-'+catId);
+  slot.innerHTML='';
+  matchState[catId].forEach(function(itemId){
+    var item=m.items.find(function(x){return x.id===itemId;});
+    if(!item)return;
+    var el=document.createElement('div');el.className='dpit';
+    el.innerHTML=item.text+' <span class="remove-x" onclick="removeFromSlot(\''+catId+'\',\''+itemId+'\')">✕</span>';
+    slot.appendChild(el);
+  });
+}
+function removeFromSlot(catId,itemId){
+  var m=missions[curM];
+  matchState[catId]=matchState[catId].filter(function(x){return x!==itemId;});
+  renderSlot(catId,m);
+  var item=m.items.find(function(x){return x.id===itemId;});
+  if(item){
+    var el=document.createElement('div');el.className='ditem';el.draggable=true;
+    el.dataset.id=itemId;el.id='di-'+itemId;el.textContent=item.text;
+    $('dpool').appendChild(el);
+    // re-init drag for this element
+    el.addEventListener('dragstart',function(e){
+      dragD=el;dragFrom=null;el.classList.add('dragging-d');e.dataTransfer.effectAllowed='move';
+    });
+    el.addEventListener('dragend',function(){el.classList.remove('dragging-d');});
+  }
+}
+function submitMatch(){
+  var m=missions[curM];
+  var total=m.items.length,correct=0;
+  m.items.forEach(function(item){
+    var assigned=null;
+    m.cats.forEach(function(cat){if(matchState[cat.id]&&matchState[cat.id].includes(item.id))assigned=cat.id;});
+    if(assigned===m.cmap[item.id])correct++;
+  });
+  var fb=$('fb');fb.classList.add('show');
+  var pct=correct/total;
+  if(pct===1){fb.className='fb show cfb';fb.innerHTML=m.fb.ok;addScore(m.pts,true);confetti(40);}
+  else if(pct>=0.6){fb.className='fb show ifb';fb.innerHTML=m.fb.part+' ('+correct+'/'+total+' correct)';addScore(Math.floor(m.pts*pct),false);streak=0;updateHUD();}
+  else{fb.className='fb show wfb';fb.innerHTML=m.fb.no+' ('+correct+'/'+total+' correct)';streak=0;updateHUD();}
+  $('msub').disabled=true;
+  var nw=document.querySelector('.nxtwrap');
+  nw.innerHTML+='<button class="btng" style="margin-left:10px;" onclick="nextMission()">Next Mission →</button>';
+}
+
+// ── SCENARIO ──
+function buildScenario(m,si){
+  var sc=m.scs[si];
+  var h='<p style="font-size:.76rem;color:#888;margin-bottom:7px;">Scenario '+(si+1)+' of '+m.scs.length+'</p>'+
+    '<div class="qctx">'+sc.sit+'</div><div class="ogrid" id="ogrid">';
+  sc.opts.forEach(function(opt,i){h+='<button class="obtn" onclick="selectScenario('+i+')">'+opt.t+'</button>';});
+  h+='</div><div class="fb" id="fb"></div>';
+  return h;
+}
+function selectScenario(idx){
+  var m=missions[curM];var sc=m.scs[scIdx];
+  var btns=document.querySelectorAll('.obtn');
+  btns.forEach(function(b){b.disabled=true;});
+  var ok=sc.opts[idx].ok;
+  btns[idx].classList.add(ok?'cor':'wrg');
+  if(!ok){for(var i=0;i<sc.opts.length;i++){if(sc.opts[i].ok){btns[i].classList.add('cor');break;}}}
+  var fb=$('fb');fb.classList.add('show');
+  if(ok){fb.className='fb show cfb';fb.innerHTML='✅ '+sc.opts[idx].ex;addScore(m.pts,true);if(streak>=3)confetti(20);}
+  else{fb.className='fb show wfb';fb.innerHTML='❌ '+sc.opts[idx].ex;addScore(0,false);}
+  scIdx++;
+  var nw=document.createElement('div');nw.className='nxtwrap';
+  if(scIdx<m.scs.length){nw.innerHTML='<button class="btng" onclick="advScenario()">Next Scenario →</button>';}
+  else{nw.innerHTML='<button class="btng" onclick="nextMission()">Next Mission →</button>';}
+  $('mcard').appendChild(nw);
+}
+function advScenario(){
+  var m=missions[curM];
+  var pct=(curM/missions.length)*100;
+  var hdr='<div class="mhdr"><span class="mtag">'+m.tag+'</span><span style="font-size:.78rem;color:#888;">+'+m.pts+' pts per scenario</span></div>'+
+    '<div class="plbl">Overall Progress</div>'+
+    '<div class="pbwrap"><div class="pbfill" style="width:'+pct+'%"></div></div>'+
+    '<div class="tbub"><span class="pixc">🤖</span><span>'+m.ctx+'</span></div>'+
+    '<div class="qtxt">'+m.title+'</div>';
+  $('mcard').innerHTML=hdr+buildScenario(m,scIdx);
+}
+
+// ── RESULTS ──
+function showResults(){
+  showScreen('results');
+  var maxScore=100+25*4+80+25*4+40*3+30*5;
+  var pct=Math.round((score/maxScore)*100);
+  var r=RANKS[rankIdx];
+  $('fsnum').textContent=score;
+  $('fspct').textContent=pct+'% of max score';
+  $('stcor').textContent=corCount;
+  $('strank').textContent=r.icon+' '+r.name;
+  $('ststrk').textContent=bestStreak;
+  var emoji='🏆',title='Master Technician!',sub='Outstanding work — you\'ve mastered printer maintenance!';
+  if(pct<50){emoji='📚';title='Keep Studying!';sub='Review the material and try again — you\'ve got this!';}
+  else if(pct<70){emoji='🔧';title='Good Effort!';sub='Solid foundation! Review the areas you missed.';}
+  else if(pct<90){emoji='⚡';title='Expert Technician!';sub='Great job! You\'re almost at the top!';}
+  $('remi').textContent=emoji;$('rtitle').textContent=title;$('rsub').textContent=sub;
+  var badges=[];
+  if(bestStreak>=3)badges.push({i:'🔥',n:'Hot Streak','d':'3+ in a row'});
+  if(corCount>=10)badges.push({i:'🎯',n:'Sharp Shooter','d':'10+ correct'});
+  if(pct>=90)badges.push({i:'🏆',n:'Master Tech','d':'90%+ score'});
+  if(pct>=70)badges.push({i:'⚡',n:'Expert','d':'70%+ score'});
+  badges.push({i:'🖨️',n:'Print Lab Hero','d':'Completed all missions'});
+  var brow=$('brow');brow.innerHTML='';
+  badges.forEach(function(b){
+    brow.innerHTML+='<div class="badge"><span class="bi">'+b.i+'</span>'+b.n+'<br><span style="font-size:.7rem;color:#888;">'+b.d+'</span></div>';
+  });
+  confetti(80);
+}
+
+function restartGame(){
+  score=0;curM=0;streak=0;bestStreak=0;corCount=0;rankIdx=0;mcQIdx=0;scIdx=0;
+  updateHUD();showScreen('intro');
+}
+
+updateHUD();
+</script>
+</body>
+</html>
