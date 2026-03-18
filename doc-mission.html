@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 6.01 – Google Docs HQ | UVA Computer Tech Literacy</title>
+<style>
+  :root {
+    --blue:#1B5EAF; --blue-dark:#134a8a; --blue-light:#d6e6f7;
+    --green:#1E7A3E; --green-light:#d4edda;
+    --gold:#F5A623; --red:#D0021B; --red-light:#fde8eb;
+    --white:#fff; --gray-bg:#f4f7fc; --gray-border:#cdd8e8; --text:#1a1a2e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gray-bg);color:var(--text);min-height:100vh;}
+
+  /* HEADER */
+  #app-header{background:linear-gradient(135deg,var(--blue-dark) 0%,var(--blue) 60%,#2471cc 100%);color:#fff;position:relative;overflow:hidden;}
+  #app-header::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");}
+  .header-top{display:flex;align-items:center;justify-content:space-between;padding:14px 24px 8px;position:relative;z-index:1;flex-wrap:wrap;gap:10px;}
+  .uva-logo-area{display:flex;align-items:center;gap:12px;}
+  .uva-shield{width:48px;height:56px;background:var(--gold);clip-path:polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:var(--blue-dark);flex-shrink:0;}
+  .uva-title h1{font-size:1.1rem;font-weight:800;letter-spacing:.5px;}
+  .uva-title p{font-size:.72rem;opacity:.85;}
+  .hud{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .hud-pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 14px;font-size:.78rem;font-weight:700;display:flex;align-items:center;gap:6px;}
+  #rank-badge{background:var(--gold);color:var(--blue-dark);border-radius:20px;padding:5px 14px;font-size:.78rem;font-weight:800;display:flex;align-items:center;gap:6px;}
+  .motto-ribbon{background:var(--green);text-align:center;padding:5px 0;font-size:.75rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#fff;position:relative;z-index:1;}
+  .progress-bar-wrap{background:rgba(0,0,0,.25);height:8px;margin:0 24px 14px;border-radius:4px;overflow:hidden;position:relative;z-index:1;}
+  #progress-bar{height:100%;background:linear-gradient(90deg,var(--gold),#ffcc44);border-radius:4px;transition:width .5s ease;width:0%;}
+
+  /* MAIN */
+  #main{max-width:860px;margin:0 auto;padding:20px 16px 40px;}
+
+  /* MISSION CARD */
+  .mission-card{background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(27,94,175,.12);overflow:hidden;margin-bottom:20px;display:none;}
+  .mission-card.active{display:block;}
+  .mission-header{background:linear-gradient(90deg,var(--blue) 0%,#2471cc 100%);color:#fff;padding:16px 22px;display:flex;align-items:center;gap:14px;}
+  .mission-num{background:var(--gold);color:var(--blue-dark);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;flex-shrink:0;}
+  .mission-header h2{font-size:1rem;font-weight:800;}
+  .mission-header p{font-size:.78rem;opacity:.85;margin-top:2px;}
+  .mission-body{padding:22px;}
+  .scenario-box{background:var(--blue-light);border-left:4px solid var(--blue);border-radius:8px;padding:14px 16px;margin-bottom:18px;font-size:.9rem;line-height:1.6;}
+  .scenario-box strong{color:var(--blue-dark);}
+
+  /* DRAG & DROP */
+  .drag-area{display:flex;gap:20px;flex-wrap:wrap;}
+  .drag-col{flex:1;min-width:200px;}
+  .drag-col h3{font-size:.8rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+  .drag-items{display:flex;flex-direction:column;gap:8px;}
+  .drag-item{background:#fff;border:2px solid var(--blue);border-radius:8px;padding:10px 14px;font-size:.85rem;cursor:grab;user-select:none;transition:all .2s;display:flex;align-items:center;gap:8px;}
+  .drag-item:hover{background:var(--blue-light);transform:translateY(-2px);box-shadow:0 4px 10px rgba(27,94,175,.2);}
+  .drag-item.dragging{opacity:.4;cursor:grabbing;}
+  .drag-handle{color:#aaa;}
+  .drop-zone{background:var(--gray-bg);border:2px dashed var(--gray-border);border-radius:8px;padding:10px 14px;min-height:48px;font-size:.85rem;color:#888;transition:all .2s;display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .drop-zone.drag-over{border-color:var(--blue);background:var(--blue-light);}
+  .drop-zone.correct{border-color:var(--green);background:var(--green-light);color:var(--green);font-weight:700;}
+  .drop-zone.incorrect{border-color:var(--red);background:var(--red-light);color:var(--red);}
+  .zone-label{font-size:.72rem;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+
+  /* CHOICES */
+  .choices{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+  .choice-btn{background:#fff;border:2px solid var(--gray-border);border-radius:10px;padding:13px 18px;font-size:.88rem;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:flex-start;gap:12px;line-height:1.5;}
+  .choice-btn:hover:not(:disabled){border-color:var(--blue);background:var(--blue-light);transform:translateX(4px);}
+  .choice-letter{background:var(--blue);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.78rem;flex-shrink:0;}
+  .choice-btn.correct{border-color:var(--green);background:var(--green-light);}
+  .choice-btn.correct .choice-letter{background:var(--green);}
+  .choice-btn.incorrect{border-color:var(--red);background:var(--red-light);}
+  .choice-btn.incorrect .choice-letter{background:var(--red);}
+  .choice-btn:disabled{cursor:default;}
+
+  /* SIM UI */
+  .sim-ui{border:2px solid var(--gray-border);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+  .sim-toolbar{background:#f1f3f4;border-bottom:1px solid #ddd;padding:6px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .sim-toolbar-btn{background:#fff;border:1px solid #ccc;border-radius:4px;padding:4px 10px;font-size:.75rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;}
+  .sim-toolbar-btn:hover{background:#e8f0fe;border-color:var(--blue);}
+  .sim-toolbar-btn.highlighted{background:#fff3cd;border-color:var(--gold);box-shadow:0 0 0 2px rgba(245,166,35,.4);animation:pulse-gold 1.2s infinite;}
+  @keyframes pulse-gold{0%,100%{box-shadow:0 0 0 2px rgba(245,166,35,.4);}50%{box-shadow:0 0 0 5px rgba(245,166,35,.15);}}
+  .sim-doc{background:#fff;padding:20px 28px;min-height:100px;font-size:.85rem;line-height:1.8;}
+  .sim-doc .doc-title{font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:8px;}
+  .sim-instruction{background:#fff8e1;border:1px solid var(--gold);border-radius:8px;padding:12px 16px;font-size:.85rem;margin-bottom:12px;display:flex;align-items:flex-start;gap:10px;}
+
+  /* ORDER LIST */
+  .order-list{display:flex;flex-direction:column;gap:8px;}
+  .order-item{background:#fff;border:2px solid var(--gray-border);border-radius:8px;padding:11px 16px;font-size:.85rem;cursor:grab;display:flex;align-items:center;gap:12px;transition:all .2s;user-select:none;}
+  .order-item:hover{border-color:var(--blue);background:var(--blue-light);}
+  .order-item.dragging{opacity:.4;}
+  .order-item.drag-over-top{border-top:3px solid var(--blue);}
+  .order-item.drag-over-bottom{border-bottom:3px solid var(--blue);}
+  .order-num{background:var(--blue);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;flex-shrink:0;}
+  .order-item.correct-pos .order-num{background:var(--green);}
+  .order-item.wrong-pos .order-num{background:var(--red);}
+
+  /* FEEDBACK */
+  .feedback-box{border-radius:10px;padding:14px 18px;margin-top:14px;font-size:.88rem;line-height:1.6;display:none;align-items:flex-start;gap:12px;}
+  .feedback-box.show{display:flex;}
+  .feedback-box.correct{background:var(--green-light);border:2px solid var(--green);color:#145a2e;}
+  .feedback-box.incorrect{background:var(--red-light);border:2px solid var(--red);color:#8b0000;}
+  .feedback-icon{font-size:1.4rem;flex-shrink:0;}
+
+  /* STREAK */
+  #streak-banner{position:fixed;top:80px;right:20px;background:var(--gold);color:var(--blue-dark);border-radius:12px;padding:10px 18px;font-weight:800;font-size:.9rem;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:999;transform:translateX(200px);transition:transform .4s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:8px;}
+  #streak-banner.show{transform:translateX(0);}
+
+  /* BUTTONS */
+  .action-row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+  .btn{padding:11px 24px;border-radius:8px;border:none;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;}
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-primary:hover{background:var(--blue-dark);transform:translateY(-2px);box-shadow:0 4px 12px rgba(27,94,175,.35);}
+  .btn-success{background:var(--green);color:#fff;}
+  .btn-success:hover{background:#165e30;transform:translateY(-2px);}
+  .btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none;}
+
+  /* CONFETTI */
+  #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:9999;}
+
+  /* RANK MODAL */
+  #rank-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:none;align-items:center;justify-content:center;}
+  #rank-modal.show{display:flex;}
+  .rank-modal-box{background:#fff;border-radius:20px;padding:36px 40px;text-align:center;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:pop-in .4s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes pop-in{from{transform:scale(.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .rank-modal-box .badge-big{font-size:4rem;margin-bottom:10px;}
+  .rank-modal-box h2{color:var(--blue);font-size:1.4rem;margin-bottom:6px;}
+  .rank-modal-box p{color:#555;font-size:.9rem;margin-bottom:20px;}
+
+  /* FINAL */
+  #final-screen{display:none;background:#fff;border-radius:16px;padding:40px 30px;text-align:center;box-shadow:0 4px 20px rgba(27,94,175,.12);}
+  #final-screen.show{display:block;}
+  .final-badge{font-size:5rem;margin-bottom:16px;}
+  .score-ring-wrap{width:130px;height:130px;position:relative;margin:0 auto 20px;}
+  .score-ring-svg{transform:rotate(-90deg);}
+  .score-ring-bg{fill:none;stroke:#e0e0e0;stroke-width:12;}
+  .score-ring-fill{fill:none;stroke:var(--blue);stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset 1s ease;}
+  .score-ring-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;color:var(--blue);}
+  .cert-strip{background:linear-gradient(90deg,var(--blue),var(--green));color:#fff;border-radius:10px;padding:14px 20px;margin:20px 0;font-size:.85rem;line-height:1.6;}
+  .stars{font-size:1.8rem;letter-spacing:4px;margin:10px 0;}
+
+  /* INTRO */
+  #intro-screen{background:#fff;border-radius:16px;padding:36px 30px;text-align:center;box-shadow:0 4px 20px rgba(27,94,175,.12);margin-bottom:20px;}
+  .intro-icon{font-size:4rem;margin-bottom:12px;}
+  #intro-screen h2{color:var(--blue);font-size:1.5rem;margin-bottom:8px;}
+  #intro-screen p{color:#555;font-size:.9rem;line-height:1.7;max-width:560px;margin:0 auto 20px;}
+  .rank-ladder{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:16px 0;}
+  .rank-step{background:var(--blue-light);border:2px solid var(--blue);border-radius:20px;padding:6px 16px;font-size:.78rem;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:6px;}
+
+  @media(max-width:600px){.drag-area{flex-direction:column;}.header-top{flex-direction:column;align-items:flex-start;}.hud{justify-content:flex-start;}}
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- RANK MODAL -->
+<div id="rank-modal">
+  <div class="rank-modal-box">
+    <div class="badge-big" id="rank-modal-icon">🎖️</div>
+    <h2 id="rank-modal-title">Rank Up!</h2>
+    <p id="rank-modal-desc">You've earned a new rank!</p>
+    <button class="btn btn-primary" onclick="closeRankModal()">Continue Mission ▶</button>
+  </div>
+</div>
+
+<!-- STREAK BANNER -->
+<div id="streak-banner">🔥 <span id="streak-text">3 in a row!</span></div>
+
+<!-- HEADER -->
+<div id="app-header">
+  <div class="header-top">
+    <div class="uva-logo-area">
+      <div class="uva-shield">UVA</div>
+      <div class="uva-title">
+        <h1>University View Academy</h1>
+        <p>Computer Tech Literacy · Lesson 6.01: Google Docs HQ</p>
+      </div>
+    </div>
+    <div class="hud">
+      <div class="hud-pill">⭐ <span id="score-display">0 pts</span></div>
+      <div class="hud-pill">🔥 <span id="streak-display">0 streak</span></div>
+      <div id="rank-badge">🎓 <span id="rank-display">Trainee</span></div>
+    </div>
+  </div>
+  <div class="motto-ribbon">✦ Virtue · Vigor · Vision ✦</div>
+  <div class="progress-bar-wrap"><div id="progress-bar"></div></div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- INTRO -->
+  <div id="intro-screen">
+    <div class="intro-icon">🚀</div>
+    <h2>Welcome to Google Docs HQ</h2>
+    <p>Agent, your mission is to master <strong>Google Docs foundations and formatting</strong>. Complete 5 missions to earn your <strong>Google Workspace Certification</strong> badge. Build answer streaks for bonus XP and climb the UVA ranks!</p>
+    <div class="rank-ladder">
+      <div class="rank-step">🎓 Trainee</div>
+      <div class="rank-step">→ 🔧 Apprentice</div>
+      <div class="rank-step">→ 💡 Expert</div>
+      <div class="rank-step">→ 🏆 Master</div>
+    </div>
+    <p style="font-size:.82rem;color:#888;margin-bottom:16px;">5 Missions · ~12 minutes · Google Workspace Certification Prep</p>
+    <button class="btn btn-primary" onclick="startGame()" style="margin:0 auto;">🚀 Launch Missions</button>
+  </div>
+
+  <!-- ══ MISSION 1: DRAG & DROP – Cloud Benefits ══ -->
+  <div class="mission-card" id="mission-1">
+    <div class="mission-header">
+      <div class="mission-num">1</div>
+      <div>
+        <h2>Mission 1 of 5 — Cloud Command Center</h2>
+        <p>Match each Google Docs feature to its core benefit</p>
+      </div>
+    </div>
+    <div class="mission-body">
+      <div class="scenario-box">
+        <strong>🌐 Situation:</strong> Your principal asks why UVA switched from Microsoft Word to Google Docs. You need to explain the key cloud-based advantages. <strong>Drag each feature card to its matching benefit.</strong>
+      </div>
+      <div class="drag-area">
+        <div class="drag-col">
+          <h3>📦 Features — drag these</h3>
+          <div class="drag-items" id="drag-source-1">
+            <div class="drag-item" draggable="true" data-id="autosave"><span class="drag-handle">⠿</span> Auto-Save every few seconds</div>
+            <div class="drag-item" draggable="true" data-id="collab"><span class="drag-handle">⠿</span> Multiple editors simultaneously</div>
+            <div class="drag-item" draggable="true" data-id="history"><span class="drag-handle">⠿</span> Version History panel</div>
+            <div class="drag-item" draggable="true" data-id="cloud"><span class="drag-handle">⠿</span> Stored on Google Drive servers</div>
+            <div class="drag-item" draggable="true" data-id="comments"><span class="drag-handle">⠿</span> @mention in Comments</div>
+          </div>
+        </div>
+        <div class="drag-col">
+          <h3>🎯 Benefits — drop here</h3>
+          <div class="drop-zone" data-accept="autosave" id="dz-autosave"><span class="zone-label">Automatic Preservation →</span></div>
+          <div class="drop-zone" data-accept="collab" id="dz-collab"><span class="zone-label">Real-Time Collaboration →</span></div>
+          <div class="drop-zone" data-accept="history" id="dz-history"><span class="zone-label">Document Recovery →</span></div>
+          <div class="drop-zone" data-accept="cloud" id="dz-cloud"><span class="zone-label">Access Anywhere →</span></div>
+          <div class="drop-zone" data-accept="comments" id="dz-comments"><span class="zone-label">Targeted Feedback →</span></div>
+        </div>
+      </div>
+      <div class="feedback-box" id="fb-1"></div>
+      <div class="action-row">
+        <button class="btn btn-primary" id="check-1" onclick="checkMission1()">✅ Check Matches</button>
+        <button class="btn btn-success" id="next-1" onclick="goToMission(2)" style="display:none">Next Mission ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MISSION 2: SIMULATION – Page Setup ══ -->
+  <div class="mission-card" id="mission-2">
+    <div class="mission-header">
+      <div class="mission-num">2</div>
+      <div>
+        <h2>Mission 2 of 5 — Page Setup Headquarters</h2>
+        <p>Navigate the real Google Docs interface to configure page layout</p>
+      </div>
+    </div>
+    <div class="mission-body">
+      <div class="scenario-box">
+        <strong>📄 Situation:</strong> Your teacher wants a document with <strong>1-inch margins, landscape orientation, and a light blue background</strong>. Navigate the simulated Google Docs interface to find the correct settings!
+      </div>
+
+      <div id="m2-step-1">
+        <div class="sim-instruction"><span>👆</span><span><strong>Step 1:</strong> Which menu contains Page Setup? Click the correct menu in the toolbar below.</span></div>
+        <div class="sim-ui">
+          <div class="sim-toolbar">
+            <div class="sim-toolbar-btn" onclick="m2Click('file')">📄 File</div>
+            <div class="sim-toolbar-btn" onclick="m2Click('edit')">✏️ Edit</div>
+            <div class="sim-toolbar-btn" onclick="m2Click('view')">👁️ View</div>
+            <div class="sim-toolbar-btn" onclick="m2Click('insert')">➕ Insert</div>
+            <div class="sim-toolbar-btn" onclick="m2Click('format')">🎨 Format</div>
+            <div class="sim-toolbar-btn" onclick="m2Click('tools')">🔧 Tools</div>
+          </div>
+          <div class="sim-doc"><div class="doc-title">My Research Paper</div><div style="color:#aaa;font-size:.82rem;text-align:center;margin-top:8px;">Click the correct menu above ↑</div></div>
+        </div>
+        <div class="feedback-box" id="fb-2a"></div>
+      </div>
+
+      <div id="m2-step-2" style="display:none">
+        <div class="sim-instruction"><span>👆</span><span><strong>Step 2:</strong> You opened the File menu. Which option leads to page layout settings?</span></div>
+        <div class="choices">
+          <button class="choice-btn" onclick="m2Step2('share')"><span class="choice-letter">A</span> Share — invite collaborators to edit</button>
+          <button class="choice-btn" onclick="m2Step2('pagesetup')"><span class="choice-letter">B</span> Page setup — margins, orientation, paper size, background color</button>
+          <button class="choice-btn" onclick="m2Step2('download')"><span class="choice-letter">C</span> Download — export as PDF or Word</button>
+          <button class="choice-btn" onclick="m2Step2('print')"><span class="choice-letter">D</span> Print — send to printer</button>
+        </div>
+        <div class="feedback-box" id="fb-2b"></div>
+      </div>
+
+      <div id="m2-step-3" style="display:none">
+        <div class="sim-instruction"><span>👆</span><span><strong>Step 3:</strong> Inside Page Setup, which section controls background color? Click it!</span></div>
+        <div class="sim-ui">
+          <div class="sim-toolbar" style="background:#fff;border-bottom:2px solid #ddd;"><span style="font-weight:700;font-size:.85rem;padding:4px 8px;">📄 Page setup</span></div>
+          <div class="sim-doc" style="padding:16px;">
+            <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+              <button class="sim-toolbar-btn" onclick="m2Step3('margins')" style="padding:8px 14px;">📐 Margins</button>
+              <button class="sim-toolbar-btn" onclick="m2Step3('orientation')" style="padding:8px 14px;">🔄 Orientation</button>
+              <button class="sim-toolbar-btn" onclick="m2Step3('pagecolor')" style="padding:8px 14px;">🎨 Page color</button>
+              <button class="sim-toolbar-btn" onclick="m2Step3('pagesize')" style="padding:8px 14px;">📏 Page size</button>
+            </div>
+            <p style="color:#888;font-size:.82rem;">Click the section that controls background color</p>
+          </div>
+        </div>
+        <div class="feedback-box" id="fb-2c"></div>
+        <div class="action-row"><button class="btn btn-success" id="next-2" onclick="goToMission(3)" style="display:none">Next Mission ▶</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MISSION 3: ORDERING – Table of Contents ══ -->
+  <div class="mission-card" id="mission-3">
+    <div class="mission-header">
+      <div class="mission-num">3</div>
+      <div>
+        <h2>Mission 3 of 5 — Table of Contents Builder</h2>
+        <p>Drag the steps into the correct order to generate an automated TOC</p>
+      </div>
+    </div>
+    <div class="mission-body">
+      <div class="scenario-box">
+        <strong>📑 Situation:</strong> You're creating a 10-page research report and need an automated Table of Contents. Drag the steps below into the correct sequence — just like you would in Google Docs!
+      </div>
+      <div class="order-list" id="order-list-3">
+        <div class="order-item" draggable="true" data-correct="4" data-id="oi-insert">
+          <div class="order-num">?</div><span>Go to <strong>Insert → Table of Contents</strong> and choose a style (with links or page numbers)</span>
+        </div>
+        <div class="order-item" draggable="true" data-correct="2" data-id="oi-heading2">
+          <div class="order-num">?</div><span>Apply <strong>Heading 2</strong> style to all section subheadings</span>
+        </div>
+        <div class="order-item" draggable="true" data-correct="1" data-id="oi-heading1">
+          <div class="order-num">?</div><span>Apply <strong>Heading 1</strong> style to all major chapter titles</span>
+        </div>
+        <div class="order-item" draggable="true" data-correct="5" data-id="oi-update">
+          <div class="order-num">?</div><span>Click <strong>Update Table of Contents</strong> (↻ icon) after adding new content</span>
+        </div>
+        <div class="order-item" draggable="true" data-correct="3" data-id="oi-cursor">
+          <div class="order-num">?</div><span>Place your cursor at the <strong>top of the document</strong> where the TOC should appear</span>
+        </div>
+      </div>
+      <div class="feedback-box" id="fb-3"></div>
+      <div class="action-row">
+        <button class="btn btn-primary" id="check-3" onclick="checkMission3()">✅ Check Order</button>
+        <button class="btn btn-success" id="next-3" onclick="goToMission(4)" style="display:none">Next Mission ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MISSION 4: CLICKABLE – APA Formatting ══ -->
+  <div class="mission-card" id="mission-4">
+    <div class="mission-header">
+      <div class="mission-num">4</div>
+      <div>
+        <h2>Mission 4 of 5 — APA Formatting Lab</h2>
+        <p>Apply professional APA standards — choose the correct settings</p>
+      </div>
+    </div>
+    <div class="mission-body">
+      <div class="scenario-box">
+        <strong>📝 Situation:</strong> Your English teacher requires APA format for your UVA research paper. Answer each formatting challenge to earn full marks!
+      </div>
+
+      <div id="m4-q1">
+        <p style="font-weight:700;margin-bottom:10px;color:var(--blue);">⚡ Challenge 1 of 3: What is the correct APA margin setting for all sides?</p>
+        <div class="choices">
+          <button class="choice-btn" onclick="m4Answer(1,'0.5')"><span class="choice-letter">A</span> 0.5 inches on all sides</button>
+          <button class="choice-btn" onclick="m4Answer(1,'1')"><span class="choice-letter">B</span> 1 inch on all sides</button>
+          <button class="choice-btn" onclick="m4Answer(1,'1.5')"><span class="choice-letter">C</span> 1.5 inches on all sides</button>
+          <button class="choice-btn" onclick="m4Answer(1,'2')"><span class="choice-letter">D</span> 2 inches on all sides</button>
+        </div>
+        <div class="feedback-box" id="fb-4a"></div>
+      </div>
+
+      <div id="m4-q2" style="display:none">
+        <p style="font-weight:700;margin-bottom:10px;color:var(--blue);">⚡ Challenge 2 of 3: How do you create a hanging indent for APA References in Google Docs?</p>
+        <div class="choices">
+          <button class="choice-btn" onclick="m4Answer(2,'tab')"><span class="choice-letter">A</span> Press Tab at the start of each line</button>
+          <button class="choice-btn" onclick="m4Answer(2,'ruler')"><span class="choice-letter">B</span> Format → Align & Indent → Indentation options → Special: Hanging (0.5")</button>
+          <button class="choice-btn" onclick="m4Answer(2,'space')"><span class="choice-letter">C</span> Add spaces manually before each continuation line</button>
+          <button class="choice-btn" onclick="m4Answer(2,'bold')"><span class="choice-letter">D</span> Bold the first line of each reference entry</button>
+        </div>
+        <div class="feedback-box" id="fb-4b"></div>
+      </div>
+
+      <div id="m4-q3" style="display:none">
+        <p style="font-weight:700;margin-bottom:10px;color:var(--blue);">⚡ Challenge 3 of 3: In APA format, where does the running head / page number appear?</p>
+        <div class="choices">
+          <button class="choice-btn" onclick="m4Answer(3,'footer')"><span class="choice-letter">A</span> In the footer, centered below the body text</button>
+          <button class="choice-btn" onclick="m4Answer(3,'header')"><span class="choice-letter">B</span> In the header — Insert → Headers & Footers → Header, then Insert → Page numbers</button>
+          <button class="choice-btn" onclick="m4Answer(3,'title')"><span class="choice-letter">C</span> On the title page only, not subsequent pages</button>
+          <button class="choice-btn" onclick="m4Answer(3,'body')"><span class="choice-letter">D</span> At the bottom of the body text, manually typed</button>
+        </div>
+        <div class="feedback-box" id="fb-4c"></div>
+        <div class="action-row"><button class="btn btn-success" id="next-4" onclick="goToMission(5)" style="display:none">Next Mission ▶</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MISSION 5: SIMULATION – Collaboration Tools ══ -->
+  <div class="mission-card" id="mission-5">
+    <div class="mission-header">
+      <div class="mission-num">5</div>
+      <div>
+        <h2>Mission 5 of 5 — Collaboration Command</h2>
+        <p>Use Google Docs collaboration tools like a certified pro</p>
+      </div>
+    </div>
+    <div class="mission-body">
+      <div class="scenario-box">
+        <strong>🤝 Situation:</strong> Your UVA group project partner left feedback on your document. Use Google Docs collaboration tools correctly to complete each task!
+      </div>
+
+      <div id="m5-step-1">
+        <div class="sim-instruction"><span>👆</span><span><strong>Task 1:</strong> Your partner wants to suggest edits without permanently changing your text. Which editing mode should they use?</span></div>
+        <div class="choices">
+          <button class="choice-btn" onclick="m5Answer(1,'editing')"><span class="choice-letter">A</span> ✏️ Editing — directly modifies the document text</button>
+          <button class="choice-btn" onclick="m5Answer(1,'suggesting')"><span class="choice-letter">B</span> 💬 Suggesting — shows tracked changes in green; you can Accept ✓ or Reject ✗ each one</button>
+          <button class="choice-btn" onclick="m5Answer(1,'viewing')"><span class="choice-letter">C</span> 👁️ Viewing — read-only mode, no changes possible</button>
+        </div>
+        <div class="feedback-box" id="fb-5a"></div>
+      </div>
+
+      <div id="m5-step-2" style="display:none">
+        <div class="sim-instruction"><span>👆</span><span><strong>Task 2:</strong> You want to see all previous saved versions of your document. Which menu contains Version History?</span></div>
+        <div class="sim-ui">
+          <div class="sim-toolbar">
+            <div class="sim-toolbar-btn" onclick="m5Step2('file')">📄 File</div>
+            <div class="sim-toolbar-btn" onclick="m5Step2('edit')">✏️ Edit</div>
+            <div class="sim-toolbar-btn" onclick="m5Step2('view')">👁️ View</div>
+            <div class="sim-toolbar-btn" onclick="m5Step2('tools')">🔧 Tools</div>
+            <div class="sim-toolbar-btn" onclick="m5Step2('extensions')">🧩 Extensions</div>
+          </div>
+          <div class="sim-doc" style="color:#aaa;font-size:.82rem;text-align:center;">Click the menu that contains Version History ↑</div>
+        </div>
+        <div class="feedback-box" id="fb-5b"></div>
+      </div>
+
+      <div id="m5-step-3" style="display:none">
+        <div class="sim-instruction"><span>👆</span><span><strong>Task 3:</strong> You want to leave a note for your partner on a specific sentence without changing the text. What's the correct action?</span></div>
+        <div class="choices">
+          <button class="choice-btn" onclick="m5Answer(3,'highlight')"><span class="choice-letter">A</span> Highlight the text in yellow using the highlight tool</button>
+          <button class="choice-btn" onclick="m5Answer(3,'comment')"><span class="choice-letter">B</span> Select the text → Insert → Comment (or Ctrl+Alt+M) to add a threaded comment</button>
+          <button class="choice-btn" onclick="m5Answer(3,'email')"><span class="choice-letter">C</span> Email your partner separately with your notes</button>
+          <button class="choice-btn" onclick="m5Answer(3,'bold')"><span class="choice-letter">D</span> Bold the sentence to draw your partner's attention</button>
+        </div>
+        <div class="feedback-box" id="fb-5c"></div>
+        <div class="action-row"><button class="btn btn-success" id="finish-btn" onclick="finishGame()" style="display:none">🏆 Complete All Missions!</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL SCREEN -->
+  <div id="final-screen">
+    <div class="final-badge" id="final-badge">🏆</div>
+    <h2 style="color:var(--blue);font-size:1.6rem;margin-bottom:8px;" id="final-title">All Missions Complete!</h2>
+    <div class="stars" id="final-stars">⭐⭐⭐</div>
+    <div class="score-ring-wrap">
+      <svg class="score-ring-svg" width="130" height="130" viewBox="0 0 130 130">
+        <circle class="score-ring-bg" cx="65" cy="65" r="54"/>
+        <circle class="score-ring-fill" id="ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339.3" stroke-dashoffset="339.3"/>
+      </svg>
+      <div class="score-ring-text" id="final-score-num">0%</div>
+    </div>
+    <div class="cert-strip">
+      🎓 <strong>Google Workspace Certification Prep — Complete!</strong><br>
+      You've demonstrated mastery of Google Docs foundations and formatting at University View Academy.
+    </div>
+    <p style="color:#555;font-size:.88rem;margin-bottom:20px;" id="final-msg">Outstanding work, UVA Agent!</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="restartGame()">🔄 Replay Missions</button>
+    </div>
+    <p style="margin-top:24px;font-size:.75rem;color:#aaa;">✦ Virtue · Vigor · Vision ✦ University View Academy · Lesson 6.01</p>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ══ STATE ══
+var score=0, streak=0, maxStreak=0, currentMission=0;
+var missionPoints={1:0,2:0,3:0,4:0,5:0};
+var totalPossible=0;
+var RANKS=[
+  {name:'Trainee',icon:'🎓',min:0},
+  {name:'Apprentice',icon:'🔧',min:120},
+  {name:'Expert',icon:'💡',min:280},
+  {name:'Master',icon:'🏆',min:450}
+];
+
+function getRank(s){var r=RANKS[0];for(var i=0;i<RANKS.length;i++){if(s>=RANKS[i].min)r=RANKS[i];}return r;}
+
+function updateHUD(){
+  document.getElementById('score-display').textContent=score+' pts';
+  document.getElementById('streak-display').textContent=streak+' streak';
+  var rank=getRank(score);
+  document.getElementById('rank-badge').innerHTML=rank.icon+' <span id="rank-display">'+rank.name+'</span>';
+  var pct=Math.min(100,(currentMission/5)*100);
+  document.getElementById('progress-bar').style.width=pct+'%';
+}
+
+function addScore(pts,correct){
+  var prevRank=getRank(score);
+  if(correct){
+    score+=pts;
+    streak++;
+    if(streak>maxStreak)maxStreak=streak;
+    if(streak>=3)showStreakBanner();
+  } else {
+    streak=0;
+  }
+  var newRank=getRank(score);
+  updateHUD();
+  if(correct && newRank.name!==prevRank.name){
+    setTimeout(function(){showRankModal(newRank);},700);
+  }
+}
+
+// ══ STREAK ══
+var streakTimer;
+function showStreakBanner(){
+  var b=document.getElementById('streak-banner');
+  document.getElementById('streak-text').textContent=streak+' in a row! 🔥';
+  b.classList.add('show');
+  clearTimeout(streakTimer);
+  streakTimer=setTimeout(function(){b.classList.remove('show');},2500);
+}
+
+// ══ RANK MODAL ══
+function showRankModal(rank){
+  document.getElementById('rank-modal-icon').textContent=rank.icon;
+  document.getElementById('rank-modal-title').textContent='Rank Up: '+rank.name+'!';
+  document.getElementById('rank-modal-desc').textContent='Outstanding work, UVA Agent! You\'ve earned the '+rank.name+' rank. Keep pushing forward!';
+  document.getElementById('rank-modal').classList.add('show');
+  launchConfetti(70);
+}
+function closeRankModal(){document.getElementById('rank-modal').classList.remove('show');}
+
+// ══ CONFETTI ══
+function launchConfetti(count){
+  var canvas=document.getElementById('confetti-canvas');
+  var ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  var pieces=[];
+  var colors=['#1B5EAF','#1E7A3E','#F5A623','#e74c3c','#9b59b6','#3498db','#2ecc71','#f39c12'];
+  for(var i=0;i<count;i++){
+    pieces.push({x:Math.random()*canvas.width,y:-10-Math.random()*100,
+      w:8+Math.random()*8,h:4+Math.random()*4,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      vx:(Math.random()-.5)*4,vy:2+Math.random()*4,
+      rot:Math.random()*360,vr:(Math.random()-.5)*8});
+  }
+  var frame;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    var alive=false;
+    for(var i=0;i<pieces.length;i++){
+      var p=pieces[i];
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      if(p.y<canvas.height+20)alive=true;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    }
+    if(alive)frame=requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  cancelAnimationFrame(frame); draw();
+}
+
+// ══ GAME FLOW ══
+function startGame(){
+  document.getElementById('intro-screen').style.display='none';
+  goToMission(1);
+}
+function goToMission(n){
+  document.querySelectorAll('.mission-card').forEach(function(c){c.classList.remove('active');});
+  var card=document.getElementById('mission-'+n);
+  if(card){card.classList.add('active'); setTimeout(function(){card.scrollIntoView({behavior:'smooth',block:'start'});},100);}
+  currentMission=n;
+  updateHUD();
+}
+
+// ══ MISSION 1: DRAG & DROP ══
+var draggedItem=null;
+document.addEventListener('DOMContentLoaded',function(){
+  setupDragDrop();
+  setupOrderDrag();
+});
+
+function setupDragDrop(){
+  document.querySelectorAll('#drag-source-1 .drag-item').forEach(function(item){
+    item.addEventListener('dragstart',function(e){
+      draggedItem=item; item.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    item.addEventListener('dragend',function(){
+      item.classList.remove('dragging'); draggedItem=null;
+    });
+  });
+  document.querySelectorAll('#mission-1 .drop-zone').forEach(function(zone){
+    zone.addEventListener('dragover',function(e){e.preventDefault();zone.classList.add('drag-over');});
+    zone.addEventListener('dragleave',function(){zone.classList.remove('drag-over');});
+    zone.addEventListener('drop',function(e){
+      e.preventDefault(); zone.classList.remove('drag-over');
+      if(!draggedItem)return;
+      var label=zone.querySelector('.zone-label');
+      zone.innerHTML='';
+      if(label)zone.appendChild(label);
+      var clone=draggedItem.cloneNode(true);
+      clone.style.border='none'; clone.style.background='transparent';
+      clone.style.padding='0'; clone.style.cursor='default';
+      clone.removeAttribute('draggable');
+      zone.appendChild(clone);
+      zone.dataset.dropped=draggedItem.dataset.id;
+      draggedItem.style.opacity='0.3';
+      draggedItem.setAttribute('draggable','false');
+    });
+  });
+}
+
+function checkMission1(){
+  var zones=document.querySelectorAll('#mission-1 .drop-zone');
+  var correct=0;
+  zones.forEach(function(zone){
+    var dropped=zone.dataset.dropped;
+    var accept=zone.dataset.accept;
+    if(dropped===accept){zone.classList.add('correct');correct++;}
+    else if(dropped){zone.classList.add('incorrect');}
+  });
+  var fb=document.getElementById('fb-1');
+  fb.classList.add('show');
+  var pts=correct*20;
+  missionPoints[1]=pts;
+  if(correct===5){
+    fb.className='feedback-box show correct';
+    fb.innerHTML='<span class="feedback-icon">🎉</span><div><strong>Perfect Match! +100 pts</strong><br>All 5 features correctly matched! Auto-Save = Automatic Preservation · Multiple editors = Real-Time Collaboration · Version History = Document Recovery · Drive servers = Access Anywhere · @mention Comments = Targeted Feedback.</div>';
+    addScore(100,true);
+    document.getElementById('next-1').style.display='inline-flex';
+    document.getElementById('check-1').disabled=true;
+    launchConfetti(90);
+  } else {
+    fb.className='feedback-box show incorrect';
+    fb.innerHTML='<span class="feedback-icon">🔍</span><div><strong>'+correct+'/5 correct. +'+pts+' pts</strong><br>Review the unmatched items. Tip: Auto-Save → Automatic Preservation | Multiple editors → Real-Time Collaboration | Version History → Document Recovery | Drive servers → Access Anywhere | @mention → Targeted Feedback.</div>';
+    addScore(pts, correct>0);
+    if(correct>=3)document.getElementById('next-1').style.display='inline-flex';
+    document.getElementById('check-1').disabled=true;
+  }
+}
+
+// ══ MISSION 2: PAGE SETUP SIMULATION ══
+function m2Click(menu){
+  var fb=document.getElementById('fb-2a');
+  fb.classList.add('show');
+  if(menu==='file'){
+    fb.className='feedback-box show correct';
+    fb.innerHTML='<span class="feedback-icon">✅</span><div><strong>Correct! +30 pts</strong><br><strong>File → Page setup</strong> is exactly where Google Docs keeps margin, orientation, paper size, and background color settings.</div>';
+    addScore(30,true); missionPoints[2]=(missionPoints[2]||0)+30;
+    setTimeout(function(){document.getElementById('m2-step-1').style.display='none';document.getElementById('m2-step-2').style.display='block';},1300);
+  } else {
+    var hints={edit:'Edit handles undo/redo and clipboard operations.',view:'View controls zoom and document display options.',insert:'Insert adds images, tables, links, and headers.',format:'Format handles text styling, paragraph spacing, and lists.',tools:'Tools has spelling check, word count, and preferences.'};
+    fb.className='feedback-box show incorrect';
+    fb.innerHTML='<span class="feedback-icon">❌</span><div>Not quite. '+hints[menu]+' Try the <strong>File</strong> menu for Page Setup.</div>';
+    addScore(0,false);
+  }
+}
+
+function m2Step2(choice){
+  var btns=document.querySelectorAll('#m2-step-2 .choice-btn');
+  btns.forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('fb-2b');
+  fb.classList.add('show');
+  if(choice==='pagesetup'){
+    btns[1].classList.add('correct');
+    fb.className='feedback-box show correct';
+    fb.innerHTML='<span class="feedback-icon">✅</span><div><strong>Correct! +30 pts</strong><br><strong>File → Page setup</strong> opens a dialog with fields for Top/Bottom/Left/Right margins, Portrait/Landscape orientation, paper size, and page background color.</div>';
+    addScore(30,true); missionPoints[2]=(missionPoints[2]||0)+30;
+    setTimeout(function(){document.getElementById('m2-step-2').style.display='none';document.getElementById('m2-step-3').style.display='block';},1300);
+  } else {
+    var idx=['share','pagesetup','download','print'].indexOf(choice);
+    if(idx>=0)btns[idx].classList.add('incorrect');
+    btns[1].classList.add('correct');
+    fb.className='feedback-box show incorrect';
+    fb.innerHTML='<span class="feedback-icon">❌</span><div>Not quite. <strong>Page setup</strong> (option B) is correct. Share manages collaborators, Download exports files, and Print sends to a printer.</div>';
+    addScore(0,false);
+    setTimeout(function(){document.getElementById('m2-step-2').style.display='none';document.getElementById('m2-step-3').style.display='block';},1600);
+  }
+}
+
+function m2Step3(section){
+  var fb=document.getElementById('fb-2c');
+  fb.classList.add('show');
+  if(section==='pagecolor'){
+    fb.className='feedback-box show correct';
+    fb.innerHTML='<span class="feedback-icon">✅</span><div><strong>Excellent! +30 pts</strong><br><strong>Page color</strong> is correct! You can choose any preset color or enter a custom hex value (e.g., #d6e6f7 for light blue). Note: background color may not print by default — check print settings.</div>';
+    addScore(30,true); missionPoints[2]=(missionPoints[2]||0)+30;
+    document.getElementById('next-2').style.display='inline-flex';
+    launchConfetti(50);
+  } else {
+    var hints={margins:'Margins sets Top/Bottom/Left/Right spacing (APA standard = 1 inch all sides).',orientation:'Orientation switches between Portrait (tall) and Landscape (wide).',pagesize:'Page size sets paper dimensions — Letter (8.5×11") is standard in the US.'};
+    fb.className='feedback-box show incorrect';
+    fb.innerHTML='<span class="feedback-icon">❌</span><div>'+hints[section]+' For background color, select <strong>Page color</strong>.</div>';
+    addScore(0,false);
+  }
+}
+
+// ══ MISSION 3: ORDERING ══
+var orderDragEl=null, orderDragOver=null;
+function setupOrderDrag(){
+  var list=document.getElementById('order-list-3');
+  if(!list)return;
+  list.querySelectorAll('.order-item').forEach(function(item){
+    item.addEventListener('dragstart',function(e){
+      orderDragEl=item; item.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    item.addEventListener('dragend',function(){
+      item.classList.remove('dragging');
+      list.querySelectorAll('.order-item').forEach(function(i){i.classList.remove('drag-over-top','drag-over-bottom');});
+      orderDragEl=null;
+    });
+    item.addEventListener('dragover',function(e){
+      e.preventDefault();
+      if(!orderDragEl||orderDragEl===item)return;
+      list.querySelectorAll('.order-item').forEach(function(i){i.classList.remove('drag-over-top','drag-over-bottom');});
+      var rect=item.getBoundingClientRect();
+      var mid=rect.top+rect.height/2;
+      if(e.clientY<mid)item.classList.add('drag-over-top');
+      else item.classList.add('drag-over-bottom');
+      orderDragOver=item;
+    });
+    item.addEventListener('drop',function(e){
+      e.preventDefault();
+      if(!orderDragEl||orderDragEl===item)return;
+      var rect=item.getBoundingClientRect();
+      var mid=rect.top+rect.height/2;
+      if(e.clientY<mid)list.insertBefore(orderDragEl,item);
+      else list.insertBefore(orderDragEl,item.nextSibling);
+      updateOrderNums();
+    });
+  });
+}
+
+function updateOrderNums(){
+  var items=document.querySelectorAll('#order-list-3 .order-item');
+  items.forEach(function(item,i){
+    item.querySelector('.order-num').textContent=i+1;
+  });
+}
+
+function checkMission3(){
+  var items=document.querySelectorAll('#order-list-3 .order-item');
+  var correct=0;
+  items.forEach(function(item,i){
+    var correctPos=parseInt(item.dataset.correct);
+    item.classList.remove('correct-pos','wrong-pos');
+    if(i+1===correctPos){item.classList.add('correct-pos');correct++;}
+    else item.classList.add('wrong-pos');
+  });
+  var fb=document.getElementById('fb-3');
+  fb.classList.add('show');
+  var pts=correct*20;
+  missionPoints[3]=pts;
+  if(correct===5){
+    fb.className='feedback-box show correct';
+    fb.innerHTML='<span class="feedback-icon">🎉</span><div><strong>Perfect Order! +100 pts</strong><br>Correct sequence: 1) Apply Heading 1 to chapter titles → 2) Apply Heading 2 to subheadings → 3) Place cursor at top → 4) Insert → Table of Contents → 5) Update TOC as you add content.</div>';
+    addScore(100,true);
+    document.getElementById('next-3').style.display='inline-flex';
+    document.getElementById('check-3').disabled=true;
+    launchConfetti(80);
+  } else {
+    fb.className='feedback-box show incorrect';
+    fb.innerHTML='<span class="feedback-icon">🔍</span><div><strong>'+correct+'/5 in correct position. +'+pts+' pts</strong><br>Green = correct position. Red = needs moving. Remember: Apply headings FIRST, then place cursor, then Insert TOC, then update it later.</div>';
+    addScore(pts,correct>0);
+    if(correct>=3)document.getElementById('next-3').style.display='inline-flex';
+    document.getElementById('check-3').disabled=true;
+  }
+}
+
+// ══ MISSION 4: APA FORMATTING ══
+var m4q=1;
+function m4Answer(q,choice){
+  var btns=document.querySelectorAll('#m4-q'+q+' .choice-btn');
+  btns.forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('fb-4'+['a','b','c'][q-1]);
+  fb.classList.add('show');
+  var correct4={1:'1',2:'ruler',3:'header'};
+  var correctIdx={1:1,2:1,3:1};
+  var explanations={
+    1:{correct:'<strong>1 inch on all sides</strong> is the APA 7th edition standard margin. In Google Docs: File → Page setup → set all four margin fields to 1.0".',wrong:'APA 7th edition requires exactly <strong>1 inch (2.54 cm)</strong> on all sides. Set this in File → Page setup.'},
+    2:{correct:'<strong>Format → Align & Indent → Indentation options → Special: Hanging (0.5")</strong> creates a proper APA hanging indent where the first line is flush left and subsequent lines are indented 0.5".',wrong:'The correct method is <strong>Format → Align & Indent → Indentation options → Special: Hanging</strong>. Manual spaces or tabs are not reliable for APA formatting.'},
+    3:{correct:'<strong>Insert → Header
