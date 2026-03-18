@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVA: Google Docs & Drive Mastery Quest</title>
+    <style>
+        :root {
+            --uva-blue: #1B5EAF;
+            --uva-green: #1E7A3E;
+            --uva-light-gray: #f4f7f6;
+            --uva-white: #ffffff;
+            --uva-dark: #333333;
+            --gold: #FFD700;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--uva-light-gray);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Header & Branding */
+        header {
+            background-color: var(--uva-blue);
+            color: white;
+            width: 100%;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .motto-banner {
+            background-color: var(--uva-green);
+            color: white;
+            padding: 5px 20px;
+            font-style: italic;
+            font-weight: bold;
+            display: inline-block;
+            border-radius: 0 0 15px 15px;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Game Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            margin: 10px auto;
+            padding: 10px;
+            border-radius: 10px;
+            border-bottom: 4px solid var(--uva-blue);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #666;
+            display: block;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: var(--uva-blue);
+            font-size: 1.1rem;
+        }
+
+        .rank-badge {
+            background: var(--uva-green);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Main Container */
+        .game-container {
+            background: white;
+            width: 95%;
+            max-width: 800px;
+            min-height: 500px;
+            margin: 20px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h3 { color: var(--uva-blue); margin-top: 0; }
+        p { line-height: 1.6; color: var(--uva-dark); }
+
+        /* UI Simulation Elements */
+        .drive-ui {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f9f9f9;
+            margin: 20px 0;
+        }
+
+        .folder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .folder {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .folder:hover {
+            border-color: var(--uva-blue);
+            background: #eef4ff;
+        }
+
+        .folder svg {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+        }
+
+        /* Mission Specifics */
+        .drop-zone {
+            border: 2px dashed #bbb;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin: 10px 0;
+            min-height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+        }
+
+        .drop-zone.hover {
+            border-color: var(--uva-green);
+            background: #f0fff4;
+        }
+
+        .draggable {
+            padding: 8px 15px;
+            background: var(--uva-blue);
+            color: white;
+            border-radius: 5px;
+            cursor: grab;
+            margin: 5px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--uva-blue);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #144683;
+        }
+
+        .btn-green {
+            background-color: var(--uva-green);
+        }
+
+        .btn-green:hover {
+            background-color: #165c2f;
+        }
+
+        /* Feedback */
+        #feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .feedback-correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .feedback-wrong { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Streak Animation */
+        .streak-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--gold);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin: 20px 0;
+            height: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--uva-green);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+        /* Table Simulation */
+        .table-sim {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .table-sim td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        .table-sim .header-row {
+            background-color: #eee;
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .game-container { padding: 15px; }
+            .stats-bar { flex-wrap: wrap; }
+            .stat-item { margin: 5px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-size: 1.5rem; font-weight: bold;">University View Academy</div>
+        <div style="font-size: 1rem;">Computer Tech Literacy: Google Docs Mastery</div>
+        <div class="motto-banner">Virtue, Vigor, Vision</div>
+    </header>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Current Rank</span>
+            <span id="rank-display" class="rank-badge">Trainee</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Score</span>
+            <span id="score-display" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Streak</span>
+            <span id="streak-display" class="stat-value">0</span>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div id="streak-popup" class="streak-popup">3 IN A ROW!</div>
+
+        <!-- Intro Screen -->
+        <div id="screen-intro" class="screen active">
+            <h3>Mission Briefing: The Digital Architect</h3>
+            <p>Welcome, Scholar. Your mission is to master the Google Workspace ecosystem. To earn your <strong>Google Workspace Certification</strong>, you must navigate through 4 critical Quests covering Drive organization, document formatting, and professional distribution.</p>
+            <p><strong>Rules of Engagement:</strong>
+                <ul>
+                    <li>Complete tasks accurately to build your score.</li>
+                    <li>Maintain a streak for bonus points.</li>
+                    <li>Ascend the ranks from Trainee to Master.</li>
+                </ul>
+            </p>
+            <button class="btn" onclick="nextScreen('screen-q1')">Begin Quest 1</button>
+        </div>
+
+        <!-- Quest 1: Drive Organization -->
+        <div id="screen-q1" class="screen">
+            <h3>Quest 1: The Color-Coded Archive</h3>
+            <p>UVA standards require a visual filing system. Match the correct <strong>Google Drive Folder Color</strong> to its specific file type as defined in the Student Guide.</p>
+
+            <div class="drive-ui">
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                    <div class="draggable" draggable="true" data-type="docs">My Docs</div>
+                    <div class="draggable" draggable="true" data-type="sheets">My Sheets</div>
+                    <div class="draggable" draggable="true" data-type="drawings">My Drawings</div>
+                    <div class="draggable" draggable="true" data-type="forms">My Forms</div>
+                </div>
+
+                <div class="folder-grid">
+                    <div class="drop-zone" data-target="docs" style="flex-direction: column;">
+                        <svg viewBox="0 0 24 24" fill="#87CEEB"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                        <span>Rainy Sky</span>
+                    </div>
+                    <div class="drop-zone" data-target="sheets" style="flex-direction: column;">
+                        <svg viewBox="0 0 24 24" fill="#77dd77"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                        <span>Asparagus</span>
+                    </div>
+                    <div class="drop-zone" data-target="drawings" style="flex-direction: column;">
+                        <svg viewBox="0 0 24 24" fill="#C41E3A"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                        <span>Cardinal</span>
+                    </div>
+                    <div class="drop-zone" data-target="forms" style="flex-direction: column;">
+                        <svg viewBox="0 0 24 24" fill="#71A6D2"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                        <span>Vern Fern</span>
+                    </div>
+                </div>
+            </div>
+            <div id="q1-feedback" class="feedback"></div>
+            <button id="q1-next" class="btn" style="display:none" onclick="nextScreen('screen-q2')">Next Quest</button>
+        </div>
+
+        <!-- Quest 2: Formatting Mechanics -->
+        <div id="screen-q2" class="screen">
+            <h3>Quest 2: Precision Selection</h3>
+            <p>A Master Architect knows the fastest way to manipulate data. Select the correct <strong>Mouse Action</strong> for the desired text selection result.</p>
+
+            <div id="q2-options">
+                <div class="drive-ui" style="cursor: pointer;" onclick="checkQ2(this, 'triple')">
+                    <strong>Action A:</strong> Quickly click the mouse three times in a block.
+                    <div style="font-size: 0.8rem; color: #666;">Result: Selects an entire paragraph.</div>
+                </div>
+                <div class="drive-ui" style="cursor: pointer;" onclick="checkQ2(this, 'double')">
+                    <strong>Action B:</strong> Quickly click the mouse twice on a word.
+                    <div style="font-size: 0.8rem; color: #666;">Result: Selects the entire document.</div>
+                </div>
+                <div class="drive-ui" style="cursor: pointer;" onclick="checkQ2(this, 'shift')">
+                    <strong>Action C:</strong> Hold Ctrl + A.
+                    <div style="font-size: 0.8rem; color: #666;">Result: Selects a single word.</div>
+                </div>
+            </div>
+            <div id="q2-feedback"></div>
+            <button id="q2-next" class="btn" style="display:none" onclick="nextScreen('screen-q3')">Next Quest</button>
+        </div>
+
+        <!-- Quest 3: Table Architecture -->
+        <div id="screen-q3" class="screen">
+            <h3>Quest 3: The Structured Data Challenge</h3>
+            <p>You are building a technical report. Which setting in <strong>Table Properties</strong> ensures that all columns in your table are exactly the same width?</p>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn btn-green" onclick="checkQ3(this, false)">Merge Cells</button>
+                <button class="btn btn-green" onclick="checkQ3(this, true)">Distribute Columns</button>
+                <button class="btn btn-green" onclick="checkQ3(this, false)">Cell Padding</button>
+                <button class="btn btn-green" onclick="checkQ3(this, false)">Repeat Header Row</button>
+            </div>
+            <div id="q3-feedback"></div>
+            <button id="q3-next" class="btn" style="display:none" onclick="nextScreen('screen-q4')">Final Quest</button>
+        </div>
+
+        <!-- Quest 4: Distribution & Permissions -->
+        <div id="screen-q4" class="screen">
+            <h3>Quest 4: Secure Distribution</h3>
+            <p>Scenario: You have finished your UVA project. You want to share it with a classmate so they can read it and give you <strong>written feedback</strong> without changing your original text. Which permission level do you choose?</p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="folder" onclick="checkQ4(this, 'view')">
+                    <svg viewBox="0 0 24 24" fill="var(--uva-blue)"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                    <strong>Can View</strong>
+                </div>
+                <div class="folder" onclick="checkQ4(this, 'comment')">
+                    <svg viewBox="0 0 24 24" fill="var(--uva-green)"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM17 11h-4v4h-2v-4H7V9h4V5h2v4h4v2z"/></svg>
+                    <strong>Can Comment</strong>
+                </div>
+                <div class="folder" onclick="checkQ4(this, 'edit')">
+                    <svg viewBox="0 0 24 24" fill="#e67e22"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                    <strong>Can Edit</strong>
+                </div>
+                <div class="folder" onclick="checkQ4(this, 'owner')">
+                    <svg viewBox="0 0 24 24" fill="#9b59b6"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <strong>Transfer Ownership</strong>
+                </div>
+            </div>
+            <div id="q4-feedback"></div>
+            <button id="q4-next" class="btn" style="display:none" onclick="showResults()">View Final Certification</button>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="screen-results" class="screen">
+            <div style="text-align: center;">
+                <h2 style="color: var(--uva-green);">Mission Accomplished!</h2>
+                <div id="final-badge-container" style="margin: 20px 0;">
+                    <!-- Badge SVG will be injected here -->
+                </div>
+                <h3>Final Rank: <span id="final-rank">Master</span></h3>
+                <p>You have successfully demonstrated proficiency in Google Docs Formatting and Drive Organization according to UVA standards.</p>
+                <div class="stats-bar" style="margin: 20px auto;">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Score</span>
+                        <span id="final-score" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Accuracy</span>
+                        <span id="final-accuracy" class="stat-value">100%</span>
+                    </div>
+                </div>
+                <button class="btn" onclick="location.reload()">Restart Mission</button>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div id="main-progress" class="progress-bar"></div>
+        </div>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        // Game State
+        let score = 0;
+        let streak = 0;
+        let currentQuest = 0;
+        let totalQuests = 4;
+        let correctAnswers = 0;
+        let rank = "Trainee";
+
+        const ranks = ["Trainee", "Apprentice", "Expert", "Master"];
+
+        // Initialize Drag and Drop for Q1
+        const draggables = document.querySelectorAll('.draggable');
+        const dropZones = document.querySelectorAll('.drop-zone');
+        let q1Matches = 0;
+
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', () => {
+                draggable.classList.add('dragging');
+            });
+
+            draggable.addEventListener('dragend', () => {
+                draggable.classList.remove('dragging');
+            });
+        });
+
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+                zone.classList.add('hover');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('hover');
+            });
+
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                zone.classList.remove('hover');
+                const draggable = document.querySelector('.dragging');
+                const type = draggable.getAttribute('data-type');
+                const target = zone.getAttribute('data-target');
+
+                if (type === target) {
+                    zone.appendChild(draggable);
+                    draggable.setAttribute('draggable', 'false');
+                    draggable.style.cursor = 'default';
+                    draggable.style.background = 'var(--uva-green)';
+                    q1Matches++;
+                    addScore(25);
+                    showFeedback('q1-feedback', 'Correct! Folder color matched.', true);
+                    if (q1Matches === 4) {
+                        document.getElementById('q1-next').style.display = 'inline-block';
+                        showFeedback('q1-feedback', 'Quest Complete! All folders organized.', true);
+                        correctAnswers++;
+                        updateStreak(true);
+                    }
+                } else {
+                    addScore(-5);
+                    updateStreak(false);
+                    showFeedback('q1-feedback', 'Incorrect color mapping. Try again!', false);
+                }
+            });
+        });
+
+        // Quest 2 Logic
+        function checkQ2(element, choice) {
+            const feedback = document.getElementById('q2-feedback');
+            if (choice === 'triple') {
+                element.style.borderColor = 'var(--uva-green)';
+                element.style.background = '#f0fff4';
+                showFeedback('q2-feedback', 'Excellent! Triple-click is the pro way to select paragraphs.', true);
+                document.getElementById('q2-next').style.display = 'inline-block';
+                document.getElementById('q2-options').style.pointerEvents = 'none';
+                addScore(50);
+                updateStreak(true);
+                correctAnswers++;
+            } else {
+                element.style.borderColor = '#f5c6cb';
+                element.style.background = '#f8d7da';
+                showFeedback('q2-feedback', 'Incorrect. Remember: Double = Word, Triple = Paragraph.', false);
+                addScore(-10);
+                updateStreak(false);
+            }
+        }
+
+        // Quest 3 Logic
+        function checkQ3(btn, isCorrect) {
+            if (isCorrect) {
+                showFeedback('q3-feedback', 'Correct! Distribute Columns creates uniform sizing.', true);
+                document.getElementById('q3-next').style.display = 'inline-block';
+                addScore(50);
+                updateStreak(true);
+                correctAnswers++;
+            } else {
+                showFeedback('q3-feedback', 'Not quite. That tool serves a different structural purpose.', false);
+                addScore(-10);
+                updateStreak(false);
+            }
+        }
+
+        // Quest 4 Logic
+        function checkQ4(element, choice) {
+            if (choice === 'comment') {
+                element.style.borderColor = 'var(--uva-green)';
+                showFeedback('q4-feedback', 'Perfect! "Can Comment" allows feedback without altering your work.', true);
+                document.getElementById('q4-next').style.display = 'inline-block';
+                addScore(50);
+                updateStreak(true);
+                correctAnswers++;
+            } else {
+                showFeedback('q4-feedback', 'Incorrect. Think about which level allows notes but not edits.', false);
+                addScore(-10);
+                updateStreak(false);
+            }
+        }
+
+        // Core Mechanics
+        function nextScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+
+            currentQuest++;
+            const progress = (currentQuest / (totalQuests + 1)) * 100;
+            document.getElementById('main-progress').style.width = progress + '%';
+        }
+
+        function addScore(points) {
+            score = Math.max(0, score + points);
+            document.getElementById('score-display').innerText = score;
+            updateRank();
+        }
+
+        function updateStreak(isCorrect) {
+            if (isCorrect) {
+                streak++;
+                if (streak % 3 === 0 && streak > 0) {
+                    showStreakPopup();
+                    score += 50; // Bonus
+                }
+            } else {
+                streak = 0;
+            }
+            document.getElementById('streak-display').innerText = streak;
+        }
+
+        function updateRank() {
+            let newRank = ranks[0];
+            if (score >= 250) newRank = ranks[3];
+            else if (score >= 150) newRank = ranks[2];
+            else if (score >= 50) newRank = ranks[1];
+
+            rank = newRank;
+            document.getElementById('rank-display').innerText = rank;
+        }
+
+        function showFeedback(id, text, isCorrect) {
+            const el = document.getElementById(id);
+            el.innerText = text;
+            el.className = 'feedback ' + (isCorrect ? 'feedback-correct' : 'feedback-wrong');
+            el.style.display = 'block';
+        }
+
+        function showStreakPopup() {
+            const popup = document.getElementById('streak-popup');
+            popup.innerText = streak + " IN A ROW!";
+            popup.style.display = 'block';
+            setTimeout(() => { popup.style.display = 'none'; }, 1500);
+        }
+
+        function showResults() {
+            nextScreen('screen-results');
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-rank').innerText = rank;
+            document.getElementById('final-accuracy').innerText = Math.round((correctAnswers / totalQuests) * 100) + "%";
+
+            // Inject Badge
+            const badgeContainer = document.getElementById('final-badge-container');
+            badgeContainer.innerHTML = `
+                <svg width="120" height="120" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="var(--uva-blue)" />
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="white" stroke-width="2" stroke-dasharray="4" />
+                    <path d="M30 50 L45 65 L70 35" fill="none" stroke="var(--gold)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+                    <text x="50" y="85" text-anchor="middle" fill="white" font-size="8" font-weight="bold">CERTIFIED</text>
+                </svg>
+            `;
+
+            startConfetti();
+        }
+
+        // Simple Confetti Effect
+        function startConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: Math.random() * 6 + 2,
+                    d: Math.random() * 100,
+                    color: ["#1B5EAF", "#1E7A3E", "#FFD700", "#ffffff"][Math.floor(Math.random() * 4)],
+                    tilt: Math.random() * 10 - 10
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((p, i) => {
+                    ctx.beginPath();
+                    ctx.lineWidth = p.r;
+                    ctx.strokeStyle = p.color;
+                    ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                    ctx.stroke();
+                });
+                update();
+            }
+
+            function update() {
+                particles.forEach((p, i) => {
+                    p.y += Math.cos(p.d) + 1 + p.r / 2;
+                    p.tilt = Math.sin(p.d) * 15;
+                    if (p.y > canvas.height) {
+                        particles[i] = { x: Math.random() * canvas.width, y: -10, r: p.r, d: p.d, color: p.color, tilt: p.tilt };
+                    }
+                });
+            }
+
+            setInterval(draw, 20);
+        }
+    </script>
+</body>
+</html>
