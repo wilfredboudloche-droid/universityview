@@ -1,386 +1,1061 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UVA Lesson 6.03: Google Docs Mastery</title>
-    <style>
-        :root {
-            --uva-blue: #1B5EAF;
-            --uva-green: #1E7A3E;
-            --uva-gold: #FFB81C;
-            --bg-light: #f4f7f9;
-            --text-dark: #2c3e50;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UVA | Lesson 6.03: Google Docs Lists & Spacing</title>
+<style>
+  :root {
+    --uva-blue: #1B5EAF;
+    --uva-green: #1E7A3E;
+    --uva-gold: #FFB81C;
+    --bg: #f0f4f8;
+    --white: #ffffff;
+    --text: #2c3e50;
+    --correct: #d4edda;
+    --correct-border: #1E7A3E;
+    --incorrect: #f8d7da;
+    --incorrect-border: #c0392b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--uva-blue);
+    color: white;
+    text-align: center;
+    padding: 18px 20px 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  }
+  .site-header h1 { font-size: 1.4rem; letter-spacing: 1px; }
+  .site-header p  { font-size: 0.9rem; opacity: 0.85; margin-top: 3px; }
+  .motto-ribbon {
+    display: inline-block;
+    background: var(--uva-green);
+    color: white;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    padding: 4px 22px;
+    border-radius: 20px;
+    margin-top: 8px;
+  }
 
-        /* Header & Branding */
-        .header {
-            background-color: var(--uva-blue);
-            color: white;
-            width: 100%;
-            padding: 20px 0;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
-        }
+  /* ── STATS BAR ── */
+  #stats-bar {
+    display: none;
+    background: var(--uva-blue);
+    color: white;
+    padding: 10px 20px;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .stat-label { font-size: 0.65rem; opacity: 0.75; letter-spacing: 1px; text-transform: uppercase; }
+  .stat-value { font-size: 1.1rem; }
+  #rank-display { color: var(--uva-gold); }
+  #streak-display { color: #ff9f43; }
 
-        .motto-banner {
-            background-color: var(--uva-green);
-            color: white;
-            padding: 5px 20px;
-            font-style: italic;
-            font-weight: bold;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            display: inline-block;
-            margin-top: 10px;
-            border-radius: 20px;
-        }
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    height: 8px;
+    width: 120px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--uva-gold);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+  }
 
-        /* Game Container */
-        #game-container {
-            max-width: 800px;
-            width: 90%;
-            background: white;
-            margin: 30px 0;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            text-align: center;
-        }
+  /* ── MAIN CARD ── */
+  #game-wrap {
+    max-width: 820px;
+    margin: 30px auto;
+    padding: 0 16px 40px;
+  }
+  .card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 40px 36px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    text-align: center;
+  }
 
-        /* Progress & Stats */
-        .stats-bar {
-            display: flex;
-            justify-content: space-around;
-            background: #eef2f7;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeUp 0.4s ease; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-        .rank-badge {
-            color: var(--uva-green);
-            text-transform: uppercase;
-        }
+  /* ── START SCREEN ── */
+  .shield-svg { margin: 10px auto 20px; display: block; }
+  #start-screen h2 { color: var(--uva-blue); font-size: 1.8rem; margin-bottom: 10px; }
+  #start-screen p  { color: #555; line-height: 1.6; max-width: 520px; margin: 0 auto 24px; }
+  .obj-list {
+    text-align: left;
+    background: #f0f7ff;
+    border-left: 4px solid var(--uva-blue);
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin: 0 auto 28px;
+    max-width: 540px;
+  }
+  .obj-list li { margin: 6px 0; font-size: 0.9rem; color: #333; }
 
-        .streak-fire {
-            color: #e67e22;
-        }
+  /* ── QUEST HEADER ── */
+  .quest-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    text-align: left;
+  }
+  .quest-badge {
+    background: var(--uva-green);
+    color: white;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .quest-title { color: var(--uva-blue); font-size: 1.2rem; font-weight: 700; }
+  .quest-scenario {
+    background: #f8f9fa;
+    border-left: 4px solid var(--uva-gold);
+    padding: 14px 16px;
+    border-radius: 6px;
+    text-align: left;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #333;
+  }
 
-        /* Screens */
-        .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.5s; }
+  /* ── OPTION BUTTONS ── */
+  .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .opt-btn {
+    background: white;
+    border: 2px solid #dde3ea;
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: var(--uva-blue); background: #f0f7ff; transform: translateX(4px); }
+  .opt-btn:disabled { cursor: default; }
+  .opt-btn.correct  { border-color: var(--correct-border); background: var(--correct); }
+  .opt-btn.incorrect{ border-color: var(--incorrect-border); background: var(--incorrect); }
+  .opt-letter {
+    background: var(--uva-blue);
+    color: white;
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+  .opt-btn.correct  .opt-letter { background: var(--uva-green); }
+  .opt-btn.incorrect .opt-letter { background: #c0392b; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+  /* ── FEEDBACK BOX ── */
+  .feedback-box {
+    display: none;
+    padding: 14px 18px;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .feedback-box.correct  { background: var(--correct);  border: 1px solid var(--correct-border);  color: #155724; }
+  .feedback-box.incorrect{ background: var(--incorrect); border: 1px solid var(--incorrect-border); color: #721c24; }
+  .feedback-icon { font-size: 1.2rem; margin-right: 6px; }
 
-        /* Buttons */
-        .btn {
-            background-color: var(--uva-blue);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-            margin-top: 20px;
-        }
+  /* ── DRAG & DROP ── */
+  .drag-area {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .drag-col { flex: 1; min-width: 200px; }
+  .drag-col h4 {
+    background: var(--uva-blue);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px 6px 0 0;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  .drop-zone {
+    min-height: 120px;
+    border: 2px dashed #b0bec5;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    padding: 10px;
+    background: #fafafa;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .drop-zone.drag-over { background: #e3f2fd; border-color: var(--uva-blue); }
+  .drag-items-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .drag-chip {
+    background: var(--uva-blue);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: grab;
+    font-size: 0.85rem;
+    user-select: none;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .drag-chip:active { cursor: grabbing; transform: scale(1.05); }
+  .drag-chip.placed { opacity: 0.4; cursor: default; }
+  .dropped-chip {
+    background: var(--uva-green);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.82rem;
+    margin: 4px;
+    display: inline-block;
+  }
+  .dropped-chip.wrong { background: #c0392b; }
 
-        .btn:hover {
-            background-color: #154a8a;
-            transform: scale(1.05);
-        }
+  /* ── SIMULATION ── */
+  .sim-docs {
+    background: #f8f9fa;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    text-align: left;
+    font-family: Arial, sans-serif;
+  }
+  .sim-toolbar {
+    background: white;
+    border-bottom: 1px solid #dadce0;
+    padding: 6px 12px;
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: #3c4043;
+  }
+  .sim-menu { cursor: pointer; padding: 3px 6px; border-radius: 3px; }
+  .sim-menu:hover { background: #e8eaed; }
+  .sim-menu.active-menu { background: #e8f0fe; color: var(--uva-blue); font-weight: 600; }
+  .sim-dropdown {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 100;
+    min-width: 220px;
+    font-size: 13px;
+  }
+  .sim-dropdown.open { display: block; }
+  .sim-dd-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    color: #3c4043;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sim-dd-item:hover { background: #f1f3f4; }
+  .sim-dd-item.correct-path { color: var(--uva-green); font-weight: 600; }
+  .sim-dd-item.wrong-path  { color: #c0392b; }
+  .sim-dd-divider { border-top: 1px solid #e0e0e0; margin: 4px 0; }
+  .sim-doc-body { padding: 20px 24px; min-height: 100px; font-size: 14px; color: #333; line-height: 1.8; }
+  .sim-relative { position: relative; }
 
-        .option-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background: white;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            text-align: left;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+  /* ── BUTTONS ── */
+  .btn-primary {
+    background: var(--uva-blue);
+    color: white;
+    border: none;
+    padding: 14px 36px;
+    font-size: 1rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.5px;
+  }
+  .btn-primary:hover { background: #154a8a; transform: scale(1.03); }
+  .btn-secondary {
+    background: white;
+    color: var(--uva-blue);
+    border: 2px solid var(--uva-blue);
+    padding: 12px 30px;
+    font-size: 0.95rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s;
+    margin-left: 10px;
+  }
+  .btn-secondary:hover { background: #f0f7ff; }
+  #next-btn { display: none; margin-top: 8px; }
+  #check-drag-btn { margin-top: 8px; }
 
-        .option-btn:hover {
-            border-color: var(--uva-blue);
-            background: #f0f7ff;
-        }
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    top: 80px; right: 20px;
+    background: #2c3e50;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    opacity: 0;
+    transform: translateX(60px);
+    transition: all 0.4s;
+    z-index: 9999;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: translateX(0); }
 
-        /* Feedback */
-        #feedback {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            display: none;
-        }
+  /* ── RANK UP BANNER ── */
+  #rank-up-banner {
+    display: none;
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--uva-blue);
+    color: white;
+    padding: 30px 50px;
+    border-radius: 16px;
+    text-align: center;
+    z-index: 9998;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: popIn 0.4s ease;
+  }
+  @keyframes popIn {
+    from { transform: translate(-50%,-50%) scale(0.5); opacity: 0; }
+    to   { transform: translate(-50%,-50%) scale(1);   opacity: 1; }
+  }
+  #rank-up-banner h2 { font-size: 1.8rem; color: var(--uva-gold); }
+  #rank-up-banner p  { margin-top: 6px; font-size: 1rem; opacity: 0.9; }
 
-        .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+  /* ── FINAL SCREEN ── */
+  #final-screen h2 { color: var(--uva-blue); font-size: 2rem; margin-bottom: 10px; }
+  .final-rank-box {
+    background: linear-gradient(135deg, var(--uva-blue), #2980b9);
+    color: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px auto;
+    max-width: 400px;
+  }
+  .final-rank-box .rank-title { font-size: 2rem; font-weight: 700; color: var(--uva-gold); }
+  .final-rank-box .xp-total  { font-size: 1.1rem; margin-top: 6px; opacity: 0.9; }
+  .cert-note {
+    background: #f0f7ff;
+    border: 1px solid var(--uva-blue);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 0.9rem;
+    color: #333;
+    max-width: 500px;
+    margin: 0 auto 24px;
+    line-height: 1.6;
+  }
 
-        /* Simulation UI */
-        .google-docs-ui {
-            background: #f8f9fa;
-            border: 1px solid #dadce0;
-            padding: 20px;
-            border-radius: 4px;
-            margin: 20px 0;
-            text-align: left;
-            font-family: Arial, sans-serif;
-        }
+  /* ── CONFETTI CANVAS ── */
+  #confetti-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9997;
+  }
 
-        .menu-bar {
-            display: flex;
-            gap: 15px;
-            border-bottom: 1px solid #dadce0;
-            padding-bottom: 5px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: #3c4043;
-        }
-
-        .menu-item { cursor: pointer; padding: 2px 5px; }
-        .menu-item:hover { background: #eee; }
-
-        .confetti {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 999;
-        }
-    </style>
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .card { padding: 24px 18px; }
+    .drag-area { flex-direction: column; }
+    .site-header h1 { font-size: 1.1rem; }
+  }
+</style>
 </head>
 <body>
 
-    <div class="header">
-        <h3 style="margin:0;">UNIVERSITY VIEW ACADEMY</h3>
-        <div style="font-size: 1.2rem; margin-top: 5px;">Computer Tech Literacy: Lesson 6.03</div>
-        <div class="motto-banner">Virtue · Vigor · Vision</div>
+<!-- HEADER -->
+<div class="site-header">
+  <h1>🎓 UNIVERSITY VIEW ACADEMY</h1>
+  <p>Computer Tech Literacy  |  Lesson 6.03: Google Docs Lists & Spacing</p>
+  <div class="motto-ribbon">✦ Virtue  ·  Vigor  ·  Vision ✦</div>
+</div>
+
+<!-- STATS BAR -->
+<div id="stats-bar">
+  <div class="stat-item">
+    <span class="stat-label">XP Earned</span>
+    <span class="stat-value" id="xp-display">0</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">Rank</span>
+    <span class="stat-value" id="rank-display">Trainee</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">Streak</span>
+    <span class="stat-value" id="streak-display">0 🔥</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">Progress</span>
+    <div class="progress-wrap">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME WRAP -->
+<div id="game-wrap">
+  <div class="card">
+
+    <!-- ══ START SCREEN ══ -->
+    <div id="start-screen" class="screen active">
+      <svg class="shield-svg" width="80" height="90" viewBox="0 0 80 90">
+        <path d="M40 2 L78 18 L78 50 C78 70 60 84 40 88 C20 84 2 70 2 50 L2 18 Z" fill="#1B5EAF" stroke="#FFB81C" stroke-width="3"/>
+        <text x="40" y="52" text-anchor="middle" fill="white" font-size="28" font-weight="bold" font-family="serif">U</text>
+        <text x="40" y="68" text-anchor="middle" fill="#FFB81C" font-size="9" font-family="sans-serif">V·V·V</text>
+      </svg>
+      <h2>Mission Briefing</h2>
+      <p>Welcome, UVA Cadet! Your mission is to master <strong>Google Docs Lists & Spacing</strong> — a core skill for the <em>Digital Literacy Certification</em>. Complete all 7 quests to earn the rank of <strong>Master</strong>.</p>
+      <ul class="obj-list">
+        <li>📋 Distinguish bulleted, numbered, and checklist formats</li>
+        <li>⌨️ Manage multilevel list hierarchies with Tab / Shift+Tab</li>
+        <li>📐 Configure line and paragraph spacing settings</li>
+        <li>📎 Apply hanging indents for professional citations</li>
+      </ul>
+      <button class="btn-primary" id="begin-btn">⚔️ BEGIN MISSION</button>
     </div>
 
-    <div id="game-container">
-        <!-- Stats Bar -->
-        <div class="stats-bar" id="stats-bar" style="display:none;">
-            <div>XP: <span id="xp-display">0</span></div>
-            <div>RANK: <span id="rank-display" class="rank-badge">Trainee</span></div>
-            <div>STREAK: <span id="streak-display" class="streak-fire">0 🔥</span></div>
-        </div>
+    <!-- ══ QUEST SCREEN ══ -->
+    <div id="quest-screen" class="screen">
+      <div class="quest-header">
+        <span class="quest-badge" id="quest-badge">QUEST 1 / 7</span>
+        <span class="quest-title" id="quest-title">Loading...</span>
+      </div>
+      <div class="quest-scenario" id="quest-scenario">Loading...</div>
 
-        <!-- Start Screen -->
-        <div id="start-screen" class="screen active">
-            <h2 style="color: var(--uva-blue);">Mastering Lists & Spacing</h2>
-            <p>Welcome, Student! Your mission is to master the professional formatting standards used in Google Docs. Complete all quests to reach the rank of <strong>Master</strong>.</p>
-            <img src="https://img.icons8.com/fluency/96/google-docs.png" alt="Docs Icon">
-            <br>
-            <button class="btn" onclick="startGame()">BEGIN MISSION</button>
-        </div>
+      <!-- MC options -->
+      <div id="mc-area">
+        <div class="options-grid" id="options-container"></div>
+      </div>
 
-        <!-- Quest Screen -->
-        <div id="quest-screen" class="screen">
-            <h3 id="quest-title" style="color: var(--uva-green);">Quest 1: The List Architect</h3>
-            <p id="quest-desc">Scenario: You are creating a grocery list where the order doesn't matter. Which tool should you use?</p>
-            
-            <div id="options-container">
-                <!-- Options injected by JS -->
-            </div>
+      <!-- Drag & Drop area -->
+      <div id="drag-area" style="display:none;">
+        <div class="drag-items-pool" id="drag-pool"></div>
+        <div class="drag-area" id="drop-columns"></div>
+        <button class="btn-primary" id="check-drag-btn">✅ Check Answers</button>
+      </div>
 
-            <div id="feedback"></div>
-            <button id="next-btn" class="btn" style="display:none;" onclick="nextQuest()">NEXT QUEST</button>
+      <!-- Simulation area -->
+      <div id="sim-area" style="display:none;">
+        <div class="sim-docs sim-relative">
+          <div class="sim-toolbar" id="sim-toolbar"></div>
+          <div id="sim-dropdown-container"></div>
+          <div class="sim-doc-body" id="sim-doc-body"></div>
         </div>
+        <p style="font-size:0.85rem;color:#666;margin-bottom:8px;">👆 Click the correct menu path above to complete this quest.</p>
+      </div>
 
-        <!-- Final Screen -->
-        <div id="final-screen" class="screen">
-            <h2 style="color: var(--uva-green);">MISSION ACCOMPLISHED!</h2>
-            <div id="final-rank-box" style="font-size: 2rem; margin: 20px 0; font-weight: bold;">RANK: MASTER</div>
-            <p>You have successfully mastered Google Docs Lists and Spacing standards. You are now ready for the Digital Literacy Certification!</p>
-            <button class="btn" onclick="location.reload()">RESTART MISSION</button>
-        </div>
+      <div class="feedback-box" id="feedback-box"></div>
+      <button class="btn-primary" id="next-btn">NEXT QUEST →</button>
     </div>
 
-    <canvas id="confetti-canvas" class="confetti"></canvas>
+    <!-- ══ FINAL SCREEN ══ -->
+    <div id="final-screen" class="screen">
+      <h2>🏆 Mission Accomplished!</h2>
+      <p style="color:#555;margin-bottom:16px;">You have completed all 7 quests and proven your mastery of Google Docs formatting.</p>
+      <div class="final-rank-box">
+        <div class="rank-title" id="final-rank-title">MASTER</div>
+        <div class="xp-total" id="final-xp">Total XP: 0</div>
+      </div>
+      <div class="cert-note">
+        🎓 <strong>Digital Literacy Certification Ready!</strong><br>
+        You can now confidently apply bulleted, numbered, and checklist formats; manage multilevel list hierarchies; configure line & paragraph spacing; and apply hanging indents for citations.
+      </div>
+      <button class="btn-primary" onclick="location.reload()">🔄 Restart Mission</button>
+    </div>
 
-    <script>
-        let currentQuest = 0;
-        let xp = 0;
-        let streak = 0;
-        let ranks = ["Trainee", "Apprentice", "Expert", "Master"];
+  </div><!-- /card -->
+</div><!-- /game-wrap -->
 
-        const quests = [
-            {
-                title: "Quest 1: The List Architect",
-                desc: "Scenario: You are writing a set of instructions for a science experiment that must be followed in a specific sequence. Which list type is required?",
-                options: [
-                    { text: "Bulleted List", correct: false, feedback: "Incorrect. Bullets are for items where order doesn't matter." },
-                    { text: "Numbered List", correct: true, feedback: "Correct! Numbered lists are for sequential steps or rankings." },
-                    { text: "Checklist", correct: false, feedback: "Incorrect. Checklists are for tracking completion, not necessarily sequence." }
-                ]
-            },
-            {
-                title: "Quest 2: Shortcut Ninja",
-                desc: "You've created a sub-item in a multilevel list. Which keyboard shortcut will 'promote' the item back to the main level (move it to the left)?",
-                options: [
-                    { text: "Tab", correct: false, feedback: "Incorrect. Tab 'demotes' an item to a sub-level." },
-                    { text: "Shift + Tab", correct: true, feedback: "Correct! Shift + Tab moves the list item back to the previous hierarchy level." },
-                    { text: "Ctrl + Z", correct: false, feedback: "Incorrect. That is the 'Undo' command." }
-                ]
-            },
-            {
-                title: "Quest 3: Spacing Commander",
-                desc: "A professional report requires 'Double Spacing'. Where do you find this in the Google Docs menu?",
-                options: [
-                    { text: "Insert > Spacing", correct: false, feedback: "Incorrect. Spacing is a formatting tool, not an insertion." },
-                    { text: "Format > Line & paragraph spacing > Double", correct: true, feedback: "Correct! This is the standard path for line spacing." },
-                    { text: "File > Page Setup", correct: false, feedback: "Incorrect. Page Setup handles margins and orientation." }
-                ]
-            },
-            {
-                title: "Quest 4: The Citation Pro",
-                desc: "When creating a Works Cited page, you need the first line to be at the margin and every line after to be indented. What is this called?",
-                options: [
-                    { text: "First Line Indent", correct: false, feedback: "Incorrect. That only indents the first line (standard paragraph)." },
-                    { text: "Hanging Indent", correct: true, feedback: "Correct! Hanging indents are the professional standard for citations." },
-                    { text: "Block Quote", correct: false, feedback: "Incorrect. Block quotes indent the entire paragraph." }
-                ]
-            }
-        ];
+<!-- TOAST -->
+<div id="toast"></div>
 
-        function startGame() {
-            document.getElementById('start-screen').classList.remove('active');
-            document.getElementById('quest-screen').classList.add('active');
-            document.getElementById('stats-bar').style.display = 'flex';
-            loadQuest();
+<!-- RANK UP BANNER -->
+<div id="rank-up-banner">
+  <h2 id="rank-up-title">RANK UP!</h2>
+  <p id="rank-up-sub">You are now an Apprentice</p>
+</div>
+
+<!-- CONFETTI -->
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+var state = {
+  currentQuest: 0,
+  xp: 0,
+  streak: 0,
+  answered: false
+};
+
+var RANKS = [
+  { name: "Trainee",    min: 0   },
+  { name: "Apprentice", min: 150 },
+  { name: "Expert",     min: 350 },
+  { name: "Master",     min: 600 }
+];
+
+// ═══════════════════════════════════════════════
+//  QUEST DATA
+// ═══════════════════════════════════════════════
+var quests = [
+  // ── Q1: MC ──
+  {
+    type: "mc",
+    badge: "QUEST 1 / 7 · The List Architect",
+    title: "Choose Your List Type",
+    scenario: "📋 SCENARIO: You are writing a step-by-step lab procedure for your science class. Each step must be followed in exact order. Which Google Docs list type should you use?",
+    xp: 100,
+    options: [
+      { text: "Bulleted List — for unordered items",         correct: false, feedback: "❌ Bullets are great for unordered items, but they don't communicate sequence. A reader can't tell which step comes first." },
+      { text: "Numbered List — for sequential steps",        correct: true,  feedback: "✅ Correct! Numbered lists communicate order and sequence — perfect for procedures, instructions, and ranked items." },
+      { text: "Checklist — for tracking task completion",    correct: false, feedback: "❌ Checklists are for tracking whether tasks are done, not for communicating a required sequence." }
+    ]
+  },
+  // ── Q2: MC ──
+  {
+    type: "mc",
+    badge: "QUEST 2 / 7 · Format Detective",
+    title: "Match the Format to the Purpose",
+    scenario: "📋 SCENARIO: Your teacher asks you to submit a reading log where you check off each book as you finish it. Which list format is the best fit?",
+    xp: 100,
+    options: [
+      { text: "Numbered List",  correct: false, feedback: "❌ Numbered lists imply a required order. A reading log doesn't need to be read in sequence." },
+      { text: "Bulleted List",  correct: false, feedback: "❌ Bullets work, but they don't give you the ability to mark items as complete." },
+      { text: "Checklist",      correct: true,  feedback: "✅ Correct! Checklists let you check off items as you complete them — ideal for tracking progress." }
+    ]
+  },
+  // ── Q3: MC ──
+  {
+    type: "mc",
+    badge: "QUEST 3 / 7 · Shortcut Ninja",
+    title: "Multilevel List Shortcuts",
+    scenario: "⌨️ SCENARIO: You are building a multilevel outline. You've just typed a main point and pressed Enter. Now you want to create a sub-point indented beneath it. Which keyboard shortcut do you press?",
+    xp: 100,
+    options: [
+      { text: "Shift + Tab — to demote to a sub-level",  correct: false, feedback: "❌ Shift + Tab actually promotes an item (moves it left / up a level). It's the opposite of what you need here." },
+      { text: "Tab — to demote to a sub-level",          correct: true,  feedback: "✅ Correct! Pressing Tab while in a list item demotes it to the next sub-level, creating a multilevel hierarchy." },
+      { text: "Ctrl + M — to increase indent",           correct: false, feedback: "❌ Ctrl + M increases paragraph indent but does not demote a list item to a sub-level in Google Docs." }
+    ]
+  },
+  // ── Q4: MC ──
+  {
+    type: "mc",
+    badge: "QUEST 4 / 7 · Shortcut Ninja II",
+    title: "Promote a List Item",
+    scenario: "⌨️ SCENARIO: You accidentally created a sub-bullet that should be a main-level bullet. You need to move it back to the left (promote it). Which shortcut do you use?",
+    xp: 100,
+    options: [
+      { text: "Tab",           correct: false, feedback: "❌ Tab demotes (moves right / deeper). You need the opposite action here." },
+      { text: "Ctrl + Z",      correct: false, feedback: "❌ Ctrl + Z undoes your last action entirely. That's not the same as promoting a list level." },
+      { text: "Shift + Tab",   correct: true,  feedback: "✅ Correct! Shift + Tab promotes a list item — moving it back to the previous (higher) level in the hierarchy." }
+    ]
+  },
+  // ── Q5: SIMULATION ──
+  {
+    type: "sim",
+    badge: "QUEST 5 / 7 · Spacing Commander",
+    title: "Set Line Spacing to Double",
+    scenario: "🖥️ SIMULATION: Your teacher requires your essay to be double-spaced. Using the Google Docs menu below, click the correct path to set line spacing to Double.",
+    xp: 125,
+    simMenus: [
+      {
+        label: "File",
+        items: [
+          { text: "New",         correct: false, feedback: "❌ The File menu handles document-level actions like saving and printing — not text formatting." },
+          { text: "Page Setup",  correct: false, feedback: "❌ Page Setup controls margins, orientation, and paper size — not line spacing." }
+        ]
+      },
+      {
+        label: "Format",
+        items: [
+          { text: "Text",                                    correct: false, feedback: "❌ The Text submenu handles bold, italic, and font styles — not spacing." },
+          { text: "Line & paragraph spacing → Double",       correct: true,  feedback: "✅ Correct! Format → Line & paragraph spacing → Double is the standard path for setting double spacing in Google Docs." },
+          { text: "Paragraph styles",                        correct: false, feedback: "❌ Paragraph styles change heading/body text styles, not line spacing values." }
+        ]
+      },
+      {
+        label: "Insert",
+        items: [
+          { text: "Table",       correct: false, feedback: "❌ The Insert menu adds objects like images and tables — not spacing settings." },
+          { text: "Special characters", correct: false, feedback: "❌ This inserts symbols — not related to spacing." }
+        ]
+      }
+    ],
+    simDocContent: "<p>The American Revolution began in 1775...</p><p>Colonial leaders gathered to discuss independence...</p>"
+  },
+  // ── Q6: DRAG & DROP ──
+  {
+    type: "drag",
+    badge: "QUEST 6 / 7 · Spacing Sorter",
+    title: "Sort the Spacing Scenarios",
+    scenario: "🖱️ DRAG & DROP: Drag each scenario to the correct spacing type. Match all items correctly to earn full XP.",
+    xp: 125,
+    columns: [
+      { id: "col-single",  label: "Single Spacing",    accepts: ["Reading a casual email", "Quick notes or drafts"] },
+      { id: "col-double",  label: "Double Spacing",    accepts: ["Academic essay submission", "Teacher feedback space"] },
+      { id: "col-custom",  label: "Custom Spacing",    accepts: ["Specific pt spacing (e.g. 1.15)", "Paragraph spacing before/after"] }
+    ],
+    chips: [
+      "Reading a casual email",
+      "Academic essay submission",
+      "Specific pt spacing (e.g. 1.15)",
+      "Quick notes or drafts",
+      "Teacher feedback space",
+      "Paragraph spacing before/after"
+    ]
+  },
+  // ── Q7: MC ──
+  {
+    type: "mc",
+    badge: "QUEST 7 / 7 · Citation Pro",
+    title: "Hanging Indent for Citations",
+    scenario: "📎 SCENARIO: You are formatting a Works Cited page. The first line of each citation must start at the left margin, and every continuation line must be indented 0.5 inches. What is this formatting called?",
+    xp: 150,
+    options: [
+      { text: "First Line Indent — indents only the first line",   correct: false, feedback: "❌ First Line Indent indents the first line inward — the opposite of what a Works Cited page requires." },
+      { text: "Hanging Indent — first line at margin, rest indented", correct: true, feedback: "✅ Correct! A Hanging Indent keeps the first line at the margin and indents all subsequent lines — the professional standard for MLA/APA citations." },
+      { text: "Block Indent — entire paragraph indented",           correct: false, feedback: "❌ A Block Indent moves the entire paragraph inward — used for long quotations, not citations." }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("begin-btn").addEventListener("click", startGame);
+  document.getElementById("next-btn").addEventListener("click", nextQuest);
+});
+
+function startGame() {
+  showScreen("quest-screen");
+  document.getElementById("stats-bar").style.display = "flex";
+  loadQuest();
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN MANAGEMENT
+// ═══════════════════════════════════════════════
+function showScreen(id) {
+  var screens = document.querySelectorAll(".screen");
+  screens.forEach(function(s) { s.classList.remove("active"); });
+  document.getElementById(id).classList.add("active");
+}
+
+// ═══════════════════════════════════════════════
+//  LOAD QUEST
+// ═══════════════════════════════════════════════
+function loadQuest() {
+  state.answered = false;
+  var q = quests[state.currentQuest];
+
+  document.getElementById("quest-badge").textContent    = q.badge;
+  document.getElementById("quest-title").textContent    = q.title;
+  document.getElementById("quest-scenario").textContent = q.scenario;
+
+  // hide all areas
+  document.getElementById("mc-area").style.display   = "none";
+  document.getElementById("drag-area").style.display = "none";
+  document.getElementById("sim-area").style.display  = "none";
+  hideFeedback();
+  document.getElementById("next-btn").style.display  = "none";
+
+  if (q.type === "mc")   buildMC(q);
+  if (q.type === "drag") buildDrag(q);
+  if (q.type === "sim")  buildSim(q);
+
+  updateStats();
+}
+
+// ═══════════════════════════════════════════════
+//  MULTIPLE CHOICE
+// ═══════════════════════════════════════════════
+function buildMC(q) {
+  document.getElementById("mc-area").style.display = "block";
+  var container = document.getElementById("options-container");
+  container.innerHTML = "";
+  var letters = ["A","B","C","D"];
+  q.options.forEach(function(opt, i) {
+    var btn = document.createElement("button");
+    btn.className = "opt-btn";
+    btn.innerHTML = '<span class="opt-letter">' + letters[i] + '</span><span>' + opt.text + '</span>';
+    btn.addEventListener("click", function() { handleMC(opt, btn, q); });
+    container.appendChild(btn);
+  });
+}
+
+function handleMC(opt, btn, q) {
+  if (state.answered) return;
+  state.answered = true;
+
+  var allBtns = document.querySelectorAll(".opt-btn");
+  allBtns.forEach(function(b) { b.disabled = true; });
+
+  if (opt.correct) {
+    btn.classList.add("correct");
+    awardXP(q.xp);
+    showFeedback(opt.feedback, "correct");
+  } else {
+    btn.classList.add("incorrect");
+    loseStreak();
+    showFeedback(opt.feedback, "incorrect");
+    // highlight correct
+    allBtns.forEach(function(b, i) {
+      if (q.options[i] && q.options[i].correct) b.classList.add("correct");
+    });
+  }
+  document.getElementById("next-btn").style.display = "inline-block";
+}
+
+// ═══════════════════════════════════════════════
+//  DRAG & DROP
+// ═══════════════════════════════════════════════
+function buildDrag(q) {
+  document.getElementById("drag-area").style.display = "block";
+
+  // Build pool
+  var pool = document.getElementById("drag-pool");
+  pool.innerHTML = "";
+  q.chips.forEach(function(chip) {
+    var el = document.createElement("div");
+    el.className = "drag-chip";
+    el.textContent = chip;
+    el.draggable = true;
+    el.dataset.chip = chip;
+    el.addEventListener("dragstart", function(e) {
+      e.dataTransfer.setData("text/plain", chip);
+      e.dataTransfer.setData("sourceId", "pool");
+    });
+    pool.appendChild(el);
+  });
+
+  // Build columns
+  var colWrap = document.getElementById("drop-columns");
+  colWrap.innerHTML = "";
+  q.columns.forEach(function(col) {
+    var colDiv = document.createElement("div");
+    colDiv.className = "drag-col";
+    colDiv.innerHTML = '<h4>' + col.label + '</h4>';
+    var zone = document.createElement("div");
+    zone.className = "drop-zone";
+    zone.dataset.colId = col.id;
+    zone.addEventListener("dragover", function(e) { e.preventDefault(); zone.classList.add("drag-over"); });
+    zone.addEventListener("dragleave", function()  { zone.classList.remove("drag-over"); });
+    zone.addEventListener("drop", function(e) {
+      e.preventDefault();
+      zone.classList.remove("drag-over");
+      var chip = e.dataTransfer.getData("text/plain");
+      // remove from pool visually
+      var poolChips = document.querySelectorAll(".drag-chip");
+      poolChips.forEach(function(c) { if (c.dataset.chip === chip) c.classList.add("placed"); });
+      // add to zone
+      var dropped = document.createElement("span");
+      dropped.className = "dropped-chip";
+      dropped.textContent = chip;
+      dropped.dataset.chip = chip;
+      zone.appendChild(dropped);
+    });
+    colDiv.appendChild(zone);
+    colWrap.appendChild(colDiv);
+  });
+
+  // Check button
+  var checkBtn = document.getElementById("check-drag-btn");
+  checkBtn.style.display = "inline-block";
+  checkBtn.onclick = function() { checkDrag(q); };
+}
+
+function checkDrag(q) {
+  if (state.answered) return;
+  state.answered = true;
+
+  var allCorrect = true;
+  var zones = document.querySelectorAll(".drop-zone");
+  zones.forEach(function(zone) {
+    var colId = zone.dataset.colId;
+    var col = q.columns.find(function(c) { return c.id === colId; });
+    var dropped = zone.querySelectorAll(".dropped-chip");
+    dropped.forEach(function(chip) {
+      var chipText = chip.dataset.chip;
+      if (col.accepts.indexOf(chipText) === -1) {
+        chip.classList.add("wrong");
+        allCorrect = false;
+      }
+    });
+  });
+
+  document.getElementById("check-drag-btn").style.display = "none";
+
+  if (allCorrect) {
+    awardXP(q.xp);
+    showFeedback("✅ Excellent! All items correctly sorted. You understand when to use each spacing type!", "correct");
+  } else {
+    loseStreak();
+    showFeedback("❌ Some items are in the wrong column (shown in red). Review the correct placements and remember: Single = casual/quick, Double = academic submissions, Custom = precise pt values.", "incorrect");
+  }
+  document.getElementById("next-btn").style.display = "inline-block";
+}
+
+// ═══════════════════════════════════════════════
+//  SIMULATION
+// ═══════════════════════════════════════════════
+function buildSim(q) {
+  document.getElementById("sim-area").style.display = "block";
+
+  var toolbar = document.getElementById("sim-toolbar");
+  toolbar.innerHTML = "";
+  var ddContainer = document.getElementById("sim-dropdown-container");
+  ddContainer.innerHTML = "";
+  document.getElementById("sim-doc-body").innerHTML = q.simDocContent;
+
+  q.simMenus.forEach(function(menu, mi) {
+    // Menu label
+    var menuEl = document.createElement("span");
+    menuEl.className = "sim-menu";
+    menuEl.textContent = menu.label;
+    toolbar.appendChild(menuEl);
+
+    // Dropdown
+    var dd = document.createElement("div");
+    dd.className = "sim-dropdown";
+    dd.id = "dd-" + mi;
+    dd.style.left = (mi * 80) + "px";
+    dd.style.top = "32px";
+    dd.style.position = "absolute";
+
+    menu.items.forEach(function(item) {
+      var itemEl = document.createElement("div");
+      itemEl.className = "sim-dd-item";
+      itemEl.innerHTML = '<span>' + item.text + '</span>';
+      itemEl.addEventListener("click", function() {
+        if (state.answered) return;
+        closeAllDropdowns();
+        if (item.correct) {
+          itemEl.classList.add("correct-path");
+          state.answered = true;
+          awardXP(q.xp);
+          showFeedback(item.feedback, "correct");
+          document.getElementById("next-btn").style.display = "inline-block";
+        } else {
+          itemEl.classList.add("wrong-path");
+          loseStreak();
+          showFeedback(item.feedback, "incorrect");
         }
+      });
+      dd.appendChild(itemEl);
+    });
 
-        function loadQuest() {
-            const quest = quests[currentQuest];
-            document.getElementById('quest-title').innerText = quest.title;
-            document.getElementById('quest-desc').innerText = quest.desc;
-            document.getElementById('feedback').style.display = 'none';
-            document.getElementById('next-btn').style.display = 'none';
-            
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            
-            quest.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerText = opt.text;
-                btn.onclick = () => checkAnswer(index);
-                container.appendChild(btn);
-            });
-        }
+    ddContainer.appendChild(dd);
 
-        function checkAnswer(index) {
-            const quest = quests[currentQuest];
-            const option = quest.options[index];
-            const feedbackDiv = document.getElementById('feedback');
-            
-            feedbackDiv.style.display = 'block';
-            feedbackDiv.innerText = option.feedback;
-            
-            if (option.correct) {
-                feedbackDiv.className = 'correct';
-                xp += 100;
-                streak++;
-                updateStats();
-                document.getElementById('next-btn').style.display = 'inline-block';
-                // Disable other buttons
-                const btns = document.querySelectorAll('.option-btn');
-                btns.forEach(b => b.disabled = true);
-            } else {
-                feedbackDiv.className = 'incorrect';
-                streak = 0;
-                updateStats();
-            }
-        }
+    // Toggle dropdown on menu click
+    menuEl.addEventListener("click", function(e) {
+      e.stopPropagation();
+      var isOpen = dd.classList.contains("open");
+      closeAllDropdowns();
+      if (!isOpen) {
+        dd.classList.add("open");
+        menuEl.classList.add("active-menu");
+      }
+    });
+  });
 
-        function updateStats() {
-            document.getElementById('xp-display').innerText = xp;
-            document.getElementById('streak-display').innerText = streak + " 🔥";
-            
-            let rankIndex = Math.min(Math.floor(xp / 150), ranks.length - 1);
-            document.getElementById('rank-display').innerText = ranks[rankIndex];
-        }
+  // Close on outside click
+  document.addEventListener("click", closeAllDropdowns);
+}
 
-        function nextQuest() {
-            currentQuest++;
-            if (currentQuest < quests.length) {
-                loadQuest();
-            } else {
-                showFinal();
-            }
-        }
+function closeAllDropdowns() {
+  document.querySelectorAll(".sim-dropdown").forEach(function(d) { d.classList.remove("open"); });
+  document.querySelectorAll(".sim-menu").forEach(function(m) { m.classList.remove("active-menu"); });
+}
 
-        function showFinal() {
-            document.getElementById('quest-screen').classList.remove('active');
-            document.getElementById('final-screen').classList.add('active');
-            document.getElementById('final-rank-box').innerText = "FINAL RANK: " + ranks[ranks.length - 1];
-            triggerConfetti();
-        }
+// ═══════════════════════════════════════════════
+//  FEEDBACK
+// ═══════════════════════════════════════════════
+function showFeedback(msg, type) {
+  var box = document.getElementById("feedback-box");
+  box.textContent = msg;
+  box.className = "feedback-box " + type;
+  box.style.display = "block";
+}
+function hideFeedback() {
+  var box = document.getElementById("feedback-box");
+  box.style.display = "none";
+  box.className = "feedback-box";
+}
 
-        // Simple Confetti Effect
-        function triggerConfetti() {
-            const canvas = document.getElementById('confetti-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            let particles = [];
-            for(let i=0; i<100; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height - canvas.height,
-                    r: Math.random() * 6 + 2,
-                    d: Math.random() * 10,
-                    color: `hsl(${Math.random() * 360}, 70%, 50%)`,
-                    tilt: Math.random() * 10 - 10
-                });
-            }
+// ═══════════════════════════════════════════════
+//  XP / STREAK / RANK
+// ═══════════════════════════════════════════════
+function awardXP(amount) {
+  var prevRank = getRank(state.xp);
+  state.xp += amount;
+  state.streak++;
+  var newRank = getRank(state.xp);
+  updateStats();
+  if (state.streak === 3) showToast("🔥 3 in a row! You're on fire!");
+  if (state.streak === 5) showToast("⚡ 5 streak! Unstoppable!");
+  if (newRank !== prevRank) showRankUp(newRank);
+}
 
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => {
-                    ctx.beginPath();
-                    ctx.lineWidth = p.r;
-                    ctx.strokeStyle = p.color;
-                    ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
-                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
-                    ctx.stroke();
-                });
-                update();
-            }
+function loseStreak() {
+  state.streak = 0;
+  updateStats();
+}
 
-            function update() {
-                particles.forEach(p => {
-                    p.y += Math.cos(p.d) + 1 + p.r/2;
-                    p.tilt = Math.sin(p.d) * 15;
-                    if(p.y > canvas.height) {
-                        p.y = -20;
-                        p.x = Math.random() * canvas.width;
-                    }
-                });
-            }
-            setInterval(draw, 20);
-        }
-    </script>
+function getRank(xp) {
+  var rank = RANKS[0].name;
+  RANKS.forEach(function(r) { if (xp >= r.min) rank = r.name; });
+  return rank;
+}
+
+function updateStats() {
+  document.getElementById("xp-display").textContent     = state.xp;
+  document.getElementById("rank-display").textContent   = getRank(state.xp);
+  document.getElementById("streak-display").textContent = state.streak + " 🔥";
+  var pct = Math.round((state.currentQuest / quests.length) * 100);
+  document.getElementById("progress-fill").style.width  = pct + "%";
+}
+
+// ═══════════════════════════════════════════════
+//  NEXT QUEST
+// ═══════════════════════════════════════════════
+function nextQuest() {
+  state.currentQuest++;
+  if (state.currentQuest < quests.length) {
+    loadQuest();
+  } else {
+    showFinal();
+  }
+}
+
+function showFinal() {
+  document.getElementById("stats-bar").style.display = "none";
+  showScreen("final-screen");
+  document.getElementById("final-rank-title").textContent = "🏅 " + getRank(state.xp);
+  document.getElementById("final-xp").textContent = "Total XP Earned: " + state.xp;
+  triggerConfetti();
+}
+
+// ═══════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════
+function showToast(msg) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(function() { t.classList.remove("show"); }, 2800);
+}
+
+// ═══════════════════════════════════════════════
+//  RANK UP BANNER
+// ═══════════════════════════════════════════════
+function showRankUp(rank) {
+  var banner = document.getElementById("rank-up-banner");
+  document.getElementById("rank-up-title").textContent = "🎖️ RANK UP!";
+  document.getElementById("rank-up-sub").textContent   = "You are now a " + rank + "!";
+  banner.style.display = "block";
+  setTimeout(function() { banner.style.display = "none"; }, 2500);
+}
+
+// ═══════════════════════════════════════════════
+//  CONFETTI
+// ═══════════════════════════════════════════════
+function triggerConfetti() {
+  var canvas = document.getElementById("confetti-canvas");
+  var ctx    = canvas.getContext("2d");
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  var particles = [];
+  var colors = ["#1B5EAF","#1E7A3E","#FFB81C","#e74c3c","#9b59b6","#3498db"];
+  for (var i = 0; i < 140; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 7 + 3,
+      d: Math.random() * 10,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      tilt: Math.random() * 10 - 10,
+      speed: Math.random() * 2 + 1
+    });
+  }
+
+  var frame;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(function(p) {
+      ctx.beginPath();
+      ctx.lineWidth = p.r;
+      ctx.strokeStyle = p.color;
+      ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+      ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+      ctx.stroke();
+      p.y += p.speed + Math.cos(p.d);
+      p.tilt = Math.sin(p.d) * 15;
+      p.d += 0.05;
+      if (p.y > canvas.height) {
+        p.y = -20;
+        p.x = Math.random() * canvas.width;
+      }
+    });
+    frame = requestAnimationFrame(draw);
+    // stop after 5s
+  }
+  draw();
+  setTimeout(function() { cancelAnimationFrame(frame); ctx.clearRect(0,0,canvas.width,canvas.height); }, 5000);
+}
+</script>
 </body>
 </html>
