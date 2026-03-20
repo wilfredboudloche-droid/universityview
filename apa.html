@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVA Lesson 6.03: Google Docs Mastery</title>
+    <style>
+        :root {
+            --uva-blue: #1B5EAF;
+            --uva-green: #1E7A3E;
+            --uva-gold: #FFB81C;
+            --bg-light: #f4f7f9;
+            --text-dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Header & Branding */
+        .header {
+            background-color: var(--uva-blue);
+            color: white;
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .motto-banner {
+            background-color: var(--uva-green);
+            color: white;
+            padding: 5px 20px;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-top: 10px;
+            border-radius: 20px;
+        }
+
+        /* Game Container */
+        #game-container {
+            max-width: 800px;
+            width: 90%;
+            background: white;
+            margin: 30px 0;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        /* Progress & Stats */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: #eef2f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .rank-badge {
+            color: var(--uva-green);
+            text-transform: uppercase;
+        }
+
+        .streak-fire {
+            color: #e67e22;
+        }
+
+        /* Screens */
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.5s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--uva-blue);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #154a8a;
+            transform: scale(1.05);
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--uva-blue);
+            background: #f0f7ff;
+        }
+
+        /* Feedback */
+        #feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Simulation UI */
+        .google-docs-ui {
+            background: #f8f9fa;
+            border: 1px solid #dadce0;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: left;
+            font-family: Arial, sans-serif;
+        }
+
+        .menu-bar {
+            display: flex;
+            gap: 15px;
+            border-bottom: 1px solid #dadce0;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #3c4043;
+        }
+
+        .menu-item { cursor: pointer; padding: 2px 5px; }
+        .menu-item:hover { background: #eee; }
+
+        .confetti {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h3 style="margin:0;">UNIVERSITY VIEW ACADEMY</h3>
+        <div style="font-size: 1.2rem; margin-top: 5px;">Computer Tech Literacy: Lesson 6.03</div>
+        <div class="motto-banner">Virtue · Vigor · Vision</div>
+    </div>
+
+    <div id="game-container">
+        <!-- Stats Bar -->
+        <div class="stats-bar" id="stats-bar" style="display:none;">
+            <div>XP: <span id="xp-display">0</span></div>
+            <div>RANK: <span id="rank-display" class="rank-badge">Trainee</span></div>
+            <div>STREAK: <span id="streak-display" class="streak-fire">0 🔥</span></div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h2 style="color: var(--uva-blue);">Mastering Lists & Spacing</h2>
+            <p>Welcome, Student! Your mission is to master the professional formatting standards used in Google Docs. Complete all quests to reach the rank of <strong>Master</strong>.</p>
+            <img src="https://img.icons8.com/fluency/96/google-docs.png" alt="Docs Icon">
+            <br>
+            <button class="btn" onclick="startGame()">BEGIN MISSION</button>
+        </div>
+
+        <!-- Quest Screen -->
+        <div id="quest-screen" class="screen">
+            <h3 id="quest-title" style="color: var(--uva-green);">Quest 1: The List Architect</h3>
+            <p id="quest-desc">Scenario: You are creating a grocery list where the order doesn't matter. Which tool should you use?</p>
+            
+            <div id="options-container">
+                <!-- Options injected by JS -->
+            </div>
+
+            <div id="feedback"></div>
+            <button id="next-btn" class="btn" style="display:none;" onclick="nextQuest()">NEXT QUEST</button>
+        </div>
+
+        <!-- Final Screen -->
+        <div id="final-screen" class="screen">
+            <h2 style="color: var(--uva-green);">MISSION ACCOMPLISHED!</h2>
+            <div id="final-rank-box" style="font-size: 2rem; margin: 20px 0; font-weight: bold;">RANK: MASTER</div>
+            <p>You have successfully mastered Google Docs Lists and Spacing standards. You are now ready for the Digital Literacy Certification!</p>
+            <button class="btn" onclick="location.reload()">RESTART MISSION</button>
+        </div>
+    </div>
+
+    <canvas id="confetti-canvas" class="confetti"></canvas>
+
+    <script>
+        let currentQuest = 0;
+        let xp = 0;
+        let streak = 0;
+        let ranks = ["Trainee", "Apprentice", "Expert", "Master"];
+
+        const quests = [
+            {
+                title: "Quest 1: The List Architect",
+                desc: "Scenario: You are writing a set of instructions for a science experiment that must be followed in a specific sequence. Which list type is required?",
+                options: [
+                    { text: "Bulleted List", correct: false, feedback: "Incorrect. Bullets are for items where order doesn't matter." },
+                    { text: "Numbered List", correct: true, feedback: "Correct! Numbered lists are for sequential steps or rankings." },
+                    { text: "Checklist", correct: false, feedback: "Incorrect. Checklists are for tracking completion, not necessarily sequence." }
+                ]
+            },
+            {
+                title: "Quest 2: Shortcut Ninja",
+                desc: "You've created a sub-item in a multilevel list. Which keyboard shortcut will 'promote' the item back to the main level (move it to the left)?",
+                options: [
+                    { text: "Tab", correct: false, feedback: "Incorrect. Tab 'demotes' an item to a sub-level." },
+                    { text: "Shift + Tab", correct: true, feedback: "Correct! Shift + Tab moves the list item back to the previous hierarchy level." },
+                    { text: "Ctrl + Z", correct: false, feedback: "Incorrect. That is the 'Undo' command." }
+                ]
+            },
+            {
+                title: "Quest 3: Spacing Commander",
+                desc: "A professional report requires 'Double Spacing'. Where do you find this in the Google Docs menu?",
+                options: [
+                    { text: "Insert > Spacing", correct: false, feedback: "Incorrect. Spacing is a formatting tool, not an insertion." },
+                    { text: "Format > Line & paragraph spacing > Double", correct: true, feedback: "Correct! This is the standard path for line spacing." },
+                    { text: "File > Page Setup", correct: false, feedback: "Incorrect. Page Setup handles margins and orientation." }
+                ]
+            },
+            {
+                title: "Quest 4: The Citation Pro",
+                desc: "When creating a Works Cited page, you need the first line to be at the margin and every line after to be indented. What is this called?",
+                options: [
+                    { text: "First Line Indent", correct: false, feedback: "Incorrect. That only indents the first line (standard paragraph)." },
+                    { text: "Hanging Indent", correct: true, feedback: "Correct! Hanging indents are the professional standard for citations." },
+                    { text: "Block Quote", correct: false, feedback: "Incorrect. Block quotes indent the entire paragraph." }
+                ]
+            }
+        ];
+
+        function startGame() {
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('quest-screen').classList.add('active');
+            document.getElementById('stats-bar').style.display = 'flex';
+            loadQuest();
+        }
+
+        function loadQuest() {
+            const quest = quests[currentQuest];
+            document.getElementById('quest-title').innerText = quest.title;
+            document.getElementById('quest-desc').innerText = quest.desc;
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            quest.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt.text;
+                btn.onclick = () => checkAnswer(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(index) {
+            const quest = quests[currentQuest];
+            const option = quest.options[index];
+            const feedbackDiv = document.getElementById('feedback');
+            
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.innerText = option.feedback;
+            
+            if (option.correct) {
+                feedbackDiv.className = 'correct';
+                xp += 100;
+                streak++;
+                updateStats();
+                document.getElementById('next-btn').style.display = 'inline-block';
+                // Disable other buttons
+                const btns = document.querySelectorAll('.option-btn');
+                btns.forEach(b => b.disabled = true);
+            } else {
+                feedbackDiv.className = 'incorrect';
+                streak = 0;
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('xp-display').innerText = xp;
+            document.getElementById('streak-display').innerText = streak + " 🔥";
+            
+            let rankIndex = Math.min(Math.floor(xp / 150), ranks.length - 1);
+            document.getElementById('rank-display').innerText = ranks[rankIndex];
+        }
+
+        function nextQuest() {
+            currentQuest++;
+            if (currentQuest < quests.length) {
+                loadQuest();
+            } else {
+                showFinal();
+            }
+        }
+
+        function showFinal() {
+            document.getElementById('quest-screen').classList.remove('active');
+            document.getElementById('final-screen').classList.add('active');
+            document.getElementById('final-rank-box').innerText = "FINAL RANK: " + ranks[ranks.length - 1];
+            triggerConfetti();
+        }
+
+        // Simple Confetti Effect
+        function triggerConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            let particles = [];
+            for(let i=0; i<100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: Math.random() * 6 + 2,
+                    d: Math.random() * 10,
+                    color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+                    tilt: Math.random() * 10 - 10
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    ctx.beginPath();
+                    ctx.lineWidth = p.r;
+                    ctx.strokeStyle = p.color;
+                    ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
+                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
+                    ctx.stroke();
+                });
+                update();
+            }
+
+            function update() {
+                particles.forEach(p => {
+                    p.y += Math.cos(p.d) + 1 + p.r/2;
+                    p.tilt = Math.sin(p.d) * 15;
+                    if(p.y > canvas.height) {
+                        p.y = -20;
+                        p.x = Math.random() * canvas.width;
+                    }
+                });
+            }
+            setInterval(draw, 20);
+        }
+    </script>
+</body>
+</html>
