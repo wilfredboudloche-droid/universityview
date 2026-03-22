@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVA Lesson 6.05: Google Docs Architecture</title>
+    <style>
+        :root {
+            --uva-blue: #1B5EAF;
+            --uva-green: #1E7A3E;
+            --uva-light-blue: #eef4fb;
+            --white: #ffffff;
+            --gray: #f4f4f4;
+            --dark-gray: #333;
+            --success: #28a745;
+            --error: #dc3545;
+            --gold: #FFD700;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background-color: #f0f2f5;
+            color: var(--dark-gray);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* UVA Branding & Header */
+        .motto-ribbon {
+            width: 100%;
+            background-color: var(--uva-green);
+            color: white;
+            text-align: center;
+            padding: 5px 0;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .header {
+            width: 100%;
+            background-color: var(--uva-blue);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            border-bottom: 4px solid var(--uva-green);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+            font-weight: 300;
+        }
+
+        /* Stats Dashboard */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            padding: 15px;
+            margin-top: -10px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 5;
+        }
+
+        .stat-box {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #777;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--uva-blue);
+        }
+
+        .streak-val { color: #e67e22; }
+
+        /* Game Container */
+        .game-container {
+            max-width: 800px;
+            width: 95%;
+            background: white;
+            margin: 30px 0;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen { display: none; animation: fadeIn 0.5s ease; }
+        .active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Rank Badge */
+        .rank-display {
+            display: inline-block;
+            background: var(--uva-green);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Progress Bar */
+        .progress-wrapper {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--uva-blue), var(--uva-green));
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Mission Content */
+        .mission-card {
+            background: var(--uva-light-blue);
+            border-left: 5px solid var(--uva-blue);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .mission-card h3 {
+            margin: 0 0 10px 0;
+            color: var(--uva-blue);
+            font-size: 1.2rem;
+        }
+
+        .options-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--uva-blue);
+            background: #f8fbff;
+            transform: translateX(5px);
+        }
+
+        .option.correct {
+            background-color: #d4edda;
+            border-color: var(--success);
+            color: #155724;
+        }
+
+        .option.wrong {
+            background-color: #f8d7da;
+            border-color: var(--error);
+            color: #721c24;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--uva-blue);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(27, 94, 175, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary:hover {
+            background: #144683;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(27, 94, 175, 0.3);
+        }
+
+        /* Feedback Area */
+        #feedback-area {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Streak & Rank Popups */
+        #streak-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #e67e22;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            transform: translateY(100px);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #streak-toast.show { transform: translateY(0); }
+
+        /* Confetti */
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="motto-ribbon">Virtue • Vigor • Vision</div>
+
+    <header class="header">
+        <h1>University View Academy</h1>
+        <p>Lesson 6.05: Google Docs Architecture & Design</p>
+    </header>
+
+    <div class="stats-bar">
+        <div class="stat-box">
+            <span class="stat-label">Current Rank</span>
+            <span class="stat-value" id="rank-val">Trainee</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-label">Mission Score</span>
+            <span class="stat-value" id="score-val">0</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-label">Streak</span>
+            <span class="stat-value streak-val" id="streak-val">0 🔥</span>
+        </div>
+    </div>
+
+    <main class="game-container">
+        <!-- Intro Screen -->
+        <div id="screen-intro" class="screen active">
+            <div class="rank-display">MISSION STATUS: READY</div>
+            <h2>Operation: Document Architect</h2>
+            <p>Welcome, Cadet. Professional document design requires more than just typing—it requires a mastery of <strong>Visual Organization</strong> and <strong>Document Architecture</strong>.</p>
+            <div class="mission-card">
+                <h3>Mission Objectives:</h3>
+                <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                    <li>Master Table Properties (Padding, Merging, Sorting)</li>
+                    <li>Configure Advanced Image Wrapping & Margins</li>
+                    <li>Implement Header Persistence for multi-page data</li>
+                </ul>
+            </div>
+            <p>Complete all 10 objectives to achieve the rank of <strong>Master Architect</strong>.</p>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-primary" onclick="ui.startMission()">Begin Mission</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="screen-game" class="screen">
+            <div id="rank-badge-game" class="rank-display">Trainee</div>
+            <div class="progress-wrapper">
+                <div id="progress-fill"></div>
+            </div>
+
+            <div id="mission-content">
+                <div class="mission-card">
+                    <h3 id="obj-title">Objective #1</h3>
+                    <p id="obj-text">Loading mission data...</p>
+                </div>
+                <div class="options-list" id="options-container">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+
+            <div id="feedback-area"></div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button id="btn-next" class="btn-primary" style="display:none;" onclick="ui.nextObjective()">Next Objective</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="screen-results" class="screen">
+            <div style="text-align: center;">
+                <h2 style="color: var(--uva-green);">Mission Accomplished!</h2>
+                <div class="mission-card" style="background: white; border: 3px solid var(--uva-blue);">
+                    <p class="stat-label">Final Rank Achieved</p>
+                    <h1 id="final-rank" style="font-size: 3rem; margin: 10px 0; color: var(--uva-blue);">MASTER</h1>
+                    <p>Total Score: <span id="final-score" style="font-weight: bold; font-size: 1.5rem;">0</span></p>
+                </div>
+                <p id="final-msg">Your mastery of document architecture reflects the UVA spirit of Vision and Vigor.</p>
+                <button class="btn-primary" onclick="location.reload()">Re-run Mission</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="streak-toast">3 IN A ROW! 🔥</div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // --- GAME DATA ---
+        const MISSION_DATA = [
+            {
+                title: "Table Architecture",
+                text: "You need to increase the white space between the text inside a cell and the cell's border. Which setting should you adjust?",
+                options: ["Cell Padding", "Cell Margin", "Border Width", "Row Distribution"],
+                correct: 0,
+                hint: "Cell padding controls the internal space within a cell."
+            },
+            {
+                title: "Merging Cells",
+                text: "To combine three selected cells into one large cell, which menu path is correct?",
+                options: ["Format > Table > Merge cells", "Insert > Table > Combine", "Tools > Table > Merge", "Right-click > Group Cells"],
+                correct: 0,
+                hint: "Format > Table > Merge cells is the standard workflow."
+            },
+            {
+                title: "Image Wrapping",
+                text: "You want text to flow around all sides of an image. Which wrapping style should you select?",
+                options: ["In line with text", "Wrap text", "Break text", "Behind text"],
+                correct: 1,
+                hint: "'Wrap text' allows text to flow around the object."
+            },
+            {
+                title: "Data Organization",
+                text: "You have a table of student names. How do you quickly alphabetize the entire table by the first column?",
+                options: ["Format > Table > Sort table", "Tools > Alphabetize", "Insert > Sort", "Manual drag and drop"],
+                correct: 0,
+                hint: "The Sort Table feature handles data organization efficiently."
+            },
+            {
+                title: "Header Persistence",
+                text: "You want the top row of your table to repeat at the top of every page. What is this called?",
+                options: ["Sticky Row", "Header Row Pinning", "Pin Row", "Header Row Persistence"],
+                correct: 1,
+                hint: "Pinning the header row ensures it stays visible across pages."
+            },
+            {
+                title: "Image Margins",
+                text: "To prevent text from touching the edge of an image, which property do you adjust?",
+                options: ["Image Padding", "Margin", "Border Weight", "Transparency"],
+                correct: 1,
+                hint: "Margins create a 'buffer zone' around the image."
+            },
+            {
+                title: "Table Distribution",
+                text: "Your table rows are all different heights. Which tool makes them all exactly the same height?",
+                options: ["Equalize Rows", "Distribute Rows", "Normalize Rows", "Balance Rows"],
+                correct: 1,
+                hint: "Distribute Rows makes all selected rows uniform in height."
+            },
+            {
+                title: "Image Adjustments",
+                text: "You need to make an image slightly see-through so it doesn't distract from the text. What do you adjust?",
+                options: ["Brightness", "Contrast", "Transparency", "Opacity"],
+                correct: 2,
+                hint: "Transparency (or Opacity) controls the see-through level."
+            },
+            {
+                title: "Splitting Cells",
+                text: "You have one cell that needs to be turned into two separate columns. What is this action called?",
+                options: ["Divide Cell", "Split Cell", "Break Cell", "Un-merge Cell"],
+                correct: 1,
+                hint: "Splitting cells allows for more complex internal structures."
+            },
+            {
+                title: "Professional Layout",
+                text: "Which wrapping style places the image on its own line, pushing all text above and below it?",
+                options: ["Wrap text", "Break text", "In front of text", "In line with text"],
+                correct: 1,
+                hint: "'Break text' ensures no text appears to the left or right of the image."
+            }
+        ];
+
+        // --- GAME LOGIC ---
+        const state = {
+            currentIndex: 0,
+            score: 0,
+            streak: 0,
+            rank: "Trainee",
+            isAnswered: false
+        };
+
+        const ui = {
+            startMission: () => {
+                document.getElementById('screen-intro').classList.remove('active');
+                document.getElementById('screen-game').classList.add('active');
+                ui.loadObjective();
+            },
+
+            loadObjective: () => {
+                state.isAnswered = false;
+                const data = MISSION_DATA[state.currentIndex];
+
+                document.getElementById('obj-title').innerText = `Objective #${state.currentIndex + 1}: ${data.title}`;
+                document.getElementById('obj-text').innerText = data.text;
+                document.getElementById('btn-next').style.display = 'none';
+                document.getElementById('feedback-area').style.display = 'none';
+
+                const container = document.getElementById('options-container');
+                container.innerHTML = '';
+
+                data.options.forEach((opt, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'option';
+                    div.innerText = opt;
+                    div.onclick = () => ui.handleAnswer(i);
+                    container.appendChild(div);
+                });
+
+                ui.updateProgress();
+            },
+
+            handleAnswer: (index) => {
+                if (state.isAnswered) return;
+                state.isAnswered = true;
+
+                const data = MISSION_DATA[state.currentIndex];
+                const options = document.querySelectorAll('.option');
+                const feedback = document.getElementById('feedback-area');
+
+                if (index === data.correct) {
+                    options[index].classList.add('correct');
+                    state.score += 100 + (state.streak * 20);
+                    state.streak++;
+                    feedback.innerText = "EXCELLENT: " + data.hint;
+                    feedback.style.backgroundColor = "#d4edda";
+                    feedback.style.color = "#155724";
+                    ui.triggerConfetti();
+                    if (state.streak >= 3) ui.showStreak();
+                } else {
+                    options[index].classList.add('wrong');
+                    options[data.correct].classList.add('correct');
+                    state.streak = 0;
+                    feedback.innerText = "RECALIBRATING: The correct path was " + data.options[data.correct];
+                    feedback.style.backgroundColor = "#f8d7da";
+                    feedback.style.color = "#721c24";
+                }
+
+                feedback.style.display = 'block';
+                document.getElementById('btn-next').style.display = 'inline-block';
+                ui.updateStats();
+            },
+
+            nextObjective: () => {
+                state.currentIndex++;
+                if (state.currentIndex < MISSION_DATA.length) {
+                    ui.loadObjective();
+                } else {
+                    ui.showResults();
+                }
+            },
+
+            updateStats: () => {
+                // Rank Logic
+                if (state.score >= 900) state.rank = "Master Architect";
+                else if (state.score >= 600) state.rank = "Expert Designer";
+                else if (state.score >= 300) state.rank = "Apprentice";
+
+                document.getElementById('score-val').innerText = state.score;
+                document.getElementById('streak-val').innerText = `${state.streak} 🔥`;
+                document.getElementById('rank-val').innerText = state.rank;
+                document.getElementById('rank-badge-game').innerText = state.rank;
+            },
+
+            updateProgress: () => {
+                const progress = (state.currentIndex / MISSION_DATA.length) * 100;
+                document.getElementById('progress-fill').style.width = progress + '%';
+            },
+
+            showStreak: () => {
+                const toast = document.getElementById('streak-toast');
+                toast.innerText = `${state.streak} IN A ROW! 🔥`;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
+            },
+
+            showResults: () => {
+                document.getElementById('screen-game').classList.remove('active');
+                document.getElementById('screen-results').classList.add('active');
+                document.getElementById('final-score').innerText = state.score;
+                document.getElementById('final-rank').innerText = state.rank;
+                ui.triggerConfetti();
+                setTimeout(ui.triggerConfetti, 1000);
+            },
+
+            triggerConfetti: () => {
+                const canvas = document.getElementById('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                let pieces = [];
+                for (let i = 0; i < 60; i++) {
+                    pieces.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height - canvas.height,
+                        r: Math.random() * 6 + 4,
+                        d: Math.random() * 10,
+                        color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+                        tilt: Math.random() * 10 - 10
+                    });
+                }
+                function draw() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    pieces.forEach((p, i) => {
+                        ctx.beginPath();
+                        ctx.lineWidth = p.r;
+                        ctx.strokeStyle = p.color;
+                        ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                        ctx.stroke();
+                        p.y += Math.cos(p.d) + 1 + p.r / 2;
+                        p.tilt = Math.sin(p.d) * 15;
+                        if (p.y > canvas.height) pieces[i] = null;
+                    });
+                    pieces = pieces.filter(p => p !== null);
+                    if (pieces.length > 0) requestAnimationFrame(draw);
+                }
+                draw();
+            }
+        };
+    </script>
+</body>
+</html>
