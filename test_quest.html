@@ -1,410 +1,186 @@
-<style>
-/* DesignPLUS shim — mimics Canvas DesignPLUS rendering outside Canvas */
-.dp-wrapper { font-family: 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; }
-.dp-content-block h3.dp-has-icon { font-size: 1.5rem; font-weight: 700; color: #111827; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
-.dp-content-block h3.dp-has-icon i { display: none; }
-.dp-panel-group { border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
-.dp-panel-heading { display: block; margin: 0; padding: 8px 12px; font-size: 1rem; font-weight: 600; cursor: default; }
-.dp-panel-content { display: block; padding: 10px 12px; }
-.dp-panels-wrapper.dp-expander-default .dp-panel-group { }
-.dp-tabs-pills-vertical .dp-panel-group { }
-/* Accordion panels use native <details>/<summary> (Canvas-safe, no JS toggle). */
-.lsv-panel-group, .lsv-static-panel { list-style: none !important; }
-.lsv-panel-heading, .lsv-static-heading { list-style: none !important; }
-.lsv-panel-content, .lsv-static-content { display: block; padding: 10px 12px; }
-.lsv-static-heading { display: block; margin: 0; padding: 8px 12px; font-size: 1rem; font-weight: 600; }
-/* Quick Check styles */
-.dp-qc { border-radius: 8px; padding: 10px 12px; margin-top: 14px; }
-.dp-qc h3 { font-size: 1rem; margin: 0 0 8px; font-weight: 700; }
-.dp-qc-question p { margin: 0 0 8px; }
-.dp-qc-answers { margin: 0; padding: 0; list-style: none; }
-.dp-qc-answer { display: block; margin-bottom: 6px; padding: 8px 12px; background: #fff; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: background 0.15s; }
-.dp-qc-answer:hover { background: #f3f4f6; }
-.dp-qc-answer.dp-qc-correct { border-color: #16a34a; }
-.dp-qc-response { display: block; margin: 4px 0 8px 12px; padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; background: #f0fdf4; border-left: 3px solid #16a34a; }
-.dp-qc-response.d-none { display: none !important; }
-.dp-qc-response:not(.dp-qc-correct) { background: #fef2f2; border-left-color: #dc2626; }
-/* Image constraints — prevent overlap with text */
-.dp-wrapper img { max-width: 100%; height: auto; display: block; margin: 12px auto; clear: both; }
-/* Header — solid background (not a gradient), matching the DesignPLUS template */
-.dp-wrapper .dp-header { background: #1B5EAF; border-radius: 14px; padding: 24px 28px; color: #ffffff; margin: 0 0 4px; }
-.dp-wrapper .dp-header .dp-heading { margin: 0; font-size: 1.6rem; line-height: 1.3; font-weight: 700; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.dp-wrapper .dp-header-pre { display: inline-flex; }
-.dp-wrapper .dp-header-pre-1 { display: inline-flex; align-items: center; }
-.dp-wrapper .dp-image-round { border-radius: 50%; width: 128px !important; height: 128px !important; max-width: none !important; display: inline-block !important; margin: 0 !important; object-fit: cover; }
-.dp-wrapper .dp-image-bordered { border: 5px solid #2d793e; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-#dp-wrapper .dp-header-title { color: #ffffff !important; font-weight: 700 !important; font-size: 1.6rem; }
-#dp-wrapper .dp-header-module { margin: 6px 0 0; font-size: 0.9rem; color: #ffffff !important; font-weight: 600 !important; }
-#dp-wrapper .dp-header-subtitle { margin: 6px 0 0; font-size: 1rem; color: #ffffff !important; font-weight: 500; }
-/* Nav link grid — 2×2 pill buttons matching the DesignPLUS template */
-.dp-link-grid { margin: 12px 0 0; }
-.dp-link-grid ul.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; list-style: none; margin: 0; padding: 0; }
-.dp-link-grid li { list-style: none; }
-.dp-link-grid a.dp-has-icon { display: flex; align-items: center; gap: 10px; padding: 12px 18px; background: #1B5EAF; color: #ffffff !important; border-radius: 999px; text-decoration: none; font-size: 0.9rem; font-weight: 600; }
-.dp-link-grid a.dp-has-icon:hover { opacity: 0.9; }
-.dp-link-grid .dp-icon, .dp-link-grid i { color: #ffffff; }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personality Questionnaire</title>
+  <style>
+    :root {
+      --primary: #005691; /* Classic Canvas Navy */
+      --primary-hover: #003e68;
+      --bg: #f5f7f9;
+      --card-bg: #ffffff;
+      --text: #2d3b45;
+      --border: #dc2222;
+    }
 
-/* Quick check interactive JS */
-</style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+    }
+
+    .quiz-card {
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e1e5e8;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: var(--primary);
+      font-size: 1.4rem;
+    }
+
+    .question {
+      margin-bottom: 20px;
+    }
+
+    p.q-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .options label {
+      display: block;
+      background: #f8f9fa;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      border: 1px solid #e1e5e8;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .options label:hover {
+      background: #eef4f8;
+    }
+
+    .options input {
+      margin-right: 10px;
+    }
+
+    button {
+      width: 100%;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 16px;
+      background: #e8f4f8;
+      border-left: 4px solid var(--primary);
+      border-radius: 4px;
+      display: none;
+    }
+
+    #result h3 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-card">
+  <h2>Work Style Personality Quiz</h2>
+  <form id="quizForm">
+    
+    <div class="question">
+      <p class="q-title">1. How do you approach group projects?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="A" required> Take charge and outline the plan immediately.</label>
+        <label><input type="radio" name="q1" value="B"> Focus on bringing creative ideas to the table.</label>
+        <label><input type="radio" name="q1" value="C"> Offer to keep everyone organized and on schedule.</label>
+      </div>
+    </div>
+
+    <div class="question">
+      <p class="q-title">2. What’s your preferred environment for studying or working?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="A" required> A quiet room with a clear, ambitious checklist.</label>
+        <label><input type="radio" name="q2" value="B"> A bustling coffee shop with flexible timing.</label>
+        <label><input type="radio" name="q2" value="C"> A neatly organized desk with all materials ready.</label>
+      </div>
+    </div>
+
+    <div class="question">
+      <p class="q-title">3. When faced with a complex problem, you usually:</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="A" required> Make a quick, confident decision to move forward.</label>
+        <label><input type="radio" name="q3" value="B"> Brainstorm unconventional solutions outside the box.</label>
+        <label><input type="radio" name="q3" value="C"> Break down the problem step-by-step to analyze data.</label>
+      </div>
+    </div>
+
+    <button type="button" onclick="calculateResult()">See Result</button>
+  </form>
+
+  <div id="result"></div>
+</div>
+
 <script>
-(function() {
-  function initQC() {
-    document.querySelectorAll('.dp-qc').forEach(function(qc) {
-      qc.querySelectorAll('.dp-qc-answer').forEach(function(answer) {
-        answer.addEventListener('click', function() {
-          var dl = answer.closest('dl');
-          if (!dl) return;
-          // Hide all responses first
-          dl.querySelectorAll('.dp-qc-response').forEach(function(r) { r.classList.add('d-none'); });
-          // Show corresponding response
-          var idx = Array.from(dl.querySelectorAll('.dp-qc-answer')).indexOf(answer);
-          var responses = dl.querySelectorAll('.dp-qc-response');
-          if (responses[idx]) responses[idx].classList.remove('d-none');
-          // Style answers
-          dl.querySelectorAll('.dp-qc-answer').forEach(function(a) {
-            a.style.background = '';
-            a.style.borderColor = '';
-          });
-          if (answer.classList.contains('dp-qc-correct')) {
-            answer.style.background = '#f0fdf4';
-            answer.style.borderColor = '#16a34a';
-          } else {
-            answer.style.background = '#fef2f2';
-            answer.style.borderColor = '#dc2626';
-          }
-        });
-      });
-    });
+  function calculateResult() {
+    const form = document.getElementById('quizForm');
+    const q1 = form.elements['q1'].value;
+    const q2 = form.elements['q2'].value;
+    const q3 = form.elements['q3'].value;
+
+    if (!q1 || !q2 || !q3) {
+      alert("Please answer all questions before submitting.");
+      return;
+    }
+
+    const counts = { A: 0, B: 0, C: 0 };
+    counts[q1]++;
+    counts[q2]++;
+    counts[q3]++;
+
+    let archetype = "A";
+    if (counts.B > counts.A && counts.B >= counts.C) archetype = "B";
+    if (counts.C > counts.A && counts.C > counts.B) archetype = "C";
+
+    const resultsMap = {
+      A: {
+        title: "The Driven Leader",
+        desc: "You are decisive, goal-oriented, and love taking charge to drive project success."
+      },
+      B: {
+        title: "The Creative Innovator",
+        desc: "You thrive on new ideas, flexibility, and finding unique approaches to challenges."
+      },
+      C: {
+        title: "The Methodical Strategist",
+        desc: "You excel at organization, detailed analysis, and keeping projects running smoothly."
+      }
+    };
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+      <h3>${resultsMap[archetype].title}</h3>
+      <p>${resultsMap[archetype].desc}</p>
+    `;
   }
-  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initQC); }
-  else { initQC(); }
-})();
-</script><div id="dp-wrapper" class="dp-wrapper dp-circle-left" data-header-class="dp-header dp-circle-left" data-nav-class="container-fluid dp-link-grid dp-link-grid-circle-right dp-cl-1" style="font-family: 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; max-width: 1054px; margin: 0 auto;">
-    <header class="dp-header dp-circle-left">
-        <h2 class="dp-heading"><span class="dp-header-pre"><span class="dp-header-pre-1">Computer Tech Literacy</span></span> <span class="dp-header-title" style="color:#ffffff !important;font-weight:700 !important;"><span style="color:#ffffff;font-weight:700;">Mastering Your Virtual Classroom</span></span></h2>
-        <p class="dp-header-module" style="margin:4px 0 0;font-size:0.88rem;color:#ffffff !important;font-weight:600 !important;">(CTL) 0.2 Mastering Your Virtual Classroom</p>
-    </header>
-    <div style="margin:10px 0;padding:8px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;display:flex;align-items:center;gap:8px;"><span style="font-size:1.1rem;">🌐</span><a href="https://lessonsaver.com/PublicLessonViewer?id=6a68c65c4f06019e929b3d07&mode=el-friendly" target="_blank" rel="noopener noreferrer" style="font-size:0.88rem;font-weight:700;color:#1e3a5f;text-decoration:none;">View EL-Friendly Version</a><span style="font-size:0.8rem;color:#1a1a1a;">— Simplified language for English Learners</span></div>
-    <p style="margin:10px 0 6px;padding:0 4px;font-size:1rem;color:#111111;font-weight:500;text-align:left;">Navigating your digital classroom</p>
-    
-            <nav class="dp-link-grid container-fluid dp-link-grid-circle-right dp-cl-1">
-                <ul class="row">
-                    <li class="col-sm-12 col-md-6 col-lg-6"><a class="dp-has-icon" href="https://uview.instructure.com/courses/15986/external_tools/11569" target="_blank" data-underline="remove" rel="noopener"><i class="dp-icon fas fa-desktop" aria-hidden="true"><span class="dp-icon-content" style="display: none;">&nbsp;</span></i> Learning Circles &amp; Recordings </a></li>
-                    <li class="col-sm-12 col-md-6 col-lg-6"><a class="dp-has-icon" href="https://uview.instructure.com/courses/15986#modules" target="_blank" data-underline="remove" rel="noopener"><i class="fas fa-bars" aria-hidden="true"><span class="dp-icon-content" style="display: none;">&nbsp;</span></i> Modules </a></li>
-                    <li class="col-sm-12 col-md-6 col-lg-6"><a class="dp-has-icon" href="https://uview.instructure.com/courses/15986/gradebook?cid=1366fc36-6886-4c80-93e5-bf637aca427b" target="_blank" data-underline="remove" rel="noopener"><i class="dp-icon fas fa-medal" aria-hidden="true"><span class="dp-icon-content" style="display: none;">&nbsp;</span></i> Grades </a></li>
-                    <li class="col-sm-12 col-md-6 col-lg-6"><a class="dp-has-icon" href="https://uview.instructure.com/courses/15986/assignments/syllabus" target="_blank" data-underline="remove" rel="noopener"><i class="icon-syllabus icon-Solid" aria-hidden="true"><span class="dp-icon-content" style="display: none;">&nbsp;</span></i> Syllabus </a></li>
-                </ul>
-            </nav>
-    
-    <div class="dp-content-block" style="background-color: #ffff; padding: 10px 18px 12px; border-radius: 10px; margin-top: 6px;">
-        <h3 class="dp-has-icon"><i class="fas fa-handshake"></i> Introduction</h3>
-        <div style="margin-top: 10px; display: flex; flex-wrap: nowrap; gap: 20px; align-items: stretch;">
-            <div style="flex: 1; min-width: 0;">
-                <div style="background-color: #f3f4f6; border-radius: 10px; padding: 10px 12px; border-left: 4px solid #16a34a; color: #111827; margin-bottom: 8px;">
-                    <p style="font-size:11px;font-weight:700;color:#5f6368;margin:0 0 6px 0;text-transform:uppercase;letter-spacing:0.8px;">Navigating your digital classroom</p>
-                    <p style="margin-top: 0;"><p><img src="https://media.base44.com/images/public/69cd829362a9374f3215a0be/41f8dca22_generated_image.png" alt="UVA Compute Tech Literacy Course Overview Intro Image" style="max-width: 45%; height: auto; margin: 0px 0px 6px 14px; width: 381.797px; float: right;">This guide provides an essential orientation for our asynchronous Computer Tech Literacy course. By mastering these tools early, you will be better equipped to focus on developing high-demand computing skills.</p></p>
-                </div>
-                <div style="background-color: #fefce8; border-radius: 10px; padding: 10px 12px; border-left: 4px solid #f59e0b; color: #111827;">
-                <p><strong>Today, your lesson will take about 43 minutes:</strong></p>
-            <ol style="list-style-type: decimal; padding-left: 22px; margin: 0; font-size: 0.92rem;">
-                <li style="margin-bottom: 4px;"><strong>Step 1 - Mastering Your Virtual Classroom - Podcast</strong> &ndash; 10 Minutes</li>
-                <li style="margin-bottom: 4px;"><strong>Step 2 - Quick Check</strong> &ndash; 2 Minutes</li>
-                <li style="margin-bottom: 4px;"><strong>Step 3 - Slideshow</strong> &ndash; 5 Minutes</li>
-                <li style="margin-bottom: 4px;"><strong>Step 4 - Quick Check</strong> &ndash; 2 Minutes</li>
-                <li style="margin-bottom: 4px;"><strong>Step 5 - Explainer Video</strong> &ndash; 7 Minutes</li>
-                <li style="margin-bottom: 4px;"><strong>Step 6 - Quick Check</strong> &ndash; 2 Minutes</li>
-                <li style="margin-bottom: 4px;"><strong>Step 7 - Game Activity</strong> &ndash; 5 Minutes</li>
-                <li style="margin-bottom: 4px;"><strong>Step 8 - Quiz</strong> &ndash; 10 Minutes</li>
-            </ol>
-                </div>
-            </div>
-            
-        </div>
-    </div>
-    <div class="dp-content-block content-block" style="background-color: #ffff; padding: 10px 18px 12px; border-radius: 10px; margin-top: 6px;">
-        <h3 class="dp-has-icon"><i class="fas fa-tasks"></i> Today's Main Focus &amp; Learning Goals</h3>
-        <div class="dp-panels-wrapper dp-tabs-pills-vertical" style="margin-top: 10px;">
-            <div class="dp-panel-group" style="border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 10px; overflow: hidden;">
-                <h3 class="dp-panel-heading" style="margin: 0; padding: 8px 12px; background-color: #e5e7eb; font-size: 1.02rem; color: #111827;">🔍 Today's Main Focus</h3>
-                <div class="dp-panel-content" style="padding: 10px; background-color: #ffff; color: #111827;">
-                    <div style="display: flex; gap: 16px; align-items: flex-start;">
-                          <div style="flex: 1; min-width: 0;">
-                            <p style="margin-top: 0;"><p>This lesson focuses on effectively navigating the Canvas Learning Management System, including understanding course structures, submission processes, and communication tools.</p></p>
-                          </div>
-                          <div style="flex-shrink: 0;"><div class="dp-embed-wrapper" style="margin-top: 8px;"><iframe style="display:block; border:none; border-radius:8px; width:260px; height:400px;" src="https://www.youtube.com/embed/tOvBoTJRjkE" title="CTL 0 2 Mastering Your Virtual Classroom Intro 1080p" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></div>
-                        </div>
-                </div>
-            </div>
-            <div class="dp-panel-group" style="border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 10px; overflow: hidden;">
-                <h3 class="dp-panel-heading" style="margin: 0; padding: 8px 12px; background-color: #e0f2fe; font-size: 1.02rem; color: #111827;">🎯 Lesson Objective</h3>
-                <div class="dp-panel-content" style="padding: 10px 12px; color: #111827; background-color: #ffff;">
-                    <p style="margin-top: 0;"><strong>By the end of this lesson, I will be able to:</strong></p>
-                    <p style="margin: 4px 0; background-color: #eff6ff; border-radius: 8px; padding: 8px 10px; border-left: 4px solid #1d4ed8;">Identify key features of the Canvas dashboard and course navigation menu.</p><p style="margin: 4px 0; background-color: #eff6ff; border-radius: 8px; padding: 8px 10px; border-left: 4px solid #1d4ed8;">Execute the sequential module workflow required to unlock course content.</p><p style="margin: 4px 0; background-color: #eff6ff; border-radius: 8px; padding: 8px 10px; border-left: 4px solid #1d4ed8;">Apply correct procedures for submitting assignments and tracking grades.</p><p style="margin: 4px 0; background-color: #eff6ff; border-radius: 8px; padding: 8px 10px; border-left: 4px solid #1d4ed8;">Implement effective communication strategies for seeking technical and academic support.</p>
-                </div>
-            </div>
-            <div class="dp-panel-group" style="border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 10px; overflow: hidden;">
-                <h3 class="dp-panel-heading" style="margin: 0; padding: 8px 12px; background-color: #ecfdf5; font-size: 1.02rem; color: #111827;">✅ Success Criteria</h3>
-                <div class="dp-panel-content" style="padding: 10px 12px; color: #111827; background-color: #ffff;">
-                    <p style="margin-top: 0;"><strong>I can:</strong></p>
-                    <ol style="margin: 0 0 0 20px;">
-                        <li style="margin-bottom: 6px;"><span style="display: inline-block; background-color: #ecfdf5; border-radius: 8px; padding: 8px 10px; border-left: 4px solid #16a34a;">I can navigate the Modules pathway to locate and complete my daily course work.</span></li>
-                        <li style="margin-bottom: 6px;"><span style="display: inline-block; background-color: #ecfdf5; border-radius: 8px; padding: 8px 10px; border-left: 4px solid #16a34a;">I can submit assignments correctly using the standard 5-step process.</span></li>
-                        <li style="margin-bottom: 6px;"><span style="display: inline-block; background-color: #ecfdf5; border-radius: 8px; padding: 8px 10px; border-left: 4px solid #16a34a;">I can configure my notification settings to receive immediate course updates.</span></li>
-                        <li style="margin-bottom: 6px;"><span style="display: inline-block; background-color: #ecfdf5; border-radius: 8px; padding: 8px 10px; border-left: 4px solid #16a34a;">I can utilize the 'Schedule Help Call' feature to resolve technical or conceptual hurdles.</span></li>
-                    </ol>
-                </div>
-            </div>
-            <div class="dp-panel-group" style="border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 10px; overflow: hidden;">
-                <h3 class="dp-panel-heading" style="margin: 0; padding: 8px 12px; background-color: #eef2ff; font-size: 1.02rem; color: #3730a3;">📐 Standards</h3>
-                <div class="dp-panel-content" style="padding: 10px 12px; background-color: #ffff; color: #111827;">
-                    <style>.ls-std-card:hover .ls-std-full{display:inline;}.ls-std-card:hover .ls-std-more-label{display:none;}</style><p class="ls-std-card" title="Make a reasonable inference or decision based on one graphic after finding information in another graphic" style="margin: 5px 0; background-color: #eef2ff; border-radius: 8px; padding: 8px 12px; border-left: 4px solid #4f46e5; font-size: 0.9rem; line-height: 1.5;"><strong style="color:#3730a3;">WK.GL.5.C.lm</strong> — Make a reasonable inference or decision based on one graphic after finding …<span class="ls-std-more-label" style="color:#4f46e5;font-size:0.78em;font-weight:700;cursor:help;white-space:nowrap;"> Read more &#9660;</span><span class="ls-std-full" style="display:none;"> information in another graphic</span></p><p class="ls-std-card" title="Identify the next or missing step in a process" style="margin: 5px 0; background-color: #eef2ff; border-radius: 8px; padding: 8px 12px; border-left: 4px solid #4f46e5; font-size: 0.9rem; line-height: 1.5;"><strong style="color:#3730a3;">WK.GL.L3.slm.2</strong> — Identify the next or missing step in a process</p><p class="ls-std-card" title="Compare two or more pieces of information" style="margin: 5px 0; background-color: #eef2ff; border-radius: 8px; padding: 8px 12px; border-left: 4px solid #4f46e5; font-size: 0.9rem; line-height: 1.5;"><strong style="color:#3730a3;">WK.GL.L4.slm.2</strong> — Compare two or more pieces of information</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="dp-content-block content-block" style="background-color: #ffff; padding: 10px 18px 12px; border-radius: 10px; margin-top: 6px;">
-        <h3 class="dp-has-icon"><i class="fas fa-book-reader"></i> Independent Learning</h3>
-        <div style="margin-top: 6px; margin-bottom: 4px; padding: 8px 12px; background-color: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; color: #92400E; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;"><span>⏳</span><span><strong>Be patient</strong> — the expander modules may take a moment to load when you open them.</span></div>
-        <div class="dp-panels-wrapper" style="margin-top: 10px;">
-            
-            <details class="lsv-panel-group" open style="border: 1px solid #0066FF; border-radius: 8px; margin-bottom: 2px; overflow: hidden;">
-                <summary class="lsv-panel-heading" style="margin: 0; padding: 10px 14px; background-color: #a6c9ff; font-size: 1.02rem; font-weight: 700; color: #111827; cursor: pointer;">🎙️ Mastering Your Virtual Classroom - Podcast</summary>
-                <div class="lsv-panel-content" style="padding: 12px 14px; color: #111827; background-color: #e6f0ff; border-top: 1px solid #0066FF22;">
-                    <div style="margin-top:8px;border:2px solid #dbeafe;border-radius:10px;overflow:hidden;">
-  <iframe src="https://lessonsaver.com/PodcastPlayer?url=https%3A%2F%2Fbase44.app%2Fapi%2Fapps%2F69cd829362a9374f3215a0be%2Ffiles%2Fmp%2Fpublic%2F69cd829362a9374f3215a0be%2F5e8dbeac7_podcast_6a68c65c4f06019e929b3d07.mp3&title=Mastering%20Your%20Virtual%20Classroom" width="100%" height="160" frameborder="0" style="display:block;border:none;" allow="autoplay" title="Deep Dive Podcast Player"></iframe>
-</div>
-                </div>
-            </details>
-            <details class="lsv-panel-group" style="border: 1px solid #00B300; border-radius: 8px; margin-bottom: 2px; overflow: hidden;">
-                <summary class="lsv-panel-heading" style="margin: 0; padding: 10px 14px; background-color: #a6e4a6; font-size: 1.02rem; font-weight: 700; color: #111827; cursor: pointer;">✅ Quick Check</summary>
-                <div class="lsv-panel-content" style="padding: 12px 14px; color: #111827; background-color: #e6f7e6; border-top: 1px solid #00B30022;">
-                    
-                    
-                    
-                    
-                    <div class="dp-qc dp-qc-si" style="margin-top: 14px; background-color: #fefce8; border-radius: 8px; padding: 10px 12px; border: 1px solid #facc15; color: #111827;" data-interactive-id="qc-step-1" data-interactive-type="Quick Check" data-interactive-title="Quick Check 2">
-                        <h3 style="font-size: 1.02rem; margin-top: 0;">Quick Check ⚡ (Pulse Check)</h3>
-                        <div class="dp-qc-question">
-                            <p>Which tool on the Canvas Dashboard is specifically recommended for reviewing upcoming work and staying ahead of deadlines?</p>
-                        </div>
-                        <dl class="dp-qc-answers">
-                            
-            <dt class="dp-qc-answer">
-                <div class="dp-qc-content">
-                    <p>Course Cards</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none">
-                <div class="dp-qc-content">
-                    <p>Incorrect. Course Cards are visual tiles for accessing your active classes, not for aggregating work and due dates.</p>
-                </div>
-            </dd>
-            <dt class="dp-qc-answer dp-qc-correct">
-                <div class="dp-qc-content">
-                    <p>To-Do List</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none dp-qc-correct">
-                <div class="dp-qc-content">
-                    <p><strong>Correct:</strong> Correct. The To-Do List is a sidebar that automatically aggregates upcoming work and due dates to help you stay ahead.</p>
-                </div>
-            </dd>
-            <dt class="dp-qc-answer">
-                <div class="dp-qc-content">
-                    <p>Recent Announcements</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none">
-                <div class="dp-qc-content">
-                    <p>Incorrect. Recent Announcements provide a view of news and course updates, not a list of upcoming assignments.</p>
-                </div>
-            </dd>
-            <dt class="dp-qc-answer">
-                <div class="dp-qc-content">
-                    <p>Course Navigation Menu</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none">
-                <div class="dp-qc-content">
-                    <p>Incorrect. The Course Navigation Menu is used for navigating specific requirements within a class, not for viewing a global list of upcoming work.</p>
-                </div>
-            </dd>
-                        </dl>
-                    </div>
-                </div>
-            </details>
-            <details class="lsv-panel-group" style="border: 1px solid #0066FF; border-radius: 8px; margin-bottom: 2px; overflow: hidden;">
-                <summary class="lsv-panel-heading" style="margin: 0; padding: 10px 14px; background-color: #a6c9ff; font-size: 1.02rem; font-weight: 700; color: #111827; cursor: pointer;">🛠️ Slideshow</summary>
-                <div class="lsv-panel-content" style="padding: 12px 14px; color: #111827; background-color: #e6f0ff; border-top: 1px solid #0066FF22;">
-                    
-                    
-                    <div class="dp-embed-wrapper" style="margin:6px auto;width:100%;max-width:1000px;"><div style="text-align:right;margin-bottom:6px;"><a href="https://lessonsaver.com/SlideViewer?id=6a68c67b8415665eca694c0e" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;background:#4f46e5;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">&#x26F6; Full Screen</a></div><iframe src="https://lessonsaver.com/SlideViewer?id=6a68c67b8415665eca694c0e" style="width:100%;height:600px;border:none;border-radius:8px;display:block;" allowfullscreen></iframe></div>
-                    
-                </div>
-            </details>
-            <details class="lsv-panel-group" style="border: 1px solid #00B300; border-radius: 8px; margin-bottom: 2px; overflow: hidden;">
-                <summary class="lsv-panel-heading" style="margin: 0; padding: 10px 14px; background-color: #a6e4a6; font-size: 1.02rem; font-weight: 700; color: #111827; cursor: pointer;">✅ Quick Check</summary>
-                <div class="lsv-panel-content" style="padding: 12px 14px; color: #111827; background-color: #e6f7e6; border-top: 1px solid #00B30022;">
-                    
-                    
-                    
-                    
-                    <div class="dp-qc dp-qc-si" style="margin-top: 14px; background-color: #fefce8; border-radius: 8px; padding: 10px 12px; border: 1px solid #facc15; color: #111827;" data-interactive-id="qc-step-3" data-interactive-type="Quick Check" data-interactive-title="Quick Check 4">
-                        <h3 style="font-size: 1.02rem; margin-top: 0;">Quick Check ⚡ (Pulse Check)</h3>
-                        <div class="dp-qc-question">
-                            <p>Which tool on the Canvas Dashboard is recommended for visualizing your entire week across all subjects to help you balance your workload?</p>
-                        </div>
-                        <dl class="dp-qc-answers">
-                            
-            <dt class="dp-qc-answer">
-                <div class="dp-qc-content">
-                    <p>The To-Do List</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none">
-                <div class="dp-qc-content">
-                    <p>Incorrect. The To-Do List is for aggregating upcoming work and due dates, not for visualizing your weekly schedule.</p>
-                </div>
-            </dd>
-            <dt class="dp-qc-answer dp-qc-correct">
-                <div class="dp-qc-content">
-                    <p>The Calendar</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none dp-qc-correct">
-                <div class="dp-qc-content">
-                    <p><strong>Correct:</strong> Correct. The Calendar is a powerful global tool used to visualize your entire week across all subjects to balance your workload effectively.</p>
-                </div>
-            </dd>
-            <dt class="dp-qc-answer">
-                <div class="dp-qc-content">
-                    <p>Course Cards</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none">
-                <div class="dp-qc-content">
-                    <p>Incorrect. Course Cards are visual tiles used to enter specific classes, not for managing your weekly schedule across all subjects.</p>
-                </div>
-            </dd>
-            <dt class="dp-qc-answer">
-                <div class="dp-qc-content">
-                    <p>Recent Announcements</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none">
-                <div class="dp-qc-content">
-                    <p>Incorrect. Recent Announcements provide a global view of news and events, not a tool for visualizing your weekly schedule.</p>
-                </div>
-            </dd>
-                        </dl>
-                    </div>
-                </div>
-            </details>
-            <details class="lsv-panel-group" style="border: 1px solid #0066FF; border-radius: 8px; margin-bottom: 2px; overflow: hidden;">
-                <summary class="lsv-panel-heading" style="margin: 0; padding: 10px 14px; background-color: #a6c9ff; font-size: 1.02rem; font-weight: 700; color: #111827; cursor: pointer;">🎬 Explainer Video</summary>
-                <div class="lsv-panel-content" style="padding: 12px 14px; color: #111827; background-color: #e6f0ff; border-top: 1px solid #0066FF22;">
-                    
-                    
-                    <div class="dp-embed-wrapper" style="margin-top: 6px;"><iframe style="width: 100%; border-radius: 6px; border: none;" src="https://www.youtube-nocookie.com/embed/PuAIlYBDq8w?rel=0" width="100%" height="650px" loading="lazy" allowfullscreen="allowfullscreen"></iframe></div>
-                    
-                </div>
-            </details>
-            <details class="lsv-panel-group" style="border: 1px solid #00B300; border-radius: 8px; margin-bottom: 2px; overflow: hidden;">
-                <summary class="lsv-panel-heading" style="margin: 0; padding: 10px 14px; background-color: #a6e4a6; font-size: 1.02rem; font-weight: 700; color: #111827; cursor: pointer;">✅ Quick Check</summary>
-                <div class="lsv-panel-content" style="padding: 12px 14px; color: #111827; background-color: #e6f7e6; border-top: 1px solid #00B30022;">
-                    
-                    
-                    
-                    
-                    <div class="dp-qc dp-qc-si" style="margin-top: 14px; background-color: #fefce8; border-radius: 8px; padding: 10px 12px; border: 1px solid #facc15; color: #111827;" data-interactive-id="qc-step-5" data-interactive-type="Quick Check" data-interactive-title="Quick Check 6">
-                        <h3 style="font-size: 1.02rem; margin-top: 0;">Quick Check ⚡ (Pulse Check)</h3>
-                        <div class="dp-qc-question">
-                            <p>According to the guide, why is it necessary to click the 'Mark as Done' button on certain pages within the Modules?</p>
-                        </div>
-                        <dl class="dp-qc-answers">
-                            
-            <dt class="dp-qc-answer">
-                <div class="dp-qc-content">
-                    <p>To notify the instructor that you have read the material.</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none">
-                <div class="dp-qc-content">
-                    <p>Incorrect. While it acknowledges you have read the material, its primary functional purpose is to progress through the course structure.</p>
-                </div>
-            </dd>
-            <dt class="dp-qc-answer dp-qc-correct">
-                <div class="dp-qc-content">
-                    <p>To unlock the next lesson and ensure accurate progress tracking.</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none dp-qc-correct">
-                <div class="dp-qc-content">
-                    <p><strong>Correct:</strong> Correct. Clicking 'Mark as Done' is required to unlock the next lesson and keep your learning path open.</p>
-                </div>
-            </dd>
-            <dt class="dp-qc-answer">
-                <div class="dp-qc-content">
-                    <p>To submit your work for grading automatically.</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none">
-                <div class="dp-qc-content">
-                    <p>Incorrect. This button is for tracking progress within a module, not for submitting assignments for a grade.</p>
-                </div>
-            </dd>
-            <dt class="dp-qc-answer">
-                <div class="dp-qc-content">
-                    <p>To request 1-on-1 support from your instructor.</p>
-                </div>
-            </dt>
-            <dd class="dp-qc-response d-none">
-                <div class="dp-qc-content">
-                    <p>Incorrect. 1-on-1 support is requested by using the 'Schedule Help Call' button on the Canvas homepage.</p>
-                </div>
-            </dd>
-                        </dl>
-                    </div>
-                </div>
-            </details>
-            <details class="lsv-panel-group" style="border: 1px solid #0066FF; border-radius: 8px; margin-bottom: 2px; overflow: hidden;">
-                <summary class="lsv-panel-heading" style="margin: 0; padding: 10px 14px; background-color: #a6c9ff; font-size: 1.02rem; font-weight: 700; color: #111827; cursor: pointer;">🎯 Game Activity</summary>
-                <div class="lsv-panel-content" style="padding: 12px 14px; color: #111827; background-color: #e6f0ff; border-top: 1px solid #0066FF22;">
-                    
-                    
-                    <div class="dp-embed-wrapper" style="margin-top: 6px;"><iframe src="https://lessonsaver.com/games/explorer-journey?id=6a68c674a6ab9d2315dd2e59&lesson_id=6a68c65c4f06019e929b3d07&count=10" width="100%" height="700px" style="border: none; border-radius: 8px; display: block;" allowfullscreen></iframe></div>
-                    
-                </div>
-            </details>
-            <details class="lsv-panel-group" style="border: 1px solid #00B300; border-radius: 8px; margin-bottom: 2px; overflow: hidden;">
-                <summary class="lsv-panel-heading" style="margin: 0; padding: 10px 14px; background-color: #a6e4a6; font-size: 1.02rem; font-weight: 700; color: #111827; cursor: pointer;">📝 Practice Quiz</summary>
-                <div class="lsv-panel-content" style="padding: 12px 14px; color: #111827; background-color: #e6f7e6; border-top: 1px solid #00B30022;">
-                    <div style="margin-top: 6px;"><iframe src="https://lessonsaver.com/QuizTake?slug=quiz-6a68c65c-ms4sm6f6" width="100%" height="700px" style="border: none; border-radius: 8px; display: block;" allowfullscreen></iframe></div>
-                </div>
-            </details>
-            <div class="dp-panel-group" style="border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 10px; overflow: hidden;">
-                <h3 class="dp-panel-heading" style="margin: 0; padding: 10px 14px; background-color: #FDF0EA; font-size: 1.02rem; font-weight: 700; color: #111827;">🙋 Rate Your Learning</h3>
-                <div class="dp-panel-content" style="padding: 12px 14px; color: #111827; background-color: #ffffff;">
-                    <div class="dp-embed-wrapper"><div style="margin:0 auto;width:100%;"><iframe src="https://lessonsaver.com/RatingWidget?lessonId=6a68c65c4f06019e929b3d07" width="100%" height="280" scrolling="no" style="border:none;outline:none;display:block;background:transparent;" title="Rate This Lesson"></iframe></div></div>
-                </div>
-            </div>
-            
-        </div>
-    </div>
-    <div class="dp-content-block content-block" style="background-color: #ffff; padding: 10px 18px 12px; border-radius: 10px; margin-top: 6px;">
-        <h3 class="dp-has-icon"><i class="fas fa-flag-checkered"></i> Summary &amp; Conclusion</h3>
-        <div style="margin-top: 2px;">
-            
-             <div style="color: #333333;">
-                 <p style="margin: 0 0 6px; line-height: 1.6;"><p>Success in this course depends on utilizing the provided digital infrastructure effectively to maintain consistent progress. By establishing a routine for checking your dashboard and keeping lines of communication open, you ensure your academic success.</p></p>
-                 <p style="margin: 0 0 4px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: #333333; font-size: 0.82rem;">Key Takeaways:</p><ul style="margin: 0 0 6px; padding-left: 20px; list-style: disc; color: #333333;"><li style="margin-bottom: 6px; color: #333333; line-height: 1.55;">Orient yourself at the start of every study session by checking your Modules and To-Do list.</li><li style="margin-bottom: 6px; color: #333333; line-height: 1.55;">Set all notifications to 'Immediately' to stay informed about grades and announcements.</li><li style="margin-bottom: 6px; color: #333333; line-height: 1.55;">Maintain steady weekly momentum by engaging with course material regularly instead of waiting for deadlines.</li></ul>
-                 
-                 <div style="margin: 8px auto 0; max-width: 94%; padding: 10px 16px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 1px 4px rgba(37,59,118,0.10); display: flex; gap: 10px; align-items: flex-start;"><span style="font-size: 1.15rem; line-height: 1.4;">💡</span><p style="margin: 0; color: #253b76; font-weight: 700; font-size: 0.95rem; line-height: 1.5;">Proactive engagement with your virtual learning environment is the essential first step toward mastering complex computing concepts.</p></div>
-             </div>
-        </div>
-    </div>
-    
-    
-    
-    
-</div>
+</script>
+
+</body>
+</html>
