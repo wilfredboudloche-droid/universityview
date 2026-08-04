@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Media Bowl: Friday Night Football Edition</title>
+    <style>
+        :root {
+            --field-green: #1B4D2E;
+            --field-line: #FFFFFF;
+            --ref-black: #111111;
+            --goalpost-gold: #FFD700;
+            --yard-dark: #143B22;
+            --accent-red: #D9534F;
+            --accent-blue: #0275D8;
+            --card-bg: #1e2820;
+            --text-light: #F8F9FA;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+        }
+
+        body {
+            background-color: var(--ref-black);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--card-bg);
+            border: 4px solid var(--goalpost-gold);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* JUMBOTRON SCOREBOARD */
+        .jumbotron {
+            background: linear-gradient(180deg, #000000 0%, #222222 100%);
+            border-bottom: 4px solid var(--goalpost-gold);
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .stat-box {
+            background-color: #050505;
+            border: 2px solid #333;
+            border-radius: 6px;
+            padding: 8px 5px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #aaa;
+            letter-spacing: 1px;
+            font-family: Arial, sans-serif;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            color: var(--goalpost-gold);
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+        }
+
+        .rank-banner {
+            grid-column: span 4;
+            background: var(--ref-black);
+            color: var(--field-line);
+            padding: 5px;
+            font-size: 0.9rem;
+            border: 1px solid var(--goalpost-gold);
+            letter-spacing: 2px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        /* FOOTBALL FIELD PROGRESS */
+        .field-container {
+            background-color: var(--field-green);
+            background-image: repeating-linear-gradient(
+                90deg,
+                var(--field-green),
+                var(--field-green) 40px,
+                var(--yard-dark) 40px,
+                var(--yard-dark) 80px
+            );
+            height: 70px;
+            position: relative;
+            border-top: 2px solid white;
+            border-bottom: 2px solid white;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .endzone {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 10%;
+            background-color: #8B0000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .endzone.left { left: 0; }
+        .endzone.right { right: 0; background-color: var(--field-green); border-left: 2px dashed white;}
+
+        .field-lines {
+            position: absolute;
+            left: 10%;
+            right: 10%;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5px;
+        }
+
+        .yard-line {
+            border-left: 2px solid rgba(255,255,255,0.5);
+            height: 100%;
+            position: relative;
+        }
+
+        .yard-line::after {
+            content: attr(data-yard);
+            position: absolute;
+            bottom: 2px;
+            left: -10px;
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.7);
+            font-family: Arial, sans-serif;
+        }
+
+        .football-icon {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.8rem;
+            transition: left 0.5s ease-in-out;
+            z-index: 10;
+            filter: drop-shadow(2px 4px 6px black);
+        }
+
+        /* PLAY AREA */
+        .play-area {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        .scenario-card {
+            background-color: rgba(0,0,0,0.4);
+            border-left: 5px solid var(--goalpost-gold);
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .scenario-title {
+            font-size: 1.1rem;
+            color: var(--goalpost-gold);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .scenario-text {
+            font-family: Arial, sans-serif;
+            font-size: 1rem;
+            line-height: 1.4;
+            color: #E0E0E0;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .play-btn {
+            background: linear-gradient(180deg, #333 0%, #111 100%);
+            border: 2px solid #555;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-family: Arial, sans-serif;
+            font-size: 0.95rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .play-btn:hover:not(:disabled) {
+            border-color: var(--goalpost-gold);
+            background: linear-gradient(180deg, #444 0%, #222 100%);
+            transform: translateX(5px);
+        }
+
+        .play-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .play-tag {
+            background-color: var(--goalpost-gold);
+            color: black;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 10px;
+            font-family: 'Impact', sans-serif;
+            font-size: 0.85rem;
+            min-width: 75px;
+            text-align: center;
+        }
+
+        /* ANNOUNCER FEEDBACK PANEL */
+        .announcer-box {
+            background-color: #0a0a0a;
+            border: 2px dashed #444;
+            border-radius: 6px;
+            padding: 15px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .announcer-call {
+            font-size: 1.2rem;
+            color: var(--goalpost-gold);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .announcer-desc {
+            font-family: Arial, sans-serif;
+            font-size: 0.9rem;
+            color: #CCC;
+            line-height: 1.3;
+        }
+
+        .next-btn {
+            margin-top: 10px;
+            background-color: var(--goalpost-gold);
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            align-self: flex-end;
+            display: none;
+            text-transform: uppercase;
+        }
+
+        .next-btn:hover {
+            background-color: #FFE44D;
+        }
+
+        /* CELEBRATION OVERLAY */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .overlay h1 {
+            font-size: 3rem;
+            color: var(--goalpost-gold);
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255,215,0,0.8);
+        }
+
+        .overlay p {
+            font-family: Arial, sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .restart-btn {
+            background-color: var(--field-green);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .restart-btn:hover {
+            background-color: #23663d;
+        }
+
+        /* TOUCH / RESPONSIVE */
+        @media (max-width: 600px) {
+            .jumbotron {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .rank-banner {
+                grid-column: span 2;
+            }
+            .stat-value {
+                font-size: 1.2rem;
+            }
+            .play-btn {
+                font-size: 0.85rem;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- SCOREBOARD HEADER -->
+    <div class="jumbotron">
+        <div class="stat-box">
+            <div class="stat-label">SCORE</div>
+            <div class="stat-value" id="ui-score">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">DOWN & DISTANCE</div>
+            <div class="stat-value" id="ui-down">1st & 10</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">BALL ON</div>
+            <div class="stat-value" id="ui-yard">OWN 20</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">DRIVE PLAY</div>
+            <div class="stat-value" id="ui-playnum">1/10</div>
+        </div>
+        <div class="rank-banner">
+            <span>RANK: <strong id="ui-rank" style="color: var(--goalpost-gold);">ROOKIE PRACTICE SQUAD</strong></span>
+            <span>STREAK: <strong id="ui-streak" style="color: var(--goalpost-gold);">0</strong></span>
+        </div>
+    </div>
+
+    <!-- VISUAL FOOTBALL FIELD -->
+    <div class="field-container">
+        <div class="endzone left">OWN ENDZONE</div>
+        <div class="field-lines">
+            <div class="yard-line" data-yard="20"></div>
+            <div class="yard-line" data-yard="30"></div>
+            <div class="yard-line" data-yard="40"></div>
+            <div class="yard-line" data-yard="50"></div>
+            <div class="yard-line" data-yard="40"></div>
+            <div class="yard-line" data-yard="30"></div>
+            <div class="yard-line" data-yard="20"></div>
+            <div class="yard-line" data-yard="10"></div>
+        </div>
+        <div class="endzone right">TOUCHDOWN</div>
+        <div class="football-icon" id="football">🏈</div>
+    </div>
+
+    <!-- PLAY EXECUTION AREA -->
+    <div class="play-area">
+        <div class="scenario-card">
+            <div class="scenario-title" id="play-title">PLAY #1: INITIALIZING DRIVE</div>
+            <div class="scenario-text" id="play-desc">Loading scenario...</div>
+        </div>
+
+        <div class="options-grid" id="options-container">
+            <!-- Dynamic option buttons go here -->
+        </div>
+
+        <!-- ANNOUNCER BOX -->
+        <div class="announcer-box">
+            <div class="announcer-call" id="callout-title">BOOTH BROADCAST</div>
+            <div class="announcer-desc" id="callout-desc">Select a tactical play call to begin your drive downfield. Execute Canvas media workflows accurately to score!</div>
+            <button class="next-btn" id="next-btn" onclick="nextPlay()">Next Play ➔</button>
+        </div>
+    </div>
+
+    <!-- GAME OVER / TOUCHDOWN OVERLAY -->
+    <div class="overlay" id="end-overlay">
+        <h1 id="overlay-title">TOUCHDOWN!</h1>
+        <p id="overlay-desc">You drove the team all the way down the field!</p>
+        <div style="font-size: 1.5rem; margin-bottom: 20px; color: var(--goalpost-gold);" id="overlay-stats">
+            Final Score: 0 | Rank: Rookie
+        </div>
+        <button class="restart-btn" onclick="resetGame()">Play Again</button>
+    </div>
+</div>
+
+<script>
+    // GAME STATE VARIABLES
+    let currentYard = 20; // Start at own 20-yard line (0 to 100 scale: 20 = Own 20, 100 = Touchdown)
+    let score = 0;
+    let down = 1;
+    let yardsToFirst = 10;
+    let currentPlayIdx = 0;
+    let streak = 0;
+    let rank = "Rookie Practice Squad";
+
+    // QUESTION BANK (10 Tactical Scenarios based on Canvas/Media guide)
+    const scenarios = [
+        {
+            title: "PLAY 1: Evidence of Work Snapshot",
+            desc: "You need to submit a snapshot of a completed lab error message without revealing your private background apps or Windows taskbar[cite: 1]. Which capture mode do you call?",
+            options: [
+                { type: "PASS", text: "Window Capture Mode via Win + Shift + S", correct: true, yards: 15, call: "PERFECT PASS!", detail: "Window Mode captures only the specific application, hiding the taskbar and other apps for total privacy[cite: 1]!" },
+                { type: "RUN", text: "Full-Screen Capture Mode", correct: false, yards: -5, call: "TACKLED FOR LOSS!", detail: "Full-Screen shows your entire monitor, cluttering the snip and revealing private taskbar/apps[cite: 1]." },
+                { type: "RUN", text: "Freeform Capture Mode", correct: false, yards: 0, call: "INCOMPLETE PASS!", detail: "Freeform is meant for circling irregular shapes, not clean application captures[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 2: The Audio Trap Avoidance",
+            desc: "You switch the Snipping Tool from static images to Video Camera mode to record a tutorial[cite: 1]. What critical pre-recording step must you execute?",
+            options: [
+                { type: "RUN", text: "Immediately hit 'Start' to save encoding time.", correct: false, yards: -10, call: "SACK IN THE BACKFIELD!", detail: "BLUNDER! Snipping Tool audio defaults to Mute[cite: 1]. You just recorded a completely silent video[cite: 1]!" },
+                { type: "PASS", text: "Check audio icon, ensure correct mic, and manually unmute.", correct: true, yards: 20, call: "BIG TIME BREAKAWAY!", detail: "CRITICAL PRO-TIP! Manually unmuting prevents the silent video trap[cite: 1]!" }
+            ]
+        },
+        {
+            title: "PLAY 3: Clipboard vs. Storage",
+            desc: "You took a quick snip with Win + Shift + S and pasted (Ctrl+V) it into a Word document[cite: 1]. Is your snip permanently saved to your computer?",
+            options: [
+                { type: "RUN", text: "Yes, pasting auto-saves it to your Pictures folder.", correct: false, yards: -5, call: "STUFFED AT THE LINE!", detail: "Incorrect! If you don't click the Disk Icon to Save As, it exists ONLY on your temporary clipboard[cite: 1]!" },
+                { type: "PASS", text: "No, you must manually click the Disk Icon to save it.", correct: true, yards: 10, call: "SOLID GAIN!", detail: "Exact! Unless saved via the disk icon, clipboard-only snips can be lost easily[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 4: Discussion Board Quick Reply",
+            desc: "You need to make a quick, one-and-done video reply to a weekly discussion board post[cite: 1]. Which tool is best suited for this lightweight play?",
+            options: [
+                { type: "PASS", text: "Native Canvas 'Record/Upload Media' Tool", correct: true, yards: 15, call: "FIRST DOWN COMPLETED!", detail: "Native tools are fast and ideal for simple, one-off video check-ins and replies[cite: 1]." },
+                { type: "RUN", text: "Kaltura Media Embed Process", correct: false, yards: 5, call: "SHORT GAIN!", detail: "Kaltura works, but it's overkill for a quick reply. Native tools are optimized for one-and-done posts[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 5: High-Stakes Presentation Embed",
+            desc: "You are submitting a high-stakes, reusable final project with PowerPoint slides where viewers must see both you and your slides[cite: 1]. What's the call?",
+            options: [
+                { type: "PASS", text: "Embed Kaltura Media -> 'Webcam and Screen' path", correct: true, yards: 20, call: "BOMB DOWN THE SIDELINE!", detail: "Bingo! Kaltura's Webcam & Screen path is built for high-stakes presentations showing both speaker and slides[cite: 1]." },
+                { type: "RUN", text: "Canvas Native Recorder -> Webcam Only", correct: false, yards: -5, call: "INTERCEPTED!", detail: "Webcam-only won't display your slides, and native tools aren't saved to your reusable media library[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 6: Digital Locker Management",
+            desc: "Your course requires multiple large assignment uploads. You worry your personal Canvas 'My Files' 50MB quota will fill up[cite: 1]. Should you panic?",
+            options: [
+                { type: "PASS", text: "No! Files submitted directly to Graded Assignments do NOT count toward the 50MB limit.", correct: true, yards: 15, call: "GREAT READ BY THE QB!", detail: "Spot on! Graded assignment submissions bypass your 50MB user storage quota[cite: 1]." },
+                { type: "RUN", text: "Yes! Every submission deducts directly from your 50MB quota.", correct: false, yards: -10, call: "BIG SACK!", detail: "False! Assignment submissions don't count against your 50MB 'My Files' digital locker limit[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 7: Video Optimization / Compression",
+            desc: "Your recorded video file is too large and keeps timing out during home upload[cite: 1]. Which Handbrake preset provides the optimal Canvas balance[cite: 1]?",
+            options: [
+                { type: "PASS", text: "Web -> Vimeo YouTube 720p30", correct: true, yards: 15, call: "POWER RUN FOR A FIRST DOWN!", detail: "Touchdown quality! 'Vimeo YouTube 720p30' is the sweet spot for Canvas compression[cite: 1]." },
+                { type: "RUN", text: "Production Max 4K Uncompressed", correct: false, yards: -15, call: "FUMBLE!", detail: "Uncompressed files are massive and will cause canvas timeouts or breach processing limits[cite: 1]!" }
+            ]
+        },
+        {
+            title: "PLAY 8: The 500MB RCE Limit",
+            desc: "Even after attempted compression, a massive video remains over 500MB, exceeding the Rich Content Editor processing boundary[cite: 1]. How do you execute the play?",
+            options: [
+                { type: "PASS", text: "Host video on YouTube/external platform and embed the link.", correct: true, yards: 15, call: "BEAUTIFUL TRICK PLAY!", detail: "Smart pivot! Bypassing the 500MB RCE limit via external embedding guarantees submission success[cite: 1]." },
+                { type: "RUN", text: "Rename extension to .ZIP and upload to 'Conversation Attachments'.", correct: false, yards: -10, call: "PENALTY - ILLEGAL PROCEDURE!", detail: "Renaming video extensions corrupts the file, and attachments have strict limits[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 9: Snipping Tool Shortcut Freeze",
+            desc: "Your 'Windows + Shift + S' keyboard shortcut suddenly stops responding[cite: 1]. What is the SAFEST initial troubleshooting fix in Settings[cite: 1]?",
+            options: [
+                { type: "PASS", text: "Windows Settings > Apps > Snipping Tool > 'Repair'", correct: true, yards: 10, call: "CLUTCH SCRAMBLE!", detail: "Repair is the safest first step because it preserves app data[cite: 1]!" },
+                { type: "RUN", text: "Windows Settings > Apps > Snipping Tool > 'Reset'", correct: false, yards: 0, call: "NO GAIN!", detail: "Reset works, but it clears internal app data[cite: 1]! Repair should always be attempted first[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 10: Final Pre-Submission Check",
+            desc: "You are 2 minutes away from a deadline. What professional verification standard ensures full credit before turning off your PC[cite: 1]?",
+            options: [
+                { type: "PASS", text: "Refresh submission page and play first 10s of uploaded video to verify audio/visuals.", correct: true, yards: 25, call: "HAIL MARY COMPLETED!", detail: "Flawless execution! The Post-Submission Check guarantees your instructor sees and hears your work[cite: 1]." },
+                { type: "RUN", text: "Close laptop immediately after progress bar finishes.", correct: false, yards: -5, call: "INCOMPLETE!", detail: "Risky! Corrupted uploads or muted audio could leave you with zero points[cite: 1]." }
+            ]
+        }
+    ];
+
+    // UI ELEMENTS
+    const uiScore = document.getElementById('ui-score');
+    const uiDown = document.getElementById('ui-down');
+    const uiYard = document.getElementById('ui-yard');
+    const uiPlayNum = document.getElementById('ui-playnum');
+    const uiRank = document.getElementById('ui-rank');
+    const uiStreak = document.getElementById('ui-streak');
+    const football = document.getElementById('football');
+    
+    const playTitle = document.getElementById('play-title');
+    const playDesc = document.getElementById('play-desc');
+    const optionsContainer = document.getElementById('options-container');
+    const calloutTitle = document.getElementById('callout-title');
+    const calloutDesc = document.getElementById('callout-desc');
+    const nextBtn = document.getElementById('next-btn');
+    const overlay = document.getElementById('end-overlay');
+
+    // INIT GAME
+    function initPlay() {
+        if (currentPlayIdx >= scenarios.length || currentYard >= 100) {
+            endGame();
+            return;
+        }
+
+        const data = scenarios[currentPlayIdx];
+        playTitle.textContent = `${data.title}`;
+        playDesc.textContent = data.desc;
+
+        // Render options
+        optionsContainer.innerHTML = '';
+        data.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'play-btn';
+            btn.innerHTML = `<span class="play-tag">${opt.type}</span> ${opt.text}`;
+            btn.onclick = () => handleChoice(opt);
+            optionsContainer.appendChild(btn);
+        });
+
+        // Reset Broadcast Box
+        calloutTitle.textContent = "BOOTH BROADCAST";
+        calloutTitle.style.color = "var(--goalpost-gold)";
+        calloutDesc.textContent = "Awaiting play call from sidelines...";
+        nextBtn.style.display = "none";
+
+        updateScoreboard();
+    }
+
+    function handleChoice(option) {
+        // Disable option buttons
+        const btns = optionsContainer.querySelectorAll('.play-btn');
+        btns.forEach(b => b.disabled = true);
+
+        // Calculate Yardage & Down Logic
+        if (option.correct) {
+            currentYard += option.yards;
+            score += 700;
+            streak++;
+            calloutTitle.textContent = `🏈 ${option.call}`;
+            calloutTitle.style.color = "#5CB85C"; // Green
+        } else {
+            currentYard += option.yards; // Could be negative
+            if (currentYard < 10) currentYard = 10; // Safety threshold
+            streak = 0;
+            calloutTitle.textContent = `💥 ${option.call}`;
+            calloutTitle.style.color = "var(--accent-red)";
+        }
+
+        calloutDesc.textContent = option.detail;
+
+        // Rank Calculation
+        updateRank();
+
+        // Check Down status
+        if (option.correct) {
+            down = 1;
+            yardsToFirst = 10;
+        } else {
+            down++;
+            if (down > 4) {
+                down = 1; // Turnover recovery simulated for continuous play
+                calloutDesc.textContent += " (Turnover on Downs! Offense recovers on turnover).";
+            }
+        }
+
+        updateScoreboard();
+
+        // Show Next Button
+        if (currentYard >= 100) {
+            nextBtn.textContent = "CELEBRATE TOUCHDOWN! 🎉";
+        } else {
+            nextBtn.textContent = "Next Play ➔";
+        }
+        nextBtn.style.display = "block";
+    }
+
+    function nextPlay() {
+        currentPlayIdx++;
+        if (currentYard >= 100 || currentPlayIdx >= scenarios.length) {
+            endGame();
+        } else {
+            initPlay();
+        }
+    }
+
+    function updateRank() {
+        if (score >= 5000) rank = "Hall of Famer 🏆";
+        else if (score >= 3200) rank = "All-Pro Starter 🌟";
+        else if (score >= 1500) rank = "Varsity Starter 🏈";
+        else rank = "Rookie Practice Squad 📋";
+    }
+
+    function updateScoreboard() {
+        uiScore.textContent = score;
+        uiStreak.textContent = streak;
+        uiRank.textContent = rank;
+        uiPlayNum.textContent = `${currentPlayIdx + 1}/${scenarios.length}`;
+
+        // Down display
+        uiDown.textContent = `${getOrdinal(down)} & ${yardsToFirst}`;
+
+        // Yardline format
+        if (currentYard <= 50) {
+            uiYard.textContent = `OWN ${currentYard}`;
+        } else if (currentYard < 100) {
+            uiYard.textContent = `OPP ${100 - currentYard}`;
+        } else {
+            uiYard.textContent = `END ZONE`;
+        }
+
+        // Football Pos on SVG Field (Scale 10 to 90% field width)
+        let fieldPercent = 10 + (Math.min(currentYard, 100) / 100) * 80;
+        football.style.left = `${fieldPercent}%`;
+    }
+
+    function getOrdinal(n) {
+        return n === 1 ? "1st" : n === 2 ? "2nd" : n === 3 ? "3rd" : "4th";
+    }
+
+    function endGame() {
+        overlay.style.display = "flex";
+        const isTouchdown = currentYard >= 100;
+        document.getElementById('overlay-title').textContent = isTouchdown ? "TOUCHDOWN! 🏆" : "GAME OVER!";
+        document.getElementById('overlay-desc').textContent = isTouchdown 
+            ? "Unbelievable drive! You mastered Canvas media & screen capture techniques and drove all the way into the End Zone!"
+            : "Drive finished! Review your Canvas Media playbook standards and attempt another drive!";
+        document.getElementById('overlay-stats').textContent = `Final Score: ${score} PTS | Rank: ${rank}`;
+    }
+
+    function resetGame() {
+        currentYard = 20;
+        score = 0;
+        down = 1;
+        currentPlayIdx = 0;
+        streak = 0;
+        rank = "Rookie Practice Squad";
+        overlay.style.display = "none";
+        initPlay();
+    }
+
+    // START ON LOAD
+    initPlay();
+</script>
+</body>
+</html>
