@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas LMS Virtual Classroom Challenge | UVA</title>
+    <style>
+        :root {
+            --uva-blue: #1B5EAF;
+            --uva-dark-blue: #0f3c73;
+            --uva-green: #1E7A3E;
+            --uva-gold: #F5B800;
+            --bg-stadium: #0d1b2a;
+            --card-bg: #162a45;
+            --text-light: #ffffff;
+            --text-dim: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-stadium);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            background-image: radial-gradient(circle at 50% 10%, #1e3a5f 0%, #0d1b2a 80%);
+        }
+
+        /* Ribbon Banner */
+        .motto-banner {
+            background: linear-gradient(90deg, var(--uva-blue), var(--uva-green));
+            color: #fff;
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            padding: 8px 15px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+            border-bottom: 3px solid var(--uva-gold);
+        }
+
+        /* Scoreboard Header */
+        .scoreboard {
+            background: var(--card-bg);
+            border: 2px solid var(--uva-blue);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 900px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            margin-bottom: 20px;
+        }
+
+        .score-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid var(--uva-gold);
+        }
+
+        .score-card .label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .score-card .value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .rank-badge {
+            color: var(--uva-gold);
+            font-weight: 800;
+        }
+
+        /* Main Game Arena */
+        .game-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 900px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .match-title {
+            color: var(--uva-gold);
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Canvas UI Simulation Box */
+        .canvas-sim {
+            background: #ffffff;
+            color: #2d3748;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #cbd5e1;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .canvas-header-bar {
+            background: var(--uva-blue);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px 6px 0 0;
+            margin: -15px -15px 15px -15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sim-content {
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Options / Action Buttons */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .opt-btn {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 14px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .opt-btn:hover {
+            background: rgba(27, 94, 175, 0.4);
+            border-color: var(--uva-blue);
+            transform: translateY(-2px);
+        }
+
+        .opt-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Visual Feedback Banner */
+        .feedback-banner {
+            margin-top: 15px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 600;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .feedback-banner.correct {
+            background: rgba(30, 122, 62, 0.2);
+            border: 1px solid var(--uva-green);
+            color: #4ade80;
+        }
+
+        .feedback-banner.incorrect {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+        }
+
+        /* Pop Animation */
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Streak Flash Overlay */
+        .streak-overlay {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            background: var(--uva-gold);
+            color: #000;
+            padding: 15px 30px;
+            font-size: 2rem;
+            font-weight: 900;
+            border-radius: 50px;
+            box-shadow: 0 0 30px var(--uva-gold);
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .streak-overlay.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        /* Canvas UI Mock Elements */
+        .mock-nav-item {
+            padding: 6px 12px;
+            margin: 4px 0;
+            background: #f1f5f9;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 0.85rem;
+            color: var(--uva-blue);
+            font-weight: bold;
+        }
+        
+        .mock-btn {
+            background: var(--uva-green);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        /* Final Results Screen */
+        .results-screen {
+            text-align: center;
+            display: none;
+            padding: 20px 10px;
+        }
+
+        .trophy-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        .restart-btn {
+            background: var(--uva-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+
+        .restart-btn:hover {
+            background: var(--uva-dark-blue);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- UVA Motto Banner -->
+    <div class="motto-banner">
+        University View Academy &bull; Virtue, Vigor, Vision
+    </div>
+
+    <!-- Sports Scoreboard Header -->
+    <div class="scoreboard">
+        <div class="score-card">
+            <div class="label">Current Level</div>
+            <div class="value" id="match-num">Match 1/4</div>
+        </div>
+        <div class="score-card">
+            <div class="label">Rank</div>
+            <div class="value rank-badge" id="player-rank">Rookie</div>
+        </div>
+        <div class="score-card">
+            <div class="label">Score Streak</div>
+            <div class="value" id="streak-count">🔥 0</div>
+        </div>
+        <div class="score-card">
+            <div class="label">Points</div>
+            <div class="value" id="total-score">0 PTS</div>
+        </div>
+    </div>
+
+    <!-- Streak Visual Animation Pop-up -->
+    <div class="streak-overlay" id="streak-banner">Hat-Trick!</div>
+
+    <!-- Game Arena Container -->
+    <div class="game-container">
+        <!-- Interactive Play Area -->
+        <div id="play-area">
+            <div class="match-header">
+                <div class="match-title" id="challenge-title">🏆 Challenge 1: Dashboard & Navigation</div>
+                <span id="step-indicator" style="font-size: 0.85rem; color: var(--text-dim);">Step 1 of 4</span>
+            </div>
+
+            <!-- Canvas Graphic/UI Interactive Box -->
+            <div class="canvas-sim" id="sim-box">
+                <div class="canvas-header-bar">
+                    <span>Canvas LMS - University View Academy</span>
+                    <span style="font-size: 0.75rem; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">CTL 0.2</span>
+                </div>
+                <div class="sim-content" id="sim-text">
+                    <!-- Dynamic Canvas UI Simulation Context -->
+                </div>
+            </div>
+
+            <!-- Question Prompt -->
+            <p id="prompt-text" style="font-weight: 600; margin-bottom: 15px; color: var(--text-light);"></p>
+
+            <!-- Options Grid -->
+            <div class="options-grid" id="options-container">
+                <!-- Buttons rendered dynamically -->
+            </div>
+
+            <!-- Feedback -->
+            <div class="feedback-banner" id="feedback-box"></div>
+        </div>
+
+        <!-- End-Game Summary Screen -->
+        <div class="results-screen" id="results-area">
+            <div class="trophy-icon">🏆</div>
+            <h2 style="font-size: 2rem; color: var(--uva-gold); margin-bottom: 10px;">Tournament Complete!</h2>
+            <p id="final-rank-text" style="font-size: 1.2rem; margin-bottom: 15px;"></p>
+            <p id="final-score-text" style="color: var(--text-dim); margin-bottom: 20px;"></p>
+            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; text-align: left; max-width: 500px; margin: 0 auto 20px auto;">
+                <h4 style="color: var(--uva-gold); margin-bottom: 8px;">Mastery Summary:</h4>
+                <ul style="margin-left: 20px; line-height: 1.6; font-size: 0.9rem; color: var(--text-dim);">
+                    <li>Navigated Canvas Dashboard & Navigation Links</li>
+                    <li>Mastered Sequential Module Unlocking & "Mark as Done"</li>
+                    <li>Executed Assignment Submissions & Grade Checks</li>
+                    <li>Identified Support Resources & 1-on-1 Help Tools</li>
+                </ul>
+            </div>
+            <button class="restart-btn" onclick="resetGame()">Play Match Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Challenge Data structured around CTL 0.2 / 1.1 Course Guide
+        const challenges = [
+            {
+                title: "🏆 Challenge 1: Command Center & Dashboard",
+                simText: `
+                    <strong>Canvas Dashboard View:</strong><br>
+                    You log into Canvas for your 100% asynchronous Computer Tech Literacy course. You need to check upcoming due dates across all your classes and locate your specific course workspace.<br><br>
+                    <span class="mock-nav-item">Dashboard</span>
+                    <span class="mock-nav-item">Course Cards</span>
+                    <span class="mock-nav-item">To-Do List</span>
+                    <span class="mock-nav-item">Calendar</span>
+                `,
+                prompt: "What is your best strategy for reviewing global upcoming deadlines across all subjects for the week?",
+                options: [
+                    { text: "Check the global Calendar to visualize the full week's workload across all courses.", correct: true, exp: "Correct! The Canvas Calendar provides a complete weekly overview across all subjects." },
+                    { text: "Only open individual assignment pages right before they close.", correct: false, exp: "Incorrect. Waiting until the last minute risks missed deadlines in an asynchronous class." },
+                    { text: "Email the teacher daily to ask what is due.", correct: false, exp: "Incorrect. The Dashboard and Calendar aggregate all due dates automatically for you." },
+                    { text: "Ignore the To-Do list and guess which assignments to do first.", correct: false, exp: "Incorrect. The To-Do list and Calendar are vital for organizing your time." }
+                ]
+            },
+            {
+                title: "🏆 Challenge 2: Module Sequential Workflow",
+                simText: `
+                    <strong>Course Modules View:</strong><br>
+                    You are trying to open <em>Lesson 1.1 Quiz</em>, but it is grayed out and locked! The page above it reads:<br><br>
+                    <div style="background:#e2e8f0; padding:8px; border-radius:4px; margin: 5px 0;">
+                        📄 <strong>Master Your Virtual Classroom Content</strong>
+                        <span class="mock-btn" style="float:right;">Mark as Done</span>
+                    </div>
+                `,
+                prompt: "How do you unlock the next sequential item in your course Module?",
+                options: [
+                    { text: "Refresh the page multiple times until the lock disappears.", correct: false, exp: "Incorrect. Refreshing won't bypass module requirements." },
+                    { text: "Click the 'Mark as Done' button at the top/bottom of the prerequisite page.", correct: true, exp: "Touchdown! You must manually click 'Mark as Done' on required pages to unlock the next item." },
+                    { text: "Skip directly to the final exam link in the course header.", correct: false, exp: "Incorrect. Modules follow a sequential pathway that requires completing prerequisite steps." },
+                    { text: "Submit a support ticket asking to unlock the quiz.", correct: false, exp: "Incorrect. Module locks are automated requirements controlled by completing prerequisite actions." }
+                ]
+            },
+            {
+                title: "🏆 Challenge 3: Submitting Assignments & Feedback",
+                simText: `
+                    <strong>Assignment Submission Workspace:</strong><br>
+                    You completed your Photopea graphic design file and need to turn it in for your Application Learning grade.<br><br>
+                    <span class="mock-btn" style="background:#1B5EAF;">Start Assignment</span> &nbsp;&rarr;&nbsp; 
+                    <span class="mock-nav-item">File Upload</span> &nbsp;&rarr;&nbsp; 
+                    <span class="mock-btn">Submit Assignment</span>
+                `,
+                prompt: "What is the proper procedure to ensure your grade is recorded and to improve future scores?",
+                options: [
+                    { text: "Email the file directly to your teacher without using Canvas.", correct: false, exp: "Incorrect. All assignments must be submitted through the Canvas submission portal." },
+                    { text: "Upload the file, click Submit, and check the Grades tab weekly for instructor feedback.", correct: true, exp: "Perfect Execution! Upload, submit, and review instructor feedback in the Grades tab to track growth." },
+                    { text: "Post your file on the public discussion board for grading.", correct: false, exp: "Incorrect. Standard assignments require submission via the official assignment portal." },
+                    { text: "Submit the assignment and never check your grade again.", correct: false, exp: "Incorrect. Checking grades weekly lets you catch feedback and take advantage of resubmission options." }
+                ]
+            },
+            {
+                title: "🏆 Challenge 4: Technical & Academic Support",
+                simText: `
+                    <strong>Canvas Course Homepage:</strong><br>
+                    You hit a technical wall with a project concept and need direct 1-on-1 assistance from your instructor, Mr. Boudloche.<br><br>
+                    <div style="text-align:center; padding: 10px; background:#e3f2fd; border-radius:6px; border:1px solid #1565c0;">
+                        <span class="mock-btn" style="background:#1B5EAF; font-size: 0.9rem;">📅 Schedule Help Call</span>
+                        <span class="mock-btn" style="background:#1E7A3E; font-size: 0.9rem;">👥 Learning Circles (+10 Bonus)</span>
+                    </div>
+                `,
+                prompt: "What is the primary method to schedule 1-on-1 support for course technical hurdles?",
+                options: [
+                    { text: "Use the 'Schedule Help Call' button on the Canvas Course Homepage.", correct: true, exp: "All-Star Play! The 'Schedule Help Call' button on the homepage is your main tool for 1-on-1 support." },
+                    { text: "Wait until the end of the semester to mention technical difficulties.", correct: false, exp: "Incorrect. Reaching out early prevents falling behind in asynchronous courses." },
+                    { text: "Post technical questions on social media.", correct: false, exp: "Incorrect. Official support tools like Schedule Help Call and Learning Circles provide direct aid." },
+                    { text: "Assume 1-on-1 help is unavailable in an online course.", correct: false, exp: "Incorrect. UVA provides dedicated 1-on-1 support and weekly Learning Circles." }
+                ]
+            }
+        ];
+
+        // State Variables
+        let currentIdx = 0;
+        let score = 0;
+        let streak = 0;
+
+        // Ranks
+        const ranks = ["Rookie", "Pro", "All-Star", "Champion"];
+
+        function getRank(points) {
+            if (points >= 400) return ranks[3];
+            if (points >= 300) return ranks[2];
+            if (points >= 200) return ranks[1];
+            return ranks[0];
+        }
+
+        function loadChallenge() {
+            const current = challenges[currentIdx];
+            
+            // Update Headers
+            document.getElementById("match-num").innerText = `Match ${currentIdx + 1}/${challenges.length}`;
+            document.getElementById("step-indicator").innerText = `Step ${currentIdx + 1} of ${challenges.length}`;
+            document.getElementById("challenge-title").innerText = current.title;
+            document.getElementById("sim-text").innerHTML = current.simText;
+            document.getElementById("prompt-text").innerText = current.prompt;
+
+            // Clear feedback banner
+            const feedbackBox = document.getElementById("feedback-box");
+            feedbackBox.style.display = "none";
+            feedbackBox.className = "feedback-banner";
+
+            // Render Options
+            const container = document.getElementById("options-container");
+            container.innerHTML = "";
+
+            current.options.forEach((opt, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "opt-btn";
+                btn.innerHTML = `<span style="color:var(--uva-gold); font-weight:bold;">${String.fromCharCode(65 + idx)}.</span> ${opt.text}`;
+                btn.onclick = () => handleAnswer(opt, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function triggerStreakBanner(text) {
+            const banner = document.getElementById("streak-banner");
+            banner.innerText = text;
+            banner.classList.add("active");
+            setTimeout(() => {
+                banner.classList.remove("active");
+            }, 1200);
+        }
+
+        function handleAnswer(option, selectedBtn) {
+            // Disable all option buttons to prevent double click
+            const buttons = document.querySelectorAll(".opt-btn");
+            buttons.forEach(b => b.style.pointerEvents = "none");
+
+            const feedbackBox = document.getElementById("feedback-box");
+            feedbackBox.style.display = "block";
+
+            if (option.correct) {
+                // Adjust score & streak
+                streak++;
+                const bonus = streak > 1 ? streak * 25 : 0;
+                const pointsEarned = 100 + bonus;
+                score += pointsEarned;
+
+                // Visual styling
+                selectedBtn.style.background = "rgba(30, 122, 62, 0.4)";
+                selectedBtn.style.borderColor = "var(--uva-green)";
+                feedbackBox.className = "feedback-banner correct";
+                feedbackBox.innerHTML = `<strong>🟢 GREAT PLAY!</strong> ${option.exp} (+${pointsEarned} PTS)`;
+
+                // Streak notifications
+                if (streak === 2) triggerStreakBanner("On Fire! 🔥");
+                if (streak === 3) triggerStreakBanner("Hat-Trick! 🎩✨");
+                if (streak === 4) triggerStreakBanner("UNSTOPPABLE! 🏆");
+
+            } else {
+                streak = 0;
+                selectedBtn.style.background = "rgba(239, 68, 68, 0.3)";
+                selectedBtn.style.borderColor = "#ef4444";
+                feedbackBox.className = "feedback-banner incorrect";
+                feedbackBox.innerHTML = `<strong>🔴 TURNOVER!</strong> ${option.exp}`;
+            }
+
+            // Update Scoreboard UI
+            document.getElementById("streak-count").innerText = `🔥 ${streak}`;
+            document.getElementById("total-score").innerText = `${score} PTS`;
+            document.getElementById("player-rank").innerText = getRank(score);
+
+            // Move to next step or complete game
+            setTimeout(() => {
+                currentIdx++;
+                if (currentIdx < challenges.length) {
+                    loadChallenge();
+                } else {
+                    showFinalResults();
+                }
+            }, 2200);
+        }
+
+        function showFinalResults() {
+            document.getElementById("play-area").style.display = "none";
+            const resultsArea = document.getElementById("results-area");
+            resultsArea.style.display = "block";
+
+            const finalRank = getRank(score);
+            document.getElementById("final-rank-text").innerText = `Final Rank Attained: ${finalRank}`;
+            document.getElementById("final-score-text").innerText = `Total Performance Score: ${score} Points`;
+        }
+
+        function resetGame() {
+            currentIdx = 0;
+            score = 0;
+            streak = 0;
+
+            document.getElementById("streak-count").innerText = `🔥 0`;
+            document.getElementById("total-score").innerText = `0 PTS`;
+            document.getElementById("player-rank").innerText = "Rookie";
+
+            document.getElementById("results-area").style.display = "none";
+            document.getElementById("play-area").style.display = "block";
+
+            loadChallenge();
+        }
+
+        // Initialize Game on Load
+        loadChallenge();
+    </script>
+</body>
+</html>
