@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Citizenship Football Bowl</title>
+    <style>
+        :root {
+            --field-green: #1B4D2E;
+            --field-line: #FFFFFF;
+            --gold: #FFD700;
+            --dark-bg: #0B1D12;
+            --stadium-card: #132E1C;
+            --ref-black: #111111;
+            --yard-accent: #28a745;
+            --penalty-red: #d9534f;
+            --font-family: 'Impact', 'Arial Black', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #FFFFFF;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        .game-wrapper {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--stadium-card);
+            border: 4px solid var(--gold);
+            border-radius: 16px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(255, 215, 0, 0.2);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* JUMBOTRON / SCOREBOARD */
+        .jumbotron {
+            background: linear-gradient(180deg, #111 0%, #222 100%);
+            border: 3px solid var(--gold);
+            border-radius: 12px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .stat-box {
+            background: #000;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-family: var(--font-family);
+            font-size: 1.6rem;
+            color: #FFF;
+            margin-top: 4px;
+        }
+
+        /* FIELD & PROGRESS BAR */
+        .field-container {
+            background-color: var(--field-green);
+            background-image: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 10%,
+                rgba(255, 255, 255, 0.15) 10%,
+                rgba(255, 255, 255, 0.15) 20%
+            );
+            border: 3px solid var(--field-line);
+            border-radius: 8px;
+            height: 60px;
+            position: relative;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .endzone {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 8%;
+            background-color: var(--gold);
+            color: #000;
+            font-family: var(--font-family);
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .endzone.left { left: 0; border-right: 2px dashed #FFF; }
+        .endzone.right { right: 0; border-left: 2px dashed #FFF; }
+
+        .football-marker {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            transition: left 0.6s ease-in-out;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.6));
+            z-index: 5;
+        }
+
+        /* PLAYBOOK & CONTENT */
+        .playbook-card {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .scenario-title {
+            color: var(--gold);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .scenario-text {
+            font-size: 1.05rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: linear-gradient(180deg, #2a2a2a 0%, #151515 100%);
+            border: 2px solid #444;
+            color: #FFF;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-btn:hover {
+            border-color: var(--gold);
+            background: linear-gradient(180deg, #3a3a3a 0%, #252525 100%);
+            transform: translateY(-2px);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* FEEDBACK PANEL */
+        .feedback-panel {
+            display: none;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .feedback-panel.gain {
+            background-color: rgba(40, 167, 69, 0.25);
+            border: 2px solid #28a745;
+        }
+
+        .feedback-panel.loss {
+            background-color: rgba(217, 83, 79, 0.25);
+            border: 2px solid #d9534f;
+        }
+
+        .feedback-header {
+            font-family: var(--font-family);
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .next-btn {
+            display: none;
+            margin-top: 15px;
+            width: 100%;
+            background: var(--gold);
+            color: #000;
+            font-family: var(--font-family);
+            font-size: 1.2rem;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background 0.2s;
+        }
+
+        .next-btn:hover {
+            background: #ffe033;
+        }
+
+        /* ANNONYNCER & FLASH LIGHTS EFFECTS */
+        .announcer-banner {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: var(--gold);
+            color: #000;
+            font-family: var(--font-family);
+            font-size: 2.5rem;
+            padding: 10px 30px;
+            border-radius: 50px;
+            box-shadow: 0 0 25px #000;
+            z-index: 100;
+            pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .announcer-banner.active {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .flash-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 90;
+        }
+
+        .strobe {
+            animation: strobeFlash 0.6s ease-out;
+        }
+
+        @keyframes strobeFlash {
+            0% { opacity: 0.8; }
+            50% { opacity: 0.2; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* END SCREEN */
+        .end-screen {
+            display: none;
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .end-screen h2 {
+            font-family: var(--font-family);
+            font-size: 2.8rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            background: #222;
+            border: 2px solid var(--gold);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 15px 0;
+            color: var(--gold);
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 600px) {
+            .jumbotron { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .stat-value { font-size: 1.2rem; }
+            .announcer-banner { font-size: 1.5rem; }
+            .scenario-text { font-size: 0.95rem; }
+            .option-btn { font-size: 0.85rem; padding: 10px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-wrapper">
+        <div class="flash-overlay" id="flashOverlay"></div>
+        <div class="announcer-banner" id="announcerBanner">FIRST DOWN!</div>
+
+        <header class="jumbotron">
+            <div class="stat-box">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="scoreDisplay">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Down & YTG</div>
+                <div class="stat-value" id="downDisplay">1st & 10</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Field Position</div>
+                <div class="stat-value" id="yardDisplay">Own 20</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Player Rank</div>
+                <div class="stat-value" id="rankDisplay">Rookie</div>
+            </div>
+        </header>
+
+        <div class="field-container">
+            <div class="endzone left">OWN GOAL</div>
+            <div class="football-marker" id="footballMarker" style="left: 20%;">🏈</div>
+            <div class="endzone right">TOUCHDOWN</div>
+        </div>
+
+        <div class="playbook-card" id="playbookCard">
+            <div class="scenario-title" id="playTitle">Play #1 - Digital Citizenship Bowl</div>
+            <div class="scenario-text" id="playDescription">Loading scenario...</div>
+
+            <div class="options-grid" id="optionsContainer">
+                </div>
+
+            <div class="feedback-panel" id="feedbackPanel">
+                <div class="feedback-header" id="feedbackHeader">GAIN!</div>
+                <div id="feedbackText">Feedback text goes here.</div>
+            </div>
+
+            <button class="next-btn" id="nextBtn" onclick="nextPlay()">Next Play ➔</button>
+        </div>
+
+        <div class="end-screen" id="endScreen">
+            <div style="font-size: 50px;">🏆</div>
+            <h2>FINAL WHISTLE!</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 10px;">Game Drive Completed!</p>
+            <div class="rank-badge" id="finalRank">Rank: Varsity Starter</div>
+            <p id="finalScoreStats" style="margin-bottom: 20px; font-size: 1.1rem;"></p>
+            <button class="next-btn" style="display: block; max-width: 250px; margin: 0 auto;" onclick="resetGame()">Play Again 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // WEB AUDIO SYNTHESIZER FOR SOUND EFFECTS
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playCheer() {
+                this.init();
+                // Simulating crowd noise using filtered noise
+                const bufferSize = this.ctx.sampleRate * 1.5;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 1000;
+                filter.Q.value = 1.0;
+
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.01, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.2);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.4);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                noise.start();
+            }
+
+            playWhistle() {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(2800, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(2600, this.ctx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(2800, this.ctx.currentTime + 0.2);
+
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.4);
+            }
+
+            playBuzzer() {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.5);
+            }
+        }
+
+        const audio = new SoundFX();
+
+        // LESSON DATA (Derived from Course Curriculum Frameworks)
+        const scenarios = [
+            {
+                title: "Play 1: Generative AI Citation",
+                text: "You used ChatGPT to help structure and outline your history essay. How should you handle this in your final submission?",
+                options: [
+                    {
+                        text: "Submit without mention since AI only provided structural suggestions.",
+                        correct: false,
+                        yards: -10,
+                        feedback: "Tackle for Loss! Leaving out disclosure for AI assistance violates academic integrity guidelines. Generative tool usage must be acknowledged."
+                    },
+                    {
+                        text: "Include a disclosure statement explaining how AI was used, along with proper references.",
+                        correct: true,
+                        yards: 20,
+                        feedback: "Big Pass Play (+20 YDS)! Correct! Ethical academic use requires full disclosure of how generative tools contributed to the work."
+                    },
+                    {
+                        text: "Copy and paste the AI response word-for-word and claim it as your original thought.",
+                        correct: false,
+                        yards: -15,
+                        feedback: "Sack! (-15 YDS) Direct plagiarism. Presenting uncredited AI text as original work leads to severe academic penalties."
+                    }
+                ]
+            },
+            {
+                title: "Play 2: Digital Footprint & EXIF Metadata",
+                text: "You take a photo with your phone at home and prepare to post it on a public media account. What hidden risk should you review?",
+                options: [
+                    {
+                        text: "Photos automatically delete location data after 24 hours.",
+                        correct: false,
+                        yards: -5,
+                        feedback: "Incomplete Pass! Photos retain hidden metadata permanently unless stripped or privacy settings block it."
+                    },
+                    {
+                        text: "Embedded EXIF data may reveal exact GPS coordinates and time stamps.",
+                        correct: true,
+                        yards: 20,
+                        feedback: "Breakaway Run (+20 YDS)! Spot on! Camera images store EXIF metadata that can leak exact locations if not audited."
+                    },
+                    {
+                        text: "Only public accounts can display image files.",
+                        correct: false,
+                        yards: -5,
+                        feedback: "Out of Bounds! Private accounts can still leak metadata to accepted followers or platforms."
+                    }
+                ]
+            },
+            {
+                title: "Play 3: Creative Commons & Fair Use",
+                text: "You are creating a video presentation for class and need background music. What is the most legally responsible choice?",
+                options: [
+                    {
+                        text: "Use a popular copyrighted pop song since it's just a school project.",
+                        correct: false,
+                        yards: -10,
+                        feedback: "Penalty Flag! Commercial copyrighted works require permission unless strict fair use criteria apply, or CC licensing is used."
+                    },
+                    {
+                        text: "Find music released under Creative Commons license or Royalty-Free, and credit the creator.",
+                        correct: true,
+                        yards: 25,
+                        feedback: "TOUCHDOWN DANCE (+25 YDS)! Outstanding! Using Creative Commons assets with proper attribution follows copyright laws."
+                    },
+                    {
+                        text: "Speed up a commercial audio track so automated copyright systems can't detect it.",
+                        correct: false,
+                        yards: -15,
+                        feedback: "Turnover! Circumventing detection algorithms violates copyright policies and ethical guidelines."
+                    }
+                ]
+            },
+            {
+                title: "Play 4: Online Netiquette in Course Forums",
+                text: "A classmate posts an opinion in an online discussion board that you strongly disagree with. How do you respond?",
+                options: [
+                    {
+                        text: "Constructively address their arguments with facts while keeping a respectful tone.",
+                        correct: true,
+                        yards: 20,
+                        feedback: "First Down Drive (+20 YDS)! Excellent netiquette! Constructive, respectful dialogue maintains a healthy learning atmosphere."
+                    },
+                    {
+                        text: "Use ALL CAPS and sarcastic comments to prove how wrong they are.",
+                        correct: false,
+                        yards: -10,
+                        feedback: "Personal Foul! ALL CAPS is considered shouting in netiquette, and hostility disrupts productive discussion."
+                    },
+                    {
+                        text: "Report the student to the administrator immediately without reading the post fully.",
+                        correct: false,
+                        yards: -5,
+                        feedback: "Incomplete Pass! Differing opinions should be addressed civilly before escalating unless terms of service are breached."
+                    }
+                ]
+            },
+            {
+                title: "Play 5: Reputation & Long-term Digital Footprint",
+                text: "A friend suggests posting a funny but potentially embarrassing meme featuring another student. What is the best judgment call?",
+                options: [
+                    {
+                        text: "Post it on a story that vanishes in 24 hours so there is no lasting footprint.",
+                        correct: false,
+                        yards: -10,
+                        feedback: "Tackle for Loss! Temporary posts are easily screenshot and shared, creating permanent digital records."
+                    },
+                    {
+                        text: "Refrain from posting images that damage someone's reputation or personal privacy.",
+                        correct: true,
+                        yards: 15,
+                        feedback: "Solid Gain (+15 YDS)! Great defense! Respecting personal privacy prevents digital drama and protects reputations."
+                    }
+                ]
+            }
+        ];
+
+        // GAME STATE
+        let currentPlayIndex = 0;
+        let yardLine = 20; // Start at own 20-yard line
+        let currentDown = 1;
+        let yardsToGain = 10;
+        let totalScore = 0;
+
+        // DOM ELEMENTS
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const downDisplay = document.getElementById('downDisplay');
+        const yardDisplay = document.getElementById('yardDisplay');
+        const rankDisplay = document.getElementById('rankDisplay');
+        const footballMarker = document.getElementById('footballMarker');
+        const playTitle = document.getElementById('playTitle');
+        const playDescription = document.getElementById('playDescription');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const feedbackPanel = document.getElementById('feedbackPanel');
+        const feedbackHeader = document.getElementById('feedbackHeader');
+        const feedbackText = document.getElementById('feedbackText');
+        const nextBtn = document.getElementById('nextBtn');
+        const announcerBanner = document.getElementById('announcerBanner');
+        const flashOverlay = document.getElementById('flashOverlay');
+        const playbookCard = document.getElementById('playbookCard');
+        const endScreen = document.getElementById('endScreen');
+
+        function initGame() {
+            currentPlayIndex = 0;
+            yardLine = 20;
+            currentDown = 1;
+            yardsToGain = 10;
+            totalScore = 0;
+            
+            playbookCard.style.display = 'block';
+            endScreen.style.display = 'none';
+
+            updateUI();
+            loadPlay();
+        }
+
+        function loadPlay() {
+            const play = scenarios[currentPlayIndex];
+            playTitle.textContent = `${play.title}`;
+            playDescription.textContent = play.text;
+
+            optionsContainer.innerHTML = '';
+            feedbackPanel.style.display = 'none';
+            nextBtn.style.display = 'none';
+
+            play.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<strong style="margin-right:10px; color:var(--gold);">${String.fromCharCode(65 + idx)}:</strong> ${opt.text}`;
+                btn.onclick = () => selectOption(opt);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(option) {
+            // Disable all option buttons after selection
+            const buttons = optionsContainer.querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            // Audio & Visual Effects
+            if (option.correct) {
+                audio.playCheer();
+                triggerFlash();
+                totalScore += 100;
+                yardLine += option.yards;
+                
+                if (yardLine >= 100) {
+                    yardLine = 100;
+                    triggerAnnouncer("TOUCHDOWN! 🎉");
+                } else {
+                    triggerAnnouncer("BIG PLAY! 🏈");
+                }
+
+                feedbackPanel.className = 'feedback-panel gain';
+                feedbackHeader.textContent = `SUCCESS: GAIN OF ${option.yards} YARDS!`;
+                feedbackHeader.style.color = '#28a745';
+            } else {
+                audio.playBuzzer();
+                yardLine += option.yards; // negative yardage
+                if (yardLine < 0) yardLine = 0;
+
+                triggerAnnouncer("TACKLE FOR LOSS! ❌");
+                
+                feedbackPanel.className = 'feedback-panel loss';
+                feedbackHeader.textContent = `PENALTY / LOSS: ${option.yards} YARDS`;
+                feedbackHeader.style.color = '#d9534f';
+            }
+
+            feedbackText.textContent = option.feedback;
+            feedbackPanel.style.display = 'block';
+            nextBtn.style.display = 'block';
+
+            updateUI();
+        }
+
+        function triggerAnnouncer(msg) {
+            announcerBanner.textContent = msg;
+            announcerBanner.classList.add('active');
+            setTimeout(() => {
+                announcerBanner.classList.remove('active');
+            }, 1400);
+        }
+
+        function triggerFlash() {
+            flashOverlay.classList.add('strobe');
+            setTimeout(() => {
+                flashOverlay.classList.remove('strobe');
+            }, 600);
+        }
+
+        function updateUI() {
+            scoreDisplay.textContent = totalScore;
+            
+            // Calculate Field Position String
+            if (yardLine >= 100) {
+                yardDisplay.textContent = "TOUCHDOWN";
+            } else if (yardLine > 50) {
+                yardDisplay.textContent = `Opp ${100 - yardLine}`;
+            } else {
+                yardDisplay.textContent = `Own ${yardLine}`;
+            }
+
+            // Down status
+            downDisplay.textContent = `${currentDown}st & ${yardsToGain}`;
+
+            // Move football marker visually
+            footballMarker.style.left = `${Math.min(Math.max(yardLine, 8), 92)}%`;
+
+            // Player Rank System
+            if (totalScore >= 400) {
+                rankDisplay.textContent = "Hall of Famer";
+            } else if (totalScore >= 250) {
+                rankDisplay.textContent = "All-Pro";
+            } else if (totalScore >= 100) {
+                rankDisplay.textContent = "Varsity Starter";
+            } else {
+                rankDisplay.textContent = "Rookie";
+            }
+        }
+
+        function nextPlay() {
+            audio.playWhistle();
+            currentPlayIndex++;
+            if (currentPlayIndex < scenarios.length && yardLine < 100) {
+                loadPlay();
+            } else {
+                showEndScreen();
+            }
+        }
+
+        function showEndScreen() {
+            playbookCard.style.display = 'none';
+            endScreen.style.display = 'block';
+
+            let rank = rankDisplay.textContent;
+            document.getElementById('finalRank').textContent = `Final Player Rank: ${rank}`;
+            document.getElementById('finalScoreStats').textContent = `Total Score: ${totalScore} PTS | Final Yard Line: ${yardDisplay.textContent}`;
+        }
+
+        function resetGame() {
+            initGame();
+        }
+
+        // Initialize on load
+        window.onload = initGame;
+    </script>
+</body>
+</html>
