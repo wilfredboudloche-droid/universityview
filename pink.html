@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pink Ribbon Football Bowl - Digital Citizenship</title>
+    <style>
+        :root {
+            --pink-primary: #D81B60;
+            --pink-dark: #880E4F;
+            --pink-light: #F48FB1;
+            --pink-accent: #FF4081;
+            --field-green: #1B4D2E;
+            --chalk-white: #FFFFFF;
+            --ref-black: #111111;
+            --gold: #FFD700;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+        }
+
+        body {
+            background-color: var(--ref-black);
+            background-image: radial-gradient(circle, #2a0818 0%, #111111 100%);
+            color: var(--chalk-white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: rgba(20, 20, 20, 0.95);
+            border: 4px solid var(--pink-primary);
+            border-radius: 16px;
+            box-shadow: 0 0 35px rgba(216, 27, 96, 0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* BREADCRUMB / RIBBON BANNER */
+        .awareness-banner {
+            background: linear-gradient(90deg, var(--pink-dark), var(--pink-accent), var(--pink-dark));
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* JUMBOTRON SCOREBOARD */
+        .jumbotron {
+            background-color: #050505;
+            color: var(--gold);
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            text-align: center;
+            border-bottom: 3px solid var(--pink-primary);
+        }
+
+        .stat-box {
+            background: #181818;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--pink-primary);
+            box-shadow: inset 0 0 8px rgba(216, 27, 96, 0.3);
+        }
+
+        .stat-label {
+            font-family: sans-serif;
+            font-size: 0.75rem;
+            color: var(--pink-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            color: var(--gold);
+            margin-top: 4px;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+
+        /* FIELD GRAPHIC & ANIMATED CANVAS */
+        .field-wrapper {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            background-color: var(--field-green);
+            border-bottom: 3px solid var(--chalk-white);
+            overflow: hidden;
+        }
+
+        canvas#fieldCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* PLAYBOOK & INTERACTIVE AREA */
+        .playbook {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: linear-gradient(180deg, rgba(20,20,20,1) 0%, rgba(35,10,22,1) 100%);
+        }
+
+        .scenario-box {
+            background-color: rgba(10, 10, 10, 0.8);
+            border: 2px solid var(--pink-primary);
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-family: sans-serif;
+            line-height: 1.5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .play-title {
+            color: var(--pink-light);
+            font-family: 'Impact', sans-serif;
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .play-btn {
+            background-color: #121212;
+            color: white;
+            border: 2px solid var(--pink-primary);
+            padding: 14px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-family: sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .play-btn:hover {
+            background-color: var(--pink-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(216, 27, 96, 0.4);
+        }
+
+        /* ANNOUNCER / FEEDBACK POPUP */
+        .announcer-box {
+            margin-top: 15px;
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+            font-family: sans-serif;
+            animation: slideUp 0.3s forwards;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .announcer-box.gain {
+            background-color: rgba(27, 77, 46, 0.95);
+            color: white;
+            border: 2px solid #28a745;
+        }
+
+        .announcer-box.loss {
+            background-color: rgba(136, 14, 79, 0.95);
+            color: white;
+            border: 2px solid var(--pink-accent);
+        }
+
+        .callout-head {
+            font-family: 'Impact', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .next-btn {
+            margin-top: 12px;
+            background-color: var(--gold);
+            color: black;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Impact', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            transition: background 0.2s;
+        }
+
+        .next-btn:hover {
+            background-color: #ffe44d;
+        }
+
+        /* END GAME RECAP SCREEN */
+        .end-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            font-family: sans-serif;
+        }
+
+        .end-screen h1 {
+            font-family: 'Impact', sans-serif;
+            color: var(--gold);
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        @media (min-width: 650px) {
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <!-- AWARENESS BANNER -->
+    <div class="awareness-banner">
+        🎗️ PINK RIBBON BOWL: DIGITAL CITIZENSHIP EDITION 🎗️
+    </div>
+
+    <!-- JUMBOTRON SCOREBOARD -->
+    <div class="jumbotron">
+        <div class="stat-box">
+            <div class="stat-label">Score</div>
+            <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Down</div>
+            <div class="stat-value" id="down-display">1st Down</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Ball Location</div>
+            <div class="stat-value" id="yard-line">Own 20</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Rank</div>
+            <div class="stat-value" id="player-rank" style="font-size: 0.95rem;">Rookie</div>
+        </div>
+    </div>
+
+    <!-- FIELD GRAPHIC (CANVAS DRAWN) -->
+    <div class="field-wrapper">
+        <canvas id="fieldCanvas"></canvas>
+    </div>
+
+    <!-- PLAYBOOK / QUESTION AREA -->
+    <div class="playbook" id="playbook-screen">
+        <div class="scenario-box">
+            <div class="play-title" id="play-title">
+                <span>🏈</span> <span id="play-title-text">PLAY 1</span>
+            </div>
+            <p id="scenario-text">Loading Playbook...</p>
+        </div>
+
+        <div class="options-grid" id="options-container">
+            <!-- Buttons injected via JavaScript -->
+        </div>
+
+        <div class="announcer-box" id="announcer-box">
+            <div class="callout-head" id="announcer-head">TOUCHDOWN!</div>
+            <p id="announcer-text">Great play execution!</p>
+            <button class="next-btn" id="next-btn" onclick="nextPlay()">NEXT PLAY 🏈</button>
+        </div>
+    </div>
+
+    <!-- FINAL GAME OVER RECAP -->
+    <div class="end-screen" id="end-screen">
+        <h1>POST-GAME RECAP</h1>
+        <p id="final-stats" style="font-size: 1.3rem; margin: 20px 0; line-height: 1.6;"></p>
+        <p id="final-rank" style="font-size: 1.8rem; color: var(--gold); margin-bottom: 25px; font-family: 'Impact', sans-serif;"></p>
+        <button class="next-btn" onclick="location.reload()" style="font-size: 1.3rem; padding: 12px 30px;">PLAY AGAIN 🔄</button>
+    </div>
+</div>
+
+<script>
+    // AUDIO SYNTHESIZER (Web Audio API)
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new AudioContext();
+        }
+    }
+
+    function playWhistle() {
+        initAudio();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(2800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(2200, audioCtx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+    }
+
+    function playCheer() {
+        initAudio();
+        if (!audioCtx) return;
+        const bufferSize = audioCtx.sampleRate * 1.0;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1000;
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start();
+    }
+
+    // GAME DATA BASED ON CURRICULUM
+    const plays = [
+        {
+            title: "PLAY 1: LEAD FRAMEWORK DEFENSE",
+            scenario: "Your drive starts on your own 20-yard line. To establish a strong offensive baseline, how do you demonstrate the 'A' in the LEAD digital citizenship framework?",
+            options: [
+                { text: "Always post online without reviewing privacy or sharing parameters.", yards: -5, call: "TACKLE FOR LOSS!", feedback: "Incorrect! 'A' stands for Aware—maintaining a vigilant pulse on digital footprints and manipulated content[cite: 1]." },
+                { text: "Aware: Maintain a vigilant pulse on digital footprints and protect intellectual property.", yards: 20, call: "20-YARD STRIKE COMPLETE!", feedback: "Spot on! Staying Aware protects your digital footprint and secondary resume[cite: 1]." },
+                { text: "Argue: Engage aggressive commenters in high-friction digital spaces.", yards: -10, call: "INTERCEPTION!", feedback: "Wrong strategy! Engaging aggressively escalates drama rather than demonstrating empathy[cite: 1]." },
+                { text: "Avoid: Completely disconnect from all modern digital tools.", yards: 0, call: "INCOMPLETE PASS!", feedback: "Digital citizenship focuses on proactive agency and legacy, not total avoidance[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 2: ADMISSIONS & EMPLOYMENT SCREENING",
+            scenario: "You are pushing past midfield. According to Kaplan test prep data, how do college admissions officers evaluate applicant social media accounts?",
+            options: [
+                { text: "0% check; admissions officers are legally prohibited from searching online.", yards: -5, call: "FALSE START!", feedback: "Incorrect! 65% consider visiting profiles 'fair game' and 36% actively do so[cite: 1]." },
+                { text: "65% consider profile visits 'fair game' & 36% actively check applicant profiles.", yards: 25, call: "BIG GAIN DOWNFIELD! +25 YARDS", feedback: "Great execution! Your digital footprint acts as an active secondary resume[cite: 1]." },
+                { text: "Search engines only index positive achievements.", yards: -10, call: "SACKED FOR A LOSS!", feedback: "False! Search engines permanently index all public digital footprints[cite: 1]." },
+                { text: "Posts are automatically deleted from servers after 30 days.", yards: -5, call: "OUT OF BOUNDS!", feedback: "Digital footprints persist indefinitely regardless of local deletion[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 3: THE GRANDPARENT GAUGE PASS",
+            scenario: "You are preparing to post content late at night. Which key test from the Grandparent Gauge should you apply?",
+            options: [
+                { text: "Popularity Test: Does it earn immediate social media engagement?", yards: 0, call: "INCOMPLETE PASS!", feedback: "Engagement metric isn't part of the gauge; ethics and long-term reputation matter[cite: 1]." },
+                { text: "Counselor Caliper: Would a teacher writing a recommendation change their opinion?", yards: 20, call: "FIRST DOWN CONVERSION!", feedback: "Excellence! Evaluating stakeholder perception safeguards your reputation[cite: 1]." },
+                { text: "Privacy Shield: Assume private group chats can never leak.", yards: -15, call: "FUMBLE TURNOVER!", feedback: "Screenshots quickly turn private messages into public records[cite: 1]." },
+                { text: "Speed Check: Publish instantly before reviewing content.", yards: -10, call: "ILLEGAL PROCEDURE!", feedback: "Always pause and run the 4-point checklist before publishing[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 4: AI ACADEMIC INTEGRITY SLANT",
+            scenario: "You used Generative AI to edit sentence structure and check spelling on an essay. What disclosure is required under the Three-Question Framework?",
+            options: [
+                { text: "Full formal citation listing AI as primary co-author.", yards: 0, call: "INCOMPLETE PASS!", feedback: "Over-citation! Mechanical assistance (spelling/formatting) generally requires no disclosure[cite: 1]." },
+                { text: "Mechanical Assistance (spell-check/formatting) generally requires no disclosure.", yards: 20, call: "BULLET PASS COMPLETE!", feedback: "Correct! Content generation requires citation, but basic mechanical editing does not[cite: 1]." },
+                { text: "Conceal all AI use and deny using spell-checking features.", yards: -15, call: "UNSPORTSMANLIKE CONDUCT!", feedback: "Transparency is required for professional academic credibility[cite: 1]." },
+                { text: "Claim AI generated the core analysis to save time.", yards: -20, call: "PICK-SIX FOR OPPONENT TD!", feedback: "Passing off AI analysis as your own work violates academic integrity[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 5: CYBERSECURITY BLITZ DEFENSE",
+            scenario: "The defense brings a password-guessing blitz. How do you implement the Phrase-to-Password method for maximum defense?",
+            options: [
+                { text: "Use 'Password2026!' across all active personal accounts.", yards: -10, call: "BLITZED! SACKED!", feedback: "Predictable passwords are compromise targets for credential harvesting[cite: 1]." },
+                { text: "Take phrase first letters + mix case variations, numbers, and symbols.", yards: 25, call: "75-YARD BOMB DOWNFIELD!", feedback: "Touchdown drive moving! e.g., 'I went to Western Elementary School for grade 3' -> 'Iw2We$t4g3'[cite: 1]." },
+                { text: "Complete online social media quizzes to generate passwords.", yards: -15, call: "INTERCEPTED!", feedback: "Quizzes are social engineering tactics used to gather password details[cite: 1]." },
+                { text: "Store plain text passwords on desktop notes.", yards: -5, call: "OUT OF BOUNDS!", feedback: "Technical security requires intentional credential protection[cite: 1]." }
+            ]
+        },
+        {
+            title: "PLAY 6: UPSTANDER GOAL-LINE STAND",
+            scenario: "Goal line in sight! You notice a classmate targeted by online harassment. How do you execute an active Upstander strategy?",
+            options: [
+                { text: "Join the comments to avoid becoming a target yourself.", yards: -20, call: "PERSONAL FOUL PENALTY!", feedback: "Never participate in online harassment[cite: 1]." },
+                { text: "Organize a public 'pile-on of kindness' or do a private check-in.", yards: 20, call: "TOUCHDOWN! PINK RIBBON BOWL VICTORY!", feedback: "Upstanders leverage public and private tactics to stop cyberbullying[cite: 1]!" },
+                { text: "Watch passively without reporting or intervening.", yards: -5, call: "STUFFED AT THE LINE!", feedback: "Bystander silence enables harmful online behavior to persist[cite: 1]." },
+                { text: "Reshare screenshots to broadcast the incident widely.", yards: -10, call: "TURNOVER ON DOWNS!", feedback: "Amplifying drama increases harm rather than resolving it[cite: 1]." }
+            ]
+        }
+    ];
+
+    let currentPlay = 0;
+    let totalYards = 20;
+    let score = 0;
+
+    // CANVAS FIELD DRAWING ENGINE
+    const canvas = document.getElementById("fieldCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        drawField();
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+
+    function drawField() {
+        if (!canvas.width) return;
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // Turf background
+        ctx.fillStyle = "#1B4D2E";
+        ctx.fillRect(0, 0, w, h);
+
+        // Pink Endzones
+        ctx.fillStyle = "#880E4F";
+        ctx.fillRect(0, 0, w * 0.1, h); // Left Endzone
+        ctx.fillRect(w * 0.9, 0, w * 0.1, h); // Right Endzone
+
+        // Pink Endzone Text
+        ctx.fillStyle = "#F48FB1";
+        ctx.font = "bold 14px Impact";
+        ctx.textAlign = "center";
+        ctx.save();
+        ctx.translate(w * 0.05, h / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText("DEFENSE", 0, 4);
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(w * 0.95, h / 2);
+        ctx.rotate(Math.PI / 2);
+        ctx.fillText("END ZONE", 0, 4);
+        ctx.restore();
+
+        // White Yard Lines
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+        ctx.lineWidth = 2;
+        for (let i = 1; i < 10; i++) {
+            let x = (w * 0.8 / 10) * i + (w * 0.1);
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, h);
+            ctx.stroke();
+
+            // Yard Line Numbers
+            ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.font = "10px Arial";
+            let num = i <= 5 ? i * 10 : (10 - i) * 10;
+            ctx.fillText(num, x, 15);
+            ctx.fillText(num, x, h - 5);
+        }
+
+        // Draw Player / Pink Helmet Position
+        let ballX = (w * 0.1) + ((totalYards / 100) * (w * 0.8));
+        let ballY = h / 2;
+
+        // Helmet Icon
+        ctx.fillStyle = "#D81B60";
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#FFD700";
+        ctx.stroke();
+
+        // Pink Ribbon Symbol on Helmet
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "12px sans-serif";
+        ctx.fillText("🎗️", ballX - 7, ballY + 4);
+    }
+
+    // GAMEPLAY LOGIC
+    function loadPlay() {
+        if (currentPlay >= plays.length) {
+            endGame();
+            return;
+        }
+
+        const play = plays[currentPlay];
+        document.getElementById("play-title-text").innerText = play.title;
+        document.getElementById("scenario-text").innerText = play.scenario;
+        document.getElementById("announcer-box").style.display = "none";
+
+        const optionsGrid = document.getElementById("options-container");
+        optionsGrid.innerHTML = "";
+
+        play.options.forEach((opt) => {
+            const btn = document.createElement("button");
+            btn.className = "play-btn";
+            btn.innerHTML = `<span>${opt.text}</span> <span>🏈</span>`;
+            btn.onclick = () => selectPlay(opt);
+            optionsGrid.appendChild(btn);
+        });
+
+        updateScoreboard();
+    }
+
+    function selectPlay(option) {
+        playWhistle();
+        const announcerBox = document.getElementById("announcer-box");
+        const announcerHead = document.getElementById("announcer-head");
+        const announcerText = document.getElementById("announcer-text");
+
+        const buttons = document.querySelectorAll(".play-btn");
+        buttons.forEach(b => b.style.pointerEvents = "none");
+
+        totalYards += option.yards;
+        if (totalYards < 0) totalYards = 0;
+
+        if (option.yards > 0) {
+            score += option.yards * 10;
+            playCheer();
+            announcerBox.className = "announcer-box gain";
+            announcerHead.innerText = "📣 " + option.call;
+        } else {
+            announcerBox.className = "announcer-box loss";
+            announcerHead.innerText = "⚠️ " + option.call;
+        }
+
+        announcerText.innerText = option.feedback + ` (${option.yards >= 0 ? '+' : ''}${option.yards} Yards)`;
+        announcerBox.style.display = "block";
+
+        updateScoreboard();
+    }
+
+    function nextPlay() {
+        currentPlay++;
+        loadPlay();
+    }
+
+    function updateScoreboard() {
+        document.getElementById("score").innerText = score;
+        
+        let displayYards = totalYards <= 50 ? `Own ${totalYards}` : `Opp ${100 - totalYards}`;
+        if (totalYards >= 100) displayYards = "GOAL LINE";
+        document.getElementById("yard-line").innerText = displayYards;
+
+        document.getElementById("down-display").innerText = `Play ${currentPlay + 1} of ${plays.length}`;
+
+        let rank = "Rookie Practice Squad";
+        if (score >= 300) rank = "Varsity Starter";
+        if (score >= 600) rank = "All-Pro Selection";
+        if (score >= 900) rank = "Hall of Fame Captain";
+        document.getElementById("player-rank").innerText = rank;
+
+        drawField();
+    }
+
+    function endGame() {
+        document.getElementById("playbook-screen").style.display = "none";
+        const endScreen = document.getElementById("end-screen");
+        endScreen.style.display = "block";
+
+        let finalRank = document.getElementById("player-rank").innerText;
+        document.getElementById("final-stats").innerText = `Final Score: ${score} PTS\nTotal Field Distance Gained: ${totalYards} Yards`;
+        document.getElementById("final-rank").innerText = `FINAL PLAYER RANK: ${finalRank.toUpperCase()}`;
+    }
+
+    // Init Canvas and Start Game
+    setTimeout(() => {
+        resizeCanvas();
+        loadPlay();
+    }, 100);
+</script>
+</body>
+</html>
