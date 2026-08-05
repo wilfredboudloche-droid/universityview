@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friday Night Digital Citizenship Bowl</title>
+    <style>
+        :root {
+            --stadium-green: #1B4D2E;
+            --field-lines: #ffffff;
+            --ref-dark: #111111;
+            --gold: #FFD700;
+            --chalk-white: #F8F9FA;
+            --hash-red: #D9534F;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+        }
+
+        body {
+            background-color: var(--ref-dark);
+            color: var(--chalk-white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 850px;
+            background-color: var(--stadium-green);
+            border: 4px solid var(--gold);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* SCOREBOARD HEADER */
+        .jumbotron {
+            background-color: #000000;
+            color: var(--gold);
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            text-align: center;
+            border-bottom: 3px solid var(--gold);
+        }
+
+        .stat-box {
+            background: #151515;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+
+        .stat-label {
+            font-family: sans-serif;
+            font-size: 0.75rem;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-top: 4px;
+        }
+
+        /* FIELD PROGRESS BAR */
+        .field-container {
+            position: relative;
+            background: linear-gradient(90deg, #133a22 0%, #1B4D2E 50%, #133a22 100%);
+            height: 60px;
+            border-bottom: 2px dashed rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .field-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .ball-runner {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.8rem;
+            transition: left 0.6s ease-in-out;
+        }
+
+        .endzone {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 50px;
+            background-color: rgba(255, 215, 0, 0.2);
+            border-left: 2px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--gold);
+            writing-mode: vertical-rl;
+            text-transform: uppercase;
+        }
+
+        /* PLAYBOOK AREA */
+        .playbook {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .scenario-box {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-family: sans-serif;
+            line-height: 1.4;
+        }
+
+        .play-title {
+            color: var(--gold);
+            font-family: 'Impact', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .play-btn {
+            background-color: var(--ref-dark);
+            color: white;
+            border: 2px solid var(--gold);
+            padding: 12px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            font-family: sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .play-btn:hover {
+            background-color: var(--gold);
+            color: var(--ref-dark);
+            font-weight: bold;
+        }
+
+        /* ANNOUNCER / FEEDBACK POPUP */
+        .announcer-box {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            display: none;
+            font-family: sans-serif;
+        }
+
+        .announcer-box.gain {
+            background-color: rgba(40, 167, 69, 0.9);
+            color: white;
+            border: 2px solid #28a745;
+        }
+
+        .announcer-box.loss {
+            background-color: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: 2px solid #dc3545;
+        }
+
+        .callout-head {
+            font-family: 'Impact', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .next-btn {
+            margin-top: 10px;
+            background-color: var(--gold);
+            color: black;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        /* END SCREEN */
+        .end-screen {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            font-family: sans-serif;
+        }
+
+        .end-screen h1 {
+            font-family: 'Impact', sans-serif;
+            color: var(--gold);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <!-- JUMBOTRON SCOREBOARD -->
+    <div class="jumbotron">
+        <div class="stat-box">
+            <div class="stat-label">Score</div>
+            <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Down & Distance</div>
+            <div class="stat-value" id="down-dist">1st & 10</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Yard Line</div>
+            <div class="stat-value" id="yard-line">Own 20</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Rank</div>
+            <div class="stat-value" id="player-rank" style="font-size: 1rem;">Rookie</div>
+        </div>
+    </div>
+
+    <!-- FIELD GRAPHIC -->
+    <div class="field-container">
+        <div class="field-line" style="left: 20%;"></div>
+        <div class="field-line" style="left: 40%;"></div>
+        <div class="field-line" style="left: 60%;"></div>
+        <div class="field-line" style="left: 80%;"></div>
+        <div class="endzone">TOUCHDOWN</div>
+        <div class="ball-runner" id="football">🏈</div>
+    </div>
+
+    <!-- PLAYBOOK / QUESTION AREA -->
+    <div class="playbook" id="playbook-screen">
+        <div class="scenario-box">
+            <div class="play-title" id="play-title">PLAY 1: CALLING THE FORMATION</div>
+            <p id="scenario-text">Scenario loading...</p>
+        </div>
+
+        <div class="options-grid" id="options-container">
+            <!-- Buttons injected by JS -->
+        </div>
+
+        <div class="announcer-box" id="announcer-box">
+            <div class="callout-head" id="announcer-head">TOUCHDOWN!</div>
+            <p id="announcer-text">Great play execution!</p>
+            <button class="next-btn" id="next-btn" onclick="nextPlay()">NEXT PLAY 🏈</button>
+        </div>
+    </div>
+
+    <!-- FINAL GAME OVER SCREEN -->
+    <div class="end-screen" id="end-screen">
+        <h1>POST-GAME RECAP</h1>
+        <p id="final-stats" style="font-size: 1.2rem; margin: 15px 0;"></p>
+        <p id="final-rank" style="font-size: 1.5rem; color: var(--gold); margin-bottom: 20px;"></p>
+        <button class="next-btn" onclick="location.reload()">PLAY AGAIN 🔄</button>
+    </div>
+</div>
+
+<script>
+    const plays = [
+        {
+            title: "PLAY 1: THE LEAD FRAMEWORK",
+            scenario: "Your team needs to establish a offensive foundation. How do you execute the 'A' in the LEAD digital citizenship framework?",
+            options: [
+                { text: "Always post online without checking security settings.", yards: -5, call: "TACKLE FOR LOSS!", feedback: "Incorrect! 'A' stands for Aware—maintaining a vigilant pulse on your digital footprint and manipulated content." },
+                { text: "Aware: Maintain a vigilant pulse on digital footprints and protect intellectual property.", yards: 20, call: "20-YARD PASS COMPLETE!", feedback: "Spot on! Staying Aware helps protect your secondary resume and privacy." },
+                { text: "Argue: Actively debate every opposing opinion in high-friction comment sections.", yards: -10, call: "INTERCEPTION!", feedback: "Wrong play! Engaging aggressively escalates digital drama instead of showing empathy." },
+                { text: "Avoid: Never touch a digital device or access the internet.", yards: 0, call: "INCOMPLETE PASS!", feedback: "Digital citizenship is about offensive success and agency, not total avoidance." }
+            ]
+        },
+        {
+            title: "PLAY 2: ADMISSIONS & RECRUITER DRIVE",
+            scenario: "You're driving toward graduation. According to Kaplan survey data, how do college admissions officers view your social media footprint?",
+            options: [
+                { text: "0% of officers check social media; it is illegal for them to look.", yards: -5, call: "FALSE START!", feedback: "Incorrect! Over 65% consider visiting profiles 'fair game' and 36% actively visit them." },
+                { text: "65% consider visiting profiles 'fair game' & 36% actively visit applicant profiles.", yards: 25, call: "BREAKAWAY RUN! +25 YARDS", feedback: "Touchdown drive moving! Your digital footprint is a permanent, searchable secondary resume." },
+                { text: "Only bad posts are indexed by search algorithms.", yards: -10, call: "SACKED IN THE BACKFIELD!", feedback: "False! Search engines index all active footprints, good and bad." },
+                { text: "Posts are automatically erased from servers after 30 days.", yards: -5, call: "OUT OF BOUNDS!", feedback: "Digital footprints are permanent records that persist long after deletion." }
+            ]
+        },
+        {
+            title: "PLAY 3: THE GRANDPARENT GAUGE PASS",
+            scenario: "You are about to hit 'Publish' on a late-night meme. Which test from the Grandparent Gauge should you run first?",
+            options: [
+                { text: "Check if it gets at least 100 likes in 5 minutes.", yards: 0, call: "INCOMPLETE PASS!", feedback: "Popularity isn't part of the gauge; ethics and long-term reputation matter." },
+                { text: "Counselor Caliper: Would a teacher writing a recommendation change their opinion?", yards: 20, call: "FIRST DOWN!", feedback: "Great read! Evaluating how key stakeholders view your content protects your legacy." },
+                { text: "Incognito Shield: Assume no one can see it if your account is set to private.", yards: -15, call: "FUMBLE RECOVERY BY DEFENSE!", feedback: "Screenshots turn 'private' posts into public records instantly." },
+                { text: "Speed Test: Post as fast as possible before thinking.", yards: -10, call: "ILLEGAL PROCEDURE!", feedback: "Always pause and run the 4-point checklist before posting." }
+            ]
+        },
+        {
+            title: "PLAY 4: AI ACADEMIC INTEGRITY SLANT",
+            scenario: "You used Generative AI to edit grammar and check formatting on an essay. What level of disclosure is required under the Three-Question Framework?",
+            options: [
+                { text: "Full citation required as a primary co-author.", yards: 0, call: "INCOMPLETE PASS!", feedback: "Over-citation! Purely mechanical edits (formatting/spelling) generally require no disclosure." },
+                { text: "Mechanical Assistance (formatting/spell-check) generally requires no disclosure.", yards: 20, call: "BULLET PASS COMPLETE!", feedback: "Correct! If AI generated prose/core analysis, full citation is required, but mechanical help doesn't." },
+                { text: "Hide the use of AI completely and deny using spell-check.", yards: -15, call: "PENALTY! UNSPORTSMANLIKE CONDUCT", feedback: "Transparency is critical for academic credibility." },
+                { text: "Claim AI wrote the entire paper to save time.", yards: -20, call: "PICK-SIX FOR DEFENSIVE TD!", feedback: "Passing off AI analysis as your own violates academic integrity principles." }
+            ]
+        },
+        {
+            title: "PLAY 5: CYBERSECURITY PHRASE-TO-PASSWORD",
+            scenario: "The defense is bringing a blitz (cyberattack). How do you form a strong defensive wall using the Phrase-to-Password method?",
+            options: [
+                { text: "Use 'Password123!' across all your personal accounts.", yards: -10, call: "BLITZED! SACKED FOR LOSS", feedback: "Common passwords are harvested quickly by credential attacks." },
+                { text: "Take first letters of a memorable phrase + mix symbols, numbers, & case variations.", yards: 25, call: "75-YARD BOMB DOWNFIELD!", feedback: "Excellence! e.g., 'I went to Western Elementary School for grade 3' becomes 'Iw2We$t4g3'." },
+                { text: "Take an online 'Personality Quiz' to generate your security questions.", yards: -15, call: "INTERCEPTED!", feedback: "Quizzes are often social engineering schemes designed to guess passwords." },
+                { text: "Write your passwords on sticky notes attached to your laptop.", yards: -5, call: "OUT OF BOUNDS!", feedback: "Physical and digital security require intentional data protection." }
+            ]
+        },
+        {
+            title: "PLAY 6: UPSTANDER GOAL-LINE STAND",
+            scenario: "You see a classmate being targeted by online harassment and 'digital drama'. How do you act as an active Upstander?",
+            options: [
+                { text: "Join in on the comments so you don't become a target.", yards: -20, call: "PERSONAL FOUL!", feedback: "Never participate in online cruelty." },
+                { text: "Organize a 'pile-on of kindness' publicly or perform a private check-in.", yards: 20, call: "TOUCHDOWN!", feedback: "Upstanders use public and private options to support targets and halt harassment!" },
+                { text: "Watch silently without taking any action.", yards: -5, call: "STUFFED AT THE LINE!", feedback: "Passive bystanders allow harmful behavior to persist." },
+                { text: "Take screenshots and share them with the whole school.", yards: -10, call: "TURNOVER ON DOWNS!", feedback: "Spreading drama escalates the harm instead of resolving it." }
+            ]
+        }
+    ];
+
+    let currentPlay = 0;
+    let totalYards = 20; // Start at own 20
+    let score = 0;
+    let down = 1;
+
+    function loadPlay() {
+        if (currentPlay >= plays.length) {
+            endGame();
+            return;
+        }
+
+        const play = plays[currentPlay];
+        document.getElementById("play-title").innerText = play.title;
+        document.getElementById("scenario-text").innerText = play.scenario;
+        document.getElementById("announcer-box").style.display = "none";
+
+        const optionsGrid = document.getElementById("options-container");
+        optionsGrid.innerHTML = "";
+
+        play.options.forEach((opt, idx) => {
+            const btn = document.createElement("button");
+            btn.className = "play-btn";
+            btn.innerText = opt.text;
+            btn.onclick = () => selectPlay(opt);
+            optionsGrid.appendChild(btn);
+        });
+
+        updateScoreboard();
+    }
+
+    function selectPlay(option) {
+        const announcerBox = document.getElementById("announcer-box");
+        const announcerHead = document.getElementById("announcer-head");
+        const announcerText = document.getElementById("announcer-text");
+
+        // Disable options after click
+        const buttons = document.querySelectorAll(".play-btn");
+        buttons.forEach(b => b.style.pointerEvents = "none");
+
+        totalYards += option.yards;
+        if (totalYards < 0) totalYards = 0;
+
+        if (option.yards > 0) {
+            score += option.yards * 10;
+            announcerBox.className = "announcer-box gain";
+            announcerHead.innerText = "🏈 " + option.call;
+        } else {
+            announcerBox.className = "announcer-box loss";
+            announcerHead.innerText = "⚠️ " + option.call;
+        }
+
+        announcerText.innerText = option.feedback + ` (${option.yards >= 0 ? '+' : ''}${option.yards} Yards)`;
+        announcerBox.style.display = "block";
+
+        updateScoreboard();
+    }
+
+    function nextPlay() {
+        currentPlay++;
+        loadPlay();
+    }
+
+    function updateScoreboard() {
+        document.getElementById("score").innerText = score;
+        
+        // Progress visual bar (0 to 100 yards mapped to 0% - 85%)
+        let progress = Math.min((totalYards / 100) * 85, 85);
+        document.getElementById("football").style.left = progress + "%";
+
+        // Yard line display
+        let displayYards = totalYards <= 50 ? `Own ${totalYards}` : `Opp ${100 - totalYards}`;
+        if (totalYards >= 100) displayYards = "GOAL LINE";
+        document.getElementById("yard-line").innerText = displayYards;
+
+        // Rank updating based on score
+        let rank = "Rookie";
+        if (score >= 300) rank = "Varsity";
+        if (score >= 600) rank = "All-Pro";
+        if (score >= 900) rank = "Hall of Fame";
+        document.getElementById("player-rank").innerText = rank;
+    }
+
+    function endGame() {
+        document.getElementById("playbook-screen").style.display = "none";
+        const endScreen = document.getElementById("end-screen");
+        endScreen.style.display = "block";
+
+        let finalRank = document.getElementById("player-rank").innerText;
+        document.getElementById("final-stats").innerText = `Final Score: ${score} PTS | Total Yardage Advanced: ${totalYards} Yards`;
+        document.getElementById("final-rank").innerText = `FINAL PLAYER RANK: ${finalRank.toUpperCase()}`;
+    }
+
+    // Initialize game
+    loadPlay();
+</script>
+</body>
+</html>
