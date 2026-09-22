@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CTL 8.2: Sequences & Commands - UVA Sports Arena</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Canvas Confetti -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
@@ -87,6 +84,16 @@
             background: #f59e0b;
         }
 
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
+        }
+
         @media print {
             body * { visibility: hidden; }
             #certificate-print-area, #certificate-print-area * { visibility: visible; }
@@ -95,6 +102,9 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased">
+
+    <!-- CANVAS FOR SELF-CONTAINED CONFETTI REWARD -->
+    <canvas id="confetti-canvas"></canvas>
 
     <!-- TOP UVA STADIUM SCOREBOARD HEADER -->
     <header class="bg-uva-navy border-b-4 border-uva-gold sticky top-0 z-40 shadow-2xl backdrop-blur bg-opacity-95">
@@ -353,8 +363,8 @@
 
                     <!-- Simulator Controls -->
                     <div class="mt-4 pt-3 border-t border-slate-800 flex items-center gap-2">
-                        <button onclick="clearCommandQueue()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-3 px-3 rounded-xl border border-slate-700 transition flex-1">
-                            Clear Queue 🗑️
+                        <button onclick="resetSimulator()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-3 px-3 rounded-xl border border-slate-700 transition flex-1">
+                            Reset Grid & Queue 🗑️
                         </button>
                         <button id="btn-run-play" onclick="runPlaySimulation()" class="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-sm md:text-base py-3 px-6 rounded-xl border border-emerald-400/50 shadow-lg hover:shadow-emerald-500/20 transition flex-[2] font-scoreboard uppercase tracking-wider">
                             Run Play Sequence 🚀
@@ -494,6 +504,66 @@
     </footer>
 
     <script>
+        /* INLINE CONFETTI ENGINE (Zero External Dependencies) */
+        function confetti(options) {
+            const canvas = document.getElementById('confetti-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particleCount = options?.particleCount || 100;
+            const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6'];
+            const particles = [];
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: canvas.width * 0.5,
+                    y: canvas.height * (options?.origin?.y || 0.5),
+                    vx: (Math.random() - 0.5) * (options?.spread ? options.spread / 5 : 12),
+                    vy: (Math.random() - 0.7) * 12,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    rSpeed: (Math.random() - 0.5) * 10,
+                    opacity: 1
+                });
+            }
+
+            let animationFrame;
+            function update() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.25; // gravity
+                    p.rotation += p.rSpeed;
+                    p.opacity -= 0.01;
+
+                    if (p.opacity > 0) {
+                        alive = true;
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate((p.rotation * Math.PI) / 180);
+                        ctx.globalAlpha = Math.max(0, p.opacity);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                        ctx.restore();
+                    }
+                });
+
+                if (alive) {
+                    animationFrame = requestAnimationFrame(update);
+                } else {
+                    cancelAnimationFrame(animationFrame);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            update();
+        }
+
         /* SOUND SYNTHESIZER (Web Audio API - Self Contained) */
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let soundEnabled = true;
@@ -560,7 +630,7 @@
             // Simulator State
             playerPos: { r: 4, c: 0 },
             playerDir: 0, // 0: Up, 1: Right, 2: Down, 3: Left
-            goalPos: { r: 0, c: 4 },
+            goalPos: { r: 0, c: 4 }, // Top-Right Cell
             defenders: [
                 { r: 2, c: 1 },
                 { r: 3, c: 3 },
@@ -648,7 +718,6 @@
             }
         ];
 
-        /* STREAMING_CHUNK:Initializing Application and Round Builders... -->
         /* INITIALIZATION */
         window.onload = function() {
             document.getElementById('cert-date').innerText = new Date().toLocaleDateString('en-US', {
@@ -718,6 +787,10 @@
                     tab.className = "flex-1 min-w-[130px] py-2.5 px-3 rounded-xl font-bold text-xs md:text-sm transition flex items-center justify-center gap-2 bg-slate-800/80 text-slate-400 hover:text-white";
                 }
             }
+
+            if (num === 4) {
+                renderGrid();
+            }
         }
 
         /* ROUND 1 LOGIC */
@@ -772,10 +845,8 @@
             }
         }
 
-        /* STREAMING_CHUNK:Writing Round 2 and 3 Interactive Logics... -->
         /* ROUND 2 LOGIC (Sequencing) */
         function initRound2() {
-            // Shuffle items
             r2CurrentState = [...R2_ITEMS_CORRECT].sort(() => Math.random() - 0.5);
             renderRound2List();
         }
@@ -816,7 +887,6 @@
             } else if (selectedR2Index === idx) {
                 selectedR2Index = null;
             } else {
-                // Swap items
                 const temp = r2CurrentState[selectedR2Index];
                 r2CurrentState[selectedR2Index] = r2CurrentState[idx];
                 r2CurrentState[idx] = temp;
@@ -913,17 +983,25 @@
             }
         }
 
-        /* STREAMING_CHUNK:Writing Simulator Grid and Code Inspector Generator... -->
         /* ROUND 4 LOGIC (Play Call Simulator + Code Generator) */
         function initSimulator() {
             state.playerPos = { r: 4, c: 0 };
             state.playerDir = 0; // facing UP
+            state.goalPos = { r: 0, c: 4 }; // ALWAYS ALWAYS x: 4, y: 0 (Row 0, Col 4)
             renderGrid();
             renderQueue();
         }
 
+        function resetSimulator() {
+            if (state.isSimulating) return;
+            playSound('click');
+            state.commandQueue = [];
+            initSimulator();
+        }
+
         function renderGrid() {
             const grid = document.getElementById('simulator-grid');
+            if (!grid) return;
             grid.innerHTML = '';
 
             for (let r = 0; r < 5; r++) {
@@ -931,29 +1009,47 @@
                     const cell = document.createElement('div');
                     cell.className = "grid-cell bg-slate-900/80 border border-slate-800/80 rounded-xl flex items-center justify-center relative text-lg font-bold shadow-inner";
 
-                    // Check Goal
-                    if (r === state.goalPos.r && c === state.goalPos.c) {
+                    const isGoal = (r === state.goalPos.r && c === state.goalPos.c);
+                    const isDefender = state.defenders.some(d => d.r === r && d.c === c);
+                    const isPlayer = (r === state.playerPos.r && c === state.playerPos.c);
+
+                    // Render Goal Post Cell
+                    if (isGoal) {
                         cell.classList.add('bg-amber-500/10', 'border-amber-500/40');
-                        cell.innerHTML = '<span class="text-xl">🥅</span>';
                     }
 
-                    // Check Defenders
-                    const isDefender = state.defenders.some(d => d.r === r && d.c === c);
+                    // Render Defender Cell
                     if (isDefender) {
                         cell.classList.add('bg-red-500/10', 'border-red-500/30');
-                        cell.innerHTML = '<span class="text-xl">🛡️</span>';
                     }
 
-                    // Check Player
-                    if (r === state.playerPos.r && c === state.playerPos.c) {
-                        const arrows = ['⬆️', '➡️', '⬇️', '⬅️'];
+                    // Render Player Cell
+                    if (isPlayer) {
                         cell.classList.add('bg-emerald-500/20', 'border-emerald-400');
+                    }
+
+                    // Inner Element Render (Priority: Player > Defender / Goal)
+                    if (isPlayer && isGoal) {
+                        // Player on top of goal cell
+                        const arrows = ['⬆️', '➡️', '⬇️', '⬅️'];
+                        cell.innerHTML = `
+                            <div class="flex flex-col items-center leading-none">
+                                <span class="text-lg">🏃‍♂️⚽</span>
+                                <span class="text-[9px] text-amber-400 font-bold">${arrows[state.playerDir]}</span>
+                            </div>
+                        `;
+                    } else if (isPlayer) {
+                        const arrows = ['⬆️', '➡️', '⬇️', '⬅️'];
                         cell.innerHTML = `
                             <div class="flex flex-col items-center leading-none">
                                 <span class="text-lg">🏃‍♂️</span>
                                 <span class="text-[9px]">${arrows[state.playerDir]}</span>
                             </div>
                         `;
+                    } else if (isGoal) {
+                        cell.innerHTML = '<span class="text-xl">🥅</span>';
+                    } else if (isDefender) {
+                        cell.innerHTML = '<span class="text-xl">🛡️</span>';
                     }
 
                     grid.appendChild(cell);
@@ -970,13 +1066,19 @@
             playSound('click');
             state.commandQueue.push(cmd);
             renderQueue();
+            if (!document.getElementById('code-modal').classList.contains('hidden')) {
+                updateCodeDisplay();
+            }
         }
 
         function clearCommandQueue() {
             if (state.isSimulating) return;
             playSound('click');
             state.commandQueue = [];
-            initSimulator();
+            renderQueue();
+            if (!document.getElementById('code-modal').classList.contains('hidden')) {
+                updateCodeDisplay();
+            }
         }
 
         function renderQueue() {
@@ -1020,6 +1122,9 @@
             playSound('click');
             state.commandQueue.splice(idx, 1);
             renderQueue();
+            if (!document.getElementById('code-modal').classList.contains('hidden')) {
+                updateCodeDisplay();
+            }
         }
 
         async function runPlaySimulation() {
@@ -1088,7 +1193,7 @@
             if (scoredGoal) {
                 playSound('whistle');
                 playSound('correct');
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
 
                 if (!state.completedRounds[3]) {
                     state.completedRounds[3] = true;
@@ -1098,7 +1203,7 @@
 
                 setTimeout(() => {
                     openCodeModal();
-                    setTimeout(() => showSummaryScreen(), 2500);
+                    setTimeout(() => showSummaryScreen(), 2800);
                 }, 800);
 
             } else {
@@ -1108,7 +1213,6 @@
             }
         }
 
-        /* STREAMING_CHUNK:Writing Code Modal and Tab Switchers... -->
         /* GENERATED CODE INSPECTOR CODE GENERATOR */
         function switchCodeTab(lang) {
             playSound('click');
@@ -1203,7 +1307,7 @@
             }
             document.getElementById('final-rank').innerText = finalRank;
 
-            confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+            confetti({ particleCount: 160, spread: 90, origin: { y: 0.5 } });
         }
 
         function restartGame() {
@@ -1214,6 +1318,7 @@
             for (let i = 1; i <= 4; i++) {
                 document.getElementById(`badge-round-${i}`).classList.add('hidden');
             }
+            initSimulator();
             updateScoreboard();
             switchRound(1);
         }
