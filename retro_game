@@ -1,0 +1,1167 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVA Arcade Dev: Computational Logic Mission</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-arcade: #0a0612;
+            --arcade-cyan: #00f0ff;
+            --arcade-pink: #ff0055;
+            --arcade-yellow: #ffcc00;
+            --arcade-green: #39ff14;
+            --arcade-purple: #9d4edd;
+            --panel-bg: rgba(18, 10, 36, 0.92);
+            --panel-border: #00f0ff;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background-color: var(--bg-arcade);
+            color: #f1f5f9;
+            overflow-x: hidden;
+            user-select: none;
+            font-size: 1.25rem;
+        }
+
+        .font-pixel {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        /* CRT Scanline Screen Effect */
+        .crt-overlay::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 40;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* Arcade Glass Panel */
+        .arcade-panel {
+            background: var(--panel-bg);
+            border: 3px solid var(--arcade-cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .arcade-panel-magenta {
+            border-color: var(--arcade-pink);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3), inset 0 0 10px rgba(255, 0, 85, 0.1);
+        }
+
+        .arcade-panel-yellow {
+            border-color: var(--arcade-yellow);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.3), inset 0 0 10px rgba(255, 204, 0, 0.1);
+        }
+
+        /* Retro Buttons */
+        .arcade-btn {
+            font-family: 'Press Start 2P', cursive;
+            background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+            border: 2px solid var(--arcade-cyan);
+            color: var(--arcade-cyan);
+            text-transform: uppercase;
+            box-shadow: 0 4px 0 #008891;
+            transition: all 0.1s ease;
+            cursor: pointer;
+        }
+
+        .arcade-btn:hover:not(:disabled) {
+            background: var(--arcade-cyan);
+            color: #000000;
+            box-shadow: 0 4px 0 #00a8b5, 0 0 15px rgba(0, 240, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .arcade-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 0 0 #000;
+        }
+
+        .arcade-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: #4b5563;
+            color: #6b7280;
+            box-shadow: none;
+        }
+
+        .arcade-btn-pink {
+            border-color: var(--arcade-pink);
+            color: var(--arcade-pink);
+            box-shadow: 0 4px 0 #a80038;
+        }
+        .arcade-btn-pink:hover:not(:disabled) {
+            background: var(--arcade-pink);
+            color: #fff;
+            box-shadow: 0 4px 0 #d10046, 0 0 15px rgba(255, 0, 85, 0.6);
+        }
+
+        .arcade-btn-green {
+            border-color: var(--arcade-green);
+            color: var(--arcade-green);
+            box-shadow: 0 4px 0 #1b8a07;
+        }
+        .arcade-btn-green:hover:not(:disabled) {
+            background: var(--arcade-green);
+            color: #000;
+            box-shadow: 0 4px 0 #28cc0e, 0 0 15px rgba(57, 255, 20, 0.6);
+        }
+
+        /* Drag & Drop Visual Tweaks */
+        .draggable-item {
+            cursor: grab;
+            transition: all 0.15s ease;
+        }
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(1.02);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0720;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--arcade-cyan);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--arcade-pink);
+        }
+
+        /* Canvas Border Glow */
+        canvas#gameCanvas {
+            image-rendering: pixelated;
+            border: 3px solid var(--arcade-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative bg-slate-950 text-slate-100 crt-overlay" id="main-body">
+
+    <!-- MAIN CONTAINER -->
+    <div class="relative z-10 flex flex-col min-h-screen max-w-7xl mx-auto w-full px-3 py-3 sm:px-6 sm:py-4">
+
+        <!-- HEADER / BRANDING & DASHBOARD HUD -->
+        <header class="arcade-panel p-3 sm:p-4 mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <!-- School Context & Game Title -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-none bg-indigo-900 border-2 border-cyan-400 flex items-center justify-center shadow-lg text-2xl font-pixel text-yellow-300">
+                        👾
+                    </div>
+                    <div>
+                        <div class="text-xs font-pixel tracking-widest text-cyan-400 uppercase">UNIVERSITY VIEW ACADEMY</div>
+                        <h1 class="text-lg sm:text-2xl font-pixel text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-500 to-cyan-400 tracking-wider">
+                            CTL 8.1: GAME DEV ACADEMY
+                        </h1>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PLAYER STATUS HUD METRICS -->
+            <div class="flex items-center justify-between md:justify-end gap-3 sm:gap-6 w-full md:w-auto bg-slate-900/90 p-3 rounded border border-slate-800 font-pixel text-xs">
+                <!-- Current Rank -->
+                <div class="flex flex-col items-center sm:items-start">
+                    <span class="text-[9px] text-slate-400 uppercase">Dev Rank</span>
+                    <span id="player-rank" class="text-yellow-400 font-bold flex items-center gap-1">
+                        🕹️ Rookie Dev
+                    </span>
+                </div>
+
+                <div class="h-8 w-px bg-slate-800"></div>
+
+                <!-- Total Score -->
+                <div class="flex flex-col items-center sm:items-start">
+                    <span class="text-[9px] text-slate-400 uppercase">XP Score</span>
+                    <span id="player-score" class="text-cyan-300 font-bold">0000</span>
+                </div>
+
+                <div class="h-8 w-px bg-slate-800"></div>
+
+                <!-- Active Streak -->
+                <div class="flex flex-col items-center sm:items-start">
+                    <span class="text-[9px] text-slate-400 uppercase">Combo Streak</span>
+                    <span id="player-streak" class="text-emerald-400 font-bold">0x</span>
+                </div>
+
+                <!-- CRT Toggle & Audio Toggle Buttons -->
+                <div class="flex gap-2">
+                    <button onclick="toggleAudio()" id="audio-btn" class="arcade-btn px-2 py-1 text-[10px]">
+                        🔊 SFX
+                    </button>
+                    <button onclick="toggleCRT()" class="arcade-btn arcade-btn-pink px-2 py-1 text-[10px]">
+                        📺 CRT
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- FLOATING STREAK / FEEDBACK BANNER -->
+        <div id="streak-banner" class="fixed top-20 left-1/2 transform -translate-x-1/2 -translate-y-12 opacity-0 z-50 pointer-events-none transition-all duration-300">
+            <div id="streak-box" class="arcade-panel arcade-panel-yellow px-6 py-3 rounded flex items-center gap-3 bg-slate-900">
+                <span id="streak-emoji" class="text-2xl">⚡</span>
+                <span id="streak-text" class="font-pixel text-yellow-300 tracking-wider text-xs sm:text-sm">COMBO STREAK x2!</span>
+            </div>
+        </div>
+
+        <!-- MODULE SELECTOR TABS -->
+        <nav class="flex items-center justify-between gap-2 mb-4 overflow-x-auto pb-1 font-pixel text-[10px] sm:text-xs" id="mission-nav">
+            <button onclick="switchLevel(1)" id="tab-lvl-1" class="arcade-btn flex-1 min-w-[140px] py-3 px-2 rounded text-center">
+                1. GAME LOGIC PILLARS
+            </button>
+            <button onclick="switchLevel(2)" id="tab-lvl-2" class="arcade-btn flex-1 min-w-[140px] py-3 px-2 rounded text-center opacity-60">
+                2. 2D PIXEL ALGORITHM
+            </button>
+            <button onclick="switchLevel(3)" id="tab-lvl-3" class="arcade-btn flex-1 min-w-[140px] py-3 px-2 rounded text-center opacity-60">
+                3. BUG HUNT DEBUGGER
+            </button>
+        </nav>
+
+        <!-- MAIN GAMEPLAY CONTENT AREA -->
+        <main class="flex-1 flex flex-col justify-center">
+
+            <!-- MODULE 1: DECOMPOSITION & GAME ENGINE CONCEPTS -->
+            <section id="level-1" class="arcade-panel p-4 sm:p-6 rounded flex flex-col gap-6">
+                <div class="border-b border-cyan-500/40 pb-3 flex justify-between items-start flex-wrap gap-2">
+                    <div>
+                        <div class="text-xs text-cyan-400 font-pixel uppercase tracking-widest">Module 1: Decomposition & Architecture</div>
+                        <h2 class="text-xl sm:text-2xl font-pixel text-yellow-300 flex items-center gap-2 mt-1">
+                            <span>🎮 Arcade Game Engine Decomposition</span>
+                        </h2>
+                    </div>
+                    <div class="bg-indigo-950 border border-cyan-500/40 px-3 py-1.5 rounded text-xs text-cyan-200">
+                        Objective: Deconstruct a 2D game engine into its 4 core software loops!
+                    </div>
+                </div>
+
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    <strong class="text-cyan-300 font-pixel text-xs">DECOMPOSITION</strong> means breaking a massive video game (like Super Mario or Street Fighter) into separate, manageable code modules. Match each game dev concept to its correct logic definition!
+                </p>
+
+                <!-- Matching Drag/Select Container -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 my-2">
+                    <!-- Concept Blocks -->
+                    <div id="module-1-questions" class="space-y-4">
+                        <!-- Dynamic Question Cards Injected Here -->
+                    </div>
+
+                    <!-- Informational Side Panel -->
+                    <div class="arcade-panel arcade-panel-yellow p-4 flex flex-col justify-between bg-slate-950/60">
+                        <div>
+                            <h3 class="text-xs font-pixel text-yellow-300 mb-3 flex items-center gap-2">
+                                💡 Game Dev Computational Logic
+                            </h3>
+                            <p class="text-sm text-slate-300 leading-relaxed space-y-2">
+                                Game programmers use these exact systems in engines like Unity, Unreal, or Godot:
+                            </p>
+                            <ul class="text-sm text-slate-400 list-disc list-inside mt-2 space-y-2">
+                                <li><strong class="text-cyan-300">Game Loop:</strong> Runs 60 times per second to update positions & render frames.</li>
+                                <li><strong class="text-pink-400">Collision Detection:</strong> Calculates bounding box overlaps (hitboxes).</li>
+                                <li><strong class="text-yellow-300">State Machine:</strong> Tracks if player is IDLE, RUNNING, JUMPING, or ATTACKING.</li>
+                                <li><strong class="text-green-400">Input Listener:</strong> Intercepts controller buttons and keyboard keys.</li>
+                            </ul>
+                        </div>
+
+                        <div id="level-1-feedback" class="mt-4 p-3 rounded font-pixel text-xs hidden"></div>
+
+                        <div class="mt-4 flex justify-end">
+                            <button onclick="checkLevel1()" class="arcade-btn arcade-btn-green px-6 py-3 rounded text-xs flex items-center gap-2">
+                                🚀 VERIFY ENGINE CODE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 2: 2D RETRO CHARACTER SEQUENCE BUILDER -->
+            <section id="level-2" class="arcade-panel arcade-panel-magenta p-4 sm:p-6 rounded flex flex-col gap-6 hidden">
+                <div class="border-b border-pink-500/40 pb-3 flex justify-between items-start flex-wrap gap-2">
+                    <div>
+                        <div class="text-xs text-pink-400 font-pixel uppercase tracking-widest">Module 2: Algorithmic Execution</div>
+                        <h2 class="text-xl sm:text-2xl font-pixel text-yellow-300 flex items-center gap-2 mt-1">
+                            <span>🕹️ Pixel Hero 2D Algorithm Simulation</span>
+                        </h2>
+                    </div>
+                    <div class="bg-indigo-950 border border-pink-500/40 px-3 py-1.5 rounded text-xs text-pink-200">
+                        Objective: Program step-by-step logic commands to navigate the 2D stage safely!
+                    </div>
+                </div>
+
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    An <strong class="text-pink-400 font-pixel text-xs">ALGORITHM</strong> is an exact sequence of step-by-step instructions. Script the sequence for <strong class="text-yellow-300">Pixel Hero</strong> to dodge spikes ⚠️, collect the Key 🔑, slay the Goblin 👾, and reach the Stage Exit Gate 🚪!
+                </p>
+
+                <!-- 2D Canvas & Code Stack Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- 2D Retro Canvas Container -->
+                    <div class="lg:col-span-7 flex flex-col items-center justify-center bg-slate-950 p-3 rounded border border-slate-800">
+                        <div class="text-xs font-pixel text-slate-400 mb-2 w-full flex justify-between">
+                            <span>STAGE 1: CANYON RUN (2D CANVAS ENGINE)</span>
+                            <span id="hero-status" class="text-cyan-400 font-bold">STATE: IDLE</span>
+                        </div>
+                        <canvas id="gameCanvas" width="560" height="280" class="w-full h-auto max-w-[560px] rounded"></canvas>
+                    </div>
+
+                    <!-- Command Stack Builder -->
+                    <div class="lg:col-span-5 flex flex-col justify-between gap-4">
+                        <!-- Command Palette Buttons -->
+                        <div>
+                            <div class="text-xs font-pixel text-slate-300 mb-2">1. Click Command Blocks:</div>
+                            <div class="grid grid-cols-2 gap-2 font-pixel text-[10px]">
+                                <button onclick="addCommand('RUN')" class="arcade-btn px-2 py-2 rounded text-left">
+                                    ➡️ RUN RIGHT
+                                </button>
+                                <button onclick="addCommand('JUMP')" class="arcade-btn px-2 py-2 rounded text-left">
+                                    🦘 JUMP OVER
+                                </button>
+                                <button onclick="addCommand('HIGH_JUMP')" class="arcade-btn arcade-btn-pink px-2 py-2 rounded text-left">
+                                    🚀 HIGH JUMP
+                                </button>
+                                <button onclick="addCommand('SLIDE')" class="arcade-btn arcade-btn-pink px-2 py-2 rounded text-left">
+                                    🛹 SLIDE DUCK
+                                </button>
+                                <button onclick="addCommand('ATTACK')" class="arcade-btn arcade-btn-pink px-2 py-2 rounded text-left">
+                                    ⚔️ ATTACK
+                                </button>
+                                <button onclick="addCommand('KEY')" class="arcade-btn arcade-btn-green px-2 py-2 rounded text-left">
+                                    🔑 GRAB KEY
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Active Program Code Sequence -->
+                        <div>
+                            <div class="flex justify-between items-center text-xs font-pixel text-slate-300 mb-1">
+                                <span>2. Code Execution Stack:</span>
+                                <button onclick="clearProgram()" class="text-pink-400 hover:text-pink-300 text-[10px] underline">
+                                    CLEAR CODE
+                                </button>
+                            </div>
+                            <div id="program-stack" class="min-h-[100px] max-h-[140px] p-2 rounded bg-slate-950 border border-slate-800 flex flex-wrap gap-1.5 items-start overflow-y-auto">
+                                <span id="empty-program-text" class="text-xs text-slate-600 italic">No code blocks added yet. Build algorithm above...</span>
+                            </div>
+                        </div>
+
+                        <!-- Execution Controls -->
+                        <div class="flex items-center gap-2">
+                            <button onclick="runHeroProgram()" id="run-btn" class="arcade-btn arcade-btn-green flex-1 py-3 rounded text-xs font-pixel">
+                                ▶️ RUN GAME LOGIC
+                            </button>
+                            <button onclick="resetHeroPos()" class="arcade-btn px-4 py-3 rounded text-xs font-pixel">
+                                🔄 RESET
+                            </button>
+                        </div>
+
+                        <div id="level-2-feedback" class="p-3 rounded font-pixel text-xs hidden"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 3: BUG HUNT / GAME LOGIC DEBUGGING -->
+            <section id="level-3" class="arcade-panel arcade-panel-yellow p-4 sm:p-6 rounded flex flex-col gap-6 hidden">
+                <div class="border-b border-yellow-500/40 pb-3 flex justify-between items-start flex-wrap gap-2">
+                    <div>
+                        <div class="text-xs text-yellow-400 font-pixel uppercase tracking-widest">Module 3: Code Logic Debugging</div>
+                        <h2 class="text-xl sm:text-2xl font-pixel text-yellow-300 flex items-center gap-2 mt-1">
+                            <span>👾 Arcade Bug Hunt & Exam Prep</span>
+                        </h2>
+                    </div>
+                    <div class="bg-indigo-950 border border-yellow-500/40 px-3 py-1.5 rounded text-xs text-yellow-200">
+                        Objective: Identify missing algorithmic logic steps and fix broken code loops!
+                    </div>
+                </div>
+
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    <strong class="text-yellow-300 font-pixel text-xs">DEBUGGING</strong> is finding and fixing errors in program logic. On your University View Academy CTL 8.1 final exam, you will analyze logic flowcharts and identify missing steps. Solve the game glitches below!
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Debug Stage Box -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div id="debug-card" class="arcade-panel p-5 bg-slate-950 flex flex-col gap-4">
+                            <div class="flex justify-between items-center text-xs font-pixel text-slate-400">
+                                <span>Glitched Code Module #<span id="debug-num">1</span>/3</span>
+                                <span id="debug-category" class="text-pink-400">Collision Detection Bug</span>
+                            </div>
+
+                            <!-- Code Block Snippet Container -->
+                            <div class="p-4 rounded bg-slate-900 border border-slate-800 text-xs font-mono text-cyan-300 space-y-2 leading-relaxed" id="debug-code-box">
+                                <!-- Dynamic Code Snippet Injected Here -->
+                            </div>
+
+                            <!-- Multiple Choice Fixes -->
+                            <div class="text-xs font-pixel text-slate-300 mb-1">Select the missing logic statement to repair the glitch:</div>
+                            <div id="debug-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <!-- Dynamic Options -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informational Box -->
+                    <div class="arcade-panel p-4 flex flex-col justify-between bg-slate-950/60">
+                        <div>
+                            <h3 class="text-xs font-pixel text-cyan-300 mb-2">
+                                📝 Exam Connection: Missing Process Steps
+                            </h3>
+                            <p class="text-sm text-slate-300 leading-relaxed">
+                                Questions on the exam test your ability to trace data sequentially. If an `IF` condition or state check is missing, the entire algorithm produces unexpected results or crashes!
+                            </p>
+                        </div>
+                        <div id="level-3-feedback" class="p-3 rounded font-pixel text-xs hidden my-2"></div>
+                        <div class="text-right">
+                            <span id="debug-progress" class="text-xs font-pixel text-yellow-400">Fixed: 0/3 Bugs</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MISSION COMPLETED CERTIFICATE / DIPLOMA OVERLAY -->
+            <section id="mission-report" class="arcade-panel arcade-panel-yellow p-6 sm:p-8 rounded flex flex-col items-center text-center gap-6 hidden max-w-3xl mx-auto my-4">
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-16 h-16 rounded bg-yellow-400 text-slate-950 flex items-center justify-center text-4xl shadow-xl font-pixel">
+                        👑
+                    </div>
+                    <span class="text-xs font-pixel tracking-widest text-cyan-400 uppercase">OFFICIAL ACADEMY CERTIFICATION</span>
+                    <h2 class="text-2xl sm:text-3xl font-pixel text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300">
+                        MASTER GAME ARCHITECT
+                    </h2>
+                    <p class="text-xs text-slate-400 font-pixel">University View Academy • Computer Tech Literacy 8.1</p>
+                </div>
+
+                <div class="w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full font-pixel text-xs">
+                    <div class="bg-slate-900 p-3 rounded border border-slate-800">
+                        <div class="text-[9px] text-slate-400 uppercase">Final XP Score</div>
+                        <div id="final-score-val" class="text-lg text-yellow-300 font-bold mt-1">0</div>
+                    </div>
+                    <div class="bg-slate-900 p-3 rounded border border-slate-800">
+                        <div class="text-[9px] text-slate-400 uppercase">Rank Earned</div>
+                        <div id="final-rank-val" class="text-lg text-cyan-300 font-bold mt-1">Master</div>
+                    </div>
+                    <div class="bg-slate-900 p-3 rounded border border-slate-800">
+                        <div class="text-[9px] text-slate-400 uppercase">Max Combo</div>
+                        <div id="final-streak-val" class="text-lg text-emerald-400 font-bold mt-1">5x</div>
+                    </div>
+                    <div class="bg-slate-900 p-3 rounded border border-slate-800">
+                        <div class="text-[9px] text-slate-400 uppercase">Completion</div>
+                        <div class="text-lg text-pink-400 font-bold mt-1">100%</div>
+                    </div>
+                </div>
+
+                <!-- Badges Unlocked -->
+                <div class="w-full">
+                    <div class="text-xs font-pixel text-slate-300 mb-3 uppercase">Computational Logic Badges Earned</div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                        <div class="p-2 rounded bg-slate-900 border border-cyan-400 flex items-center gap-2">
+                            <span class="text-xl">🛠️</span>
+                            <div class="text-left font-pixel text-[9px]">
+                                <div class="text-cyan-300">Engine Decomposer</div>
+                            </div>
+                        </div>
+                        <div class="p-2 rounded bg-slate-900 border border-pink-400 flex items-center gap-2">
+                            <span class="text-xl">🕹️</span>
+                            <div class="text-left font-pixel text-[9px]">
+                                <div class="text-pink-300">2D Algorithm Ace</div>
+                            </div>
+                        </div>
+                        <div class="p-2 rounded bg-slate-900 border border-yellow-400 flex items-center gap-2">
+                            <span class="text-xl">🔍</span>
+                            <div class="text-left font-pixel text-[9px]">
+                                <div class="text-yellow-300">Master Debugger</div>
+                            </div>
+                        </div>
+                        <div class="p-2 rounded bg-slate-900 border border-emerald-400 flex items-center gap-2">
+                            <span class="text-xl">🎓</span>
+                            <div class="text-left font-pixel text-[9px]">
+                                <div class="text-emerald-300">UVA CTL Scholar</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="restartGame()" class="arcade-btn arcade-btn-green px-8 py-3 rounded text-xs font-pixel mt-2">
+                    🔄 RE-START ARCADE SIMULATION
+                </button>
+            </section>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="mt-6 pt-3 border-t border-slate-800 text-center text-xs text-slate-500 font-pixel flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div>University View Academy • Computer Tech Literacy</div>
+            <div>CTL 8.1 Introduction to Programming & Computational Logic</div>
+        </footer>
+    </div>
+
+    <script>
+        /* ------------------------------------------------------------------
+           GAME STATE & VARIABLES
+           ------------------------------------------------------------------ */
+        let gameState = {
+            score: 0,
+            streak: 0,
+            maxStreak: 0,
+            currentLevel: 1,
+            audioEnabled: true,
+            crtEnabled: true,
+            completedLevels: new Set()
+        };
+
+        const ranks = [
+            { threshold: 0, title: "🕹️ Rookie Dev" },
+            { threshold: 300, title: "👾 Pixel Programmer" },
+            { threshold: 700, title: "⚙️ Lead Engine Dev" },
+            { threshold: 1100, title: "👑 Master Game Architect" }
+        ];
+
+        /* ------------------------------------------------------------------
+           WEB AUDIO API 8-BIT SYNTHESIZER
+           ------------------------------------------------------------------ */
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+        }
+
+        function playRetroSound(type) {
+            if (!gameState.audioEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.setValueAtTime(150, now + 0.04);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'jump') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    osc.frequency.setValueAtTime(783.99, now + 0.16);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(140, now);
+                    osc.frequency.linearRampToValueAtTime(80, now + 0.2);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === 'key') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(987.77, now);
+                    osc.frequency.setValueAtTime(1318.51, now + 0.1);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                }
+            } catch (e) {
+                // Ignore audio context autoplay restrictions
+            }
+        }
+
+        function toggleAudio() {
+            gameState.audioEnabled = !gameState.audioEnabled;
+            document.getElementById('audio-btn').innerText = gameState.audioEnabled ? "🔊 SFX" : "🔇 MUTED";
+        }
+
+        function toggleCRT() {
+            gameState.crtEnabled = !gameState.crtEnabled;
+            const body = document.getElementById('main-body');
+            if (gameState.crtEnabled) body.classList.add('crt-overlay');
+            else body.classList.remove('crt-overlay');
+        }
+
+        /* ------------------------------------------------------------------
+           SCORE & STREAK SYSTEM
+           ------------------------------------------------------------------ */
+        function addScore(points) {
+            gameState.score += points;
+            gameState.streak++;
+            if (gameState.streak > gameState.maxStreak) gameState.maxStreak = gameState.streak;
+
+            document.getElementById('player-score').innerText = String(gameState.score).padStart(4, '0');
+            document.getElementById('player-streak').innerText = `${gameState.streak}x`;
+
+            let currentRank = ranks[0].title;
+            for (let r of ranks) {
+                if (gameState.score >= r.threshold) currentRank = r.title;
+            }
+            document.getElementById('player-rank').innerText = currentRank;
+
+            if (gameState.streak >= 2) triggerStreakBanner();
+            else playRetroSound('correct');
+        }
+
+        function resetStreak() {
+            gameState.streak = 0;
+            document.getElementById('player-streak').innerText = "0x";
+            playRetroSound('wrong');
+        }
+
+        function triggerStreakBanner() {
+            playRetroSound('correct');
+            const banner = document.getElementById('streak-banner');
+            const streakText = document.getElementById('streak-text');
+            const titles = ["COMBO STREAK!", "PIXEL PERFECT!", "GLITCH FIXED!", "ALGORITHM MASTER!"];
+            const title = titles[Math.min(gameState.streak - 2, titles.length - 1)];
+
+            streakText.innerText = `${title} x${gameState.streak}`;
+            banner.classList.remove('opacity-0', '-translate-y-12');
+            banner.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                banner.classList.remove('opacity-100', 'translate-y-0');
+                banner.classList.add('opacity-0', '-translate-y-12');
+            }, 1500);
+        }
+
+        /* ------------------------------------------------------------------
+           LEVEL NAVIGATION
+           ------------------------------------------------------------------ */
+        function switchLevel(lvl) {
+            playRetroSound('click');
+            gameState.currentLevel = lvl;
+
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`level-${i}`).classList.add('hidden');
+                document.getElementById(`tab-lvl-${i}`).classList.add('opacity-60');
+            }
+            document.getElementById('mission-report').classList.add('hidden');
+
+            const target = document.getElementById(`level-${lvl}`);
+            target.classList.remove('hidden');
+            const tab = document.getElementById(`tab-lvl-${lvl}`);
+            tab.classList.remove('opacity-60');
+
+            if (lvl === 2) {
+                setTimeout(initHeroCanvas, 100);
+            }
+        }
+
+        /* ------------------------------------------------------------------
+           MODULE 1: GAME LOGIC DECOMPOSITION MATCHING
+           ------------------------------------------------------------------ */
+        const module1Questions = [
+            {
+                id: 1,
+                concept: "🎮 Game Loop",
+                correct: "Repeats 60 times/sec to capture inputs, update physics positions, and render retro graphics.",
+                options: [
+                    "Repeats 60 times/sec to capture inputs, update physics positions, and render retro graphics.",
+                    "Checks if two bounding box hitboxes overlap on screen.",
+                    "Stores high scores permanently on a cloud database server."
+                ]
+            },
+            {
+                id: 2,
+                concept: "⚡ Collision Detection",
+                correct: "Calculates bounding box overlaps between character sprite and obstacle hitboxes.",
+                options: [
+                    "Plays 8-bit chip tune background music tracks.",
+                    "Calculates bounding box overlaps between character sprite and obstacle hitboxes.",
+                    "Translates raw keyboard inputs into player speed variables."
+                ]
+            },
+            {
+                id: 3,
+                concept: "🧠 State Machine",
+                correct: "Tracks current sprite animation state (e.g., IDLE, JUMPING, DUCKING, DEAD).",
+                options: [
+                    "Loads map texture images into system VRAM memory.",
+                    "Calculates player movement speed multiplied by delta time.",
+                    "Tracks current sprite animation state (e.g., IDLE, JUMPING, DUCKING, DEAD)."
+                ]
+            }
+        ];
+
+        function initLevel1() {
+            const container = document.getElementById('module-1-questions');
+            container.innerHTML = '';
+
+            module1Questions.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = "arcade-panel p-4 bg-slate-900/80 flex flex-col gap-2";
+
+                card.innerHTML = `
+                    <div class="text-xs font-pixel text-yellow-300 font-bold">${q.concept}</div>
+                    <select id="m1-select-${q.id}" class="bg-slate-950 border border-cyan-500/50 rounded p-2 text-xs text-slate-200 font-mono focus:border-cyan-300 outline-none">
+                        <option value="">-- Select Matching Engine Function --</option>
+                        ${q.options.sort(() => Math.random() - 0.5).map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                    </select>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function checkLevel1() {
+            let correctCount = 0;
+            module1Questions.forEach(q => {
+                const val = document.getElementById(`m1-select-${q.id}`).value;
+                if (val === q.correct) correctCount++;
+            });
+
+            const feedback = document.getElementById('level-1-feedback');
+            feedback.classList.remove('hidden', 'bg-emerald-950', 'bg-rose-950', 'text-emerald-300', 'text-rose-300');
+
+            if (correctCount === module1Questions.length) {
+                feedback.classList.add('bg-emerald-950', 'text-emerald-300', 'border', 'border-emerald-500');
+                feedback.innerHTML = "✅ <strong>ENGINE DECOMPOSITION VERIFIED!</strong> All 3 core game loops matched correctly!";
+                addScore(300);
+                gameState.completedLevels.add(1);
+                setTimeout(() => switchLevel(2), 1800);
+            } else {
+                feedback.classList.add('bg-rose-950', 'text-rose-300', 'border', 'border-rose-500');
+                feedback.innerHTML = `❌ <strong>LOGIC ERROR!</strong> Only ${correctCount}/${module1Questions.length} matched correctly. Review system definitions!`;
+                resetStreak();
+            }
+        }
+
+        /* ------------------------------------------------------------------
+           MODULE 2: 2D RETRO CHARACTER CANVAS & ALGORITHM STACK
+           ------------------------------------------------------------------ */
+        let canvas, ctx;
+        let programStack = [];
+        let isExecuting = false;
+
+        // Stage 2D World Coordinates & Objects
+        const hero = {
+            x: 20,
+            y: 190,
+            width: 24,
+            height: 32,
+            state: 'IDLE', // IDLE, RUN, JUMP, SLIDE, ATTACK
+            hasKey: false
+        };
+
+        const stageObstacles = [
+            { type: 'SPIKES', x: 120, y: 210, width: 40, height: 20, icon: '⚠️' },
+            { type: 'GAP', x: 230, y: 220, width: 50, height: 60, icon: '🕳️' },
+            { type: 'KEY', x: 310, y: 150, width: 20, height: 20, icon: '🔑', collected: false },
+            { type: 'GOBLIN', x: 400, y: 190, width: 30, height: 30, icon: '👾', defeated: false },
+            { type: 'GATE', x: 500, y: 170, width: 30, height: 50, icon: '🚪' }
+        ];
+
+        function initHeroCanvas() {
+            canvas = document.getElementById('gameCanvas');
+            if (!canvas) return;
+            ctx = canvas.getContext('2d');
+            resetHeroPos();
+        }
+
+        function resetHeroPos() {
+            hero.x = 20;
+            hero.y = 190;
+            hero.state = 'IDLE';
+            hero.hasKey = false;
+            stageObstacles[2].collected = false;
+            stageObstacles[3].defeated = false;
+            document.getElementById('hero-status').innerText = "STATE: IDLE";
+            render2DCanvas();
+        }
+
+        function render2DCanvas() {
+            if (!ctx) return;
+            // Background Sky
+            ctx.fillStyle = "#0c0721";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Retro Star Grid Background
+            ctx.fillStyle = "#1e1345";
+            for (let i = 0; i < canvas.width; i += 20) {
+                for (let j = 0; j < canvas.height - 60; j += 20) {
+                    ctx.fillRect(i + 8, j + 8, 2, 2);
+                }
+            }
+
+            // Ground Floor
+            ctx.fillStyle = "#3b0764";
+            ctx.fillRect(0, 220, canvas.width, 60);
+            ctx.fillStyle = "#a855f7";
+            ctx.fillRect(0, 220, canvas.width, 4);
+
+            // Draw Gap Void
+            const gap = stageObstacles[1];
+            ctx.fillStyle = "#0c0721";
+            ctx.fillRect(gap.x, gap.y, gap.width, gap.height);
+
+            // Draw Spikes
+            const spikes = stageObstacles[0];
+            ctx.fillStyle = "#ef4444";
+            for (let s = 0; s < spikes.width; s += 10) {
+                ctx.beginPath();
+                ctx.moveTo(spikes.x + s, spikes.y + spikes.height);
+                ctx.lineTo(spikes.x + s + 5, spikes.y);
+                ctx.lineTo(spikes.x + s + 10, spikes.y + spikes.height);
+                ctx.fill();
+            }
+
+            // Draw Key
+            const key = stageObstacles[2];
+            if (!key.collected) {
+                ctx.font = "18px sans-serif";
+                ctx.fillText("🔑", key.x, key.y + 15);
+            }
+
+            // Draw Goblin Enemy
+            const goblin = stageObstacles[3];
+            if (!goblin.defeated) {
+                ctx.font = "24px sans-serif";
+                ctx.fillText("👾", goblin.x, goblin.y + 22);
+            }
+
+            // Draw Exit Gate
+            const gate = stageObstacles[4];
+            ctx.fillStyle = hero.hasKey ? "#39ff14" : "#f59e0b";
+            ctx.fillRect(gate.x, gate.y, gate.width, gate.height);
+            ctx.fillStyle = "#000";
+            ctx.font = "16px sans-serif";
+            ctx.fillText("🚪", gate.x + 6, gate.y + 32);
+
+            // Draw Pixel Hero Character
+            ctx.fillStyle = "#00f0ff";
+            if (hero.state === 'SLIDE') {
+                ctx.fillRect(hero.x, hero.y + 16, hero.width + 8, hero.height - 16);
+            } else {
+                ctx.fillRect(hero.x, hero.y, hero.width, hero.height);
+                // Hero Head Eyes
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(hero.x + 14, hero.y + 6, 6, 6);
+                ctx.fillStyle = "#000";
+                ctx.fillRect(hero.x + 16, hero.y + 8, 2, 2);
+            }
+
+            // Hero State Tag
+            ctx.fillStyle = "#ffcc00";
+            ctx.font = "10px 'Press Start 2P'";
+            ctx.fillText(hero.state, hero.x - 5, hero.y - 8);
+        }
+
+        function addCommand(cmd) {
+            playRetroSound('click');
+            if (programStack.length >= 10 || isExecuting) return;
+            programStack.push(cmd);
+            renderProgramStack();
+        }
+
+        function clearProgram() {
+            playRetroSound('click');
+            if (isExecuting) return;
+            programStack = [];
+            resetHeroPos();
+            renderProgramStack();
+        }
+
+        function renderProgramStack() {
+            const stackEl = document.getElementById('program-stack');
+            const emptyText = document.getElementById('empty-program-text');
+
+            if (programStack.length === 0) {
+                stackEl.innerHTML = '';
+                stackEl.appendChild(emptyText);
+                emptyText.classList.remove('hidden');
+                return;
+            }
+
+            stackEl.innerHTML = '';
+            programStack.forEach((cmd, idx) => {
+                const tag = document.createElement('div');
+                tag.className = "px-2 py-1 rounded bg-slate-900 border border-cyan-500/40 text-cyan-300 font-pixel text-[9px] flex items-center gap-1";
+
+                let label = cmd;
+                if (cmd === 'RUN') label = '➡️ RUN';
+                if (cmd === 'JUMP') label = '🦘 JUMP';
+                if (cmd === 'HIGH_JUMP') label = '🚀 HIGH JUMP';
+                if (cmd === 'SLIDE') label = '🛹 SLIDE';
+                if (cmd === 'ATTACK') label = '⚔️ ATTACK';
+                if (cmd === 'KEY') label = '🔑 KEY';
+
+                tag.innerHTML = `
+                    <span>${idx + 1}.${label}</span>
+                    <button onclick="removeCommand(${idx})" class="text-pink-400 font-bold ml-1">×</button>
+                `;
+                stackEl.appendChild(tag);
+            });
+        }
+
+        function removeCommand(idx) {
+            if (isExecuting) return;
+            playRetroSound('click');
+            programStack.splice(idx, 1);
+            renderProgramStack();
+        }
+
+        async function runHeroProgram() {
+            if (programStack.length === 0 || isExecuting) return;
+            isExecuting = true;
+            resetHeroPos();
+            document.getElementById('run-btn').disabled = true;
+
+            const feedback = document.getElementById('level-2-feedback');
+            feedback.classList.add('hidden');
+
+            for (let cmd of programStack) {
+                document.getElementById('hero-status').innerText = `EXEC: ${cmd}`;
+
+                if (cmd === 'RUN') {
+                    hero.state = 'RUN';
+                    hero.x += 65;
+                } else if (cmd === 'JUMP') {
+                    hero.state = 'JUMP';
+                    playRetroSound('jump');
+                    hero.x += 60;
+                    hero.y = 150;
+                    render2DCanvas();
+                    await new Promise(r => setTimeout(r, 250));
+                    hero.y = 190;
+                } else if (cmd === 'HIGH_JUMP') {
+                    hero.state = 'JUMP';
+                    playRetroSound('jump');
+                    hero.x += 90;
+                    hero.y = 120;
+                    render2DCanvas();
+                    await new Promise(r => setTimeout(r, 300));
+                    hero.y = 190;
+                } else if (cmd === 'SLIDE') {
+                    hero.state = 'SLIDE';
+                    hero.x += 50;
+                } else if (cmd === 'ATTACK') {
+                    hero.state = 'ATTACK';
+                    playRetroSound('click');
+                    if (Math.abs(hero.x - stageObstacles[3].x) < 50) {
+                        stageObstacles[3].defeated = true;
+                    }
+                } else if (cmd === 'KEY') {
+                    if (Math.abs(hero.x - stageObstacles[2].x) < 60) {
+                        hero.hasKey = true;
+                        stageObstacles[2].collected = true;
+                        playRetroSound('key');
+                    }
+                }
+
+                render2DCanvas();
+
+                // Check Collisions / Failures
+                // Spikes Collision
+                if (hero.state !== 'JUMP' && Math.abs(hero.x - stageObstacles[0].x) < 30) {
+                    triggerHeroFail("Hero ran into ⚠️ Spikes! Use JUMP or HIGH JUMP.");
+                    return;
+                }
+                // Gap Collision
+                if (hero.state !== 'JUMP' && hero.x >= stageObstacles[1].x && hero.x <= stageObstacles[1].x + stageObstacles[1].width) {
+                    triggerHeroFail("Hero fell into the 🕳️ Gap! Requires HIGH JUMP.");
+                    return;
+                }
+                // Goblin Collision
+                if (!stageObstacles[3].defeated && Math.abs(hero.x - stageObstacles[3].x) < 30) {
+                    triggerHeroFail("Hero got hit by 👾 Goblin! Execute ATTACK first.");
+                    return;
+                }
+
+                await new Promise(r => setTimeout(r, 450));
+                hero.state = 'IDLE';
+                render2DCanvas();
+            }
+
+            // Check Exit Gate Win
+            if (hero.x >= stageObstacles[4].x - 20) {
+                if (hero.hasKey) {
+                    feedback.classList.remove('hidden');
+                    feedback.className = 'p-3 rounded font-pixel text-xs bg-emerald-950 text-emerald-300 border border-emerald-500';
+                    feedback.innerHTML = "🎉 <strong>ALGORITHM PERFECT!</strong> Pixel Hero unlocked the gate and cleared Stage 1!";
+                    addScore(400);
+                    gameState.completedLevels.add(2);
+                    setTimeout(() => switchLevel(3), 2000);
+                } else {
+                    triggerHeroFail("Gate is locked 🚪! Sequence missing 🔑 COLLECT KEY.");
+                }
+            } else {
+                triggerHeroFail("Algorithm stopped before reaching Stage Exit Gate 🚪!");
+            }
+
+            isExecuting = false;
+            document.getElementById('run-btn').disabled = false;
+        }
+
+        function triggerHeroFail(msg) {
+            playRetroSound('wrong');
+            isExecuting = false;
+            document.getElementById('run-btn').disabled = false;
+            document.getElementById('hero-status').innerText = "STATUS: CRASHED";
+            const feedback = document.getElementById('level-2-feedback');
+            feedback.classList.remove('hidden');
+            feedback.className = 'p-3 rounded font-pixel text-xs bg-rose-950 text-rose-300 border border-rose-500';
+            feedback.innerHTML = `❌ <strong>LOGIC ERROR:</strong> ${msg}`;
+            resetStreak();
+        }
+
+        /* ------------------------------------------------------------------
+           MODULE 3: BUG HUNT & EXAM PREP DEBUGGING
+           ------------------------------------------------------------------ */
+        const debugQuestions = [
+            {
+                category: "Collision Logic Bug",
+                code: `if (player.x == spike.x) {\n  // Bug: Exact floating point equality fails!\n  player.takeDamage();\n}`,
+                fix: `if (Math.abs(player.x - spike.x) < hitboxWidth)`,
+                options: [
+                    `if (Math.abs(player.x - spike.x) < hitboxWidth)`,
+                    `if (player.x === "spike.x")`,
+                    `while (player.x != spike.x) { jump(); }`
+                ]
+            },
+            {
+                category: "Infinite Loop Glitch",
+                code: `while (enemyState == "PATROL") {\n  renderEnemy();\n  // Bug: Missing position increment counter!\n}`,
+                fix: `enemyPosition += speed;`,
+                options: [
+                    `enemyPosition += speed;`,
+                    `enemyState = "DEAD";`,
+                    `stopGameLoopPermanent();`
+                ]
+            },
+            {
+                category: "Missing Input Handshake",
+                code: `if (keyDown("SPACE")) {\n  // Bug: Key press triggers 60 jumps in 1 second!\n  player.jump();\n}`,
+                fix: `if (keyDown("SPACE") && player.isGrounded)`,
+                options: [
+                    `if (keyDown("SPACE") && player.isGrounded)`,
+                    `if (keyUp("ESCAPE"))`,
+                    `player.y = 0;`
+                ]
+            }
+        ];
+
+        let debugIdx = 0;
+
+        function loadDebugStage() {
+            const stage = debugQuestions[debugIdx];
+            document.getElementById('debug-num').innerText = debugIdx + 1;
+            document.getElementById('debug-category').innerText = stage.category;
+            document.getElementById('debug-progress').innerText = `Fixed: ${debugIdx}/3 Bugs`;
+
+            document.getElementById('debug-code-box').innerHTML = `<pre class="font-mono text-cyan-300 text-xs">${stage.code}</pre>`;
+
+            const optionsBox = document.getElementById('debug-options');
+            optionsBox.innerHTML = '';
+            stage.options.sort(() => Math.random() - 0.5).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "arcade-btn p-3 rounded text-left text-[10px] font-mono leading-snug";
+                btn.innerText = opt;
+                btn.onclick = () => checkDebugChoice(opt);
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function checkDebugChoice(selected) {
+            const stage = debugQuestions[debugIdx];
+            const feedback = document.getElementById('level-3-feedback');
+            feedback.classList.remove('hidden', 'bg-emerald-950', 'bg-rose-950', 'text-emerald-300', 'text-rose-300');
+
+            if (selected === stage.fix) {
+                addScore(300);
+                debugIdx++;
+                if (debugIdx < debugQuestions.length) {
+                    feedback.classList.add('bg-emerald-950', 'text-emerald-300');
+                    feedback.innerHTML = "✅ <strong>BUG REPAIRED!</strong> Code stack re-compiled.";
+                    setTimeout(() => {
+                        feedback.classList.add('hidden');
+                        loadDebugStage();
+                    }, 1200);
+                } else {
+                    feedback.classList.add('bg-emerald-950', 'text-emerald-300');
+                    feedback.innerHTML = "🎉 <strong>ALL GAME GLITCHES FIXED!</strong> You are ready for the CTL 8.1 Final Exam!";
+                    gameState.completedLevels.add(3);
+                    setTimeout(() => showMissionReport(), 1800);
+                }
+            } else {
+                feedback.classList.add('bg-rose-950', 'text-rose-300');
+                feedback.innerHTML = "❌ <strong>GLITCH PERSISTS!</strong> Incorrect patch syntax. Try again!";
+                resetStreak();
+            }
+        }
+
+        /* ------------------------------------------------------------------
+           FINAL REPORT & RESTART
+           ------------------------------------------------------------------ */
+        function showMissionReport() {
+            playRetroSound('correct');
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`level-${i}`).classList.add('hidden');
+            }
+
+            document.getElementById('mission-report').classList.remove('hidden');
+            document.getElementById('final-score-val').innerText = gameState.score;
+            document.getElementById('final-streak-val').innerText = `${gameState.maxStreak}x`;
+
+            let finalRank = "Master";
+            for (let r of ranks) {
+                if (gameState.score >= r.threshold) finalRank = r.title.replace(/[^a-zA-Z ]/g, "").trim();
+            }
+            document.getElementById('final-rank-val').innerText = finalRank;
+        }
+
+        function restartGame() {
+            gameState.score = 0;
+            gameState.streak = 0;
+            gameState.maxStreak = 0;
+            gameState.completedLevels.clear();
+            debugIdx = 0;
+
+            document.getElementById('player-score').innerText = "0000";
+            document.getElementById('player-streak').innerText = "0x";
+            document.getElementById('player-rank').innerText = "🕹️ Rookie Dev";
+
+            initLevel1();
+            loadDebugStage();
+            switchLevel(1);
+        }
+
+        window.onload = function () {
+            initLevel1();
+            loadDebugStage();
+        };
+    </script>
+</body>
+</html>
