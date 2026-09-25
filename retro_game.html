@@ -6,15 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UVA Arcade Dev: CTL 8.1 Computational Logic Lab</title>
     
+    <!-- Retro Pixel Font Loading with System Fallbacks -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-arcade: #090514;
+            --bg-arcade: #080a12;
+            --panel-bg: #0d1222;
+            --card-bg: #131a2e;
             --arcade-cyan: #00f0ff;
             --arcade-pink: #ff0055;
-            --arcade-yellow: #ffcc00;
+            --arcade-yellow: #ffe66d;
+            --arcade-coral: #ff6b6b;
             --arcade-green: #39ff14;
-            --arcade-purple: #8b5cf6;
-            --panel-bg: rgba(15, 10, 30, 0.96);
+            --arcade-purple: #9d4edd;
+            --border-glow: 0 0 12px rgba(0, 240, 255, 0.4);
         }
 
         * {
@@ -25,11 +33,11 @@
         }
 
         body {
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'VT323', 'Courier New', monospace;
             background-color: var(--bg-arcade);
             color: #f8fafc;
-            line-height: 1.5;
-            font-size: 17px; /* Increased base body font size */
+            line-height: 1.4;
+            font-size: 20px; /* High legibility retro text base */
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -37,20 +45,29 @@
             padding: 10px;
         }
 
-        /* 700px MAX CONTAINER SPECIFICATION */
+        /* 700px MAX CONTAINER SPECIFICATION FOR CANVAS / LMS */
         .iframe-container {
             width: 100%;
             max-width: 700px;
             display: flex;
-            flex-col: column;
-            gap: 16px;
+            flex-direction: column;
+            gap: 14px;
             position: relative;
         }
 
+        /* RETRO PIXEL FONT HEADINGS (Matching original screenshot) */
         .font-pixel {
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            letter-spacing: -0.5px;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            text-transform: uppercase;
+        }
+
+        /* GRADIENT & GLOW TITLE TEXT (Exact warmth gradient from screenshot) */
+        .title-gradient {
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            background: linear-gradient(180deg, #ffe66d 0%, #ff758c 50%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(255, 107, 107, 0.65));
         }
 
         /* CRT Scanline Screen Effect */
@@ -59,43 +76,57 @@
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
             z-index: 50;
             background-size: 100% 4px, 6px 100%;
             pointer-events: none;
-            opacity: 0.6;
+            opacity: 0.65;
         }
 
-        /* Arcade Cabinet Panels */
+        /* Arcade Cabinet Main Panels */
         .arcade-panel {
             background: var(--panel-bg);
             border: 3px solid var(--arcade-cyan);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 12px rgba(0, 240, 255, 0.08);
-            border-radius: 12px;
-            padding: 18px;
+            box-shadow: var(--border-glow);
+            border-radius: 10px;
+            padding: 16px;
             width: 100%;
         }
 
         .arcade-panel-pink {
             border-color: var(--arcade-pink);
-            box-shadow: 0 0 15px rgba(255, 0, 85, 0.2), inset 0 0 12px rgba(255, 0, 85, 0.08);
+            box-shadow: 0 0 12px rgba(255, 0, 85, 0.4);
         }
 
         .arcade-panel-yellow {
             border-color: var(--arcade-yellow);
-            box-shadow: 0 0 15px rgba(255, 204, 0, 0.2), inset 0 0 12px rgba(255, 204, 0, 0.08);
+            box-shadow: 0 0 12px rgba(255, 230, 109, 0.4);
+        }
+
+        /* Icon Box from Screenshot */
+        .icon-box-cyan {
+            width: 52px;
+            height: 58px;
+            border: 2px solid var(--arcade-cyan);
+            box-shadow: inset 0 0 8px rgba(0, 240, 255, 0.3), 0 0 8px rgba(0, 240, 255, 0.3);
+            background: #091024;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            flex-shrink: 0;
         }
 
         /* Large Retro Buttons for 16-20px readability */
         .arcade-btn {
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            font-size: 17px;
-            padding: 12px 16px;
-            background: #1e293b;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            padding: 12px 14px;
+            background: #131b2e;
             border: 2px solid var(--arcade-cyan);
             color: var(--arcade-cyan);
-            border-radius: 8px;
+            border-radius: 6px;
             text-transform: uppercase;
             box-shadow: 0 4px 0 #007780;
             transition: all 0.1s ease;
@@ -109,7 +140,7 @@
         .arcade-btn:hover:not(:disabled) {
             background: var(--arcade-cyan);
             color: #000;
-            box-shadow: 0 4px 0 #00a8b5, 0 0 12px rgba(0, 240, 255, 0.6);
+            box-shadow: 0 4px 0 #00a8b5, 0 0 12px rgba(0, 240, 255, 0.7);
             transform: translateY(-2px);
         }
 
@@ -121,7 +152,7 @@
         .arcade-btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
-            border-color: #475569;
+            border-color: #334155;
             color: #64748b;
             box-shadow: none;
         }
@@ -134,7 +165,7 @@
         .arcade-btn-pink:hover:not(:disabled) {
             background: var(--arcade-pink);
             color: #fff;
-            box-shadow: 0 4px 0 #cc0044, 0 0 12px rgba(255, 0, 85, 0.6);
+            box-shadow: 0 4px 0 #cc0044, 0 0 12px rgba(255, 0, 85, 0.7);
         }
 
         .arcade-btn-green {
@@ -145,26 +176,27 @@
         .arcade-btn-green:hover:not(:disabled) {
             background: var(--arcade-green);
             color: #000;
-            box-shadow: 0 4px 0 #22c55e, 0 0 12px rgba(57, 255, 20, 0.6);
+            box-shadow: 0 4px 0 #22c55e, 0 0 12px rgba(57, 255, 20, 0.7);
         }
 
         /* Typography sizing overrides */
-        h1 { font-size: 26px; line-height: 1.2; }
-        h2 { font-size: 22px; line-height: 1.3; }
-        h3 { font-size: 19px; }
-        p, select, option { font-size: 16px; }
+        h1 { font-size: 18px; }
+        h2 { font-size: 20px; }
+        h3 { font-size: 18px; }
+        p, select, option { font-size: 20px; font-family: 'VT323', monospace; }
 
-        /* Module Navigation Tabs */
+        /* Navigation Tabs Header */
         .nav-tabs {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             width: 100%;
         }
         .nav-tab {
-            flex: 1;
-            padding: 10px 6px;
-            font-size: 14px;
+            padding: 10px 4px;
+            font-size: 10px;
             text-align: center;
+            white-space: nowrap;
         }
 
         /* Canvas Display */
@@ -182,10 +214,11 @@
         /* Command Stack Block Styling */
         .cmd-block {
             padding: 8px 12px;
-            font-size: 15px;
+            font-family: 'VT323', monospace;
+            font-size: 20px;
             font-weight: bold;
             border-radius: 6px;
-            background: #0f172a;
+            background: #090e1a;
             border: 2px solid var(--arcade-cyan);
             color: var(--arcade-cyan);
             display: flex;
@@ -194,7 +227,7 @@
             gap: 8px;
         }
 
-        /* Helper Classes */
+        /* Helper Utilities */
         .flex { display: flex; }
         .flex-col { flex-direction: column; }
         .items-center { align-items: center; }
@@ -211,11 +244,11 @@
         .text-pink { color: var(--arcade-pink); }
         .text-green { color: var(--arcade-green); }
         .text-muted { color: #94a3b8; }
-        .bg-card { background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; border-radius: 8px; padding: 12px; }
+        .bg-card { background: var(--card-bg); border: 1px solid #2a3654; border-radius: 8px; padding: 12px; }
 
         /* Custom Scrollbars */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #090514; }
+        ::-webkit-scrollbar-track { background: #080a12; }
         ::-webkit-scrollbar-thumb { background: var(--arcade-cyan); border-radius: 4px; }
     </style>
 </head>
@@ -223,52 +256,74 @@
 
     <div class="iframe-container flex flex-col">
 
-        <!-- HEADER & HUD DISPLAY -->
-        <header class="arcade-panel flex flex-col gap-3">
+        <!-- HEADER & HUD DISPLAY WITH RESTORED IMAGE STYLING -->
+        <header class="arcade-panel flex flex-col gap-3" style="padding: 14px 16px;">
             <div class="flex justify-between items-center w-full">
+                
+                <!-- Title & Icon Block (Matching Screenshot) -->
                 <div class="flex items-center gap-3">
-                    <div style="font-size: 32px; background: #1e1b4b; border: 2px solid var(--arcade-cyan); width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
-                        👾
+                    <div class="icon-box-cyan">
+                        <!-- Pixelated Retro Space Alien SVG -->
+                        <svg width="34" height="34" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 2H11V4H5V2Z" fill="#9D4EDD"/>
+                            <path d="M3 4H13V6H3V4Z" fill="#00F0FF"/>
+                            <path d="M1 6H15V10H1V6Z" fill="#00F0FF"/>
+                            <path d="M3 7H5V9H3V7Z" fill="#091024"/>
+                            <path d="M11 7H13V9H11V7Z" fill="#091024"/>
+                            <path d="M2 10H5V12H2V10Z" fill="#FF0055"/>
+                            <path d="M11 10H14V12H11V10Z" fill="#FF0055"/>
+                            <path d="M4 12H6V14H4V12Z" fill="#00F0FF"/>
+                            <path d="M10 12H12V14H10V12Z" fill="#00F0FF"/>
+                        </svg>
                     </div>
-                    <div>
-                        <div style="font-size: 13px; color: var(--arcade-cyan); font-weight: bold;">UNIVERSITY VIEW ACADEMY</div>
-                        <h1 class="text-yellow">CTL 8.1: LOGIC LAB</h1>
+
+                    <div class="flex flex-col gap-1">
+                        <!-- Subtitle in Neon Cyan -->
+                        <div class="font-pixel text-cyan" style="font-size: 11px; letter-spacing: 1px;">
+                            UNIVERSITY VIEW ACADEMY
+                        </div>
+                        <!-- Restored Gradient Warm Title from Screenshot -->
+                        <div class="title-gradient" style="font-size: 16px; line-height: 1.25; letter-spacing: -0.5px;">
+                            CTL 8.1: GAME<br>DEV ACADEMY
+                        </div>
                     </div>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="toggleAudio()" id="audio-btn" class="arcade-btn" style="padding: 6px 10px; font-size: 13px;">
+
+                <!-- SFX & CRT Control Toggles -->
+                <div class="flex flex-col gap-2">
+                    <button onclick="toggleAudio()" id="audio-btn" class="arcade-btn" style="padding: 6px 8px; font-size: 9px;">
                         🔊 SFX
                     </button>
-                    <button onclick="toggleCRT()" class="arcade-btn arcade-btn-pink" style="padding: 6px 10px; font-size: 13px;">
+                    <button onclick="toggleCRT()" class="arcade-btn arcade-btn-pink" style="padding: 6px 8px; font-size: 9px;">
                         📺 CRT
                     </button>
                 </div>
             </div>
 
             <!-- SCORE & RANK TRACKER HUD -->
-            <div class="bg-card flex justify-between items-center w-full" style="padding: 10px 14px;">
+            <div class="bg-card flex justify-between items-center w-full" style="padding: 8px 12px; border-color: #263554;">
                 <div class="flex flex-col">
-                    <span style="font-size: 12px;" class="text-muted">RANK</span>
-                    <span id="player-rank" class="text-yellow" style="font-size: 16px; font-weight: bold;">
+                    <span style="font-size: 14px;" class="text-muted">DEV RANK</span>
+                    <span id="player-rank" class="font-pixel text-yellow" style="font-size: 11px;">
                         🕹️ Rookie Dev
                     </span>
                 </div>
-                <div style="width: 1px; height: 32px; background: #334155;"></div>
+                <div style="width: 1px; height: 28px; background: #263554;"></div>
                 <div class="flex flex-col">
-                    <span style="font-size: 12px;" class="text-muted">SCORE</span>
-                    <span id="player-score" class="text-cyan" style="font-size: 18px; font-weight: bold;">0000</span>
+                    <span style="font-size: 14px;" class="text-muted">SCORE</span>
+                    <span id="player-score" class="font-pixel text-cyan" style="font-size: 13px;">0000</span>
                 </div>
-                <div style="width: 1px; height: 32px; background: #334155;"></div>
+                <div style="width: 1px; height: 28px; background: #263554;"></div>
                 <div class="flex flex-col">
-                    <span style="font-size: 12px;" class="text-muted">STREAK</span>
-                    <span id="player-streak" class="text-green" style="font-size: 18px; font-weight: bold;">0x</span>
+                    <span style="font-size: 14px;" class="text-muted">STREAK</span>
+                    <span id="player-streak" class="font-pixel text-green" style="font-size: 13px;">0x</span>
                 </div>
             </div>
         </header>
 
         <!-- STREAK BANNER POPUP -->
         <div id="streak-banner" class="arcade-panel arcade-panel-yellow hidden" style="position: absolute; top: 120px; left: 50%; transform: translateX(-50%); z-index: 100; width: 90%; text-align: center;">
-            <span id="streak-text" class="text-yellow" style="font-size: 18px; font-weight: bold;">⚡ COMBO STREAK x2!</span>
+            <span id="streak-text" class="font-pixel text-yellow" style="font-size: 12px;">⚡ COMBO STREAK x2!</span>
         </div>
 
         <!-- MODULE NAVIGATION TABS -->
@@ -286,68 +341,66 @@
 
         <main class="w-full">
 
-            <!-- MODULE 1: DECOMPOSITION & PATTERN MATCHING -->
             <section id="level-1" class="arcade-panel flex flex-col gap-4">
                 <div>
-                    <div style="font-size: 13px;" class="text-cyan">MODULE 1: GAME ARCHITECTURE</div>
-                    <h2 class="text-yellow">🎮 Computational Pillars Matching</h2>
+                    <div class="font-pixel text-cyan" style="font-size: 10px;">MODULE 1: GAME ARCHITECTURE</div>
+                    <h2 class="font-pixel text-yellow" style="margin-top: 4px;">🎮 Computational Pillars Matching</h2>
                 </div>
 
-                <p>
-                    Game developers break complex titles into 4 core pillars: <strong class="text-cyan">Decomposition</strong>, <strong class="text-pink">Pattern Recognition</strong>, <strong class="text-yellow">Abstraction</strong>, and <strong class="text-green">Algorithms</strong>. Match each video game feature below!
+                <p style="font-size: 21px;">
+                    Game programmers break complex mechanics into 4 pillars: <strong class="text-cyan">Decomposition</strong>, <strong class="text-pink">Pattern Recognition</strong>, <strong class="text-yellow">Abstraction</strong>, and <strong class="text-green">Algorithms</strong>. Match each video game feature below!
                 </p>
 
                 <div id="module-1-questions" class="flex flex-col gap-3">
                     <!-- Dynamic Questions Injected Here -->
                 </div>
 
-                <div id="level-1-feedback" class="bg-card hidden" style="padding: 12px; font-size: 16px;"></div>
+                <div id="level-1-feedback" class="bg-card hidden" style="padding: 12px; font-size: 20px;"></div>
 
-                <button onclick="checkLevel1()" class="arcade-btn arcade-btn-green w-full" style="margin-top: 8px;">
+                <button onclick="checkLevel1()" class="arcade-btn arcade-btn-green w-full" style="margin-top: 6px; font-size: 12px;">
                     🚀 VERIFY PILLAR LOGIC
                 </button>
             </section>
 
-            <!-- MODULE 2: 2D PIXEL ALGORITHM SEQUENCER -->
             <section id="level-2" class="arcade-panel arcade-panel-pink flex flex-col gap-4 hidden">
                 <div>
-                    <div style="font-size: 13px;" class="text-pink">MODULE 2: ALGORITHMIC EXECUTION</div>
-                    <h2 class="text-yellow">🕹️ 2D Pixel Hero Command Sequencer</h2>
+                    <div class="font-pixel text-pink" style="font-size: 10px;">MODULE 2: ALGORITHMIC EXECUTION</div>
+                    <h2 class="font-pixel text-yellow" style="margin-top: 4px;">🕹️ 2D Pixel Hero Sequencer</h2>
                 </div>
 
-                <p>
+                <p style="font-size: 21px;">
                     Script an algorithm for <strong class="text-yellow">Pixel Hero</strong>! Collect key 🔑, dodge spikes ⚠️, leap the gap 🕳️, slay the enemy 👾 with sword ⚔️, and unlock exit gate 🚪!
                 </p>
 
                 <!-- 2D Canvas Screen -->
                 <div class="flex flex-col items-center gap-2">
-                    <div class="flex justify-between w-full" style="font-size: 14px; color: #94a3b8;">
+                    <div class="flex justify-between w-full" style="font-size: 18px; color: #94a3b8;">
                         <span>STAGE 1: CANYON RUN</span>
-                        <span id="hero-status" class="text-cyan" style="font-weight: bold;">STATE: IDLE</span>
+                        <span id="hero-status" class="font-pixel text-cyan" style="font-size: 11px;">STATE: IDLE</span>
                     </div>
                     <canvas id="gameCanvas" width="660" height="260"></canvas>
                 </div>
 
                 <!-- Action Button Palette (Large Touch Targets) -->
                 <div class="flex flex-col gap-2">
-                    <span style="font-size: 15px; font-weight: bold;" class="text-muted">1. Select Action Commands:</span>
+                    <span style="font-size: 18px; font-weight: bold;" class="text-muted">1. Select Action Commands:</span>
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="addCommand('STEP')" class="arcade-btn" style="font-size: 15px; padding: 10px;">
+                        <button onclick="addCommand('STEP')" class="arcade-btn" style="font-size: 11px; padding: 10px;">
                             ➡️ STEP FORWARD
                         </button>
-                        <button onclick="addCommand('JUMP')" class="arcade-btn" style="font-size: 15px; padding: 10px;">
+                        <button onclick="addCommand('JUMP')" class="arcade-btn" style="font-size: 11px; padding: 10px;">
                             🦘 JUMP OVER
                         </button>
-                        <button onclick="addCommand('HIGH_JUMP')" class="arcade-btn arcade-btn-pink" style="font-size: 15px; padding: 10px;">
+                        <button onclick="addCommand('HIGH_JUMP')" class="arcade-btn arcade-btn-pink" style="font-size: 11px; padding: 10px;">
                             🚀 HIGH JUMP
                         </button>
-                        <button onclick="addCommand('SLIDE')" class="arcade-btn arcade-btn-pink" style="font-size: 15px; padding: 10px;">
+                        <button onclick="addCommand('SLIDE')" class="arcade-btn arcade-btn-pink" style="font-size: 11px; padding: 10px;">
                             🛹 SLIDE DASH
                         </button>
-                        <button onclick="addCommand('ATTACK')" class="arcade-btn arcade-btn-pink" style="font-size: 15px; padding: 10px;">
+                        <button onclick="addCommand('ATTACK')" class="arcade-btn arcade-btn-pink" style="font-size: 11px; padding: 10px;">
                             ⚔️ SWORD ATTACK
                         </button>
-                        <button onclick="addCommand('KEY')" class="arcade-btn arcade-btn-green" style="font-size: 15px; padding: 10px;">
+                        <button onclick="addCommand('KEY')" class="arcade-btn arcade-btn-green" style="font-size: 11px; padding: 10px;">
                             🔑 COLLECT KEY
                         </button>
                     </div>
@@ -356,98 +409,96 @@
                 <!-- Program Code Stack -->
                 <div class="flex flex-col gap-2">
                     <div class="flex justify-between items-center w-full">
-                        <span style="font-size: 15px; font-weight: bold;" class="text-muted">2. Program Sequence Stack:</span>
-                        <button onclick="clearProgram()" class="text-pink" style="background: none; border: none; font-size: 14px; cursor: pointer; text-decoration: underline;">
+                        <span style="font-size: 18px; font-weight: bold;" class="text-muted">2. Program Sequence Stack:</span>
+                        <button onclick="clearProgram()" class="text-pink" style="background: none; border: none; font-size: 18px; cursor: pointer; text-decoration: underline;">
                             CLEAR CODE
                         </button>
                     </div>
                     <div id="program-stack" class="bg-card flex flex-col gap-2" style="min-height: 100px; max-height: 160px; overflow-y: auto;">
-                        <span id="empty-program-text" style="color: #64748b; font-style: italic; font-size: 15px;">No action blocks added yet. Click buttons above...</span>
+                        <span id="empty-program-text" style="color: #64748b; font-style: italic; font-size: 20px;">No action blocks added yet. Click buttons above...</span>
                     </div>
                 </div>
 
                 <!-- Execution Controls -->
                 <div class="flex gap-2">
-                    <button onclick="runHeroProgram()" id="run-btn" class="arcade-btn arcade-btn-green w-full" style="font-size: 18px;">
+                    <button onclick="runHeroProgram()" id="run-btn" class="arcade-btn arcade-btn-green w-full" style="font-size: 14px;">
                         ▶️ RUN ALGORITHM
                     </button>
-                    <button onclick="resetHeroPos()" class="arcade-btn" style="padding: 12px;">
+                    <button onclick="resetHeroPos()" class="arcade-btn" style="padding: 10px 14px; font-size: 16px;">
                         🔄
                     </button>
                 </div>
 
-                <div id="level-2-feedback" class="bg-card hidden" style="padding: 12px; font-size: 16px;"></div>
+                <div id="level-2-feedback" class="bg-card hidden" style="padding: 12px; font-size: 20px;"></div>
             </section>
 
-            <!-- MODULE 3: RETRO BUG HUNT -->
             <section id="level-3" class="arcade-panel arcade-panel-yellow flex flex-col gap-4 hidden">
                 <div>
-                    <div style="font-size: 13px;" class="text-yellow">MODULE 3: CODE DEBUGGING</div>
-                    <h2 class="text-yellow">👾 Retro Game Bug Hunt</h2>
+                    <div class="font-pixel text-yellow" style="font-size: 10px;">MODULE 3: CODE DEBUGGING</div>
+                    <h2 class="font-pixel text-yellow" style="margin-top: 4px;">👾 Retro Game Bug Hunt</h2>
                 </div>
 
-                <p>
+                <p style="font-size: 21px;">
                     Identify missing steps or logic flaws in retro script snippets to prepare for CTL 8.1 exam questions!
                 </p>
 
-                <div class="bg-card flex flex-col gap-3" style="padding: 16px;">
-                    <div class="flex justify-between items-center" style="font-size: 14px;">
+                <div class="bg-card flex flex-col gap-3" style="padding: 14px;">
+                    <div class="flex justify-between items-center" style="font-size: 18px;">
                         <span class="text-muted">Script Bug #<span id="debug-num">1</span>/3</span>
-                        <span id="debug-category" class="text-pink" style="font-weight: bold;">Physics Bug</span>
+                        <span id="debug-category" class="text-pink font-pixel" style="font-size: 11px;">Physics Bug</span>
                     </div>
 
                     <!-- Code Snippet Box -->
-                    <div style="background: #000; border: 1px solid #334155; padding: 14px; border-radius: 6px; font-size: 15px; color: var(--arcade-cyan);">
-                        <pre id="debug-code-box" style="white-space: pre-wrap; font-family: 'Courier New', Courier, monospace;"></pre>
+                    <div style="background: #000; border: 1px solid #334155; padding: 12px; border-radius: 6px; font-size: 18px; color: var(--arcade-cyan);">
+                        <pre id="debug-code-box" style="white-space: pre-wrap; font-family: 'VT323', monospace;"></pre>
                     </div>
 
-                    <span style="font-size: 15px; font-weight: bold;" class="text-muted">Select missing conditional check:</span>
+                    <span style="font-size: 18px; font-weight: bold;" class="text-muted">Select missing conditional check:</span>
                     <div id="debug-options" class="flex flex-col gap-2">
                         <!-- Dynamic Options Injected Here -->
                     </div>
                 </div>
 
-                <div id="level-3-feedback" class="bg-card hidden" style="padding: 12px; font-size: 16px;"></div>
-                <div class="text-yellow flex justify-between" style="font-size: 14px;">
+                <div id="level-3-feedback" class="bg-card hidden" style="padding: 12px; font-size: 20px;"></div>
+                <div class="text-yellow flex justify-between" style="font-size: 18px;">
                     <span id="debug-progress">Fixed: 0/3 Bugs</span>
                 </div>
             </section>
 
-            <!-- MODULE 4: FINAL CERTIFICATE REPORT -->
             <section id="mission-report" class="arcade-panel arcade-panel-yellow flex flex-col items-center gap-4 hidden text-center">
                 <div style="font-size: 48px;">👑</div>
-                <div style="font-size: 13px;" class="text-cyan">UNIVERSITY VIEW ACADEMY CERTIFICATION</div>
-                <h2 class="text-yellow" style="font-size: 26px;">MASTER GAME ARCHITECT</h2>
-                <p style="font-size: 14px;" class="text-muted">CTL 8.1 Introduction to Programming & Computational Logic</p>
+                <div class="font-pixel text-cyan" style="font-size: 10px;">UNIVERSITY VIEW ACADEMY CERTIFICATION</div>
+                <h2 class="font-pixel text-yellow" style="font-size: 18px;">MASTER GAME ARCHITECT</h2>
+                <p style="font-size: 18px;" class="text-muted">CTL 8.1 Introduction to Programming & Computational Logic</p>
 
                 <div style="width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--arcade-cyan), transparent);"></div>
 
                 <div class="grid grid-cols-2 gap-3 w-full" style="text-align: center;">
                     <div class="bg-card">
-                        <div style="font-size: 12px;" class="text-muted">FINAL SCORE</div>
-                        <div id="final-score-val" class="text-yellow" style="font-size: 22px; font-weight: bold;">0</div>
+                        <div style="font-size: 16px;" class="text-muted">FINAL SCORE</div>
+                        <div id="final-score-val" class="font-pixel text-yellow" style="font-size: 16px;">0</div>
                     </div>
                     <div class="bg-card">
-                        <div style="font-size: 12px;" class="text-muted">RANK EARNED</div>
-                        <div id="final-rank-val" class="text-cyan" style="font-size: 18px; font-weight: bold;">Master</div>
+                        <div style="font-size: 16px;" class="text-muted">RANK EARNED</div>
+                        <div id="final-rank-val" class="font-pixel text-cyan" style="font-size: 12px;">Master</div>
                     </div>
                     <div class="bg-card">
-                        <div style="font-size: 12px;" class="text-muted">MAX STREAK</div>
-                        <div id="final-streak-val" class="text-green" style="font-size: 22px; font-weight: bold;">0x</div>
+                        <div style="font-size: 16px;" class="text-muted">MAX STREAK</div>
+                        <div id="final-streak-val" class="font-pixel text-green" style="font-size: 16px;">0x</div>
                     </div>
                     <div class="bg-card">
-                        <div style="font-size: 12px;" class="text-muted">COMPLETION</div>
-                        <div class="text-pink" style="font-size: 22px; font-weight: bold;">100%</div>
+                        <div style="font-size: 16px;" class="text-muted">COMPLETION</div>
+                        <div class="font-pixel text-pink" style="font-size: 16px;">100%</div>
                     </div>
                 </div>
 
-                <button onclick="restartGame()" class="arcade-btn arcade-btn-green w-full" style="margin-top: 10px;">
+                <button onclick="restartGame()" class="arcade-btn arcade-btn-green w-full" style="margin-top: 8px; font-size: 12px;">
                     🔄 RESTART LAB MISSION
                 </button>
             </section>
         </main>
 
-        <footer style="text-align: center; font-size: 13px; color: #64748b; margin-top: 8px;">
+        <footer style="text-align: center; font-size: 16px; color: #64748b; margin-top: 4px;">
             University View Academy • Computer Tech Literacy 8.1
         </footer>
     </div>
@@ -468,9 +519,9 @@
 
         const ranks = [
             { threshold: 0, title: "🕹️ Rookie Dev" },
-            { threshold: 300, title: "⚙️ Scripting Pilot" },
-            { threshold: 700, title: "👾 Logic Commander" },
-            { threshold: 1100, title: "👑 Master Architect" }
+            { threshold: 300, title: "⚙️ Script Cadet" },
+            { threshold: 700, title: "👾 Game Programmer" },
+            { threshold: 1100, title: "👑 Lead Architect" }
         ];
 
         /* ------------------------------------------------------------------
@@ -703,9 +754,6 @@
             }
         }
 
-        /* ------------------------------------------------------------------
-           MODULE 1: GAME PILLAR MATCHING
-           ------------------------------------------------------------------ */
         const module1Questions = [
             {
                 id: 1,
@@ -748,8 +796,8 @@
                 card.className = "bg-card flex flex-col gap-2";
 
                 card.innerHTML = `
-                    <div style="font-size: 16px; font-weight: bold;" class="text-yellow">${q.mechanic}</div>
-                    <select id="m1-select-${q.id}" style="background: #000; color: #fff; border: 1px solid #334155; padding: 10px; border-radius: 6px; font-size: 15px; width: 100%;">
+                    <div style="font-size: 20px; font-weight: bold;" class="text-yellow">${q.mechanic}</div>
+                    <select id="m1-select-${q.id}" style="background: #000; color: #fff; border: 1px solid #334155; padding: 8px; border-radius: 6px; font-size: 18px; width: 100%;">
                         <option value="">-- Match Computational Pillar --</option>
                         ${q.options.sort(() => Math.random() - 0.5).map(opt => `<option value="${opt}">${opt}</option>`).join('')}
                     </select>
@@ -783,9 +831,6 @@
             }
         }
 
-        /* ------------------------------------------------------------------
-           MODULE 2: 2D PIXEL ALGORITHM SEQUENCER CANVAS
-           ------------------------------------------------------------------ */
         let canvas, ctx;
         let programStack = [];
         let isExecuting = false;
@@ -888,8 +933,8 @@
             }
 
             // Hero State Label
-            ctx.fillStyle = "#ffcc00";
-            ctx.font = "bold 12px 'Courier New', monospace";
+            ctx.fillStyle = "#ffe66d";
+            ctx.font = "bold 14px 'VT323', monospace";
             ctx.fillText(hero.state, hero.x - 5, hero.y - 8);
         }
 
@@ -934,7 +979,7 @@
 
                 block.innerHTML = `
                     <span>${idx + 1}. ${label}</span>
-                    <button onclick="removeCommand(${idx})" style="color: var(--arcade-pink); background: none; border: none; font-size: 18px; cursor: pointer;">×</button>
+                    <button onclick="removeCommand(${idx})" style="color: var(--arcade-pink); background: none; border: none; font-size: 20px; cursor: pointer;">× font-bold</button>
                 `;
                 stackEl.appendChild(block);
             });
@@ -1051,9 +1096,6 @@
             resetStreak();
         }
 
-        /* ------------------------------------------------------------------
-           MODULE 3: RETRO BUG HUNT
-           ------------------------------------------------------------------ */
         const debugQuestions = [
             {
                 category: "Jump Physics Bug",
@@ -1102,7 +1144,7 @@
             stage.options.sort(() => Math.random() - 0.5).forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = "arcade-btn";
-                btn.style.fontSize = "15px";
+                btn.style.fontSize = "10px";
                 btn.style.textAlign = "left";
                 btn.innerText = opt;
                 btn.onclick = () => checkDebugChoice(opt);
