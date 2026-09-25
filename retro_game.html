@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UVA Arcade Dev: CTL 8.1 Computational Logic Lab</title>
     
-    <!-- Retro Pixel Font Loading with System Fallbacks -->
+    <!-- Retro Pixel Font & Clean Sans Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -23,6 +23,8 @@
             --arcade-green: #39ff14;
             --arcade-purple: #9d4edd;
             --border-glow: 0 0 12px rgba(0, 240, 255, 0.4);
+            --font-pixel: 'Press Start 2P', cursive, monospace;
+            --font-clean: 'Trebuchet MS', 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         * {
@@ -33,16 +35,16 @@
         }
 
         body {
-            font-family: 'VT323', 'Courier New', monospace;
+            font-family: var(--font-clean);
             background-color: var(--bg-arcade);
             color: #f8fafc;
-            line-height: 1.4;
-            font-size: 20px; /* High legibility retro text base */
+            line-height: 1.5;
+            font-size: 17px; /* Clear readable base size */
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 10px;
+            padding: 12px;
         }
 
         /* 700px MAX CONTAINER SPECIFICATION FOR CANVAS / LMS */
@@ -55,22 +57,28 @@
             position: relative;
         }
 
-        /* RETRO PIXEL FONT HEADINGS (Matching original screenshot) */
+        /* RETRO PIXEL FONT - Applied ONLY to Headings, Banner Labels, Badges & Buttons */
         .font-pixel {
-            font-family: 'Press Start 2P', 'Courier New', monospace;
+            font-family: var(--font-pixel);
             text-transform: uppercase;
+            letter-spacing: -0.5px;
         }
 
-        /* GRADIENT & GLOW TITLE TEXT (Exact warmth gradient from screenshot) */
+        /* CLEAN READABLE SANS-SERIF - Body, Prompts, Options, Feedback */
+        .font-clean {
+            font-family: var(--font-clean);
+        }
+
+        /* GRADIENT & GLOW TITLE TEXT (Exact screenshot warm gradient) */
         .title-gradient {
-            font-family: 'Press Start 2P', 'Courier New', monospace;
+            font-family: var(--font-pixel);
             background: linear-gradient(180deg, #ffe66d 0%, #ff758c 50%, #ff6b6b 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 8px rgba(255, 107, 107, 0.65));
         }
 
-        /* CRT Scanline Screen Effect */
+        /* CRT Scanline Overlay */
         .crt-overlay::before {
             content: " ";
             display: block;
@@ -80,16 +88,15 @@
             z-index: 50;
             background-size: 100% 4px, 6px 100%;
             pointer-events: none;
-            opacity: 0.65;
+            opacity: 0.55;
         }
 
-        /* Arcade Cabinet Main Panels */
         .arcade-panel {
             background: var(--panel-bg);
-            border: 3px solid var(--arcade-cyan);
+            border: 2px solid var(--arcade-cyan);
             box-shadow: var(--border-glow);
             border-radius: 10px;
-            padding: 16px;
+            padding: 18px;
             width: 100%;
         }
 
@@ -103,10 +110,10 @@
             box-shadow: 0 0 12px rgba(255, 230, 109, 0.4);
         }
 
-        /* Icon Box from Screenshot */
+        /* Cyan Alien Icon Box from Screenshot */
         .icon-box-cyan {
             width: 52px;
-            height: 58px;
+            height: 56px;
             border: 2px solid var(--arcade-cyan);
             box-shadow: inset 0 0 8px rgba(0, 240, 255, 0.3), 0 0 8px rgba(0, 240, 255, 0.3);
             background: #091024;
@@ -117,10 +124,9 @@
             flex-shrink: 0;
         }
 
-        /* Large Retro Buttons for 16-20px readability */
         .arcade-btn {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 13px;
+            font-family: var(--font-pixel);
+            font-size: 11px;
             line-height: 1.4;
             padding: 12px 14px;
             background: #131b2e;
@@ -179,13 +185,6 @@
             box-shadow: 0 4px 0 #22c55e, 0 0 12px rgba(57, 255, 20, 0.7);
         }
 
-        /* Typography sizing overrides */
-        h1 { font-size: 18px; }
-        h2 { font-size: 20px; }
-        h3 { font-size: 18px; }
-        p, select, option { font-size: 20px; font-family: 'VT323', monospace; }
-
-        /* Navigation Tabs Header */
         .nav-tabs {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -193,16 +192,15 @@
             width: 100%;
         }
         .nav-tab {
-            padding: 10px 4px;
+            padding: 12px 4px;
             font-size: 10px;
             text-align: center;
             white-space: nowrap;
         }
 
-        /* Canvas Display */
         canvas#gameCanvas {
             image-rendering: pixelated;
-            border: 3px solid var(--arcade-pink);
+            border: 2px solid var(--arcade-pink);
             box-shadow: 0 0 15px rgba(255, 0, 85, 0.35);
             border-radius: 8px;
             background-color: #0c0721;
@@ -211,12 +209,11 @@
             display: block;
         }
 
-        /* Command Stack Block Styling */
         .cmd-block {
-            padding: 8px 12px;
-            font-family: 'VT323', monospace;
-            font-size: 20px;
-            font-weight: bold;
+            padding: 10px 12px;
+            font-family: var(--font-clean);
+            font-size: 17px;
+            font-weight: 700;
             border-radius: 6px;
             background: #090e1a;
             border: 2px solid var(--arcade-cyan);
@@ -227,7 +224,25 @@
             gap: 8px;
         }
 
-        /* Helper Utilities */
+        /* Clean High-Legibility Dropdown Selectors & Options */
+        select.clean-select {
+            font-family: var(--font-clean);
+            font-size: 16px;
+            background: #090e1a;
+            color: #f8fafc;
+            border: 1px solid #3b82f6;
+            padding: 10px 12px;
+            border-radius: 6px;
+            width: 100%;
+            cursor: pointer;
+            outline: none;
+        }
+        select.clean-select:focus {
+            border-color: var(--arcade-cyan);
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+        }
+
+        /* Flex & Grid Utilities */
         .flex { display: flex; }
         .flex-col { flex-direction: column; }
         .items-center { align-items: center; }
@@ -244,7 +259,7 @@
         .text-pink { color: var(--arcade-pink); }
         .text-green { color: var(--arcade-green); }
         .text-muted { color: #94a3b8; }
-        .bg-card { background: var(--card-bg); border: 1px solid #2a3654; border-radius: 8px; padding: 12px; }
+        .bg-card { background: var(--card-bg); border: 1px solid #2a3654; border-radius: 8px; padding: 14px; }
 
         /* Custom Scrollbars */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -256,11 +271,10 @@
 
     <div class="iframe-container flex flex-col">
 
-        <!-- HEADER & HUD DISPLAY WITH RESTORED IMAGE STYLING -->
         <header class="arcade-panel flex flex-col gap-3" style="padding: 14px 16px;">
             <div class="flex justify-between items-center w-full">
                 
-                <!-- Title & Icon Block (Matching Screenshot) -->
+                <!-- Title & Icon Block (Restored Pixel Styling) -->
                 <div class="flex items-center gap-3">
                     <div class="icon-box-cyan">
                         <!-- Pixelated Retro Space Alien SVG -->
@@ -278,12 +292,12 @@
                     </div>
 
                     <div class="flex flex-col gap-1">
-                        <!-- Subtitle in Neon Cyan -->
-                        <div class="font-pixel text-cyan" style="font-size: 11px; letter-spacing: 1px;">
+                        <!-- Subtitle in Pixel Neon Cyan -->
+                        <div class="font-pixel text-cyan" style="font-size: 10px; letter-spacing: 0.5px;">
                             UNIVERSITY VIEW ACADEMY
                         </div>
                         <!-- Restored Gradient Warm Title from Screenshot -->
-                        <div class="title-gradient" style="font-size: 16px; line-height: 1.25; letter-spacing: -0.5px;">
+                        <div class="title-gradient" style="font-size: 15px; line-height: 1.25;">
                             CTL 8.1: GAME<br>DEV ACADEMY
                         </div>
                     </div>
@@ -291,10 +305,10 @@
 
                 <!-- SFX & CRT Control Toggles -->
                 <div class="flex flex-col gap-2">
-                    <button onclick="toggleAudio()" id="audio-btn" class="arcade-btn" style="padding: 6px 8px; font-size: 9px;">
+                    <button onclick="toggleAudio()" id="audio-btn" class="arcade-btn" style="padding: 6px 8px; font-size: 8px;">
                         🔊 SFX
                     </button>
-                    <button onclick="toggleCRT()" class="arcade-btn arcade-btn-pink" style="padding: 6px 8px; font-size: 9px;">
+                    <button onclick="toggleCRT()" class="arcade-btn arcade-btn-pink" style="padding: 6px 8px; font-size: 8px;">
                         📺 CRT
                     </button>
                 </div>
@@ -303,39 +317,38 @@
             <!-- SCORE & RANK TRACKER HUD -->
             <div class="bg-card flex justify-between items-center w-full" style="padding: 8px 12px; border-color: #263554;">
                 <div class="flex flex-col">
-                    <span style="font-size: 14px;" class="text-muted">DEV RANK</span>
-                    <span id="player-rank" class="font-pixel text-yellow" style="font-size: 11px;">
+                    <span class="font-clean text-muted" style="font-size: 13px;">DEV RANK</span>
+                    <span id="player-rank" class="font-pixel text-yellow" style="font-size: 10px;">
                         🕹️ Rookie Dev
                     </span>
                 </div>
                 <div style="width: 1px; height: 28px; background: #263554;"></div>
                 <div class="flex flex-col">
-                    <span style="font-size: 14px;" class="text-muted">SCORE</span>
-                    <span id="player-score" class="font-pixel text-cyan" style="font-size: 13px;">0000</span>
+                    <span class="font-clean text-muted" style="font-size: 13px;">SCORE</span>
+                    <span id="player-score" class="font-pixel text-cyan" style="font-size: 12px;">0000</span>
                 </div>
                 <div style="width: 1px; height: 28px; background: #263554;"></div>
                 <div class="flex flex-col">
-                    <span style="font-size: 14px;" class="text-muted">STREAK</span>
-                    <span id="player-streak" class="font-pixel text-green" style="font-size: 13px;">0x</span>
+                    <span class="font-clean text-muted" style="font-size: 13px;">STREAK</span>
+                    <span id="player-streak" class="font-pixel text-green" style="font-size: 12px;">0x</span>
                 </div>
             </div>
         </header>
 
         <!-- STREAK BANNER POPUP -->
         <div id="streak-banner" class="arcade-panel arcade-panel-yellow hidden" style="position: absolute; top: 120px; left: 50%; transform: translateX(-50%); z-index: 100; width: 90%; text-align: center;">
-            <span id="streak-text" class="font-pixel text-yellow" style="font-size: 12px;">⚡ COMBO STREAK x2!</span>
+            <span id="streak-text" class="font-pixel text-yellow" style="font-size: 11px;">⚡ COMBO STREAK x2!</span>
         </div>
 
-        <!-- MODULE NAVIGATION TABS -->
         <nav class="nav-tabs">
             <button onclick="switchLevel(1)" id="tab-lvl-1" class="arcade-btn nav-tab">
-                1. PILLARS
+                1. GAME LOGIC PILLARS
             </button>
             <button onclick="switchLevel(2)" id="tab-lvl-2" class="arcade-btn nav-tab" style="opacity: 0.6;">
-                2. ALGORITHM
+                2. 2D PIXEL ALGORITHM
             </button>
             <button onclick="switchLevel(3)" id="tab-lvl-3" class="arcade-btn nav-tab" style="opacity: 0.6;">
-                3. BUG HUNT
+                3. BUG HUNT DEBUGGER
             </button>
         </nav>
 
@@ -344,20 +357,20 @@
             <section id="level-1" class="arcade-panel flex flex-col gap-4">
                 <div>
                     <div class="font-pixel text-cyan" style="font-size: 10px;">MODULE 1: GAME ARCHITECTURE</div>
-                    <h2 class="font-pixel text-yellow" style="margin-top: 4px;">🎮 Computational Pillars Matching</h2>
+                    <h2 class="font-pixel text-yellow" style="margin-top: 6px; font-size: 14px;">🎮 Computational Pillars Matching</h2>
                 </div>
 
-                <p style="font-size: 21px;">
-                    Game programmers break complex mechanics into 4 pillars: <strong class="text-cyan">Decomposition</strong>, <strong class="text-pink">Pattern Recognition</strong>, <strong class="text-yellow">Abstraction</strong>, and <strong class="text-green">Algorithms</strong>. Match each video game feature below!
+                <p class="font-clean" style="font-size: 17px; color: #e2e8f0;">
+                    Game programmers break complex mechanics into 4 pillars: <strong class="text-cyan">Decomposition</strong>, <strong class="text-pink">Pattern Recognition</strong>, <strong class="text-yellow">Abstraction</strong>, and <strong class="text-green">Algorithm Design</strong>. Match each video game feature below!
                 </p>
 
                 <div id="module-1-questions" class="flex flex-col gap-3">
                     <!-- Dynamic Questions Injected Here -->
                 </div>
 
-                <div id="level-1-feedback" class="bg-card hidden" style="padding: 12px; font-size: 20px;"></div>
+                <div id="level-1-feedback" class="bg-card font-clean hidden" style="padding: 12px; font-size: 16px;"></div>
 
-                <button onclick="checkLevel1()" class="arcade-btn arcade-btn-green w-full" style="margin-top: 6px; font-size: 12px;">
+                <button onclick="checkLevel1()" class="arcade-btn arcade-btn-green w-full" style="margin-top: 4px;">
                     🚀 VERIFY PILLAR LOGIC
                 </button>
             </section>
@@ -365,42 +378,42 @@
             <section id="level-2" class="arcade-panel arcade-panel-pink flex flex-col gap-4 hidden">
                 <div>
                     <div class="font-pixel text-pink" style="font-size: 10px;">MODULE 2: ALGORITHMIC EXECUTION</div>
-                    <h2 class="font-pixel text-yellow" style="margin-top: 4px;">🕹️ 2D Pixel Hero Sequencer</h2>
+                    <h2 class="font-pixel text-yellow" style="margin-top: 6px; font-size: 14px;">🕹️ 2D Pixel Hero Sequencer</h2>
                 </div>
 
-                <p style="font-size: 21px;">
-                    Script an algorithm for <strong class="text-yellow">Pixel Hero</strong>! Collect key 🔑, dodge spikes ⚠️, leap the gap 🕳️, slay the enemy 👾 with sword ⚔️, and unlock exit gate 🚪!
+                <p class="font-clean" style="font-size: 17px; color: #e2e8f0;">
+                    Script a step-by-step algorithm for <strong class="text-yellow">Pixel Hero</strong>! Collect key 🔑, leap spikes ⚠️, clear the canyon 🕳️, defeat the goblin 👾 with sword ⚔️, and unlock exit gate 🚪!
                 </p>
 
                 <!-- 2D Canvas Screen -->
                 <div class="flex flex-col items-center gap-2">
-                    <div class="flex justify-between w-full" style="font-size: 18px; color: #94a3b8;">
+                    <div class="flex justify-between w-full font-clean" style="font-size: 15px; color: #94a3b8;">
                         <span>STAGE 1: CANYON RUN</span>
-                        <span id="hero-status" class="font-pixel text-cyan" style="font-size: 11px;">STATE: IDLE</span>
+                        <span id="hero-status" class="font-pixel text-cyan" style="font-size: 10px;">STATE: IDLE</span>
                     </div>
                     <canvas id="gameCanvas" width="660" height="260"></canvas>
                 </div>
 
-                <!-- Action Button Palette (Large Touch Targets) -->
+                <!-- Action Button Palette -->
                 <div class="flex flex-col gap-2">
-                    <span style="font-size: 18px; font-weight: bold;" class="text-muted">1. Select Action Commands:</span>
+                    <span class="font-clean text-muted" style="font-size: 16px; font-weight: 600;">1. Select Action Commands:</span>
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="addCommand('STEP')" class="arcade-btn" style="font-size: 11px; padding: 10px;">
+                        <button onclick="addCommand('STEP')" class="arcade-btn">
                             ➡️ STEP FORWARD
                         </button>
-                        <button onclick="addCommand('JUMP')" class="arcade-btn" style="font-size: 11px; padding: 10px;">
+                        <button onclick="addCommand('JUMP')" class="arcade-btn">
                             🦘 JUMP OVER
                         </button>
-                        <button onclick="addCommand('HIGH_JUMP')" class="arcade-btn arcade-btn-pink" style="font-size: 11px; padding: 10px;">
+                        <button onclick="addCommand('HIGH_JUMP')" class="arcade-btn arcade-btn-pink">
                             🚀 HIGH JUMP
                         </button>
-                        <button onclick="addCommand('SLIDE')" class="arcade-btn arcade-btn-pink" style="font-size: 11px; padding: 10px;">
+                        <button onclick="addCommand('SLIDE')" class="arcade-btn arcade-btn-pink">
                             🛹 SLIDE DASH
                         </button>
-                        <button onclick="addCommand('ATTACK')" class="arcade-btn arcade-btn-pink" style="font-size: 11px; padding: 10px;">
+                        <button onclick="addCommand('ATTACK')" class="arcade-btn arcade-btn-pink">
                             ⚔️ SWORD ATTACK
                         </button>
-                        <button onclick="addCommand('KEY')" class="arcade-btn arcade-btn-green" style="font-size: 11px; padding: 10px;">
+                        <button onclick="addCommand('KEY')" class="arcade-btn arcade-btn-green">
                             🔑 COLLECT KEY
                         </button>
                     </div>
@@ -409,58 +422,58 @@
                 <!-- Program Code Stack -->
                 <div class="flex flex-col gap-2">
                     <div class="flex justify-between items-center w-full">
-                        <span style="font-size: 18px; font-weight: bold;" class="text-muted">2. Program Sequence Stack:</span>
-                        <button onclick="clearProgram()" class="text-pink" style="background: none; border: none; font-size: 18px; cursor: pointer; text-decoration: underline;">
+                        <span class="font-clean text-muted" style="font-size: 16px; font-weight: 600;">2. Program Sequence Stack:</span>
+                        <button onclick="clearProgram()" class="text-pink font-clean" style="background: none; border: none; font-size: 16px; cursor: pointer; text-decoration: underline;">
                             CLEAR CODE
                         </button>
                     </div>
-                    <div id="program-stack" class="bg-card flex flex-col gap-2" style="min-height: 100px; max-height: 160px; overflow-y: auto;">
-                        <span id="empty-program-text" style="color: #64748b; font-style: italic; font-size: 20px;">No action blocks added yet. Click buttons above...</span>
+                    <div id="program-stack" class="bg-card flex flex-col gap-2" style="min-height: 100px; max-height: 170px; overflow-y: auto;">
+                        <span id="empty-program-text" class="font-clean" style="color: #64748b; font-style: italic; font-size: 16px;">No action blocks added yet. Click action buttons above to construct your code...</span>
                     </div>
                 </div>
 
                 <!-- Execution Controls -->
                 <div class="flex gap-2">
-                    <button onclick="runHeroProgram()" id="run-btn" class="arcade-btn arcade-btn-green w-full" style="font-size: 14px;">
+                    <button onclick="runHeroProgram()" id="run-btn" class="arcade-btn arcade-btn-green w-full" style="font-size: 12px;">
                         ▶️ RUN ALGORITHM
                     </button>
-                    <button onclick="resetHeroPos()" class="arcade-btn" style="padding: 10px 14px; font-size: 16px;">
+                    <button onclick="resetHeroPos()" class="arcade-btn" style="padding: 10px 14px; font-size: 14px;">
                         🔄
                     </button>
                 </div>
 
-                <div id="level-2-feedback" class="bg-card hidden" style="padding: 12px; font-size: 20px;"></div>
+                <div id="level-2-feedback" class="bg-card font-clean hidden" style="padding: 12px; font-size: 16px;"></div>
             </section>
 
             <section id="level-3" class="arcade-panel arcade-panel-yellow flex flex-col gap-4 hidden">
                 <div>
                     <div class="font-pixel text-yellow" style="font-size: 10px;">MODULE 3: CODE DEBUGGING</div>
-                    <h2 class="font-pixel text-yellow" style="margin-top: 4px;">👾 Retro Game Bug Hunt</h2>
+                    <h2 class="font-pixel text-yellow" style="margin-top: 6px; font-size: 14px;">👾 Bug Hunt Debugger</h2>
                 </div>
 
-                <p style="font-size: 21px;">
-                    Identify missing steps or logic flaws in retro script snippets to prepare for CTL 8.1 exam questions!
+                <p class="font-clean" style="font-size: 17px; color: #e2e8f0;">
+                    Identify missing conditional steps or logic flaws in retro game scripts to prepare for CTL 8.1 exam questions!
                 </p>
 
                 <div class="bg-card flex flex-col gap-3" style="padding: 14px;">
-                    <div class="flex justify-between items-center" style="font-size: 18px;">
+                    <div class="flex justify-between items-center font-clean" style="font-size: 16px;">
                         <span class="text-muted">Script Bug #<span id="debug-num">1</span>/3</span>
-                        <span id="debug-category" class="text-pink font-pixel" style="font-size: 11px;">Physics Bug</span>
+                        <span id="debug-category" class="text-pink font-pixel" style="font-size: 10px;">Physics Bug</span>
                     </div>
 
-                    <!-- Code Snippet Box -->
-                    <div style="background: #000; border: 1px solid #334155; padding: 12px; border-radius: 6px; font-size: 18px; color: var(--arcade-cyan);">
-                        <pre id="debug-code-box" style="white-space: pre-wrap; font-family: 'VT323', monospace;"></pre>
+                    <!-- Code Snippet Box with High Readability Font -->
+                    <div style="background: #000; border: 1px solid #334155; padding: 14px; border-radius: 6px; font-size: 17px; color: var(--arcade-cyan);">
+                        <pre id="debug-code-box" style="white-space: pre-wrap; font-family: 'Consolas', 'Courier New', monospace; line-height: 1.4;"></pre>
                     </div>
 
-                    <span style="font-size: 18px; font-weight: bold;" class="text-muted">Select missing conditional check:</span>
+                    <span class="font-clean text-muted" style="font-size: 16px; font-weight: 600;">Select missing conditional check:</span>
                     <div id="debug-options" class="flex flex-col gap-2">
                         <!-- Dynamic Options Injected Here -->
                     </div>
                 </div>
 
-                <div id="level-3-feedback" class="bg-card hidden" style="padding: 12px; font-size: 20px;"></div>
-                <div class="text-yellow flex justify-between" style="font-size: 18px;">
+                <div id="level-3-feedback" class="bg-card font-clean hidden" style="padding: 12px; font-size: 16px;"></div>
+                <div class="text-yellow font-clean flex justify-between" style="font-size: 16px;">
                     <span id="debug-progress">Fixed: 0/3 Bugs</span>
                 </div>
             </section>
@@ -468,45 +481,42 @@
             <section id="mission-report" class="arcade-panel arcade-panel-yellow flex flex-col items-center gap-4 hidden text-center">
                 <div style="font-size: 48px;">👑</div>
                 <div class="font-pixel text-cyan" style="font-size: 10px;">UNIVERSITY VIEW ACADEMY CERTIFICATION</div>
-                <h2 class="font-pixel text-yellow" style="font-size: 18px;">MASTER GAME ARCHITECT</h2>
-                <p style="font-size: 18px;" class="text-muted">CTL 8.1 Introduction to Programming & Computational Logic</p>
+                <h2 class="font-pixel text-yellow" style="font-size: 16px;">MASTER GAME ARCHITECT</h2>
+                <p class="font-clean text-muted" style="font-size: 17px;">CTL 8.1 Introduction to Programming & Computational Logic</p>
 
                 <div style="width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--arcade-cyan), transparent);"></div>
 
                 <div class="grid grid-cols-2 gap-3 w-full" style="text-align: center;">
                     <div class="bg-card">
-                        <div style="font-size: 16px;" class="text-muted">FINAL SCORE</div>
-                        <div id="final-score-val" class="font-pixel text-yellow" style="font-size: 16px;">0</div>
+                        <div class="font-clean text-muted" style="font-size: 14px;">FINAL SCORE</div>
+                        <div id="final-score-val" class="font-pixel text-yellow" style="font-size: 14px;">0</div>
                     </div>
                     <div class="bg-card">
-                        <div style="font-size: 16px;" class="text-muted">RANK EARNED</div>
-                        <div id="final-rank-val" class="font-pixel text-cyan" style="font-size: 12px;">Master</div>
+                        <div class="font-clean text-muted" style="font-size: 14px;">RANK EARNED</div>
+                        <div id="final-rank-val" class="font-pixel text-cyan" style="font-size: 11px;">Master</div>
                     </div>
                     <div class="bg-card">
-                        <div style="font-size: 16px;" class="text-muted">MAX STREAK</div>
-                        <div id="final-streak-val" class="font-pixel text-green" style="font-size: 16px;">0x</div>
+                        <div class="font-clean text-muted" style="font-size: 14px;">MAX STREAK</div>
+                        <div id="final-streak-val" class="font-pixel text-green" style="font-size: 14px;">0x</div>
                     </div>
                     <div class="bg-card">
-                        <div style="font-size: 16px;" class="text-muted">COMPLETION</div>
-                        <div class="font-pixel text-pink" style="font-size: 16px;">100%</div>
+                        <div class="font-clean text-muted" style="font-size: 14px;">COMPLETION</div>
+                        <div class="font-pixel text-pink" style="font-size: 14px;">100%</div>
                     </div>
                 </div>
 
-                <button onclick="restartGame()" class="arcade-btn arcade-btn-green w-full" style="margin-top: 8px; font-size: 12px;">
+                <button onclick="restartGame()" class="arcade-btn arcade-btn-green w-full" style="margin-top: 8px;">
                     🔄 RESTART LAB MISSION
                 </button>
             </section>
         </main>
 
-        <footer style="text-align: center; font-size: 16px; color: #64748b; margin-top: 4px;">
+        <footer class="font-clean" style="text-align: center; font-size: 15px; color: #64748b; margin-top: 4px;">
             University View Academy • Computer Tech Literacy 8.1
         </footer>
     </div>
 
     <script>
-        /* ------------------------------------------------------------------
-           GAME STATE
-           ------------------------------------------------------------------ */
         let gameState = {
             score: 0,
             streak: 0,
@@ -524,9 +534,6 @@
             { threshold: 1100, title: "👑 Lead Architect" }
         ];
 
-        /* ------------------------------------------------------------------
-           SYNTHESIZED 8-BIT SOUND ENGINE (WEB AUDIO API)
-           ------------------------------------------------------------------ */
         let audioCtx = null;
 
         function initAudio() {
@@ -558,7 +565,6 @@
                     osc.stop(now + 0.05);
                 }
                 else if (type === 'step') {
-                    // Crunchy 8-Bit Footstep Pulse
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'triangle';
@@ -572,7 +578,6 @@
                     osc.stop(now + 0.06);
                 }
                 else if (type === 'jump') {
-                    // Classic Retro Rising Pitch 'Boing'
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'square';
@@ -586,7 +591,6 @@
                     osc.stop(now + 0.18);
                 }
                 else if (type === 'high_jump') {
-                    // Double Octave Chirp
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'sawtooth';
@@ -600,7 +604,6 @@
                     osc.stop(now + 0.28);
                 }
                 else if (type === 'slide') {
-                    // Friction Noise Swoosh
                     const bufferSize = audioCtx.sampleRate * 0.15;
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
@@ -620,7 +623,6 @@
                     noise.start(now);
                 }
                 else if (type === 'attack') {
-                    // Slash Noise Chime
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'sawtooth';
@@ -634,7 +636,6 @@
                     osc.stop(now + 0.12);
                 }
                 else if (type === 'key') {
-                    // Dual-Tone High Bell Arpeggio
                     const notes = [987.77, 1318.51];
                     notes.forEach((freq, i) => {
                         const osc = audioCtx.createOscillator();
@@ -650,7 +651,6 @@
                     });
                 }
                 else if (type === 'goal') {
-                    // Victory Fanfare
                     const notes = [523.25, 659.25, 783.99, 1046.50];
                     notes.forEach((freq, i) => {
                         const osc = audioCtx.createOscillator();
@@ -666,7 +666,6 @@
                     });
                 }
                 else if (type === 'fail') {
-                    // Low Buzz Synth Crash
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'sawtooth';
@@ -694,9 +693,6 @@
             else body.classList.remove('crt-overlay');
         }
 
-        /* ------------------------------------------------------------------
-           SCORE & STREAK MANAGEMENT
-           ------------------------------------------------------------------ */
         function addScore(points) {
             gameState.score += points;
             gameState.streak++;
@@ -733,9 +729,6 @@
             }, 1400);
         }
 
-        /* ------------------------------------------------------------------
-           NAVIGATION
-           ------------------------------------------------------------------ */
         function switchLevel(lvl) {
             playRetroSound('ui_click');
             gameState.currentLevel = lvl;
@@ -762,7 +755,7 @@
                 options: [
                     "Decomposition - Splitting complex game data into distinct Item, Quest, and Equipment sub-systems.",
                     "Abstraction - Rendering 3D world lighting textures.",
-                    "Algorithm - Repeating sound effects on loop."
+                    "Algorithm Design - Repeating sound effects on loop."
                 ]
             },
             {
@@ -781,7 +774,7 @@
                 correct: "Abstraction - Hiding thousands of lines of raw damage math behind a simple red visual meter.",
                 options: [
                     "Abstraction - Hiding thousands of lines of raw damage math behind a simple red visual meter.",
-                    "Algorithm - Reading raw keyboard input codes.",
+                    "Algorithm Design - Reading raw keyboard input codes.",
                     "Pattern Recognition - Drawing pixel art sprites."
                 ]
             }
@@ -796,8 +789,8 @@
                 card.className = "bg-card flex flex-col gap-2";
 
                 card.innerHTML = `
-                    <div style="font-size: 20px; font-weight: bold;" class="text-yellow">${q.mechanic}</div>
-                    <select id="m1-select-${q.id}" style="background: #000; color: #fff; border: 1px solid #334155; padding: 8px; border-radius: 6px; font-size: 18px; width: 100%;">
+                    <div class="font-clean text-yellow" style="font-size: 17px; font-weight: 700;">${q.mechanic}</div>
+                    <select id="m1-select-${q.id}" class="clean-select">
                         <option value="">-- Match Computational Pillar --</option>
                         ${q.options.sort(() => Math.random() - 0.5).map(opt => `<option value="${opt}">${opt}</option>`).join('')}
                     </select>
@@ -826,7 +819,7 @@
             } else {
                 feedback.style.borderColor = "var(--arcade-pink)";
                 feedback.style.color = "var(--arcade-pink)";
-                feedback.innerHTML = `❌ <strong>LOGIC ERROR!</strong> Only ${correctCount}/${module1Questions.length} matched correctly. Review definitions!`;
+                feedback.innerHTML = `❌ <strong>LOGIC ERROR!</strong> Only ${correctCount}/${module1Questions.length} matched correctly. Review definitions and try again!`;
                 resetStreak();
             }
         }
@@ -872,11 +865,11 @@
 
         function render2DCanvas() {
             if (!ctx) return;
-            // Background
+            // Canvas Background
             ctx.fillStyle = "#0c0721";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Floor
+            // Floor Platform
             ctx.fillStyle = "#3b0764";
             ctx.fillRect(0, 210, canvas.width, 50);
             ctx.fillStyle = "#a855f7";
@@ -920,7 +913,7 @@
             ctx.font = "20px monospace";
             ctx.fillText("🚪", gate.x + 8, gate.y + 38);
 
-            // Pixel Hero Sprite
+            // Pixel Hero Character
             ctx.fillStyle = "#00f0ff";
             if (hero.state === 'SLIDE') {
                 ctx.fillRect(hero.x, hero.y + 18, hero.width + 10, hero.height - 18);
@@ -932,9 +925,9 @@
                 ctx.fillRect(hero.x + 18, hero.y + 10, 2, 2);
             }
 
-            // Hero State Label
+            // Hero State Overhead Label
             ctx.fillStyle = "#ffe66d";
-            ctx.font = "bold 14px 'VT323', monospace";
+            ctx.font = "bold 13px 'Trebuchet MS', sans-serif";
             ctx.fillText(hero.state, hero.x - 5, hero.y - 8);
         }
 
@@ -979,7 +972,7 @@
 
                 block.innerHTML = `
                     <span>${idx + 1}. ${label}</span>
-                    <button onclick="removeCommand(${idx})" style="color: var(--arcade-pink); background: none; border: none; font-size: 20px; cursor: pointer;">× font-bold</button>
+                    <button onclick="removeCommand(${idx})" style="color: var(--arcade-pink); background: none; border: none; font-size: 20px; cursor: pointer; font-weight: bold;">×</button>
                 `;
                 stackEl.appendChild(block);
             });
@@ -1050,11 +1043,11 @@
                     return;
                 }
                 if (hero.state !== 'HIGH_JUMP' && hero.x >= stageObstacles[1].x && hero.x <= stageObstacles[1].x + stageObstacles[1].width) {
-                    triggerHeroFail("Hero fell into the 🕳️ Gap! Requires HIGH JUMP.");
+                    triggerHeroFail("Hero fell into the 🕳️ Canyon Gap! Requires HIGH JUMP.");
                     return;
                 }
                 if (!stageObstacles[3].defeated && Math.abs(hero.x - stageObstacles[3].x) < 35) {
-                    triggerHeroFail("Hero was stopped by 👾 Goblin! Execute ATTACK first.");
+                    triggerHeroFail("Hero was stopped by 👾 Goblin! Execute SWORD ATTACK first.");
                     return;
                 }
 
@@ -1143,9 +1136,10 @@
             optionsBox.innerHTML = '';
             stage.options.sort(() => Math.random() - 0.5).forEach(opt => {
                 const btn = document.createElement('button');
-                btn.className = "arcade-btn";
-                btn.style.fontSize = "10px";
+                btn.className = "arcade-btn font-clean";
+                btn.style.fontSize = "15px";
                 btn.style.textAlign = "left";
+                btn.style.textTransform = "none";
                 btn.innerText = opt;
                 btn.onclick = () => checkDebugChoice(opt);
                 optionsBox.appendChild(btn);
@@ -1163,7 +1157,7 @@
                 if (debugIdx < debugQuestions.length) {
                     feedback.style.borderColor = "var(--arcade-green)";
                     feedback.style.color = "var(--arcade-green)";
-                    feedback.innerHTML = "✅ <strong>BUG REPAIRED!</strong> Code stack re-compiled.";
+                    feedback.innerHTML = "✅ <strong>BUG REPAIRED!</strong> Code stack re-compiled successfully.";
                     setTimeout(() => {
                         feedback.classList.add('hidden');
                         loadDebugStage();
@@ -1183,9 +1177,6 @@
             }
         }
 
-        /* ------------------------------------------------------------------
-           SUMMARY & CERTIFICATION
-           ------------------------------------------------------------------ */
         function showMissionReport() {
             playRetroSound('goal');
             for (let i = 1; i <= 3; i++) {
