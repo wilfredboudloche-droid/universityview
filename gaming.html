@@ -1,0 +1,1312 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVA Space Cadet: Computational Logic Mission</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --space-bg: #0b0d19;
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #ff0055;
+            --neon-amber: #ffb700;
+            --neon-green: #00ff66;
+            --hud-glass: rgba(16, 23, 42, 0.82);
+            --hud-border: rgba(0, 243, 255, 0.3);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--space-bg);
+            color: #e2e8f0;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Glassmorphism Panel Styling */
+        .hud-panel {
+            background: var(--hud-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--hud-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 243, 255, 0.08);
+            border-radius: 12px;
+        }
+
+        .hud-panel-active {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.15);
+        }
+
+        .hud-btn {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .hud-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.4) 0%, rgba(0, 243, 255, 0.1) 100%);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
+            transform: translateY(-2px);
+            color: #ffffff;
+        }
+
+        .hud-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        .hud-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: #475569;
+            color: #64748b;
+        }
+
+        .hud-btn-magenta {
+            background: linear-gradient(135deg, rgba(255, 0, 85, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border-color: var(--neon-magenta);
+            color: var(--neon-magenta);
+        }
+
+        .hud-btn-magenta:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(255, 0, 85, 0.5) 0%, rgba(255, 0, 85, 0.1) 100%);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
+            color: #ffffff;
+        }
+
+        .hud-btn-amber {
+            background: linear-gradient(135deg, rgba(255, 183, 0, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border-color: var(--neon-amber);
+            color: var(--neon-amber);
+        }
+
+        .hud-btn-amber:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(255, 183, 0, 0.5) 0%, rgba(255, 183, 0, 0.1) 100%);
+            box-shadow: 0 0 15px rgba(255, 183, 0, 0.6);
+            color: #ffffff;
+        }
+
+        /* Animated Pulse Effects */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.8; box-shadow: 0 0 10px rgba(0, 243, 255, 0.3); }
+            50% { opacity: 1; box-shadow: 0 0 22px rgba(0, 243, 255, 0.8); }
+        }
+
+        .pulse-cyan {
+            animation: pulse-glow 2s infinite;
+        }
+
+        /* Custom Scrollbar for Code/Logs */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 243, 255, 0.4);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-cyan);
+        }
+
+        /* Drag & Drop Visual Tweaks */
+        .draggable-item {
+            cursor: grab;
+            transition: transform 0.15s ease, background-color 0.2s, border-color 0.2s;
+        }
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(1.02);
+        }
+        .draggable-item.dragging {
+            opacity: 0.5;
+            border-color: var(--neon-amber);
+        }
+
+        /* Streak Notification Banner Overlay */
+        #streak-banner {
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Grid Map Styling */
+        .grid-cell {
+            aspect-ratio: 1;
+            transition: all 0.2s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative bg-slate-950 text-slate-100">
+
+    <canvas id="starfield" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- MAIN UI CONTAINER -->
+    <div class="relative z-10 flex flex-col min-h-screen max-w-7xl mx-auto w-full px-3 py-3 sm:px-6 sm:py-4">
+
+        <!-- HEADER / BRANDING & DASHBOARD HUD -->
+        <header class="hud-panel p-3 sm:p-4 mb-4 flex flex-col md:flex-row justify-between items-center gap-4 border-b-2 border-cyan-500/40">
+            <!-- School Context & Mission Title -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-tr from-cyan-600 via-blue-700 to-indigo-900 flex items-center justify-center border border-cyan-400/50 shadow-lg shadow-cyan-500/20">
+                        <!-- UVA Planet Logo Icon SVG -->
+                        <svg class="w-6 h-6 sm:w-7 sm:h-7 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 100-18 9 9 0 000 18pt z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.6 9h16.8M3.6 15h16.8M12 3a15.3 15.3 0 014 9 15.3 15.3 0 01-4 9 15.3 15.3 0 01-4-9 15.3 15.3 0 014-9z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-[10px] sm:text-xs font-semibold tracking-widest text-cyan-400 uppercase font-orbitron">University View Academy</div>
+                        <h1 class="text-lg sm:text-2xl font-black font-orbitron tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-amber-300">
+                            CTL 8.1: SPACE CADET LOGIC
+                        </h1>
+                    </div>
+                </div>
+                <!-- Audio Sound Toggle -->
+                <button id="audio-toggle-btn" onclick="toggleAudio()" class="md:hidden p-2 hud-panel text-cyan-400 hover:text-white rounded-lg text-xs flex items-center gap-1 font-orbitron">
+                    <span id="audio-icon">🔊</span>
+                </button>
+            </div>
+
+            <!-- PLAYER STATUS HUD METRICS -->
+            <div class="flex items-center justify-between md:justify-end gap-3 sm:gap-6 w-full md:w-auto text-xs sm:text-sm font-orbitron bg-slate-900/60 p-2 sm:p-3 rounded-lg border border-slate-800">
+                <!-- Current Rank -->
+                <div class="flex flex-col items-center sm:items-start">
+                    <span class="text-[10px] text-slate-400 uppercase tracking-wider">Rank Status</span>
+                    <span id="player-rank" class="text-amber-400 font-bold text-sm sm:text-base flex items-center gap-1">
+                        🚀 Cadet
+                    </span>
+                </div>
+
+                <div class="h-8 w-px bg-slate-800"></div>
+
+                <!-- Total Score -->
+                <div class="flex flex-col items-center sm:items-start">
+                    <span class="text-[10px] text-slate-400 uppercase tracking-wider">Mission Points</span>
+                    <span id="player-score" class="text-cyan-300 font-black text-sm sm:text-base">0000</span>
+                </div>
+
+                <div class="h-8 w-px bg-slate-800"></div>
+
+                <!-- Active Streak -->
+                <div class="flex flex-col items-center sm:items-start">
+                    <span class="text-[10px] text-slate-400 uppercase tracking-wider">Warp Streak</span>
+                    <span id="player-streak" class="text-emerald-400 font-bold text-sm sm:text-base">0x</span>
+                </div>
+
+                <!-- Audio Toggle (Desktop) -->
+                <button id="audio-toggle-btn-desk" onclick="toggleAudio()" class="hidden md:flex p-2 hud-panel text-cyan-400 hover:text-white rounded-lg text-xs items-center gap-1 font-orbitron ml-2">
+                    <span id="audio-icon-desk">🔊 SFX ON</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- FLOATING STREAK / FEEDBACK BANNER -->
+        <div id="streak-banner" class="fixed top-20 left-1/2 transform -translate-x-1/2 -translate-y-12 opacity-0 z-50 pointer-events-none transition-all duration-300">
+            <div id="streak-box" class="hud-panel px-6 py-3 rounded-full flex items-center gap-3 border-2 border-amber-400 shadow-2xl bg-slate-900/95">
+                <span id="streak-emoji" class="text-2xl">🔥</span>
+                <span id="streak-text" class="font-orbitron font-extrabold text-amber-300 tracking-wider text-base sm:text-lg">ZERO-G STREAK x3!</span>
+            </div>
+        </div>
+
+        <!-- MISSION SELECTOR TABS -->
+        <nav class="flex items-center justify-between gap-1 sm:gap-2 mb-4 overflow-x-auto pb-1" id="mission-nav">
+            <button onclick="switchLevel(1)" id="tab-lvl-1" class="hud-btn flex-1 min-w-[120px] py-2.5 px-3 rounded-lg text-[11px] sm:text-xs text-center font-semibold border-cyan-500/80">
+                1. DECOMPOSITION
+            </button>
+            <button onclick="switchLevel(2)" id="tab-lvl-2" class="hud-btn flex-1 min-w-[120px] py-2.5 px-3 rounded-lg text-[11px] sm:text-xs text-center font-semibold opacity-60">
+                2. PATTERNS
+            </button>
+            <button onclick="switchLevel(3)" id="tab-lvl-3" class="hud-btn flex-1 min-w-[120px] py-2.5 px-3 rounded-lg text-[11px] sm:text-xs text-center font-semibold opacity-60">
+                3. ABSTRACTION
+            </button>
+            <button onclick="switchLevel(4)" id="tab-lvl-4" class="hud-btn flex-1 min-w-[120px] py-2.5 px-3 rounded-lg text-[11px] sm:text-xs text-center font-semibold opacity-60">
+                4. ALGORITHMS
+            </button>
+        </nav>
+
+        <!-- MAIN GAMEPLAY CONTENT AREA -->
+        <main class="flex-1 flex flex-col justify-center">
+
+            <!-- LEVEL 1: DECOMPOSITION MISSION -->
+            <section id="level-1" class="hud-panel p-4 sm:p-6 rounded-xl flex flex-col gap-6">
+                <div class="border-b border-cyan-500/30 pb-3 flex justify-between items-start flex-wrap gap-2">
+                    <div>
+                        <div class="text-xs text-cyan-400 font-orbitron font-bold uppercase tracking-widest">Computational Logic Concept #1: Decomposition</div>
+                        <h2 class="text-xl sm:text-2xl font-orbitron font-bold text-white flex items-center gap-2">
+                            <span>🛠️ Mission 1: Spaceship Warp Core Recovery</span>
+                        </h2>
+                    </div>
+                    <div class="bg-cyan-950/80 border border-cyan-500/40 px-3 py-1.5 rounded text-xs text-cyan-200">
+                        Objective: Re-order the complex reboot sequence into its correct logical breakdown!
+                    </div>
+                </div>
+
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    <strong class="text-cyan-300">Decomposition</strong> means breaking down a large, overwhelming problem into smaller, manageable step-by-step tasks. 
+                    The Starship <span class="text-amber-300 font-semibold">UVA Explorer</span> warp drive has overheated! Drag and re-arrange the sequence steps below into the exact order required to restore sub-light ignition safely.
+                </p>
+
+                <!-- Drag and Drop Ordering Container -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 my-2">
+                    <!-- Unordered / User Target Drag Area -->
+                    <div class="flex flex-col gap-2">
+                        <div class="text-xs font-orbitron text-cyan-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+                            <span>Reboot Sequence Queue (Drag to Reorder)</span>
+                            <span class="text-[10px] text-slate-400">☰ Grab handle to move</span>
+                        </div>
+                        <div id="drag-container-1" class="space-y-2.5 min-h-[280px] p-3 rounded-lg bg-slate-900/80 border border-slate-800">
+                            <!-- Injected dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Step Explanation & Concept Helper Box -->
+                    <div class="hud-panel p-4 flex flex-col justify-between bg-slate-900/40 border-cyan-500/20">
+                        <div>
+                            <h3 class="text-sm font-orbitron text-amber-300 font-bold mb-2 flex items-center gap-2">
+                                💡 Why Decomposition Matters in Game Dev
+                            </h3>
+                            <p class="text-xs text-slate-300 leading-relaxed space-y-2">
+                                When game developers build complex games like <em>Space Cadet</em>, they can't write all code at once. They break the game down into components:
+                            </p>
+                            <ul class="text-xs text-slate-400 list-disc list-inside mt-2 space-y-1">
+                                stroke-width="2" <span class="text-cyan-300">Player Controller Logic</span> (Movement & Inputs)</li>
+                                stroke-width="2" <span class="text-cyan-300">Physics & Collision Detection</span> (Asteroid Bouncing)</li>
+                                stroke-width="2" <span class="text-cyan-300">UI & HUD Rendering</span> (Health, Score, Badges)</li>
+                                stroke-width="2" <span class="text-cyan-300">Audio Synthesizer Engine</span> (Laser sound FX)</li>
+                            </ul>
+                        </div>
+
+                        <div id="level-1-feedback" class="mt-4 p-3 rounded-lg text-xs font-orbitron hidden"></div>
+
+                        <div class="mt-4 flex justify-end">
+                            <button onclick="checkLevel1()" class="hud-btn px-6 py-2.5 rounded-lg text-xs flex items-center gap-2">
+                                🚀 Verify & Engage Core
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 2: PATTERN RECOGNITION MISSION -->
+            <section id="level-2" class="hud-panel p-4 sm:p-6 rounded-xl flex flex-col gap-6 hidden">
+                <div class="border-b border-cyan-500/30 pb-3 flex justify-between items-start flex-wrap gap-2">
+                    <div>
+                        <div class="text-xs text-cyan-400 font-orbitron font-bold uppercase tracking-widest">Computational Logic Concept #2: Pattern Recognition</div>
+                        <h2 class="text-xl sm:text-2xl font-orbitron font-bold text-white flex items-center gap-2">
+                            <span>📡 Mission 2: Cosmic Telemetry Signals</span>
+                        </h2>
+                    </div>
+                    <div class="bg-cyan-950/80 border border-cyan-500/40 px-3 py-1.5 rounded text-xs text-cyan-200">
+                        Objective: Detect telemetry sequence patterns to calculate asteroid collision trajectory!
+                    </div>
+                </div>
+
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    <strong class="text-cyan-300">Pattern Recognition</strong> involves spotting recurring trends, sequences, or rules in data to make predictions or optimize code loops. 
+                    Analyze the telemetry frequency stream coming from the planetary scanner and select the next item in the sequence.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Pattern Quiz Stage 1 -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div id="pattern-card" class="hud-panel p-5 bg-slate-900/90 border-cyan-500/40 flex flex-col gap-4">
+                            <div class="flex justify-between items-center text-xs font-orbitron text-slate-400">
+                                <span>Signal Stream Telemetry #<span id="pattern-num">1</span>/3</span>
+                                <span id="pattern-rule-hint" class="text-amber-400">Pattern Type: Numerical Delta</span>
+                            </div>
+
+                            <!-- Sequence Box Display -->
+                            <div id="sequence-display" class="flex items-center justify-center gap-2 sm:gap-4 my-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xl sm:text-3xl font-orbitron text-cyan-300 font-bold tracking-widest overflow-x-auto">
+                                <!-- Dynamic sequence badges injected here -->
+                            </div>
+
+                            <!-- Multiple Choice Options -->
+                            <div class="text-xs font-orbitron text-slate-300 mb-1">Select the missing code value to complete the sequence loop:</div>
+                            <div id="pattern-options" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <!-- Dynamic Options -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informational Box -->
+                    <div class="hud-panel p-4 flex flex-col justify-between bg-slate-900/40 border-cyan-500/20">
+                        <div>
+                            <h3 class="text-sm font-orbitron text-amber-300 font-bold mb-2">
+                                ⚙️ Pattern Loops in Programming
+                            </h3>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Programmers use pattern recognition to create <span class="text-cyan-300">Loops (`for`, `while`)</span>. Instead of writing identical code 100 times to spawn stars or update score counters, we recognize the pattern and run a loop!
+                            </p>
+                        </div>
+                        <div id="level-2-feedback" class="p-3 rounded-lg text-xs font-orbitron hidden my-2"></div>
+                        <div class="text-right">
+                            <span id="pattern-progress" class="text-xs font-orbitron text-cyan-400">Completed: 0/3 Sequences</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 3: ABSTRACTION MISSION -->
+            <section id="level-3" class="hud-panel p-4 sm:p-6 rounded-xl flex flex-col gap-6 hidden">
+                <div class="border-b border-cyan-500/30 pb-3 flex justify-between items-start flex-wrap gap-2">
+                    <div>
+                        <div class="text-xs text-cyan-400 font-orbitron font-bold uppercase tracking-widest">Computational Logic Concept #3: Abstraction</div>
+                        <h2 class="text-xl sm:text-2xl font-orbitron font-bold text-white flex items-center gap-2">
+                            <span>🧹 Mission 3: Deep Space Data Sweep</span>
+                        </h2>
+                    </div>
+                    <div class="bg-cyan-950/80 border border-cyan-500/40 px-3 py-1.5 rounded text-xs text-cyan-200">
+                        Objective: Filter out noise & irrelevant clutter to extract essential planetary coordinates!
+                    </div>
+                </div>
+
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    <strong class="text-cyan-300">Abstraction</strong> means filtering out useless clutter, extra noise, and non-essential background details so you can focus strictly on what matters. 
+                    The long-range sensor log contains electromagnetic noise (cosmic dust, radiation spikes, alien chatter). <strong class="text-amber-300">Click to eliminate noise tags</strong> and isolate only valid <span class="text-cyan-300 font-mono">NAV_WAYPOINT</span> records.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Abstraction Data Grid -->
+                    <div class="lg:col-span-2 flex flex-col gap-3">
+                        <div class="flex justify-between items-center text-xs font-orbitron text-slate-400">
+                            <span>RAW SENSOR LOG DATASTREAM</span>
+                            <span class="text-cyan-400">Target Waypoints Left: <span id="waypoint-count" class="text-amber-300 font-bold">4</span></span>
+                        </div>
+
+                        <div id="abstraction-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-slate-950 border border-slate-800">
+                            <!-- Dynamic Sensor Log Cards Injected Here -->
+                        </div>
+                    </div>
+
+                    <!-- Tech Info Side Panel -->
+                    <div class="hud-panel p-4 flex flex-col justify-between bg-slate-900/40 border-cyan-500/20">
+                        <div>
+                            <h3 class="text-sm font-orbitron text-amber-300 font-bold mb-2">
+                                🎨 Abstraction in Game Engines
+                            </h3>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                In video games, players don't need to see complex physics calculus equations on screen; they just press "JUMP". The game abstracts complex engine math into a simple button press.
+                            </p>
+                        </div>
+
+                        <div id="level-3-feedback" class="p-3 rounded-lg text-xs font-orbitron hidden my-2"></div>
+
+                        <button onclick="checkLevel3()" id="level-3-submit" class="hud-btn px-6 py-2.5 rounded-lg text-xs flex items-center justify-center gap-2 w-full">
+                            ✨ Confirm Essential Data
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEVEL 4: ALGORITHMIC THINKING GRID ENGINE -->
+            <section id="level-4" class="hud-panel p-4 sm:p-6 rounded-xl flex flex-col gap-6 hidden">
+                <div class="border-b border-cyan-500/30 pb-3 flex justify-between items-start flex-wrap gap-2">
+                    <div>
+                        <div class="text-xs text-cyan-400 font-orbitron font-bold uppercase tracking-widest">Computational Logic Concept #4: Algorithmic Thinking</div>
+                        <h2 class="text-xl sm:text-2xl font-orbitron font-bold text-white flex items-center gap-2">
+                            <span>🛸 Mission 4: Autonomous Rover Navigation</span>
+                        </h2>
+                    </div>
+                    <div class="bg-cyan-950/80 border border-cyan-500/40 px-3 py-1.5 rounded text-xs text-cyan-200">
+                        Objective: Write step-by-step program logic to guide the rover around space debris!
+                    </div>
+                </div>
+
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    An <strong class="text-cyan-300">Algorithm</strong> is an exact sequence of step-by-step instructions given to a computer to solve a task. 
+                    Build a visual program using command blocks to steer the <strong class="text-amber-300">UVA Rover (🤖)</strong> through the asteroid belt to reach the <strong class="text-emerald-400">Starbase Gate (🏁)</strong>!
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- 5x5 Map Grid Display -->
+                    <div class="lg:col-span-5 flex flex-col items-center justify-center bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <div class="text-xs font-orbitron text-slate-400 mb-2 w-full flex justify-between">
+                            <span>ASTEROID SECTOR MAP</span>
+                            <span id="rover-status" class="text-cyan-400 font-bold">READY</span>
+                        </div>
+                        <div id="rover-grid" class="grid grid-cols-5 gap-2 w-full max-w-[320px]">
+                            <!-- 25 Cells created dynamically in JS -->
+                        </div>
+                    </div>
+
+                    <!-- Block Command Palette & Code Sequence Area -->
+                    <div class="lg:col-span-7 flex flex-col justify-between gap-4">
+                        <!-- Command Builder Buttons -->
+                        <div>
+                            <div class="text-xs font-orbitron text-slate-400 mb-2">1. Click Command Blocks to add to Program:</div>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="addCommand('FORWARD')" class="hud-btn px-3 py-2 rounded text-xs flex items-center gap-1">
+                                    ⬆️ MOVE FORWARD
+                                </button>
+                                <button onclick="addCommand('TURN_LEFT')" class="hud-btn px-3 py-2 rounded text-xs flex items-center gap-1">
+                                    ↩️ TURN LEFT
+                                </button>
+                                <button onclick="addCommand('TURN_RIGHT')" class="hud-btn px-3 py-2 rounded text-xs flex items-center gap-1">
+                                    ↪️ TURN RIGHT
+                                </button>
+                                <button onclick="addCommand('COLLECT')" class="hud-btn hud-btn-amber px-3 py-2 rounded text-xs flex items-center gap-1">
+                                    💎 COLLECT SAMPLE
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Active Program Code Sequence List -->
+                        <div>
+                            <div class="flex justify-between items-center text-xs font-orbitron text-slate-400 mb-2">
+                                <span>2. Program Sequence Stack:</span>
+                                <button onclick="clearProgram()" class="text-rose-400 hover:text-rose-300 text-[11px] underline">
+                                    Clear Code Stack
+                                </button>
+                            </div>
+                            <div id="program-stack" class="min-h-[100px] max-h-[140px] p-3 rounded-lg bg-slate-950 border border-slate-800 flex flex-wrap gap-2 items-start overflow-y-auto">
+                                <span id="empty-program-text" class="text-xs text-slate-600 italic">No instructions added. Click commands above to script navigation logic...</span>
+                            </div>
+                        </div>
+
+                        <!-- Execution Controls -->
+                        <div class="flex items-center gap-3">
+                            <button onclick="runRoverProgram()" id="run-btn" class="hud-btn flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-700 text-white">
+                                ▶️ EXECUTE ALGORITHM
+                            </button>
+                        </div>
+
+                        <div id="level-4-feedback" class="p-3 rounded-lg text-xs font-orbitron hidden"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MISSION COMPLETED CERTIFICATE / REPORT OVERLAY -->
+            <section id="mission-report" class="hud-panel p-6 sm:p-8 rounded-2xl flex flex-col items-center text-center gap-6 hidden max-w-3xl mx-auto my-4 border-2 border-amber-400">
+                <!-- University View Academy Crest Header -->
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-500 via-amber-400 to-indigo-600 flex items-center justify-center text-3xl shadow-xl shadow-amber-500/30">
+                        🏆
+                    </div>
+                    <span class="text-xs font-orbitron tracking-widest text-cyan-400 uppercase">Official Mission Certification</span>
+                    <h2 class="text-2xl sm:text-4xl font-black font-orbitron text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-cyan-200 to-white">
+                        ACADEMY COMMANDER DIPLOMA
+                    </h2>
+                    <p class="text-xs text-slate-400">University View Academy — Computer Tech Literacy Course</p>
+                </div>
+
+                <div class="w-full h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+
+                <!-- Final Performance Stats Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
+                    <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+                        <div class="text-[10px] text-slate-400 uppercase font-orbitron">Final Score</div>
+                        <div id="final-score-val" class="text-xl font-bold font-orbitron text-amber-300">0</div>
+                    </div>
+                    <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+                        <div class="text-[10px] text-slate-400 uppercase font-orbitron">Rank Achieved</div>
+                        <div id="final-rank-val" class="text-xl font-bold font-orbitron text-cyan-300">Admiral</div>
+                    </div>
+                    <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+                        <div class="text-[10px] text-slate-400 uppercase font-orbitron">Max Streak</div>
+                        <div id="final-streak-val" class="text-xl font-bold font-orbitron text-emerald-400">5x</div>
+                    </div>
+                    <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+                        <div class="text-[10px] text-slate-400 uppercase font-orbitron">Completion</div>
+                        <div class="text-xl font-bold font-orbitron text-indigo-300">100%</div>
+                    </div>
+                </div>
+
+                <!-- Earned Space Badges -->
+                <div class="w-full">
+                    <div class="text-xs font-orbitron text-slate-300 mb-3 uppercase tracking-wider">Computational Thinking Badges Unlocked</div>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <div class="hud-panel p-3 flex items-center gap-2 rounded-lg border-cyan-500/40 bg-slate-900/90">
+                            <span class="text-2xl">🧩</span>
+                            <div class="text-left">
+                                <div class="text-xs font-orbitron font-bold text-cyan-300">Master Decomposer</div>
+                                <div class="text-[10px] text-slate-400">Task Breakdown Ace</div>
+                            </div>
+                        </div>
+                        <div class="hud-panel p-3 flex items-center gap-2 rounded-lg border-amber-500/40 bg-slate-900/90">
+                            <span class="text-2xl">📡</span>
+                            <div class="text-left">
+                                <div class="text-xs font-orbitron font-bold text-amber-300">Pattern Voyager</div>
+                                <div class="text-[10px] text-slate-400">Loop Detection Expert</div>
+                            </div>
+                        </div>
+                        <div class="hud-panel p-3 flex items-center gap-2 rounded-lg border-emerald-500/40 bg-slate-900/90">
+                            <span class="text-2xl">🔍</span>
+                            <div class="text-left">
+                                <div class="text-xs font-orbitron font-bold text-emerald-300">Abstraction Specialist</div>
+                                <div class="text-[10px] text-slate-400">Noise Filter Agent</div>
+                            </div>
+                        </div>
+                        <div class="hud-panel p-3 flex items-center gap-2 rounded-lg border-purple-500/40 bg-slate-900/90">
+                            <span class="text-2xl">⚡</span>
+                            <div class="text-left">
+                                <div class="text-xs font-orbitron font-bold text-purple-300">Algorithm Ace</div>
+                                <div class="text-[10px] text-slate-400">Rover Script Master</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam & Learning Reflection summary -->
+                <div class="p-4 rounded-xl bg-cyan-950/30 border border-cyan-500/30 text-xs text-slate-300 leading-relaxed text-left">
+                    <strong class="text-cyan-300 font-orbitron">Final Exam Connection Tip:</strong> Remember these 4 pillars on your University View Academy final exam! Decomposition breaks tasks down; Pattern Recognition finds loops; Abstraction removes irrelevant clutter; Algorithmic Thinking builds ordered step-by-step solutions.
+                </div>
+
+                <button onclick="restartGame()" class="hud-btn px-8 py-3 rounded-xl text-xs font-bold tracking-wider">
+                    🔄 RE-LAUNCH SIMULATION
+                </button>
+            </section>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="mt-6 pt-3 border-t border-slate-800 text-center text-[11px] text-slate-500 font-orbitron flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div>University View Academy • Computer Tech Literacy 8.1</div>
+            <div>Built for High School Computational Thinking Mastery</div>
+        </footer>
+    </div>
+
+    <script>
+        /* ------------------------------------------------------------------
+           GAME STATE & VARIABLES
+           ------------------------------------------------------------------ */
+        let gameState = {
+            score: 0,
+            streak: 0,
+            maxStreak: 0,
+            currentLevel: 1,
+            audioEnabled: true,
+            completedLevels: new Set()
+        };
+
+        const ranks = [
+            { threshold: 0, title: "🚀 Cadet", badge: "Cadet" },
+            { threshold: 400, title: "👨‍✈️ Pilot", badge: "Pilot" },
+            { threshold: 800, title: "🎖️ Commander", badge: "Commander" },
+            { threshold: 1200, title: "⭐ Admiral", badge: "Admiral" }
+        ];
+
+        /* ------------------------------------------------------------------
+           WEB AUDIO API SYNTHESIZER FOR SOUND EFFECTS
+           ------------------------------------------------------------------ */
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            }
+        }
+
+        function playSound(type) {
+            if (!gameState.audioEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.05);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(880, now + 0.1);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'streak') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    osc.frequency.setValueAtTime(783.99, now + 0.16);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(110, now + 0.2);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === 'win') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.12);
+                    osc.frequency.setValueAtTime(783.99, now + 0.24);
+                    osc.frequency.setValueAtTime(1046.50, now + 0.36);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+                    osc.start(now);
+                    osc.stop(now + 0.6);
+                }
+            } catch (e) {
+                // Fail silently if browser blocks autoplay
+            }
+        }
+
+        function toggleAudio() {
+            gameState.audioEnabled = !gameState.audioEnabled;
+            const text = gameState.audioEnabled ? "🔊 SFX ON" : "🔇 SFX OFF";
+            document.getElementById('audio-icon').innerText = gameState.audioEnabled ? "🔊" : "🔇";
+            document.getElementById('audio-icon-desk').innerText = text;
+        }
+
+        /* ------------------------------------------------------------------
+           CANVAS ANIMATED STARFIELD
+           ------------------------------------------------------------------ */
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            const count = Math.floor((canvas.width * canvas.height) / 3000);
+            for (let i = 0; i < count; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 1.8 + 0.2,
+                    alpha: Math.random(),
+                    speed: Math.random() * 0.4 + 0.1
+                });
+            }
+        }
+
+        function renderStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#ffffff";
+            stars.forEach(star => {
+                star.y += star.speed;
+                if (star.y > canvas.height) star.y = 0;
+                
+                star.alpha += (Math.random() - 0.5) * 0.05;
+                if (star.alpha < 0.1) star.alpha = 0.1;
+                if (star.alpha > 1) star.alpha = 1;
+
+                ctx.globalAlpha = star.alpha;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(renderStars);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        /* ------------------------------------------------------------------
+           SCORE & STREAK SYSTEM
+           ------------------------------------------------------------------ */
+        function addScore(points) {
+            gameState.score += points;
+            gameState.streak++;
+            if (gameState.streak > gameState.maxStreak) {
+                gameState.maxStreak = gameState.streak;
+            }
+
+            // Update UI
+            document.getElementById('player-score').innerText = String(gameState.score).padStart(4, '0');
+            document.getElementById('player-streak').innerText = `${gameState.streak}x`;
+
+            // Check Rank
+            let currentRank = ranks[0].title;
+            for (let r of ranks) {
+                if (gameState.score >= r.threshold) currentRank = r.title;
+            }
+            document.getElementById('player-rank').innerText = currentRank;
+
+            // Trigger Streak Banner
+            if (gameState.streak >= 2) {
+                triggerStreakBanner();
+            } else {
+                playSound('correct');
+            }
+        }
+
+        function resetStreak() {
+            gameState.streak = 0;
+            document.getElementById('player-streak').innerText = "0x";
+            playSound('wrong');
+        }
+
+        function triggerStreakBanner() {
+            playSound('streak');
+            const banner = document.getElementById('streak-banner');
+            const streakText = document.getElementById('streak-text');
+            
+            const titles = ["ZERO-G STREAK!", "WARP SPEED!", "ASTEROID DODGER!", "COSMIC MIND!"];
+            const title = titles[Math.min(gameState.streak - 2, titles.length - 1)];
+
+            streakText.innerText = `${title} x${gameState.streak}`;
+            banner.classList.remove('opacity-0', '-translate-y-12');
+            banner.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                banner.classList.remove('opacity-100', 'translate-y-0');
+                banner.classList.add('opacity-0', '-translate-y-12');
+            }, 1600);
+        }
+
+        /* ------------------------------------------------------------------
+           LEVEL NAVIGATION
+           ------------------------------------------------------------------ */
+        function switchLevel(lvl) {
+            playSound('click');
+            gameState.currentLevel = lvl;
+
+            // Hide all levels
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`level-${i}`).classList.add('hidden');
+                document.getElementById(`tab-lvl-${i}`).classList.remove('hud-panel-active', 'border-cyan-400');
+                document.getElementById(`tab-lvl-${i}`).classList.add('opacity-60');
+            }
+
+            document.getElementById('mission-report').classList.add('hidden');
+
+            // Show current level
+            const target = document.getElementById(`level-${lvl}`);
+            target.classList.remove('hidden');
+            const tab = document.getElementById(`tab-lvl-${lvl}`);
+            tab.classList.add('hud-panel-active', 'border-cyan-400');
+            tab.classList.remove('opacity-60');
+        }
+
+        /* ------------------------------------------------------------------
+           LEVEL 1: DECOMPOSITION LOGIC
+           ------------------------------------------------------------------ */
+        const level1Data = [
+            { id: "step-1", correctIndex: 0, text: "1. Diagnostic Scan: Detect system power loss in primary core." },
+            { id: "step-2", correctIndex: 1, text: "2. Isolation: Disconnect damaged battery conduits." },
+            { id: "step-3", correctIndex: 2, text: "3. Power Transfer: Divert emergency backup solar cells." },
+            { id: "step-4", correctIndex: 3, text: "4. Ignition Sequence: Reboot plasma drive & initiate warp." }
+        ];
+
+        let currentLvl1Order = [];
+
+        function initLevel1() {
+            // Shuffle steps
+            currentLvl1Order = [...level1Data].sort(() => Math.random() - 0.5);
+            renderLevel1Items();
+        }
+
+        function renderLevel1Items() {
+            const container = document.getElementById('drag-container-1');
+            container.innerHTML = '';
+
+            currentLvl1Order.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = "draggable-item hud-panel p-3 bg-slate-900 border border-slate-700 rounded-lg flex items-center justify-between text-xs text-slate-200";
+                card.draggable = true;
+                card.dataset.index = index;
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="text-cyan-400 font-mono">::</span>
+                        <span>${item.text}</span>
+                    </div>
+                    <span class="text-slate-500 cursor-grab">☰</span>
+                `;
+
+                // Drag Events
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('drop', handleDrop);
+                card.addEventListener('dragend', handleDragEnd);
+
+                container.appendChild(card);
+            });
+        }
+
+        let dragSrcIndex = null;
+
+        function handleDragStart(e) {
+            dragSrcIndex = this.dataset.index;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            const targetIndex = this.dataset.index;
+
+            if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+                // Swap items in state array
+                const movedItem = currentLvl1Order[dragSrcIndex];
+                currentLvl1Order.splice(dragSrcIndex, 1);
+                currentLvl1Order.splice(targetIndex, 0, movedItem);
+                renderLevel1Items();
+            }
+            return false;
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+        }
+
+        function checkLevel1() {
+            const feedback = document.getElementById('level-1-feedback');
+            feedback.classList.remove('hidden', 'bg-emerald-950/80', 'bg-rose-950/80', 'text-emerald-300', 'text-rose-300');
+
+            let isCorrect = true;
+            currentLvl1Order.forEach((item, idx) => {
+                if (item.correctIndex !== idx) isCorrect = false;
+            });
+
+            if (isCorrect) {
+                feedback.classList.add('bg-emerald-950/80', 'text-emerald-300', 'border', 'border-emerald-500/40');
+                feedback.innerHTML = "✅ <strong>CORE REBOOT SUCCESSFUL!</strong> Excellent decomposition! You broke the reboot procedure into its exact sequential tasks.";
+                addScore(300);
+                gameState.completedLevels.add(1);
+                setTimeout(() => switchLevel(2), 2000);
+            } else {
+                feedback.classList.add('bg-rose-950/80', 'text-rose-300', 'border', 'border-rose-500/40');
+                feedback.innerHTML = "❌ <strong>SEQUENCE ERROR!</strong> Core steps are out of order. Diagnostic must come first before diversion!";
+                resetStreak();
+            }
+        }
+
+        /* ------------------------------------------------------------------
+           LEVEL 2: PATTERN RECOGNITION LOGIC
+           ------------------------------------------------------------------ */
+        const patternData = [
+            {
+                type: "Numerical Multiplier",
+                sequence: ["2 MHz", "4 MHz", "8 MHz", "16 MHz", "?"],
+                options: ["20 MHz", "24 MHz", "32 MHz", "64 MHz"],
+                answer: "32 MHz"
+            },
+            {
+                type: "Geometric Direction Rotation",
+                sequence: ["⬆️ NORTH", "➡️ EAST", "⬇️ SOUTH", "⬅️ WEST", "?"],
+                options: ["⬆️ NORTH", "➡️ EAST", "↗️ NORTHEAST", "🔄 SPIN"],
+                answer: "⬆️ NORTH"
+            },
+            {
+                type: "Shield Frequency Delta",
+                sequence: ["100 Hz", "150 Hz", "200 Hz", "250 Hz", "?"],
+                options: ["275 Hz", "300 Hz", "350 Hz", "400 Hz"],
+                answer: "300 Hz"
+            }
+        ];
+
+        let patternIdx = 0;
+
+        function loadPatternStage() {
+            const stage = patternData[patternIdx];
+            document.getElementById('pattern-num').innerText = patternIdx + 1;
+            document.getElementById('pattern-rule-hint').innerText = `Pattern Type: ${stage.type}`;
+            document.getElementById('pattern-progress').innerText = `Completed: ${patternIdx}/3 Sequences`;
+
+            // Display sequence
+            const display = document.getElementById('sequence-display');
+            display.innerHTML = '';
+            stage.sequence.forEach(item => {
+                const badge = document.createElement('div');
+                badge.className = "px-3 py-2 rounded-lg bg-slate-900 border border-cyan-500/30 text-cyan-300";
+                badge.innerText = item;
+                display.appendChild(badge);
+            });
+
+            // Display choices
+            const optionsBox = document.getElementById('pattern-options');
+            optionsBox.innerHTML = '';
+            stage.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "hud-btn py-3 px-2 rounded-lg text-xs font-bold font-orbitron";
+                btn.innerText = opt;
+                btn.onclick = () => checkPatternChoice(opt);
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function checkPatternChoice(selected) {
+            const stage = patternData[patternIdx];
+            const feedback = document.getElementById('level-2-feedback');
+            feedback.classList.remove('hidden', 'bg-emerald-950/80', 'bg-rose-950/80', 'text-emerald-300', 'text-rose-300');
+
+            if (selected === stage.answer) {
+                addScore(250);
+                patternIdx++;
+                if (patternIdx < patternData.length) {
+                    feedback.classList.add('bg-emerald-950/80', 'text-emerald-300');
+                    feedback.innerHTML = "✅ <strong>PATTERN VERIFIED!</strong> Signal lock updated.";
+                    setTimeout(() => {
+                        feedback.classList.add('hidden');
+                        loadPatternStage();
+                    }, 1000);
+                } else {
+                    feedback.classList.add('bg-emerald-950/80', 'text-emerald-300');
+                    feedback.innerHTML = "🎉 <strong>ALL TELEMETRY PATTERNS RECOGNIZED!</strong> Trajectory shield online!";
+                    gameState.completedLevels.add(2);
+                    setTimeout(() => switchLevel(3), 1800);
+                }
+            } else {
+                feedback.classList.add('bg-rose-950/80', 'text-rose-300');
+                feedback.innerHTML = "❌ <strong>INCORRECT PATTERN!</strong> Frequency offset detected. Try again!";
+                resetStreak();
+            }
+        }
+
+        /* ------------------------------------------------------------------
+           LEVEL 3: ABSTRACTION SENSOR SWEEP LOGIC
+           ------------------------------------------------------------------ */
+        const sensorLogs = [
+            { id: 1, type: 'NOISE', text: '🌫️ Cosmic Dust Interference (Density 88%)' },
+            { id: 2, type: 'WAYPOINT', text: '🎯 NAV_WAYPOINT: Sector Alpha (34.2, 88.1)' },
+            { id: 3, type: 'NOISE', text: '📻 Alien Broadcast: Unknown Dialect' },
+            { id: 4, type: 'WAYPOINT', text: '🎯 NAV_WAYPOINT: Sector Beta (12.4, 99.0)' },
+            { id: 5, type: 'NOISE', text: '⚡ Solar Flare Static Spike (+400V)' },
+            { id: 6, type: 'WAYPOINT', text: '🎯 NAV_WAYPOINT: Sector Gamma (04.1, 11.8)' },
+            { id: 7, type: 'NOISE', text: '🌌 Background Microwave Radiation' },
+            { id: 8, type: 'WAYPOINT', text: '🎯 NAV_WAYPOINT: Sector Delta (77.3, 45.2)' },
+            { id: 9, type: 'NOISE', text: '🪐 Atmospheric Refraction Noise' }
+        ];
+
+        let remainingCards = [];
+
+        function initLevel3() {
+            remainingCards = [...sensorLogs];
+            renderAbstractionGrid();
+        }
+
+        function renderAbstractionGrid() {
+            const grid = document.getElementById('abstraction-grid');
+            grid.innerHTML = '';
+
+            const waypointsLeft = remainingCards.filter(c => c.type === 'WAYPOINT').length;
+            document.getElementById('waypoint-count').innerText = waypointsLeft;
+
+            remainingCards.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = `p-3 rounded-lg border text-xs font-orbitron cursor-pointer transition-all flex flex-col justify-between h-24 ${
+                    card.type === 'WAYPOINT' 
+                    ? 'bg-slate-900 border-cyan-500/50 hover:border-cyan-300 text-cyan-200' 
+                    : 'bg-slate-900/60 border-slate-800 hover:border-amber-500/50 text-slate-400'
+                }`;
+
+                cardEl.innerHTML = `
+                    <span>${card.text}</span>
+                    <span class="text-[10px] text-right font-mono text-slate-500">
+                        ${card.type === 'WAYPOINT' ? 'CRITICAL DATA' : 'CLICK TO FILTER NOISE'}
+                    </span>
+                `;
+
+                cardEl.onclick = () => filterCard(card.id);
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function filterCard(id) {
+            const card = remainingCards.find(c => c.id === id);
+            if (!card) return;
+
+            if (card.type === 'NOISE') {
+                playSound('click');
+                remainingCards = remainingCards.filter(c => c.id !== id);
+                renderAbstractionGrid();
+            } else {
+                // Clicked an actual waypoint by mistake
+                playSound('wrong');
+                const feedback = document.getElementById('level-3-feedback');
+                feedback.classList.remove('hidden');
+                feedback.className = 'p-3 rounded-lg text-xs font-orbitron my-2 bg-rose-950/80 text-rose-300 border border-rose-500/40';
+                feedback.innerHTML = "⚠️ <strong>CAUTION!</strong> Do not delete NAV_WAYPOINT data! Abstract away ONLY background noise.";
+                resetStreak();
+            }
+        }
+
+        function checkLevel3() {
+            const feedback = document.getElementById('level-3-feedback');
+            feedback.classList.remove('hidden');
+
+            const noiseLeft = remainingCards.filter(c => c.type === 'NOISE').length;
+            const waypointsLeft = remainingCards.filter(c => c.type === 'WAYPOINT').length;
+
+            if (noiseLeft === 0 && waypointsLeft === 4) {
+                feedback.className = 'p-3 rounded-lg text-xs font-orbitron my-2 bg-emerald-950/80 text-emerald-300 border border-emerald-500/40';
+                feedback.innerHTML = "✅ <strong>ABSTRACTION COMPLETE!</strong> Clutter purged. Navigational vectors isolated!";
+                addScore(350);
+                gameState.completedLevels.add(3);
+                setTimeout(() => switchLevel(4), 1800);
+            } else {
+                feedback.className = 'p-3 rounded-lg text-xs font-orbitron my-2 bg-amber-950/80 text-amber-300 border border-amber-500/40';
+                feedback.innerHTML = `⚠️ Unfiltered noise remains! Remove all background static logs before proceeding.`;
+            }
+        }
+
+        /* ------------------------------------------------------------------
+           LEVEL 4: ALGORITHMIC GRID ROVER ENGINE
+           ------------------------------------------------------------------ */
+        // 5x5 Grid Layout: 0=Empty, 1=Asteroid, 2=Sample, 3=Goal
+        const roverGridMap = [
+            [0, 0, 1, 0, 3],
+            [1, 0, 0, 0, 0],
+            [0, 0, 1, 1, 0],
+            [0, 2, 0, 0, 0],
+            [0, 0, 0, 1, 0]
+        ];
+
+        // Rover Directions: 0=NORTH, 1=EAST, 2=SOUTH, 3=WEST
+        const dirIcons = ['⬆️', '➡️', '⬇️', '⬅️'];
+        let roverState = { x: 0, y: 4, dir: 1, samplesCollected: 0 }; // Start at bottom-left facing EAST
+        let programStack = [];
+
+        function initLevel4() {
+            renderRoverGrid();
+            renderProgramStack();
+        }
+
+        function renderRoverGrid() {
+            const container = document.getElementById('rover-grid');
+            container.innerHTML = '';
+
+            for (let r = 0; r < 5; r++) {
+                for (let c = 0; c < 5; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = "grid-cell rounded-md border border-slate-800 bg-slate-900 flex items-center justify-center text-lg font-bold relative";
+
+                    const tileType = roverGridMap[r][c];
+
+                    // Render Map Features
+                    if (tileType === 1) cell.innerHTML = '🪨'; // Asteroid
+                    else if (tileType === 2) cell.innerHTML = '💎'; // Sample
+                    else if (tileType === 3) cell.innerHTML = '🏁'; // Goal
+
+                    // Render Rover Position
+                    if (r === roverState.y && c === roverState.x) {
+                        cell.innerHTML = `<span class="transform transition-transform duration-200">${dirIcons[roverState.dir]}</span>`;
+                        cell.classList.add('bg-cyan-950/80', 'border-cyan-400');
+                    }
+
+                    container.appendChild(cell);
+                }
+            }
+        }
+
+        function addCommand(cmd) {
+            playSound('click');
+            if (programStack.length >= 12) return;
+            programStack.push(cmd);
+            renderProgramStack();
+        }
+
+        function clearProgram() {
+            playSound('click');
+            programStack = [];
+            resetRoverPos();
+            renderProgramStack();
+        }
+
+        function resetRoverPos() {
+            roverState = { x: 0, y: 4, dir: 1, samplesCollected: 0 };
+            document.getElementById('rover-status').innerText = "READY";
+            renderRoverGrid();
+        }
+
+        function renderProgramStack() {
+            const stackEl = document.getElementById('program-stack');
+            const emptyText = document.getElementById('empty-program-text');
+
+            if (programStack.length === 0) {
+                stackEl.innerHTML = '';
+                stackEl.appendChild(emptyText);
+                emptyText.classList.remove('hidden');
+                return;
+            }
+
+            stackEl.innerHTML = '';
+            programStack.forEach((cmd, idx) => {
+                const tag = document.createElement('div');
+                tag.className = "px-2.5 py-1.5 rounded bg-slate-900 border border-cyan-500/40 text-cyan-300 font-orbitron text-[11px] flex items-center gap-1.5";
+
+                let label = cmd;
+                if (cmd === 'FORWARD') label = '⬆️ MOVE';
+                if (cmd === 'TURN_LEFT') label = '↩️ LEFT';
+                if (cmd === 'TURN_RIGHT') label = '↪️ RIGHT';
+                if (cmd === 'COLLECT') label = '💎 SAMPLE';
+
+                tag.innerHTML = `
+                    <span>${idx + 1}. ${label}</span>
+                    <button onclick="removeCommand(${idx})" class="text-rose-400 hover:text-white font-bold ml-1">×</button>
+                `;
+                stackEl.appendChild(tag);
+            });
+        }
+
+        function removeCommand(idx) {
+            playSound('click');
+            programStack.splice(idx, 1);
+            renderProgramStack();
+        }
+
+        async function runRoverProgram() {
+            if (programStack.length === 0) return;
+            resetRoverPos();
+            document.getElementById('run-btn').disabled = true;
+            document.getElementById('rover-status').innerText = "EXECUTING...";
+
+            const feedback = document.getElementById('level-4-feedback');
+            feedback.classList.add('hidden');
+
+            for (let cmd of programStack) {
+                await new Promise(res => setTimeout(res, 450));
+
+                if (cmd === 'TURN_LEFT') {
+                    roverState.dir = (roverState.dir + 3) % 4;
+                } else if (cmd === 'TURN_RIGHT') {
+                    roverState.dir = (roverState.dir + 1) % 4;
+                } else if (cmd === 'FORWARD') {
+                    let nextX = roverState.x;
+                    let nextY = roverState.y;
+
+                    if (roverState.dir === 0) nextY--; // NORTH
+                    if (roverState.dir === 1) nextX++; // EAST
+                    if (roverState.dir === 2) nextY++; // SOUTH
+                    if (roverState.dir === 3) nextX--; // WEST
+
+                    // Collision Check
+                    if (nextX < 0 || nextX >= 5 || nextY < 0 || nextY >= 5) {
+                        triggerRoverFailure("Rover walked off mission perimeter boundaries!");
+                        document.getElementById('run-btn').disabled = false;
+                        return;
+                    }
+
+                    if (roverGridMap[nextY][nextX] === 1) {
+                        triggerRoverFailure("CRASH! Rover hit an asteroid block!");
+                        document.getElementById('run-btn').disabled = false;
+                        return;
+                    }
+
+                    roverState.x = nextX;
+                    roverState.y = nextY;
+                } else if (cmd === 'COLLECT') {
+                    if (roverGridMap[roverState.y][roverState.x] === 2) {
+                        roverState.samplesCollected++;
+                        playSound('correct');
+                    }
+                }
+
+                renderRoverGrid();
+            }
+
+            document.getElementById('run-btn').disabled = false;
+
+            // Check Goal Reached
+            if (roverGridMap[roverState.y][roverState.x] === 3) {
+                feedback.classList.remove('hidden');
+                feedback.className = 'p-3 rounded-lg text-xs font-orbitron bg-emerald-950/80 text-emerald-300 border border-emerald-500/40';
+                feedback.innerHTML = "🎉 <strong>ALGORITHM SUCCESS!</strong> Rover safely navigated the asteroid grid and reached Starbase!";
+                addScore(400);
+                gameState.completedLevels.add(4);
+
+                setTimeout(() => showMissionReport(), 2000);
+            } else {
+                triggerRoverFailure("Rover stopped before reaching the Starbase gate 🏁!");
+            }
+        }
+
+        function triggerRoverFailure(msg) {
+            playSound('wrong');
+            const feedback = document.getElementById('level-4-feedback');
+            feedback.classList.remove('hidden');
+            feedback.className = 'p-3 rounded-lg text-xs font-orbitron bg-rose-950/80 text-rose-300 border border-rose-500/40';
+            feedback.innerHTML = `❌ <strong>ALGORITHM ERROR:</strong> ${msg}`;
+            document.getElementById('rover-status').innerText = "FAILED";
+            resetStreak();
+        }
+
+        /* ------------------------------------------------------------------
+           FINAL MISSION REPORT / CERTIFICATE
+           ------------------------------------------------------------------ */
+        function showMissionReport() {
+            playSound('win');
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`level-${i}`).classList.add('hidden');
+            }
+
+            document.getElementById('mission-report').classList.remove('hidden');
+
+            document.getElementById('final-score-val').innerText = gameState.score;
+            document.getElementById('final-streak-val').innerText = `${gameState.maxStreak}x`;
+
+            let finalRank = "Admiral";
+            for (let r of ranks) {
+                if (gameState.score >= r.threshold) finalRank = r.badge;
+            }
+            document.getElementById('final-rank-val').innerText = finalRank;
+        }
+
+        function restartGame() {
+            gameState.score = 0;
+            gameState.streak = 0;
+            gameState.maxStreak = 0;
+            gameState.completedLevels.clear();
+            patternIdx = 0;
+            
+            document.getElementById('player-score').innerText = "0000";
+            document.getElementById('player-streak').innerText = "0x";
+            document.getElementById('player-rank').innerText = "🚀 Cadet";
+
+            initLevel1();
+            loadPatternStage();
+            initLevel3();
+            initLevel4();
+
+            switchLevel(1);
+        }
+
+        /* ------------------------------------------------------------------
+           INITIALIZATION ON PAGE LOAD
+           ------------------------------------------------------------------ */
+        window.onload = function () {
+            resizeCanvas();
+            renderStars();
+
+            initLevel1();
+            loadPatternStage();
+            initLevel3();
+            initLevel4();
+        };
+    </script>
+</body>
+</html>
