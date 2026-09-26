@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTL 8.2: Sequences & Commands - UVA Sports Arena</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #060a12;
+            color: #f8fafc;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        .font-scoreboard {
+            font-family: 'Teko', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .font-code {
+            font-family: 'Fira Code', monospace;
+        }
+
+        .bg-uva-navy { background-color: #0b2341; }
+        .bg-uva-gold { background-color: #f59e0b; }
+        .text-uva-gold { color: #f59e0b; }
+        .border-uva-gold { border-color: #f59e0b; }
+
+        .scoreboard-glow {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.25), inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .digital-number {
+            font-family: 'Teko', sans-serif;
+            text-shadow: 0 0 12px rgba(245, 158, 11, 0.8);
+        }
+
+        .grid-cell {
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Syntax Highlighting Colors for Generated Code Modal */
+        .token-keyword { color: #f472b6; font-weight: 600; }
+        .token-fn { color: #38bdf8; font-weight: 600; }
+        .token-string { color: #4ade80; }
+        .token-comment { color: #94a3b8; font-style: italic; }
+        .token-class { color: #fbbf24; font-weight: 600; }
+        .token-number { color: #c084fc; }
+
+        .streak-pop {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.6) translateY(-20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.8); }
+        }
+
+        .pulse-gold {
+            animation: pulseGlow 2s infinite;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #certificate-print-area, #certificate-print-area * { visibility: visible; }
+            #certificate-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased">
+
+    <!-- CANVAS FOR SELF-CONTAINED CONFETTI REWARD -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- TOP UVA STADIUM SCOREBOARD HEADER -->
+    <header class="bg-uva-navy border-b-4 border-uva-gold sticky top-0 z-40 shadow-2xl backdrop-blur bg-opacity-95">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap justify-between items-center gap-3">
+            
+            <!-- School Brand & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-uva-gold text-slate-950 font-black px-3 py-1 rounded text-xl tracking-wider font-scoreboard shadow-md flex items-center gap-1.5">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    UVA LYNX
+                </div>
+                <div>
+                    <h1 class="text-base md:text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
+                        CTL 8.2: Sequences & Basic Commands
+                    </h1>
+                    <p class="text-[11px] text-amber-400 font-bold uppercase tracking-wider">University View Academy • Computer Tech Literacy</p>
+                </div>
+            </div>
+
+            <!-- Scoreboard Status Module -->
+            <div class="flex items-center gap-2 md:gap-5 bg-slate-950/80 px-3 py-1.5 rounded-xl border border-slate-700 shadow-inner">
+                <!-- Current Rank -->
+                <div class="text-center px-1">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 block leading-tight">Rank</span>
+                    <span id="player-rank" class="text-xs md:text-sm font-black text-amber-400 uppercase tracking-wider font-scoreboard">ROOKIE</span>
+                </div>
+
+                <div class="h-6 w-px bg-slate-800"></div>
+
+                <!-- Score Tally -->
+                <div class="text-center px-1">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 block leading-tight">Score</span>
+                    <span id="player-score" class="text-lg md:text-xl font-scoreboard font-bold text-emerald-400 leading-none digital-number">0</span>
+                </div>
+
+                <div class="h-6 w-px bg-slate-800"></div>
+
+                <!-- Streak Counter -->
+                <div class="text-center px-1">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 block leading-tight">Streak</span>
+                    <div class="flex items-center justify-center gap-0.5">
+                        <span id="streak-count" class="text-lg md:text-xl font-scoreboard font-bold text-amber-400 leading-none digital-number">0</span>
+                        <span class="text-xs">🔥</span>
+                    </div>
+                </div>
+
+                <div class="h-6 w-px bg-slate-800"></div>
+
+                <!-- Audio Toggle -->
+                <button onclick="toggleAudio()" id="btn-audio" class="p-1.5 text-slate-400 hover:text-amber-400 transition rounded-lg hover:bg-slate-800" title="Toggle Sound Effects">
+                    <svg id="icon-audio-on" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                    <svg id="icon-audio-off" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- STREAK BANNER POPUP -->
+    <div id="streak-banner" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none hidden">
+        <div class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black px-6 py-2 rounded-full shadow-2xl border-2 border-white flex items-center gap-2 streak-pop text-lg md:text-xl font-scoreboard uppercase tracking-wider">
+            <span id="streak-banner-icon">⚡</span>
+            <span id="streak-banner-text">HAT-TRICK! 3 IN A ROW!</span>
+        </div>
+    </div>
+
+    <!-- MAIN GAME AREA CONTAINER -->
+    <main class="max-w-7xl mx-auto w-full p-4 md:p-6 flex-grow flex flex-col justify-start">
+
+        <!-- STAGE / QUARTER NAVIGATION TABS -->
+        <div class="mb-6 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800 flex justify-between items-center gap-1.5 overflow-x-auto shadow-lg">
+            <button id="nav-round-1" onclick="switchRound(1)" class="flex-1 min-w-[130px] py-2.5 px-3 rounded-xl font-bold text-xs md:text-sm transition flex items-center justify-center gap-2 bg-blue-900/90 text-white shadow border border-blue-400/40">
+                <span>1️⃣ Pre-Game Drills</span>
+                <span id="badge-round-1" class="hidden text-xs bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded-full font-black">✓</span>
+            </button>
+            <button id="nav-round-2" onclick="switchRound(2)" class="flex-1 min-w-[130px] py-2.5 px-3 rounded-xl font-bold text-xs md:text-sm transition flex items-center justify-center gap-2 bg-slate-800/80 text-slate-400 hover:text-white">
+                <span>2️⃣ Playbook Order</span>
+                <span id="badge-round-2" class="hidden text-xs bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded-full font-black">✓</span>
+            </button>
+            <button id="nav-round-3" onclick="switchRound(3)" class="flex-1 min-w-[130px] py-2.5 px-3 rounded-xl font-bold text-xs md:text-sm transition flex items-center justify-center gap-2 bg-slate-800/80 text-slate-400 hover:text-white">
+                <span>3️⃣ Referee Debugging</span>
+                <span id="badge-round-3" class="hidden text-xs bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded-full font-black">✓</span>
+            </button>
+            <button id="nav-round-4" onclick="switchRound(4)" class="flex-1 min-w-[130px] py-2.5 px-3 rounded-xl font-bold text-xs md:text-sm transition flex items-center justify-center gap-2 bg-slate-800/80 text-slate-400 hover:text-white">
+                <span>4️⃣ Play Simulator</span>
+                <span id="badge-round-4" class="hidden text-xs bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded-full font-black">✓</span>
+            </button>
+        </div>
+
+        <!-- ROUND 1: PRE-GAME CONCEPT DRILLS -->
+        <section id="round-1" class="round-stage bg-slate-900/90 border border-slate-800 rounded-2xl p-5 md:p-8 shadow-2xl backdrop-blur">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center justify-between mb-6 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">Quarter 1 / 4</span>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-white">Pre-Game Drills: Core Terminology</h2>
+                    </div>
+                    <span class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold px-3 py-1 rounded-full">
+                        Concept Mastery
+                    </span>
+                </div>
+
+                <p class="text-slate-300 text-sm md:text-base mb-6 leading-relaxed">
+                    Welcome Lynx Athlete! Before executing complex tactics on the field, you must master the fundamental rules of computer sequence logic. Answer all 3 scenario drills to unlock the Playbook!
+                </p>
+
+                <div id="r1-questions-container" class="space-y-6"></div>
+
+                <div class="mt-8 flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-800">
+                    <div id="r1-feedback" class="text-sm font-semibold"></div>
+                    <button id="btn-submit-r1" onclick="checkRound1()" class="w-full md:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-8 py-3 rounded-xl text-lg shadow-lg hover:shadow-amber-500/20 transition uppercase font-scoreboard">
+                        Lock In Answers ➔
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROUND 2: PLAYBOOK SEQUENCING -->
+        <section id="round-2" class="round-stage bg-slate-900/90 border border-slate-800 rounded-2xl p-5 md:p-8 shadow-2xl hidden">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center justify-between mb-6 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">Quarter 2 / 4</span>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-white">Playbook Sequencing: Logical Order</h2>
+                    </div>
+                    <span class="text-xs bg-blue-500/10 border border-blue-500/30 text-blue-300 font-bold px-3 py-1 rounded-full">
+                        Exam Skill: Step Sequence
+                    </span>
+                </div>
+
+                <p class="text-slate-300 text-sm md:text-base mb-4">
+                    In programming, a <strong>Sequence</strong> is an ordered set of commands executed strictly from first to last.
+                    Below are scrambled steps for logging into Canvas LMS at University View Academy and submitting an assignment. Arrange them into the exact logical order!
+                </p>
+
+                <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 mb-6 flex items-center justify-between text-xs md:text-sm">
+                    <span class="text-amber-300 font-semibold flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Click any item to select it, then click another to swap positions!
+                    </span>
+                    <button onclick="resetRound2()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                        Reset Order 🔄
+                    </button>
+                </div>
+
+                <!-- Interactive Swap List -->
+                <div id="r2-sequence-list" class="space-y-3 mb-8"></div>
+
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-800">
+                    <div id="r2-feedback" class="text-sm font-semibold"></div>
+                    <button id="btn-submit-r2" onclick="checkRound2()" class="w-full md:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-8 py-3 rounded-xl text-lg shadow-lg hover:shadow-amber-500/20 transition uppercase font-scoreboard">
+                        Execute Play Order ➔
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROUND 3: REFEREE DEBUGGING -->
+        <section id="round-3" class="round-stage bg-slate-900/90 border border-slate-800 rounded-2xl p-5 md:p-8 shadow-2xl hidden">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center justify-between mb-6 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">Quarter 3 / 4</span>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-white">Referee Challenge: Debugging Errors</h2>
+                    </div>
+                    <span class="text-xs bg-red-500/10 border border-red-500/30 text-red-300 font-bold px-3 py-1 rounded-full">
+                        Exam Skill: Finding Missing Steps
+                    </span>
+                </div>
+
+                <p class="text-slate-300 text-sm md:text-base mb-6 leading-relaxed">
+                    A program with out-of-order or missing steps causes a <strong>Logical Error / Bug</strong>. Blow the whistle on broken play sequences by identifying the missing step in each process!
+                </p>
+
+                <div id="r3-questions-container" class="space-y-6"></div>
+
+                <div class="mt-8 flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-800">
+                    <div id="r3-feedback" class="text-sm font-semibold"></div>
+                    <button id="btn-submit-r3" onclick="checkRound3()" class="w-full md:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-8 py-3 rounded-xl text-lg shadow-lg hover:shadow-amber-500/20 transition uppercase font-scoreboard">
+                        Blow Whistle / Submit ➔
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROUND 4: PLAY CALL SIMULATOR (TACTIC RUNNER + GENERATED CODE INSPECTOR) -->
+        <section id="round-4" class="round-stage bg-slate-900/90 border border-slate-800 rounded-2xl p-4 md:p-6 shadow-2xl hidden">
+            <div class="flex flex-col lg:flex-row gap-6">
+                
+                <!-- Left Column: Grid Arena -->
+                <div class="lg:w-1/2 flex flex-col items-center">
+                    <div class="w-full flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Quarter 4: Tactic Simulation</span>
+                        <button onclick="openCodeModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg border border-indigo-400/40 transition flex items-center gap-1.5 shadow">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                            Inspect Generated Code 💻
+                        </button>
+                    </div>
+
+                    <!-- 5x5 Stadium Field Grid -->
+                    <div class="bg-emerald-950/80 p-3 rounded-2xl border-4 border-emerald-600/60 shadow-2xl relative w-full max-w-[360px] aspect-square flex flex-col justify-between">
+                        <!-- Yard lines background effect -->
+                        <div class="absolute inset-0 grid grid-rows-5 pointer-events-none opacity-20">
+                            <div class="border-b border-white"></div>
+                            <div class="border-b border-white"></div>
+                            <div class="border-b border-white"></div>
+                            <div class="border-b border-white"></div>
+                            <div></div>
+                        </div>
+
+                        <!-- Grid Cells Container -->
+                        <div id="simulator-grid" class="grid grid-cols-5 grid-rows-5 gap-1.5 h-full w-full relative z-10"></div>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="flex items-center justify-center gap-4 text-xs text-slate-300 mt-3 bg-slate-950/80 px-4 py-2 rounded-xl border border-slate-800">
+                        <div class="flex items-center gap-1"><span>🏃‍♂️</span><span>Lynx Player</span></div>
+                        <div class="flex items-center gap-1"><span>🛡️</span><span>Defender</span></div>
+                        <div class="flex items-center gap-1"><span>🥅</span><span>Goal Post</span></div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Command Block Queue Controls -->
+                <div class="lg:w-1/2 flex flex-col justify-between bg-slate-950/80 p-4 rounded-xl border border-slate-800">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <span>📋 Command Block Queue</span>
+                            </h3>
+                            <span id="queue-counter" class="text-xs font-mono font-bold bg-slate-800 text-amber-400 px-2.5 py-1 rounded-md border border-slate-700">
+                                0 / 12 Slots
+                            </span>
+                        </div>
+
+                        <!-- Action Buttons Palette -->
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <button onclick="addCommand('FORWARD')" class="bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs md:text-sm font-bold py-2.5 px-3 rounded-xl border border-blue-400/40 flex items-center justify-center gap-2 shadow transition">
+                                <span>⬆️</span> Move Forward
+                            </button>
+                            <button onclick="addCommand('TURN_RIGHT')" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs md:text-sm font-bold py-2.5 px-3 rounded-xl border border-indigo-400/40 flex items-center justify-center gap-2 shadow transition">
+                                <span>↪️</span> Turn Right
+                            </button>
+                            <button onclick="addCommand('TURN_LEFT')" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs md:text-sm font-bold py-2.5 px-3 rounded-xl border border-indigo-400/40 flex items-center justify-center gap-2 shadow transition">
+                                <span>↩️</span> Turn Left
+                            </button>
+                            <button onclick="addCommand('SHOOT')" class="bg-amber-600 hover:bg-amber-500 active:scale-95 text-slate-950 font-black text-xs md:text-sm py-2.5 px-3 rounded-xl border border-amber-400/40 flex items-center justify-center gap-2 shadow transition">
+                                <span>⚽</span> Kick Goal
+                            </button>
+                        </div>
+
+                        <!-- Command Queue List Display -->
+                        <p class="text-[11px] text-slate-400 mb-1 font-semibold uppercase tracking-wider">Play Sequence Queue (Executes in strict order):</p>
+                        <div id="command-queue-display" class="min-h-[140px] max-h-[170px] overflow-y-auto bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 space-y-1.5 font-mono text-xs">
+                            <p class="text-slate-500 text-center py-8 italic">No commands added. Click action blocks above!</p>
+                        </div>
+                    </div>
+
+                    <!-- Simulator Controls -->
+                    <div class="mt-4 pt-3 border-t border-slate-800 flex items-center gap-2">
+                        <button onclick="resetSimulator()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-3 px-3 rounded-xl border border-slate-700 transition flex-1">
+                            Reset Grid & Queue 🗑️
+                        </button>
+                        <button id="btn-run-play" onclick="runPlaySimulation()" class="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-sm md:text-base py-3 px-6 rounded-xl border border-emerald-400/50 shadow-lg hover:shadow-emerald-500/20 transition flex-[2] font-scoreboard uppercase tracking-wider">
+                            Run Play Sequence 🚀
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FINAL CHAMPIONSHIP SCREEN & DIPLOMA -->
+        <section id="round-summary" class="round-stage bg-slate-900/90 border border-slate-800 rounded-2xl p-6 md:p-10 shadow-2xl hidden">
+            <div class="max-w-3xl mx-auto text-center">
+                <div class="inline-block bg-amber-500/10 border-2 border-amber-500 p-4 rounded-full mb-4 pulse-gold">
+                    <svg class="w-16 h-16 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7-6.3-4.6-6.3 4.6 2.3-7-6-4.6h7.6z"/></svg>
+                </div>
+
+                <h2 class="text-3xl md:text-5xl font-black text-white font-scoreboard tracking-wider uppercase mb-2">
+                    TOURNAMENT CHAMPION! 🏆
+                </h2>
+                <p class="text-slate-300 text-sm md:text-base max-w-xl mx-auto mb-6">
+                    Outstanding play calling, Lynx! You demonstrated mastery over programming sequences, logical order, debugging missing steps, and real syntax structure!
+                </p>
+
+                <!-- Final Stats Card -->
+                <div class="grid grid-cols-3 gap-3 max-w-md mx-auto bg-slate-950 p-4 rounded-2xl border border-slate-800 mb-8">
+                    <div>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Final Score</span>
+                        <span id="final-score" class="text-2xl font-scoreboard font-bold text-emerald-400 digital-number">0</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Highest Rank</span>
+                        <span id="final-rank" class="text-base font-scoreboard font-bold text-amber-400 uppercase">CHAMPION</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Best Streak</span>
+                        <span id="final-streak" class="text-2xl font-scoreboard font-bold text-amber-400 digital-number">0</span>
+                    </div>
+                </div>
+
+                <!-- Certificate Display Container -->
+                <div id="certificate-print-area" class="bg-slate-950 p-6 rounded-2xl border-2 border-uva-gold shadow-2xl text-left mb-8 relative overflow-hidden">
+                    <div class="absolute -right-12 -bottom-12 opacity-10 text-uva-gold pointer-events-none">
+                        <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </div>
+                    
+                    <div class="border-b border-slate-800 pb-3 mb-4 flex justify-between items-center">
+                        <div>
+                            <p class="text-xs text-amber-400 font-extrabold uppercase tracking-widest">University View Academy</p>
+                            <h3 class="text-xl font-black text-white">Certificate of CTL Sequence Mastery</h3>
+                        </div>
+                        <span class="text-2xl font-scoreboard text-emerald-400 font-bold">100% COMPLETE</span>
+                    </div>
+
+                    <p class="text-xs md:text-sm text-slate-300 mb-4 leading-relaxed">
+                        This verifies that the student athlete has successfully completed <strong>CTL 8.2: Sequences & Basic Commands</strong>, demonstrating competency in sequence formulation, debugging logical errors, step ordering, and block-to-syntax compilation.
+                    </p>
+
+                    <div class="flex justify-between items-end text-[11px] text-slate-400 font-mono">
+                        <div>
+                            <p>Program: Computer Tech Literacy (CTL)</p>
+                            <p>Verified: <span id="cert-date"></span></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-amber-400">UVA Sports Arena Curriculum</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button onclick="openCodeModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold px-6 py-3 rounded-xl border border-indigo-400/40 text-sm transition">
+                        View Code Breakdown 💻
+                    </button>
+                    <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-extrabold px-6 py-3 rounded-xl border border-slate-700 text-sm transition">
+                        Print Certificate 🖨️
+                    </button>
+                    <button onclick="restartGame()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-6 py-3 rounded-xl text-sm transition uppercase font-scoreboard">
+                        Play Again 🔄
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- GENERATED CODE INSPECTOR MODAL (Python, Java, C++) -->
+    <div id="code-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border-2 border-indigo-500/60 rounded-2xl max-w-3xl w-full p-5 shadow-2xl flex flex-col max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800 mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="p-2 bg-indigo-500/10 rounded-xl text-indigo-400 border border-indigo-500/30">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    </span>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Generated Playbook Code Inspector</h3>
+                        <p class="text-xs text-slate-400">See how your interactive game sequence translates into real programming code!</p>
+                    </div>
+                </div>
+                <button onclick="closeCodeModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Language Switcher Tabs -->
+            <div class="flex gap-2 mb-3 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button id="tab-code-python" onclick="switchCodeTab('python')" class="flex-1 py-1.5 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow">
+                    Python 🐍
+                </button>
+                <button id="tab-code-java" onclick="switchCodeTab('java')" class="flex-1 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+                    Java ☕
+                </button>
+                <button id="tab-code-cpp" onclick="switchCodeTab('cpp')" class="flex-1 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+                    C++ ⚡
+                </button>
+            </div>
+
+            <!-- Code Display Area -->
+            <div class="flex-grow overflow-y-auto bg-slate-950 p-4 rounded-xl border border-slate-800 font-code text-xs leading-relaxed">
+                <pre id="code-content" class="whitespace-pre-wrap"></pre>
+            </div>
+
+            <!-- Footer Explanation -->
+            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs text-slate-400">
+                <p>💡 Each block command runs sequentially from top to bottom.</p>
+                <button onclick="closeCodeModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-4 py-2 rounded-xl transition">
+                    Close Inspector
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 border-t border-slate-900 py-3 text-center text-xs text-slate-500">
+        <p>© University View Academy • Computer Tech Literacy (CTL) 8.2 • Sequences & Basic Commands</p>
+    </footer>
+
+    <script>
+        /* INLINE CONFETTI ENGINE (Zero External Dependencies) */
+        function confetti(options) {
+            const canvas = document.getElementById('confetti-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particleCount = options?.particleCount || 100;
+            const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6'];
+            const particles = [];
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: canvas.width * 0.5,
+                    y: canvas.height * (options?.origin?.y || 0.5),
+                    vx: (Math.random() - 0.5) * (options?.spread ? options.spread / 5 : 12),
+                    vy: (Math.random() - 0.7) * 12,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    rSpeed: (Math.random() - 0.5) * 10,
+                    opacity: 1
+                });
+            }
+
+            let animationFrame;
+            function update() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.25; // gravity
+                    p.rotation += p.rSpeed;
+                    p.opacity -= 0.01;
+
+                    if (p.opacity > 0) {
+                        alive = true;
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate((p.rotation * Math.PI) / 180);
+                        ctx.globalAlpha = Math.max(0, p.opacity);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                        ctx.restore();
+                    }
+                });
+
+                if (alive) {
+                    animationFrame = requestAnimationFrame(update);
+                } else {
+                    cancelAnimationFrame(animationFrame);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            update();
+        }
+
+        /* SOUND SYNTHESIZER (Web Audio API - Self Contained) */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let soundEnabled = true;
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('icon-audio-on').classList.toggle('hidden', !soundEnabled);
+            document.getElementById('icon-audio-off').classList.toggle('hidden', soundEnabled);
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.setValueAtTime(130, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'whistle') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(2200, now);
+                    osc.frequency.setValueAtTime(2400, now + 0.08);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            } catch (e) {}
+        }
+
+        /* GAME STATE VARIABLES */
+        let state = {
+            score: 0,
+            streak: 0,
+            maxStreak: 0,
+            completedRounds: [false, false, false, false],
+            currentRound: 1,
+            // Simulator State
+            playerPos: { r: 4, c: 0 },
+            playerDir: 0, // 0: Up, 1: Right, 2: Down, 3: Left
+            goalPos: { r: 0, c: 4 }, // Top-Right Cell
+            defenders: [
+                { r: 2, c: 1 },
+                { r: 3, c: 3 },
+                { r: 1, c: 3 }
+            ],
+            commandQueue: [],
+            isSimulating: false,
+            activeCodeTab: 'python'
+        };
+
+        /* RANK DATA */
+        const RANKS = [
+            { threshold: 0, title: "ROOKIE" },
+            { threshold: 100, title: "PRO" },
+            { threshold: 250, title: "ALL-STAR" },
+            { threshold: 400, title: "CHAMPION" }
+        ];
+
+        /* ROUND 1 QUESTIONS DATA */
+        const R1_DATA = [
+            {
+                question: "What is a 'Sequence' in computer programming?",
+                options: [
+                    "A random group of instructions executed in any order",
+                    "A set of commands executed in a specific, step-by-step order",
+                    "A decorative background style on a stadium screen"
+                ],
+                correct: 1,
+                explain: "A sequence requires commands to run in precise order from start to finish!"
+            },
+            {
+                question: "If a coach gives play instructions out of order, what type of error occurs?",
+                options: [
+                    "Logical Error (The sequence fails to reach the intended goal)",
+                    "Hardware Crash (The helmet breaks)",
+                    "Bandwidth Delay (Internet slows down)"
+                ],
+                correct: 0,
+                explain: "Incorrect step ordering causes a Logical Error, producing unintended results!"
+            },
+            {
+                question: "Why do computers require strict logical sequences?",
+                options: [
+                    "Computers cannot guess intent and execute instructions line-by-line",
+                    "Computers automatically fix out-of-order steps",
+                    "Sequences make the code run slower on purpose"
+                ],
+                correct: 0,
+                explain: "Computers blindly follow commands in the exact sequence given!"
+            }
+        ];
+
+        /* ROUND 2 SEQUENCE ITEMS (Logging into UVA Canvas) */
+        const R2_ITEMS_CORRECT = [
+            "Open Browser & Go to UVA Canvas Portal",
+            "Enter Student ID Credentials & Log In",
+            "Select 'Computer Tech Literacy (CTL 8.2)' Course",
+            "Locate 'Assignments' Tab in Left Navigation",
+            "Upload Sequence Homework File & Click Submit"
+        ];
+
+        let r2CurrentState = [];
+
+        /* ROUND 3 DEBUGGING DATA */
+        const R3_DATA = [
+            {
+                scenario: "A student wrote a script to calculate their final grade score: [1. Print Total Score] ➔ [2. Input Assignment Marks] ➔ [3. Add Marks Together]. What is the missing or out-of-order error?",
+                options: [
+                    "Printing the total score happens before marks are input and added",
+                    "The program needs a restart button",
+                    "Marks should only be subtracted, not added"
+                ],
+                correct: 0,
+                explain: "You cannot print a calculated total before gathering and adding the input marks first!"
+            },
+            {
+                scenario: "Canvas Quiz Workflow: [1. Click Start Quiz] ➔ [2. Submit Quiz] ➔ [3. Select Answers for Questions 1 to 5]. What is broken in this sequence?",
+                options: [
+                    "Submitting happens before selecting answers",
+                    "Quizzes can only have 1 question",
+                    "Step 1 should be 'Logout of Canvas'"
+                ],
+                correct: 0,
+                explain: "Submitting before answering results in a zero grade! Selecting answers must happen first."
+            }
+        ];
+
+        /* INITIALIZATION */
+        window.onload = function() {
+            document.getElementById('cert-date').innerText = new Date().toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            renderRound1();
+            initRound2();
+            renderRound3();
+            initSimulator();
+            updateScoreboard();
+        };
+
+        function updateScoreboard() {
+            document.getElementById('player-score').innerText = state.score;
+            document.getElementById('streak-count').innerText = state.streak;
+
+            // Determine Rank
+            let currentRank = "ROOKIE";
+            for (let r of RANKS) {
+                if (state.score >= r.threshold) currentRank = r.title;
+            }
+            document.getElementById('player-rank').innerText = currentRank;
+        }
+
+        function addScore(pts) {
+            state.score += pts;
+            state.streak++;
+            if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+
+            // Trigger streak pop up if streak >= 2
+            if (state.streak >= 2) {
+                const banner = document.getElementById('streak-banner');
+                const text = document.getElementById('streak-banner-text');
+                const icon = document.getElementById('streak-banner-icon');
+
+                if (state.streak === 2) { text.innerText = "DOUBLE PLAY! 2 IN A ROW!"; icon.innerText = "🔥"; }
+                else if (state.streak === 3) { text.innerText = "HAT-TRICK! 3 IN A ROW!"; icon.innerText = "⚡"; }
+                else { text.innerText = `UNSTOPPABLE! ${state.streak} STREAK!`; icon.innerText = "🏆"; }
+
+                banner.classList.remove('hidden');
+                setTimeout(() => banner.classList.add('hidden'), 1800);
+            }
+
+            updateScoreboard();
+        }
+
+        function resetStreak() {
+            state.streak = 0;
+            updateScoreboard();
+        }
+
+        function switchRound(num) {
+            playSound('click');
+            state.currentRound = num;
+
+            // Update UI stage visibility
+            document.querySelectorAll('.round-stage').forEach((el, idx) => {
+                el.classList.toggle('hidden', idx !== (num - 1));
+            });
+
+            // Update Tab styles
+            for (let i = 1; i <= 4; i++) {
+                const tab = document.getElementById(`nav-round-${i}`);
+                if (i === num) {
+                    tab.className = "flex-1 min-w-[130px] py-2.5 px-3 rounded-xl font-bold text-xs md:text-sm transition flex items-center justify-center gap-2 bg-blue-900/90 text-white shadow border border-blue-400/40";
+                } else {
+                    tab.className = "flex-1 min-w-[130px] py-2.5 px-3 rounded-xl font-bold text-xs md:text-sm transition flex items-center justify-center gap-2 bg-slate-800/80 text-slate-400 hover:text-white";
+                }
+            }
+
+            if (num === 4) {
+                renderGrid();
+            }
+        }
+
+        /* ROUND 1 LOGIC */
+        function renderRound1() {
+            const container = document.getElementById('r1-questions-container');
+            container.innerHTML = '';
+
+            R1_DATA.forEach((q, idx) => {
+                let html = `
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <p class="text-sm md:text-base font-bold text-white mb-3">${idx + 1}. ${q.question}</p>
+                        <div class="space-y-2">
+                `;
+                q.options.forEach((opt, oIdx) => {
+                    html += `
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800/80 border border-slate-800 cursor-pointer transition text-xs md:text-sm">
+                            <input type="radio" name="r1-q${idx}" value="${oIdx}" class="text-amber-500 focus:ring-amber-500 bg-slate-950 border-slate-700">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+                html += `</div></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function checkRound1() {
+            let correctCount = 0;
+            R1_DATA.forEach((q, idx) => {
+                const selected = document.querySelector(`input[name="r1-q${idx}"]:checked`);
+                if (selected && parseInt(selected.value) === q.correct) {
+                    correctCount++;
+                }
+            });
+
+            const feedback = document.getElementById('r1-feedback');
+            if (correctCount === R1_DATA.length) {
+                playSound('correct');
+                feedback.className = "text-sm font-bold text-emerald-400";
+                feedback.innerText = " Perfect Warmup Drill! Sequence rules mastered! (+100 PTS)";
+                if (!state.completedRounds[0]) {
+                    state.completedRounds[0] = true;
+                    document.getElementById('badge-round-1').classList.remove('hidden');
+                    addScore(100);
+                }
+                setTimeout(() => switchRound(2), 1200);
+            } else {
+                playSound('wrong');
+                resetStreak();
+                feedback.className = "text-sm font-bold text-amber-400";
+                feedback.innerText = `⚠️ You got ${correctCount}/${R1_DATA.length} correct. Review and try again!`;
+            }
+        }
+
+        /* ROUND 2 LOGIC (Sequencing) */
+        function initRound2() {
+            r2CurrentState = [...R2_ITEMS_CORRECT].sort(() => Math.random() - 0.5);
+            renderRound2List();
+        }
+
+        let selectedR2Index = null;
+
+        function renderRound2List() {
+            const container = document.getElementById('r2-sequence-list');
+            container.innerHTML = '';
+
+            r2CurrentState.forEach((item, idx) => {
+                const isSelected = selectedR2Index === idx;
+                const div = document.createElement('div');
+                div.className = `p-3.5 rounded-xl border flex items-center justify-between cursor-pointer transition ${
+                    isSelected 
+                        ? 'bg-amber-500/20 border-amber-400 text-white font-bold' 
+                        : 'bg-slate-950 border-slate-800 hover:border-slate-700 text-slate-200'
+                }`;
+                div.onclick = () => handleR2ItemClick(idx);
+
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-mono font-bold text-amber-400">
+                            ${idx + 1}
+                        </span>
+                        <span class="text-xs md:text-sm font-medium">${item}</span>
+                    </div>
+                    <span class="text-xs text-slate-500">${isSelected ? 'Selected 🎯' : 'Tap to Swap'}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function handleR2ItemClick(idx) {
+            playSound('click');
+            if (selectedR2Index === null) {
+                selectedR2Index = idx;
+            } else if (selectedR2Index === idx) {
+                selectedR2Index = null;
+            } else {
+                const temp = r2CurrentState[selectedR2Index];
+                r2CurrentState[selectedR2Index] = r2CurrentState[idx];
+                r2CurrentState[idx] = temp;
+                selectedR2Index = null;
+            }
+            renderRound2List();
+        }
+
+        function resetRound2() {
+            playSound('click');
+            selectedR2Index = null;
+            initRound2();
+            document.getElementById('r2-feedback').innerText = '';
+        }
+
+        function checkRound2() {
+            let isCorrect = true;
+            for (let i = 0; i < R2_ITEMS_CORRECT.length; i++) {
+                if (r2CurrentState[i] !== R2_ITEMS_CORRECT[i]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            const feedback = document.getElementById('r2-feedback');
+            if (isCorrect) {
+                playSound('correct');
+                feedback.className = "text-sm font-bold text-emerald-400";
+                feedback.innerText = " Touchdown! Canvas LMS sequence executed in perfect order! (+100 PTS)";
+                if (!state.completedRounds[1]) {
+                    state.completedRounds[1] = true;
+                    document.getElementById('badge-round-2').classList.remove('hidden');
+                    addScore(100);
+                }
+                setTimeout(() => switchRound(3), 1200);
+            } else {
+                playSound('wrong');
+                resetStreak();
+                feedback.className = "text-sm font-bold text-amber-400";
+                feedback.innerText = "⚠️ Logical Order Error! The sequence steps are out of order. Tap to swap!";
+            }
+        }
+
+        /* ROUND 3 LOGIC (Debugging) */
+        function renderRound3() {
+            const container = document.getElementById('r3-questions-container');
+            container.innerHTML = '';
+
+            R3_DATA.forEach((q, idx) => {
+                let html = `
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <p class="text-xs text-amber-400 font-bold uppercase tracking-wider mb-1">Scenario ${idx + 1}</p>
+                        <p class="text-xs md:text-sm font-semibold text-slate-200 mb-3 leading-relaxed">${q.scenario}</p>
+                        <div class="space-y-2">
+                `;
+                q.options.forEach((opt, oIdx) => {
+                    html += `
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800/80 border border-slate-800 cursor-pointer transition text-xs md:text-sm">
+                            <input type="radio" name="r3-q${idx}" value="${oIdx}" class="text-amber-500 focus:ring-amber-500 bg-slate-950 border-slate-700">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+                html += `</div></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function checkRound3() {
+            let correctCount = 0;
+            R3_DATA.forEach((q, idx) => {
+                const selected = document.querySelector(`input[name="r3-q${idx}"]:checked`);
+                if (selected && parseInt(selected.value) === q.correct) {
+                    correctCount++;
+                }
+            });
+
+            const feedback = document.getElementById('r3-feedback');
+            if (correctCount === R3_DATA.length) {
+                playSound('correct');
+                feedback.className = "text-sm font-bold text-emerald-400";
+                feedback.innerText = " Whistle blown! All missing steps identified! (+100 PTS)";
+                if (!state.completedRounds[2]) {
+                    state.completedRounds[2] = true;
+                    document.getElementById('badge-round-3').classList.remove('hidden');
+                    addScore(100);
+                }
+                setTimeout(() => switchRound(4), 1200);
+            } else {
+                playSound('wrong');
+                resetStreak();
+                feedback.className = "text-sm font-bold text-amber-400";
+                feedback.innerText = "⚠️ Missed a logical bug! Review step dependencies and try again.";
+            }
+        }
+
+        /* ROUND 4 LOGIC (Play Call Simulator + Code Generator) */
+        function initSimulator() {
+            state.playerPos = { r: 4, c: 0 };
+            state.playerDir = 0; // facing UP
+            state.goalPos = { r: 0, c: 4 }; // ALWAYS ALWAYS x: 4, y: 0 (Row 0, Col 4)
+            renderGrid();
+            renderQueue();
+        }
+
+        function resetSimulator() {
+            if (state.isSimulating) return;
+            playSound('click');
+            state.commandQueue = [];
+            initSimulator();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('simulator-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            for (let r = 0; r < 5; r++) {
+                for (let c = 0; c < 5; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = "grid-cell bg-slate-900/80 border border-slate-800/80 rounded-xl flex items-center justify-center relative text-lg font-bold shadow-inner";
+
+                    const isGoal = (r === state.goalPos.r && c === state.goalPos.c);
+                    const isDefender = state.defenders.some(d => d.r === r && d.c === c);
+                    const isPlayer = (r === state.playerPos.r && c === state.playerPos.c);
+
+                    // Render Goal Post Cell
+                    if (isGoal) {
+                        cell.classList.add('bg-amber-500/10', 'border-amber-500/40');
+                    }
+
+                    // Render Defender Cell
+                    if (isDefender) {
+                        cell.classList.add('bg-red-500/10', 'border-red-500/30');
+                    }
+
+                    // Render Player Cell
+                    if (isPlayer) {
+                        cell.classList.add('bg-emerald-500/20', 'border-emerald-400');
+                    }
+
+                    // Inner Element Render (Priority: Player > Defender / Goal)
+                    if (isPlayer && isGoal) {
+                        // Player on top of goal cell
+                        const arrows = ['⬆️', '➡️', '⬇️', '⬅️'];
+                        cell.innerHTML = `
+                            <div class="flex flex-col items-center leading-none">
+                                <span class="text-lg">🏃‍♂️⚽</span>
+                                <span class="text-[9px] text-amber-400 font-bold">${arrows[state.playerDir]}</span>
+                            </div>
+                        `;
+                    } else if (isPlayer) {
+                        const arrows = ['⬆️', '➡️', '⬇️', '⬅️'];
+                        cell.innerHTML = `
+                            <div class="flex flex-col items-center leading-none">
+                                <span class="text-lg">🏃‍♂️</span>
+                                <span class="text-[9px]">${arrows[state.playerDir]}</span>
+                            </div>
+                        `;
+                    } else if (isGoal) {
+                        cell.innerHTML = '<span class="text-xl">🥅</span>';
+                    } else if (isDefender) {
+                        cell.innerHTML = '<span class="text-xl">🛡️</span>';
+                    }
+
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        function addCommand(cmd) {
+            if (state.isSimulating) return;
+            if (state.commandQueue.length >= 12) {
+                playSound('wrong');
+                return;
+            }
+            playSound('click');
+            state.commandQueue.push(cmd);
+            renderQueue();
+            if (!document.getElementById('code-modal').classList.contains('hidden')) {
+                updateCodeDisplay();
+            }
+        }
+
+        function clearCommandQueue() {
+            if (state.isSimulating) return;
+            playSound('click');
+            state.commandQueue = [];
+            renderQueue();
+            if (!document.getElementById('code-modal').classList.contains('hidden')) {
+                updateCodeDisplay();
+            }
+        }
+
+        function renderQueue() {
+            const container = document.getElementById('command-queue-display');
+            const counter = document.getElementById('queue-counter');
+            counter.innerText = `${state.commandQueue.length} / 12 Slots`;
+
+            if (state.commandQueue.length === 0) {
+                container.innerHTML = '<p class="text-slate-500 text-center py-8 italic">No commands added. Click action blocks above!</p>';
+                return;
+            }
+
+            const names = {
+                'FORWARD': 'MOVE_FORWARD()',
+                'TURN_RIGHT': 'TURN_RIGHT()',
+                'TURN_LEFT': 'TURN_LEFT()',
+                'SHOOT': 'KICK_GOAL()'
+            };
+
+            const colors = {
+                'FORWARD': 'text-blue-400 border-blue-500/30 bg-blue-950/40',
+                'TURN_RIGHT': 'text-indigo-400 border-indigo-500/30 bg-indigo-950/40',
+                'TURN_LEFT': 'text-indigo-400 border-indigo-500/30 bg-indigo-950/40',
+                'SHOOT': 'text-amber-400 border-amber-500/30 bg-amber-950/40'
+            };
+
+            container.innerHTML = '';
+            state.commandQueue.forEach((cmd, idx) => {
+                const item = document.createElement('div');
+                item.className = `p-2 rounded-lg border font-mono text-xs flex justify-between items-center ${colors[cmd]}`;
+                item.innerHTML = `
+                    <span><strong class="text-slate-400 mr-2">${idx + 1}.</strong>${names[cmd]}</span>
+                    <button onclick="removeCommand(${idx})" class="text-slate-500 hover:text-red-400 text-xs px-1">✕</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function removeCommand(idx) {
+            if (state.isSimulating) return;
+            playSound('click');
+            state.commandQueue.splice(idx, 1);
+            renderQueue();
+            if (!document.getElementById('code-modal').classList.contains('hidden')) {
+                updateCodeDisplay();
+            }
+        }
+
+        async function runPlaySimulation() {
+            if (state.isSimulating || state.commandQueue.length === 0) return;
+            state.isSimulating = true;
+            document.getElementById('btn-run-play').disabled = true;
+
+            // Reset player position for run
+            state.playerPos = { r: 4, c: 0 };
+            state.playerDir = 0;
+            renderGrid();
+
+            let hitObstacle = false;
+            let scoredGoal = false;
+
+            for (let i = 0; i < state.commandQueue.length; i++) {
+                const cmd = state.commandQueue[i];
+                await new Promise(r => setTimeout(r, 450));
+
+                if (cmd === 'TURN_RIGHT') {
+                    state.playerDir = (state.playerDir + 1) % 4;
+                    playSound('click');
+                } else if (cmd === 'TURN_LEFT') {
+                    state.playerDir = (state.playerDir + 3) % 4;
+                    playSound('click');
+                } else if (cmd === 'FORWARD') {
+                    let nr = state.playerPos.r;
+                    let nc = state.playerPos.c;
+
+                    if (state.playerDir === 0) nr--; // Up
+                    else if (state.playerDir === 1) nc++; // Right
+                    else if (state.playerDir === 2) nr++; // Down
+                    else if (state.playerDir === 3) nc--; // Left
+
+                    // Check bounds
+                    if (nr < 0 || nr >= 5 || nc < 0 || nc >= 5) {
+                        hitObstacle = true;
+                        playSound('wrong');
+                        break;
+                    }
+
+                    // Check defenders
+                    if (state.defenders.some(d => d.r === nr && d.c === nc)) {
+                        hitObstacle = true;
+                        playSound('wrong');
+                        break;
+                    }
+
+                    state.playerPos = { r: nr, c: nc };
+                    playSound('click');
+                } else if (cmd === 'SHOOT') {
+                    if (state.playerPos.r === state.goalPos.r && state.playerPos.c === state.goalPos.c) {
+                        scoredGoal = true;
+                    } else {
+                        hitObstacle = true;
+                    }
+                    break;
+                }
+
+                renderGrid();
+            }
+
+            state.isSimulating = false;
+            document.getElementById('btn-run-play').disabled = false;
+
+            if (scoredGoal) {
+                playSound('whistle');
+                playSound('correct');
+                confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+
+                if (!state.completedRounds[3]) {
+                    state.completedRounds[3] = true;
+                    document.getElementById('badge-round-4').classList.remove('hidden');
+                    addScore(150);
+                }
+
+                setTimeout(() => {
+                    openCodeModal();
+                    setTimeout(() => showSummaryScreen(), 2800);
+                }, 800);
+
+            } else {
+                playSound('wrong');
+                resetStreak();
+                alert("⚠️ Play Tackle! The play sequence was tackled by defenders or went out of bounds. Modify your queue and try again!");
+            }
+        }
+
+        /* GENERATED CODE INSPECTOR CODE GENERATOR */
+        function switchCodeTab(lang) {
+            playSound('click');
+            state.activeCodeTab = lang;
+            ['python', 'java', 'cpp'].forEach(l => {
+                const btn = document.getElementById(`tab-code-${l}`);
+                if (l === lang) {
+                    btn.className = "flex-1 py-1.5 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow";
+                } else {
+                    btn.className = "flex-1 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white";
+                }
+            });
+            updateCodeDisplay();
+        }
+
+        function openCodeModal() {
+            playSound('click');
+            updateCodeDisplay();
+            document.getElementById('code-modal').classList.remove('hidden');
+        }
+
+        function closeCodeModal() {
+            playSound('click');
+            document.getElementById('code-modal').classList.add('hidden');
+        }
+
+        function updateCodeDisplay() {
+            const pre = document.getElementById('code-content');
+            const cmds = state.commandQueue;
+
+            if (cmds.length === 0) {
+                pre.innerHTML = '<span class="token-comment">// Add commands to the simulator queue to see generated code here!</span>';
+                return;
+            }
+
+            let code = '';
+            if (state.activeCodeTab === 'python') {
+                code += `<span class="token-comment"># --- UVA Lynx Tactic Sequence (Python 3) ---</span>\n`;
+                code += `<span class="token-keyword">from</span> uva_sports <span class="token-keyword">import</span> AthleteRobot\n\n`;
+                code += `player = AthleteRobot(start_x=<span class="token-number">0</span>, start_y=<span class="token-number">4</span>)\n\n`;
+                code += `<span class="token-keyword">def</span> <span class="token-fn">execute_playbook</span>():\n`;
+                cmds.forEach(cmd => {
+                    if (cmd === 'FORWARD') code += `    player.<span class="token-fn">move_forward</span>()\n`;
+                    if (cmd === 'TURN_RIGHT') code += `    player.<span class="token-fn">turn_right</span>()\n`;
+                    if (cmd === 'TURN_LEFT') code += `    player.<span class="token-fn">turn_left</span>()\n`;
+                    if (cmd === 'SHOOT') code += `    player.<span class="token-fn">kick_goal</span>()\n`;
+                });
+                code += `\n<span class="token-comment"># Sequence Execution</span>\nexecute_playbook()`;
+
+            } else if (state.activeCodeTab === 'java') {
+                code += `<span class="token-comment">// --- UVA Lynx Tactic Sequence (Java 17) ---</span>\n`;
+                code += `<span class="token-keyword">public class</span> <span class="token-class">PlaybookSequence</span> {\n`;
+                code += `    <span class="token-keyword">public static void</span> <span class="token-fn">main</span>(String[] args) {\n`;
+                code += `        AthleteRobot player = <span class="token-keyword">new</span> AthleteRobot(<span class="token-number">0</span>, <span class="token-number">4</span>);\n\n`;
+                cmds.forEach(cmd => {
+                    if (cmd === 'FORWARD') code += `        player.<span class="token-fn">moveForward</span>();\n`;
+                    if (cmd === 'TURN_RIGHT') code += `        player.<span class="token-fn">turnRight</span>();\n`;
+                    if (cmd === 'TURN_LEFT') code += `        player.<span class="token-fn">turnLeft</span>();\n`;
+                    if (cmd === 'SHOOT') code += `        player.<span class="token-fn">kickGoal</span>();\n`;
+                });
+                code += `    }\n}`;
+
+            } else if (state.activeCodeTab === 'cpp') {
+                code += `<span class="token-comment">// --- UVA Lynx Tactic Sequence (C++ 20) ---</span>\n`;
+                code += `<span class="token-keyword">#include</span> <span class="token-string">&lt;iostream&gt;</span>\n`;
+                code += `<span class="token-keyword">#include</span> <span class="token-string">"UvaSports.h"</span>\n\n`;
+                code += `<span class="token-keyword">int</span> <span class="token-fn">main</span>() {\n`;
+                code += `    AthleteRobot player(<span class="token-number">0</span>, <span class="token-number">4</span>);\n\n`;
+                cmds.forEach(cmd => {
+                    if (cmd === 'FORWARD') code += `    player.<span class="token-fn">moveForward</span>();\n`;
+                    if (cmd === 'TURN_RIGHT') code += `    player.<span class="token-fn">turnRight</span>();\n`;
+                    if (cmd === 'TURN_LEFT') code += `    player.<span class="token-fn">turnLeft</span>();\n`;
+                    if (cmd === 'SHOOT') code += `    player.<span class="token-fn">kickGoal</span>();\n`;
+                });
+                code += `    <span class="token-keyword">return</span> <span class="token-number">0</span>;\n}`;
+            }
+
+            pre.innerHTML = code;
+        }
+
+        /* FINAL SUMMARY & RESTART */
+        function showSummaryScreen() {
+            document.querySelectorAll('.round-stage').forEach(el => el.classList.add('hidden'));
+            document.getElementById('round-summary').classList.remove('hidden');
+
+            document.getElementById('final-score').innerText = state.score;
+            document.getElementById('final-streak').innerText = state.maxStreak;
+
+            let finalRank = "ROOKIE";
+            for (let r of RANKS) {
+                if (state.score >= r.threshold) finalRank = r.title;
+            }
+            document.getElementById('final-rank').innerText = finalRank;
+
+            confetti({ particleCount: 160, spread: 90, origin: { y: 0.5 } });
+        }
+
+        function restartGame() {
+            state.score = 0;
+            state.streak = 0;
+            state.maxStreak = 0;
+            state.completedRounds = [false, false, false, false];
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`badge-round-${i}`).classList.add('hidden');
+            }
+            initSimulator();
+            updateScoreboard();
+            switchRound(1);
+        }
+    </script>
+</body>
+</html>
