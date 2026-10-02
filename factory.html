@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Code Factory: If-Then Shift</title>
+<!-- Built with LessonSaver Games · University View Academy -->
+<style>:root{--p:#3E4A56;--s:#1F2933;--a:#F59E0B}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#05081a;font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+#frame{position:absolute;width:960px;height:540px;transform-origin:0 0;overflow:hidden;border-radius:6px}
+#game{position:absolute;inset:0;width:960px;height:540px;display:block;cursor:pointer}
+#hud{position:absolute;top:0;left:0;right:0;height:50px;display:flex;align-items:center;gap:10px;padding:0 10px;background:linear-gradient(180deg,rgba(6,10,30,.92),rgba(6,10,30,.65));color:#fff;z-index:5;pointer-events:none}
+#hud .grp{display:flex;align-items:center;gap:8px}
+.shield{width:34px;height:34px;border-radius:9px 9px 16px 16px;background:linear-gradient(160deg,var(--p),var(--s));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+#hSchool{font-size:11px;opacity:.8;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hMatch{font-weight:900;font-size:12px;letter-spacing:1px;color:var(--a)}
+#hTitle{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px}
+#hGoal{flex:1;text-align:center;font-weight:700;font-size:14px;color:#ffe9a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.board{background:#000;border:2px solid #333;border-radius:6px;padding:2px 8px;font-family:"Courier New",monospace;font-weight:900;color:#ffd23f;font-size:20px;min-width:70px;text-align:right;text-shadow:0 0 6px rgba(255,210,63,.7)}
+.lbl{font-size:9px;opacity:.7;letter-spacing:1px;text-align:center}
+#hStreak{font-weight:900;font-size:15px;color:#ff9f43;min-width:44px}
+#hRank{background:linear-gradient(135deg,var(--a),var(--p));padding:4px 10px;border-radius:20px;font-weight:900;font-size:12px;letter-spacing:1px;text-transform:uppercase;box-shadow:0 0 10px rgba(255,255,255,.25)}
+.ibtn{pointer-events:auto;background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:8px;width:32px;height:32px;font-size:16px;cursor:pointer}
+.ibtn.off{opacity:.4}
+#progWrap{position:absolute;top:50px;left:0;right:0;height:4px;background:rgba(0,0,0,.35);z-index:5}
+#hProg{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a));transition:width .5s}
+.ov{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:10}
+.ov.show{display:flex}
+.panel{background:#fff;border-radius:22px;padding:26px 30px;box-shadow:0 20px 60px rgba(0,0,0,.45);max-width:620px;text-align:center;color:#1d1d2c;animation:popIn .35s cubic-bezier(.2,1.4,.4,1)}
+@keyframes popIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.btn{margin-top:16px;border:0;border-radius:40px;padding:14px 34px;font-size:20px;font-weight:900;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--p),var(--s));box-shadow:0 6px 0 rgba(0,0,0,.25);transition:transform .1s}
+.btn:hover{transform:translateY(-2px)}.btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+#title{background:radial-gradient(circle at 50% 30%,var(--s),#060a24 75%);flex-direction:column;color:#fff;text-align:center}
+#tSchool{letter-spacing:3px;font-size:13px;font-weight:800;color:var(--a);text-transform:uppercase}
+#tTitle{font-size:44px;font-weight:900;margin:8px 30px;text-shadow:0 4px 0 rgba(0,0,0,.35);line-height:1.1}
+#tSub{font-size:18px;opacity:.85}
+#tObj{list-style:none;margin:16px auto 0;max-width:620px;font-size:14px;opacity:.9}
+#tObj li{margin:4px 0}#tObj li:before{content:"★  ";color:var(--a)}
+#title .btn{font-size:26px;padding:16px 54px;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.ctl{margin-top:14px;font-size:13px;opacity:.7}
+#card{background:rgba(5,8,26,.55);cursor:pointer}
+#cardBox{text-align:center;color:#fff;animation:slide .5s ease-out}
+@keyframes slide{from{transform:translateX(-120px);opacity:0}to{transform:none;opacity:1}}
+#cardK{display:inline-block;background:var(--a);color:#111;font-weight:900;letter-spacing:3px;padding:6px 18px;border-radius:6px;font-size:16px}
+#cardT{font-size:50px;font-weight:900;margin-top:10px;text-shadow:0 5px 0 rgba(0,0,0,.4)}
+#cardS{font-size:19px;margin-top:6px;opacity:.9;max-width:700px}
+#choices{align-items:flex-end;padding-bottom:14px;pointer-events:none}
+#choices .wrap{pointer-events:auto;width:920px;background:linear-gradient(180deg,rgba(10,14,40,.94),rgba(10,14,40,.98));border:3px solid var(--p);border-radius:18px;padding:12px 14px;box-shadow:0 -6px 30px rgba(0,0,0,.4);animation:up .3s ease-out}
+@keyframes up{from{transform:translateY(80px);opacity:0}to{transform:none;opacity:1}}
+#cPrompt{color:#fff;font-weight:800;font-size:18px;margin:0 4px 10px}
+#cList{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choice{display:flex;align-items:center;gap:10px;text-align:left;border:0;border-radius:12px;padding:11px 12px;font-size:16px;font-weight:700;background:#fff;color:#1d1d2c;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.3);transition:transform .1s,background .1s;min-height:54px}
+.choice:hover{transform:translateY(-2px);background:#fff8d6}
+.choice:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+.key{flex:none;width:28px;height:28px;border-radius:8px;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900}
+#coach{background:rgba(5,8,26,.35)}
+.coachH{font-size:30px;font-weight:900;margin-bottom:8px}
+.coachH.best{color:#16a34a}.coachH.okay{color:#d97706}.coachH.poor{color:#dc2626}
+#coachB{font-size:18px;line-height:1.45}
+#coachO{margin-top:12px;font-size:13px;color:#555;background:#f1f5ff;border-radius:10px;padding:8px 12px;display:inline-block}
+#coachO:empty{display:none}
+#mg{background:rgba(5,8,26,.45)}
+#mgT{font-size:30px;font-weight:900;color:var(--s)}
+#mgI{font-size:18px;margin-top:8px;line-height:1.4}
+.legend{display:flex;gap:10px;justify-content:center;margin-top:12px;font-weight:800;font-size:15px}
+.legend span:empty{display:none}.legend span{background:#f1f5ff;border-radius:10px;padding:6px 12px}
+#finale{background:rgba(5,8,26,.25);align-items:flex-start;padding-top:62px}
+#finale .panel{max-width:700px;padding:18px 26px}
+#fT{font-size:32px;font-weight:900;color:var(--s)}
+#fM{font-size:16px;margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:12px}
+.stat{background:#0b1030;color:#fff;border-radius:10px;padding:8px 4px}
+.stat b{display:block;font-size:20px;color:#ffd23f;font-family:"Courier New",monospace}
+.stat i{font-style:normal;font-size:10px;letter-spacing:1px;opacity:.75;text-transform:uppercase}
+#fList{list-style:none;text-align:left;margin-top:10px;font-size:14px}
+#fList li{padding:3px 0}#fList li:before{content:"✅  "}
+#toast{position:absolute;top:66px;left:50%;transform:translateX(-50%) translateY(-20px);background:rgba(10,14,40,.92);color:#fff;font-weight:800;padding:10px 20px;border-radius:30px;border:2px solid var(--a);opacity:0;transition:all .3s;z-index:12;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#info{position:absolute;top:66px;right:14px;width:300px;background:#fffdf0;border:3px solid #7a5230;border-radius:14px;padding:12px 14px;z-index:6;display:none;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#info.show{display:block;animation:popIn .3s}
+#infoT{font-weight:900;color:#7a5230;font-size:15px}#infoT:before{content:"📌  "}
+#infoB{font-size:14px;margin-top:4px;line-height:1.4;color:#333}
+#hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(10,14,40,.85);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;z-index:6;display:none}
+#hint.show{display:block}
+#fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .4s;z-index:20}
+#fade.show{opacity:1}
+#touch{position:absolute;bottom:12px;left:12px;right:12px;display:none;justify-content:space-between;z-index:7;pointer-events:none}
+#touch .tb{pointer-events:auto;width:70px;height:70px;border-radius:50%;border:3px solid rgba(255,255,255,.6);background:rgba(10,14,40,.45);color:#fff;font-size:28px;font-weight:900}
+@media (pointer:coarse){#touch{display:flex}}
+</style>
+</head>
+<body>
+
+<div id="frame">
+  <canvas id="game"></canvas>
+  <div id="hud">
+    <div class="grp"><div class="shield" id="hInit">UVA</div><div><div id="hMatch"></div><div id="hTitle"></div></div></div>
+    <div id="hGoal"></div>
+    <div class="grp"><div><div class="lbl">SCORE</div><div class="board" id="hScore">0</div></div>
+    <div><div class="lbl">STREAK</div><div id="hStreak">—</div></div><div id="hRank"></div>
+    <button class="ibtn" id="readBtn" title="Read aloud">🗣️</button><button class="ibtn" id="muteBtn" title="Sound">🔊</button></div>
+    <span id="hSchool" style="display:none"></span>
+  </div>
+  <div id="progWrap"><div id="hProg"></div></div>
+  <div id="info"><div id="infoT"></div><div id="infoB"></div></div>
+  <div id="toast"></div>
+  <div id="hint">← → walk · ↑ jump · Space/E talk — or just tap where you want to go!</div>
+  <div id="touch"><div><button class="tb" id="tLeft">◀</button> <button class="tb" id="tRight">▶</button></div><div><button class="tb" id="tJump">⬆</button> <button class="tb" id="tTalk">💬</button></div></div>
+  <div class="ov" id="choices"><div class="wrap"><div id="cPrompt"></div><div id="cList"></div></div></div>
+  <div class="ov" id="coach"><div class="panel"><div id="coachH" class="coachH"></div><div id="coachB"></div><div id="coachO"></div><br><button class="btn" id="coachBtn">Continue</button></div></div>
+  <div class="ov" id="mg"><div class="panel"><div id="mgT"></div><div id="mgI"></div><div class="legend"><span id="mgG"></span><span id="mgB"></span></div><button class="btn" id="mgBtn">Start! ▶</button></div></div>
+  <div class="ov" id="card"><div id="cardBox"><div id="cardK"></div><div id="cardT"></div><div id="cardS"></div></div></div>
+  <div class="ov" id="finale"><div class="panel"><div id="fT"></div><div id="fM"></div>
+    <div class="stats"><div class="stat"><b id="fScore"></b><i>Score</i></div><div class="stat"><b id="fRank" style="font-size:13px"></b><i>Rank</i></div><div class="stat"><b id="fBest"></b><i>Best picks</i></div><div class="stat"><b id="fStreak"></b><i>Top streak</i></div><div class="stat"><b id="fTeam"></b><i>Teammates</i></div><div class="stat"><b id="fFacts"></b><i>Facts</i></div></div>
+    <ul id="fList"></ul><button class="btn" id="againBtn">↺ Play again</button></div></div>
+  <div class="ov show" id="title"><div id="tSchool"></div><div id="tTitle"></div><div id="tSub"></div><ul id="tObj"></ul>
+    <button class="btn" id="playBtn">▶ PLAY</button><div class="ctl">Walk with ← → (or tap) · Jump with ↑ · Talk with Space</div></div>
+  <div id="fade"></div>
+</div>
+
+<script>window.GAME_DATA = {"title":"Code Factory: If-Then Shift","subtitle":"Build game logic on the University View Academy factory floor.","school":"University View Academy","gradeBand":"HS","readAloud":false,"objectives":["Define a conditional statement as code that makes a decision.","Spot patterns in game logic that follow simple rules.","Build clear if-then rules for basic game situations.","Explain how computer decisions change game outcomes."],"theme":{"name":"Industrial Codeworks","primary":"#3E4A56","secondary":"#1F2933","accent":"#F59E0B","challengeWord":"Manufacturing Mi","rankNames":["Operator","Technician","Supervisor","Plant Manager"],"streakCallouts":["Quality Chain!","Production Peak!","Efficiency Surge!","Efficiency Champion!"],"verdicts":{"best":"Precision Build ✅","okay":"Needs Calibration ⚙️","poor":"System Jam ⚠️"},"coinName":"Gear Tokens"},"player":{"name":"Builder Bob","look":{"skin":"#C68642","hair":"#3B2416","hairStyle":"short","shirt":"#F59E0B","pants":"#1F2933","accessory":"cap"}},"characters":[{"id":"maya","name":"Maya","role":"Sensor Technician","type":"kid","look":{"skin":"#8D5524","hair":"#111827","hairStyle":"braids","shirt":"#2563EB","pants":"#334155","accessory":"glasses"}},{"id":"jamal","name":"Jamal","role":"Process Analyst","type":"kid","look":{"skin":"#5C4033","hair":"#0F172A","hairStyle":"afro","shirt":"#10B981","pants":"#111827","accessory":"none"}},{"id":"andre","name":"Andre","role":"Game Mechanic","type":"kid","look":{"skin":"#D2A679","hair":"#2B1B0E","hairStyle":"buzz","shirt":"#DC2626","pants":"#374151","accessory":"headband"}},{"id":"lina","name":"Lina","role":"Pattern Inspector","type":"kid","look":{"skin":"#F1C27D","hair":"#3B2F2F","hairStyle":"ponytail","shirt":"#7C3AED","pants":"#1E293B","accessory":"none"}},{"id":"noah","name":"Noah","role":"Rule Assembler","type":"kid","look":{"skin":"#FFDBAC","hair":"#8B5A2B","hairStyle":"spiky","shirt":"#0891B2","pants":"#334155","accessory":"glasses"}},{"id":"priya","name":"Priya","role":"Simulation Designer","type":"kid","look":{"skin":"#A0522D","hair":"#1F1300","hairStyle":"long","shirt":"#E11D48","pants":"#273449","accessory":"bow"}},{"id":"carter","name":"Carter","role":"Debug Lead","type":"kid","look":{"skin":"#E0AC69","hair":"#111111","hairStyle":"curly","shirt":"#EA580C","pants":"#1F2937","accessory":"cap"}},{"id":"val","name":"Supervisor Val","role":"Factory Floor Supervisor","type":"adult","look":{"skin":"#6B4423","hair":"#4B5563","hairStyle":"bun","shirt":"#475569","pants":"#111827","accessory":"whistle"}}],"scenes":[{"id":"blueprint_bay","title":"Blueprint Bay","setting":"lab","timeOfDay":"day","subtitle":"Calibrate the meaning of conditional statements.","props":[{"type":"desk","x":0.12,"size":1},{"type":"table","x":0.38,"size":1.1},{"type":"plant","x":0.62,"size":0.8},{"type":"emoji","x":0.82,"emoji":"⚙️","size":1.4}],"signs":[{"x":0.2,"title":"Factory Fact","text":"A conditional statement tells a program to run code only when a condition is true."},{"x":0.7,"title":"If-Then Blueprint","text":"Basic structure: if condition is true, then do an action; else, do another action."}],"ambient":[{"npc":"val","x":0.08,"mood":"neutral","lines":[{"speaker":"val","text":"Builder Bob, University View Academy needs this logic line running before the next code inspection.","emotion":"neutral","emote":"exclaim"}]}],"encounters":[{"npc":"maya","x":0.35,"mood":"worried","intro":[{"speaker":"maya","text":"The badge scanner keeps opening the factory gate for everyone, even invalid badges.","emotion":"worried","emote":"cloud"},{"speaker":"maya","text":"I know it needs a decision, but I do not want to describe it so vaguely that the programmers miss the logic.","emotion":"worried","emote":"question"}],"prompt":"What definition should Builder Bob give Maya?","objective":"Define what a conditional statement is in computer code.","choices":[{"text":"A conditional is any line that makes the game faster.","quality":"poor","playerLine":"A conditional is basically speed code that helps the game run faster.","reaction":[{"speaker":"maya","text":"That sounds useful, but it does not tell me how the scanner decides who gets in.","emotion":"sad","emote":"tear"}],"feedback":"Performance and decision-making are different ideas. A conditional is about choosing actions based on whether a condition is true or false."},{"text":"A conditional is code that stores a value for later.","quality":"poor","playerLine":"It is code that stores a value so the scanner remembers the badge.","reaction":[{"speaker":"maya","text":"That sounds more like a variable. My gate still needs a decision rule.","emotion":"worried","emote":"question"}],"feedback":"Storing data is the role of variables. Conditional statements use conditions to decide which code should run."},{"text":"A conditional runs actions based on whether a condition is true.","quality":"best","playerLine":"A conditional statement checks a condition, like badgeValid, and runs an action only if that condition is true.","reaction":[{"speaker":"maya","text":"Perfect. If badgeValid is true, open the gate; otherwise, keep it locked.","emotion":"happy","emote":"sparkle"}],"feedback":"Correct. Conditional statements let programs make decisions by testing true-or-false conditions and choosing the matching action."},{"text":"A conditional is a comment explaining what code should do.","quality":"okay","playerLine":"It is like a note explaining when the gate should open.","reaction":[{"speaker":"maya","text":"A note helps humans, but I need something the computer actually executes.","emotion":"neutral","emote":"none"}],"feedback":"This is close in purpose but not technically accurate. Comments explain code; conditionals are executable instructions that control program flow."}],"outro":[{"speaker":"maya","text":"Gate scanner calibrated. I am joining your crew, Builder Bob.","emotion":"excited","emote":"thumbs"}],"joinsTeam":true},{"npc":"jamal","x":0.72,"mood":"shy","intro":[{"speaker":"jamal","text":"I wrote a process card for a robot arm: pick up crate, move right, drop crate.","emotion":"neutral","emote":"none"},{"speaker":"jamal","text":"Now Val wants it to avoid heavy crates unless the crane is available. I am not sure if that changes the type of logic.","emotion":"shy","emote":"question"}],"prompt":"How should Builder Bob distinguish sequence from conditionals?","objective":"Define what a conditional statement is in computer code.","choices":[{"text":"Sequence and conditionals are identical because both use steps.","quality":"poor","playerLine":"They are the same thing because code is always a list of steps.","reaction":[{"speaker":"jamal","text":"Then I still cannot explain why the robot behaves differently for heavy crates.","emotion":"worried","emote":"cloud"}],"feedback":"A sequence runs steps in order. A conditional can change which step runs depending on a condition."},{"text":"A sequence runs in order; a conditional chooses based on a test.","quality":"best","playerLine":"Your first card is a sequence. Add a conditional: if crateWeight is heavy and craneReady is true, then lift it; else flag it for help.","reaction":[{"speaker":"jamal","text":"That makes the difference clear: order alone versus a decision point.","emotion":"happy","emote":"star"}],"feedback":"Correct. Sequence controls order, while a conditional controls branching based on a true-or-false test."},{"text":"A conditional means the robot repeats forever.","quality":"poor","playerLine":"The new logic is conditional because the robot repeats the same movement forever.","reaction":[{"speaker":"jamal","text":"That sounds more like a loop, not the crate decision I need.","emotion":"sad","emote":"tear"}],"feedback":"Repeating code is looping. Conditional statements make decisions; loops repeat actions."},{"text":"A conditional is just a more complicated sequence.","quality":"okay","playerLine":"It is like a sequence with an extra decision added.","reaction":[{"speaker":"jamal","text":"That helps a little, but I should name the test and the branch more precisely.","emotion":"neutral","emote":"none"}],"feedback":"This is partially useful, but a conditional is not merely complexity. Its key feature is branching based on whether a condition evaluates true or false."}],"outro":[{"speaker":"jamal","text":"Process card updated. I will help inspect the next station.","emotion":"excited","emote":"thumbs"}],"joinsTeam":true}]},{"id":"conveyor_logic","title":"Conveyor Logic Line","setting":"classroom","timeOfDay":"day","subtitle":"Inspect repeated game patterns and sort logic parts.","props":[{"type":"table","x":0.16,"size":1},{"type":"bookshelf","x":0.42,"size":1},{"type":"flag","x":0.63,"size":0.9},{"type":"emoji","x":0.86,"emoji":"🏭","size":1.3}],"signs":[{"x":0.25,"title":"Pattern Notice","text":"Many games use repeated conditional patterns: if collision happens, then lose health; if score reaches a target, then unlock a reward."},{"x":0.75,"title":"Boolean Test","text":"A condition usually evaluates to true or false, such as playerHealth \u003c= 0 or keyCollected == true."}],"ambient":[],"encounters":[{"npc":"andre","x":0.28,"mood":"worried","intro":[{"speaker":"andre","text":"The prototype game has enemies, coins, doors, and health, but the logic sheet looks like a pile of loose gears.","emotion":"worried","emote":"cloud"},{"speaker":"andre","text":"I need to spot which rules are the same kind of pattern before we can debug them.","emotion":"neutral","emote":"question"}],"prompt":"Which pattern should Builder Bob identify?","objective":"Identify patterns in game logic using simple rules.","choices":[{"text":"Every sprite needs the exact same condition.","quality":"poor","playerLine":"Use the same condition for everything so the logic is consistent.","reaction":[{"speaker":"andre","text":"If every object uses the same test, coins might damage the player and enemies might award points.","emotion":"surprised","emote":"exclaim"}],"feedback":"Consistency does not mean identical conditions. Different game objects need conditions that match their purpose."},{"text":"The pattern is always about animation speed.","quality":"poor","playerLine":"Look for animation speed changes; that is probably the main pattern.","reaction":[{"speaker":"andre","text":"Some rules do animate things, but the bug is about outcomes after collisions and scores.","emotion":"worried","emote":"cloud"}],"feedback":"Animation can use conditionals, but the broader pattern is decision logic: test a situation, then trigger a result."},{"text":"Any rule with if is automatically correct.","quality":"okay","playerLine":"If it starts with if, it is probably one of the rules we need.","reaction":[{"speaker":"andre","text":"That finds possible rules, but it does not tell us whether the condition and result match.","emotion":"neutral","emote":"none"}],"feedback":"The word if is a clue, but you still need to inspect the condition and action. A correct pattern connects the test to a logical outcome."},{"text":"Look for test-and-result pairs like collision then damage.","quality":"best","playerLine":"Group rules that test a game state and trigger a result: if player collides with enemy, then reduce health; if coins reach ten, then unlock the door.","reaction":[{"speaker":"andre","text":"Now I can see the pattern: condition first, outcome second.","emotion":"excited","emote":"star"}],"feedback":"Correct. Game logic often follows recurring if-then patterns where a condition about the game state triggers a consequence."}],"outro":[{"speaker":"andre","text":"The conveyor labels are clean. I am rolling with your team.","emotion":"happy","emote":"thumbs"}],"joinsTeam":true},{"npc":"lina","x":0.68,"mood":"angry","intro":[{"speaker":"lina","text":"The warning light keeps flashing even when the player is safe.","emotion":"angry","emote":"exclaim"},{"speaker":"lina","text":"The rule says, if playerHealth \u003c 100, then show danger. It technically works, but it feels wrong.","emotion":"worried","emote":"question"}],"prompt":"What pattern problem should Builder Bob point out?","objective":"Identify patterns in game logic using simple rules.","choices":[{"text":"The condition is too broad for the intended outcome.","quality":"best","playerLine":"The danger outcome should match a danger condition. Try if playerHealth \u003c= 25, then show warning, so safe damage does not trigger panic.","reaction":[{"speaker":"lina","text":"That explains it. The condition was true too often, so the outcome fired too often.","emotion":"happy","emote":"sparkle"}],"feedback":"Correct. Conditional logic must match the intended game state; otherwise the program makes technically valid but poor decisions."},{"text":"Remove the condition and always show danger.","quality":"poor","playerLine":"Just keep the warning on all the time so nobody misses it.","reaction":[{"speaker":"lina","text":"That would make the warning useless because it would stop communicating risk.","emotion":"sad","emote":"tear"}],"feedback":"Always-on behavior removes the decision. A conditional is valuable because the output changes when the game state changes."},{"text":"Change the warning color but keep the same rule.","quality":"okay","playerLine":"Maybe use yellow instead of red while keeping playerHealth \u003c 100.","reaction":[{"speaker":"lina","text":"That softens the message, but the light still triggers almost constantly.","emotion":"neutral","emote":"none"}],"feedback":"Changing the output helps only slightly. The main issue is the condition being too broad for the intended danger threshold."},{"text":"The player should manually decide when danger appears.","quality":"poor","playerLine":"Let the player click a button whenever they feel in danger.","reaction":[{"speaker":"lina","text":"That avoids the bug, but it stops the computer from responding automatically.","emotion":"worried","emote":"cloud"}],"feedback":"Game systems usually need automatic checks. Conditional statements allow the computer to respond to state changes without manual judgment."}],"outro":[{"speaker":"lina","text":"Warning system tuned. I am joining the inspection crew.","emotion":"excited","emote":"star"}],"joinsTeam":true}],"minigame":{"type":"catch","title":"Fast-Sort Logic Parts","instructions":"Catch parts that could work as conditional logic pieces. Let vague or non-logical parts fall into the scrap bin.","goodLabel":"Usable Logic","badLabel":"Scrap Metal","good":["if health \u003c=0","then respawn","else continue","score >= 100","collision detected","lives == 0","timer \u003c 10","input pressed"],"bad":["make it fun","maybe win","cool graphics","random stuff"],"durationSec":30}},{"id":"rule_assembly","title":"Rule Assembly Line","setting":"gym","timeOfDay":"sunset","subtitle":"Build if-then steps for playable game systems.","props":[{"type":"cones","x":0.14,"size":0.9},{"type":"hoop","x":0.37,"size":1},{"type":"bleachers","x":0.62,"size":1},{"type":"emoji","x":0.86,"emoji":"🦺","size":1.2}],"signs":[{"x":0.18,"title":"Rule Recipe","text":"A useful game rule names the condition, the action that happens when true, and often an else action for false."},{"x":0.78,"title":"Clear Conditions","text":"Precise comparisons such as score >= 50 are easier to test than vague conditions such as score is pretty good."}],"ambient":[],"encounters":[{"npc":"noah","x":0.31,"mood":"shy","intro":[{"speaker":"noah","text":"I am designing a lava-floor mini-game for our Manufacturing Mission.","emotion":"shy","emote":"none"},{"speaker":"noah","text":"The player should lose one life only when they touch lava and are not shielded.","emotion":"worried","emote":"question"}],"prompt":"Which rule should Builder Bob install?","objective":"Create a basic set of game rules using if-then steps.","choices":[{"text":"If touching anything, then lose a life.","quality":"poor","playerLine":"Use if touching anything, then subtract one life.","reaction":[{"speaker":"noah","text":"That would punish the player for touching coins, platforms, and maybe even the goal.","emotion":"surprised","emote":"exclaim"}],"feedback":"The condition is too broad. A good conditional targets the exact state that should trigger the action."},{"text":"If the level starts, then subtract one life.","quality":"poor","playerLine":"Use if the level starts, then subtract one life so the rule is simple.","reaction":[{"speaker":"noah","text":"That makes the player lose for no reason before any lava decision happens.","emotion":"sad","emote":"tear"}],"feedback":"The condition does not match the desired event. Rules should connect cause and effect accurately."},{"text":"If touching lava and shield is false, then lose one life.","quality":"best","playerLine":"Use: if touchingLava is true and shieldActive is false, then lives = lives - 1; else keep lives unchanged.","reaction":[{"speaker":"noah","text":"That is exact. Lava is dangerous, but the shield actually changes the outcome.","emotion":"happy","emote":"sparkle"}],"feedback":"Correct. The rule combines two conditions and includes the intended action, plus an else outcome for when the player is safe."},{"text":"If shield exists, then the player can never lose.","quality":"okay","playerLine":"Use if shield exists, then prevent all life loss.","reaction":[{"speaker":"noah","text":"That protects the player, but it ignores whether the shield is active or whether they touched lava.","emotion":"neutral","emote":"question"}],"feedback":"This points toward shield logic but is not precise enough. The condition should test both the hazard and the active shield state."}],"outro":[{"speaker":"noah","text":"Lava rule assembled. I am joining the line.","emotion":"excited","emote":"thumbs"}],"joinsTeam":true},{"npc":"priya","x":0.69,"mood":"worried","intro":[{"speaker":"priya","text":"My factory maze has a locked exit. Players need both the keycard and at least five gear tokens.","emotion":"worried","emote":"cloud"},{"speaker":"priya","text":"The old rule opens the exit after any one pickup, so speedrunners are skipping half the mission.","emotion":"angry","emote":"exclaim"}],"prompt":"What if-then rule should Builder Bob recommend?","objective":"Create a basic set of game rules using if-then steps.","choices":[{"text":"If keycard or five tokens, then open exit.","quality":"okay","playerLine":"Use if hasKeycard or gearTokens >= 5, then open the exit.","reaction":[{"speaker":"priya","text":"That is closer, but it still lets players leave with only one requirement completed.","emotion":"neutral","emote":"question"}],"feedback":"The operator OR means either condition can be true. Priya requires both, so the rule needs AND."},{"text":"If has keycard and tokens >= 5, then open exit.","quality":"best","playerLine":"Use: if hasKeycard is true and gearTokens >= 5, then unlockExit; else keepExitLocked.","reaction":[{"speaker":"priya","text":"That locks the exit until both requirements are met. The maze finally has integrity.","emotion":"happy","emote":"star"}],"feedback":"Correct. AND requires both conditions to be true before the game changes the exit state."},{"text":"If the exit is visible, then open it.","quality":"poor","playerLine":"Use if the player can see the exit, then open it.","reaction":[{"speaker":"priya","text":"That would turn the maze into a hallway. The requirements would not matter.","emotion":"sad","emote":"tear"}],"feedback":"The condition must represent the required achievements. Visibility is not the same as having the keycard and tokens."},{"text":"If tokens are shiny, then unlock the door.","quality":"poor","playerLine":"Use if the tokens look shiny, then unlock the door.","reaction":[{"speaker":"priya","text":"That sounds like art feedback, not logic the game can reliably test.","emotion":"worried","emote":"cloud"}],"feedback":"Conditions should be measurable in code. A numeric comparison like gearTokens >= 5 is more testable than a vague description."}],"outro":[{"speaker":"priya","text":"Exit rule locked in. I will help simulate the outcomes.","emotion":"excited","emote":"thumbs"}],"joinsTeam":true}]},{"id":"testing_floor","title":"Outcome Testing Floor","setting":"hallway","timeOfDay":"night","subtitle":"Trace how decisions change results and reveal missing steps.","props":[{"type":"bench","x":0.12,"size":0.9},{"type":"fence","x":0.35,"size":1},{"type":"flag","x":0.6,"size":0.8},{"type":"emoji","x":0.84,"emoji":"🚨","size":1.4}],"signs":[{"x":0.23,"title":"Outcome Trace","text":"Changing a condition can change the path through the program and produce a different game outcome."},{"x":0.7,"title":"Test Prep Note","text":"On process questions, find the missing step by checking what decision must happen before the next action makes sense."}],"ambient":[],"encounters":[{"npc":"carter","x":0.33,"mood":"worried","intro":[{"speaker":"carter","text":"Two players reached the same boss door, but one got a victory screen and the other got a locked-door message.","emotion":"worried","emote":"question"},{"speaker":"carter","text":"The art, map, and player position are identical. Only the hidden game state might be different.","emotion":"neutral","emote":"none"}],"prompt":"How should Builder Bob explain the different outcomes?","objective":"Explain how computer decisions change the outcome of a game.","choices":[{"text":"The computer randomly chooses an ending every time.","quality":"poor","playerLine":"The computer probably just picks an ending randomly.","reaction":[{"speaker":"carter","text":"That would be possible only if we coded randomness, and this door rule does not mention random values.","emotion":"neutral","emote":"none"}],"feedback":"Do not assume randomness unless the logic includes it. Conditional outcomes come from the current state meeting or failing a condition."},{"text":"The graphics decide whether the door opens.","quality":"poor","playerLine":"Maybe the door graphic controls the outcome.","reaction":[{"speaker":"carter","text":"The door looks the same in both runs, so the decision must be deeper than the image.","emotion":"worried","emote":"cloud"}],"feedback":"Graphics can reflect state, but the conditional logic usually decides the state first."},{"text":"One player may have met the condition, such as bossKey == true.","quality":"best","playerLine":"The outcomes differ because the condition evaluated differently. If bossKey == true, show victory; else show locked door.","reaction":[{"speaker":"carter","text":"That explains both results without changing the map. The hidden variable changes the branch.","emotion":"happy","emote":"sparkle"}],"feedback":"Correct. A game can show different outcomes in the same location because conditions evaluate differently based on stored game state."},{"text":"Both outcomes are bugs because identical screens must behave identically.","quality":"okay","playerLine":"If the screens look identical, it might be a bug that they behave differently.","reaction":[{"speaker":"carter","text":"It could be a bug, but we should check the condition before assuming the system failed.","emotion":"neutral","emote":"question"}],"feedback":"Visual similarity does not guarantee identical state. Debugging requires tracing the condition that controls the outcome."}],"outro":[{"speaker":"carter","text":"Outcome trace complete. I am joining the debug crew.","emotion":"excited","emote":"thumbs"}],"joinsTeam":true},{"npc":"val","x":0.72,"mood":"neutral","intro":[{"speaker":"val","text":"Final inspection, Builder Bob. A test question shows this process: collect item, blank step, unlock upgrade.","emotion":"neutral","emote":"exclaim"},{"speaker":"val","text":"The missing step must explain why the upgrade unlocks only for some players.","emotion":"neutral","emote":"question"}],"prompt":"Which missing step best fits the process?","objective":"Explain how computer decisions change the outcome of a game.","choices":[{"text":"Check whether the item count meets the requirement.","quality":"best","playerLine":"Insert a decision step: if itemCount >= requiredAmount, then unlock the upgrade; else keep it locked.","reaction":[{"speaker":"val","text":"That is the inspection answer. The missing step is the condition that justifies the outcome.","emotion":"happy","emote":"star"}],"feedback":"Correct. For exam-style process questions, identify the decision needed before the next action can logically occur."},{"text":"Change the background music before unlocking.","quality":"poor","playerLine":"The missing step is probably changing the music so the upgrade feels important.","reaction":[{"speaker":"val","text":"Music may support the moment, but it does not explain who earned the upgrade.","emotion":"neutral","emote":"none"}],"feedback":"Aesthetic feedback does not control eligibility. The missing step should be a conditional test tied to the unlock requirement."},{"text":"Display a message saying upgrades are useful.","quality":"okay","playerLine":"Maybe show a message explaining the upgrade before unlocking it.","reaction":[{"speaker":"val","text":"A message could help players, but it still does not decide whether the upgrade should unlock.","emotion":"neutral","emote":"question"}],"feedback":"Player communication is useful, but the process needs a logic step that determines the outcome."},{"text":"Unlock the upgrade before checking anything.","quality":"poor","playerLine":"Just unlock first and check the requirement later.","reaction":[{"speaker":"val","text":"That reverses the process. The factory would ship rewards before quality control.","emotion":"angry","emote":"exclaim"}],"feedback":"Order matters in a process. The condition must be checked before the program grants the result."}],"outro":[{"speaker":"val","text":"Inspection passed. Builder Bob, you have earned the Plant Manager blueprint stamp.","emotion":"excited","emote":"sparkle"}],"joinsTeam":true}]}],"finale":{"title":"Production Record Set!","message":"University View Academy's logic factory is running clean. You defined conditionals, inspected game patterns, assembled if-then rules, and traced how decisions change outcomes.","takeaways":["A conditional statement checks whether a condition is true or false before running an action.","Game logic often follows patterns like collision then damage, score threshold then reward, or key collected then door unlocked.","Strong if-then rules use precise, testable conditions and clear outcomes.","When a process has a missing step, look for the decision that must happen before the result makes sense."]},"coins":true};</script>
+<script>
+(function(){
+'use strict';
+
+var G = window.GAME_DATA;
+var W = 960, H = 540, GROUND = 450;
+var K2 = G.gradeBand === 'K2';
+var FONT = '"Trebuchet MS", "Segoe UI", system-ui, sans-serif';
+var FS = K2 ? 22 : 19;
+var TH = G.theme;
+var cv = document.getElementById('game');
+var ctx = cv.getContext('2d');
+var frame = document.getElementById('frame');
+var $ = function (id) { return document.getElementById(id); };
+
+var S = { mode: 'title', sceneIdx: 0, score: 0, streak: 0, bestStreak: 0, rank: 0, bestCount: 0, answered: 0,
+  facts: 0, coins: 0, muted: false, read: !!G.readAloud, time: 0, maxScore: 1, locked: false };
+var player = { id: 'player', c: { name: G.player.name, type: 'kid', look: G.player.look }, x: 140, y: GROUND, vy: 0,
+  dir: 1, walkT: 0, onGround: true, emotion: 'happy', targetX: null, talking: 0, moving: false };
+var team = [], hist = [], actors = [], particles = [], popups = [];
+var scene = null, camX = 0, camFocus = null, crowd = 0, shake = 0;
+var keys = {};
+var CH = {};
+(G.characters || []).forEach(function (c) { CH[c.id] = c; });
+
+// ---------- helpers ----------
+function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function rand(a, b) { return a + Math.random() * (b - a); }
+function hash(s) { s = String(s); var h = 0; for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0; } return Math.abs(h); }
+function pick(arr, n) { return arr[hash(n) % arr.length]; }
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function circ(x, y, r, col) { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+function shade(hex, amt) {
+  var c = String(hex || '#888').replace('#', ''); if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+  var n = parseInt(c, 16); if (isNaN(n)) n = 0x888888;
+  var r = clamp((n >> 16) + amt, 0, 255), g = clamp(((n >> 8) & 255) + amt, 0, 255), b = clamp((n & 255) + amt, 0, 255);
+  return 'rgb(' + r + ',' + g + ',' + b + ')';
+}
+function wrapText(text, maxW) {
+  var words = String(text).split(' '), lines = [], cur = '';
+  for (var i = 0; i < words.length; i++) {
+    var test = cur ? cur + ' ' + words[i] : words[i];
+    if (ctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = words[i]; } else cur = test;
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]; }); }
+function charName(id) { if (id === 'player') return G.player.name; if (id === 'narrator') return ''; return CH[id] ? CH[id].name : id; }
+function actorFor(id) { if (id === 'player') return player; for (var i = 0; i < actors.length; i++) if (actors[i].id === id) return actors[i]; return null; }
+
+// ---------- layout / scaling ----------
+var scale = 1;
+function resize() {
+  var bw = window.innerWidth, bh = window.innerHeight;
+  scale = Math.min(bw / W, bh / H);
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cv.width = Math.round(W * scale * dpr); cv.height = Math.round(H * scale * dpr);
+  ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
+  frame.style.transform = 'scale(' + scale + ')';
+  frame.style.left = ((bw - W * scale) / 2) + 'px';
+  frame.style.top = ((bh - H * scale) / 2) + 'px';
+}
+window.addEventListener('resize', resize);
+
+// ---------- audio (synthesized, no files) ----------
+var AC = null;
+function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { AC = null; } } return AC; }
+function tone(f, d, type, vol, slide, delay) {
+  if (S.muted) return; var a = ac(); if (!a) return;
+  var t0 = a.currentTime + (delay || 0);
+  var o = a.createOscillator(), g = a.createGain();
+  o.type = type || 'square'; o.frequency.setValueAtTime(f, t0);
+  if (slide) o.frequency.exponentialRampToValueAtTime(slide, t0 + d);
+  g.gain.setValueAtTime(vol || 0.06, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+  o.connect(g); g.connect(a.destination); o.start(t0); o.stop(t0 + d + 0.02);
+}
+function noise(d, vol, freq) {
+  if (S.muted) return; var a = ac(); if (!a) return;
+  var len = Math.floor(a.sampleRate * d), buf = a.createBuffer(1, len, a.sampleRate), data = buf.getChannelData(0);
+  for (var i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / len);
+  var src = a.createBufferSource(); src.buffer = buf;
+  var bp = a.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = freq || 1200; bp.Q.value = 0.6;
+  var g = a.createGain(); g.gain.value = vol || 0.15;
+  src.connect(bp); bp.connect(g); g.connect(a.destination); src.start();
+}
+var SFX = {
+  blip: function (p) { tone(380 + (p || 0), 0.035, 'square', 0.025); },
+  coin: function () { tone(988, 0.07, 'square', 0.05); tone(1319, 0.14, 'square', 0.05, 0, 0.07); },
+  jump: function () { tone(280, 0.16, 'square', 0.04, 620); },
+  step: function () { tone(120, 0.03, 'triangle', 0.02); },
+  good: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.2, 'triangle', 0.08, 0, i * 0.09); }); },
+  okay: function () { tone(523, 0.15, 'triangle', 0.07); tone(659, 0.22, 'triangle', 0.07, 0, 0.12); },
+  bad: function () { tone(240, 0.28, 'sawtooth', 0.05, 110); },
+  cheer: function () { noise(1.4, 0.18, 1500); noise(1.0, 0.1, 700); },
+  whistle: function () { tone(2200, 0.12, 'sine', 0.06); tone(2400, 0.3, 'sine', 0.06, 0, 0.14); },
+  rank: function () { [392, 523, 659, 784, 1047, 784, 1047].forEach(function (f, i) { tone(f, 0.22, 'square', 0.05, 0, i * 0.11); }); },
+  pop: function () { tone(660, 0.06, 'sine', 0.06, 990); }
+};
+
+// ---------- read-aloud (browser speech, no files) ----------
+function say(text, who) {
+  if (!S.read || !window.speechSynthesis) return;
+  try {
+    window.speechSynthesis.cancel();
+    var clean = Array.from(String(text)).filter(function (ch) { return ch.codePointAt(0) < 0x2190; }).join('');
+    var u = new SpeechSynthesisUtterance(clean);
+    u.rate = K2 ? 0.92 : 1.02;
+    u.pitch = who === 'player' ? 1.3 : who === 'narrator' ? 1 : 0.75 + (hash(who) % 70) / 100;
+    window.speechSynthesis.speak(u);
+  } catch (e) { /* speech unavailable */ }
+}
+function hush() { try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) { /* ignore */ } }
+
+// ---------- input ----------
+window.addEventListener('keydown', function (e) {
+  var k = e.key;
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', ' ', 'ArrowDown'].indexOf(k) >= 0) e.preventDefault();
+  if (keys[k]) return;
+  keys[k] = true;
+  onKey(k);
+});
+window.addEventListener('keyup', function (e) { keys[e.key] = false; });
+function held(name) {
+  if (name === 'left') return keys.ArrowLeft || keys.a || keys.A || touch.left;
+  if (name === 'right') return keys.ArrowRight || keys.d || keys.D || touch.right;
+  return false;
+}
+var touch = { left: false, right: false };
+function bindHold(id, prop) {
+  var el = $(id); if (!el) return;
+  var on = function (e) { e.preventDefault(); touch[prop] = true; player.targetX = null; };
+  var off = function (e) { e.preventDefault(); touch[prop] = false; };
+  el.addEventListener('pointerdown', on); el.addEventListener('pointerup', off);
+  el.addEventListener('pointerleave', off); el.addEventListener('pointercancel', off);
+}
+function canvasPoint(e) {
+  var r = cv.getBoundingClientRect();
+  return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H };
+}
+
+var OUTDOOR = { field: 1, stadium: 1, playground: 1, park: 1, forest: 1, town: 1 };
+var SKY = { day: ['#5bb8ff', '#c9ecff'], sunset: ['#ff8a5b', '#ffd59e'], night: ['#0a1238', '#2a3b78'] };
+var CROWD_COLS = [TH.primary, TH.secondary, TH.accent, '#ffffff', '#ffd23f', '#ff6b6b'];
+
+function repeatX(par, spacing, fn) {
+  var off = camX * par, start = Math.floor(off / spacing) - 1, n = Math.ceil(W / spacing) + 3;
+  for (var i = start; i < start + n; i++) fn(i * spacing - off, i);
+}
+
+function drawBackground() {
+  var set = scene.setting;
+  if (OUTDOOR[set]) drawOutdoor(set); else drawIndoor(set);
+}
+
+function drawOutdoor(set) {
+  var tod = scene.timeOfDay || 'day', sky = SKY[tod] || SKY.day;
+  var g = ctx.createLinearGradient(0, 0, 0, 420); g.addColorStop(0, sky[0]); g.addColorStop(1, sky[1]);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, 420);
+  if (tod === 'night') {
+    for (var s = 0; s < 60; s++) { var sx = (hash('s' + s) % 1000) / 1000 * W, sy = (hash('y' + s) % 1000) / 1000 * 260;
+      ctx.globalAlpha = 0.5 + 0.5 * Math.sin(S.time * 2 + s); circ(sx, sy, 1.4, '#fff'); }
+    ctx.globalAlpha = 1; circ(820 - camX * 0.02, 90, 34, '#f4f1d0');
+  } else {
+    ctx.globalAlpha = 0.35; circ(820 - camX * 0.02, 95, 58, '#fff6b0'); ctx.globalAlpha = 1;
+    circ(820 - camX * 0.02, 95, 38, tod === 'sunset' ? '#ffb347' : '#ffe45c');
+  }
+  repeatX(0.08, 340, function (x, i) { var y = 50 + (hash('c' + i) % 120); drawCloud(x + (S.time * 6 % 340), y, 0.7 + (hash(i) % 5) / 10); });
+
+  if (set === 'field' || set === 'stadium') {
+    repeatX(0.25, 520, function (x) { drawLightTower(x + 60); });
+    ctx.fillStyle = shade(TH.secondary, -40); ctx.fillRect(0, 210, W, 175);
+    for (var row = 0; row < 6; row++) {
+      var ry = 228 + row * 26;
+      ctx.fillStyle = shade(TH.secondary, -60 + row * 8); ctx.fillRect(0, ry + 12, W, 4);
+      repeatX(0.3, 22, function (x, i) {
+        var jump = crowd > 0.05 ? Math.abs(Math.sin(S.time * 10 + i * 1.7 + row)) * 8 * crowd : Math.sin(S.time * 2 + i) * 1;
+        var col = CROWD_COLS[hash(i * 7 + row) % CROWD_COLS.length];
+        circ(x + (row % 2) * 11, ry - jump, 7, '#f1c27d'); ctx.fillStyle = col; ctx.fillRect(x + (row % 2) * 11 - 7, ry + 5 - jump, 14, 9);
+        if (crowd > 0.4 && (i + row) % 5 === 0) { ctx.fillStyle = col; ctx.fillRect(x + (row % 2) * 11 + 6, ry - 22 - jump, 3, 16); }
+      });
+    }
+    repeatX(0.6, 480, function (x, i) {
+      ctx.fillStyle = i % 2 ? TH.primary : '#ffffff'; ctx.fillRect(x, 368, 470, 42);
+      ctx.fillStyle = i % 2 ? '#ffffff' : TH.primary; ctx.font = '900 22px ' + FONT; ctx.textAlign = 'center';
+      ctx.fillText(i % 2 ? String(G.school).toUpperCase() : 'GO TEAM!  ★  ' + TH.challengeWord.toUpperCase() + ' DAY', x + 235, 397);
+    });
+  } else if (set === 'town') {
+    repeatX(0.3, 150, function (x, i) {
+      var h = 120 + hash('b' + i) % 140, col = pick(['#e07a5f', '#81b29a', '#f2cc8f', '#3d405b', '#a8dadc'], 'b' + i);
+      ctx.fillStyle = col; ctx.fillRect(x, 400 - h, 130, h);
+      ctx.fillStyle = 'rgba(255,255,230,0.8)';
+      for (var wy = 400 - h + 18; wy < 380; wy += 34) for (var wx = 14; wx < 120; wx += 38) ctx.fillRect(x + wx, wy, 20, 20);
+    });
+  } else {
+    drawHills(0.15, 300, '#8fd18a', 60); drawHills(0.3, 340, '#6cbf6a', 45);
+  }
+  if (set === 'playground') {
+    repeatX(0.6, 30, function (x) { ctx.fillStyle = '#9aa5b1'; ctx.fillRect(x, 340, 3, 70); });
+    ctx.fillStyle = '#9aa5b1'; ctx.fillRect(0, 340, W, 3); ctx.fillRect(0, 375, W, 2);
+  } else if (set === 'park' || set === 'forest') {
+    repeatX(0.55, set === 'forest' ? 110 : 260, function (x, i) { drawTree(x + hash(i) % 60, 410, 0.8 + (hash('t' + i) % 4) / 10); });
+  } else if (set === 'town') {
+    repeatX(0.7, 300, function (x) { ctx.fillStyle = '#4a4e69'; ctx.fillRect(x, 300, 5, 110); circ(x + 2, 296, 9, '#ffe9a8'); });
+  }
+  // ground
+  var top = 405;
+  if (set === 'field' || set === 'stadium') {
+    repeatX(1, 120, function (x, i) { ctx.fillStyle = i % 2 ? '#3fa34d' : '#4cb85a'; ctx.fillRect(x, top, 121, H - top); });
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, top + 8, W, 4);
+  } else if (set === 'playground') {
+    ctx.fillStyle = '#5cb85c'; ctx.fillRect(0, top, W, 12);
+    ctx.fillStyle = '#d2a66a'; ctx.fillRect(0, top + 12, W, H - top);
+    repeatX(1, 37, function (x, i) { ctx.fillStyle = '#b98b4e'; ctx.fillRect(x, top + 30 + (hash(i) % 90), 6, 3); });
+  } else if (set === 'town') {
+    ctx.fillStyle = '#c9c9c9'; ctx.fillRect(0, top, W, 70); repeatX(1, 80, function (x) { ctx.fillStyle = '#b0b0b0'; ctx.fillRect(x, top, 2, 70); });
+    ctx.fillStyle = '#555'; ctx.fillRect(0, top + 70, W, H); repeatX(1, 120, function (x) { ctx.fillStyle = '#ffd23f'; ctx.fillRect(x, top + 100, 60, 6); });
+  } else {
+    ctx.fillStyle = '#5cb85c'; ctx.fillRect(0, top, W, H - top);
+    ctx.fillStyle = '#e6cf9c'; ctx.fillRect(0, top + 30, W, 40);
+    repeatX(1, 53, function (x, i) { ctx.fillStyle = '#4ea64e'; ctx.fillRect(x, top + 80 + hash(i) % 40, 4, 8); });
+  }
+}
+
+function drawCloud(x, y, s) {
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  circ(x, y, 22 * s, ctx.fillStyle); circ(x + 26 * s, y - 10 * s, 28 * s, ctx.fillStyle); circ(x + 56 * s, y, 22 * s, ctx.fillStyle);
+  ctx.fillRect(x, y, 56 * s, 20 * s);
+}
+function drawHills(par, base, col, amp) {
+  ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(0, 420);
+  for (var x = 0; x <= W; x += 20) ctx.lineTo(x, base + Math.sin((x + camX * par) / 140) * amp * 0.5 + Math.sin((x + camX * par) / 61) * amp * 0.2);
+  ctx.lineTo(W, 420); ctx.closePath(); ctx.fill();
+}
+function drawLightTower(x) {
+  ctx.fillStyle = '#5a6270'; ctx.fillRect(x, 60, 8, 160);
+  ctx.fillStyle = '#3a404a'; ctx.fillRect(x - 30, 40, 68, 30);
+  for (var i = 0; i < 4; i++) { circ(x - 20 + i * 16, 55, 6, crowd > 0.3 ? '#ffffff' : '#fff7c2'); }
+  if (crowd > 0.3) { ctx.globalAlpha = 0.12 * crowd; ctx.fillStyle = '#fffbd6'; ctx.beginPath(); ctx.moveTo(x - 30, 70); ctx.lineTo(x - 160, 420); ctx.lineTo(x + 180, 420); ctx.lineTo(x + 38, 70); ctx.fill(); ctx.globalAlpha = 1; }
+}
+function drawTree(x, y, s) {
+  ctx.fillStyle = '#7a5230'; ctx.fillRect(x - 8 * s, y - 70 * s, 16 * s, 70 * s);
+  circ(x, y - 100 * s, 44 * s, '#3e9b4f'); circ(x - 30 * s, y - 80 * s, 30 * s, '#48a95a'); circ(x + 30 * s, y - 82 * s, 32 * s, '#358a45');
+}
+
+var WALL = { classroom: '#f6e7c8', gym: '#d9dde6', cafeteria: '#cfe8e3', library: '#e9dcc9', hallway: '#d6e2f0', lab: '#e2ecf3' };
+function drawIndoor(set) {
+  ctx.fillStyle = WALL[set] || '#eee'; ctx.fillRect(0, 0, W, 410);
+  ctx.fillStyle = shade(WALL[set] || '#eee', -25); ctx.fillRect(0, 320, W, 85);
+  ctx.fillStyle = shade(TH.primary, -10); ctx.fillRect(0, 316, W, 6);
+  repeatX(0.9, 260, function (x) { ctx.fillStyle = '#fffbe8'; ctx.fillRect(x + 80, 0, 100, 10); ctx.globalAlpha = 0.15; ctx.fillStyle = '#fffbe8';
+    ctx.beginPath(); ctx.moveTo(x + 80, 10); ctx.lineTo(x + 40, 320); ctx.lineTo(x + 220, 320); ctx.lineTo(x + 180, 10); ctx.fill(); ctx.globalAlpha = 1; });
+  repeatX(0.9, 440, function (x, i) {
+    if (set === 'classroom') {
+      if (i % 2) { ctx.fillStyle = '#7a5230'; ctx.fillRect(x + 40, 90, 300, 170); ctx.fillStyle = '#2f5d50'; ctx.fillRect(x + 50, 100, 280, 150);
+        ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = '600 20px ' + FONT; ctx.textAlign = 'center'; ctx.fillText(K2 ? 'A b C d  1 2 3' : scene.title, x + 190, 160); ctx.fillText('Be Kind! ♥', x + 190, 200); }
+      else drawWindow(x + 120, 90);
+      if (K2) { for (var b = 0; b < 8; b++) { ctx.fillStyle = CROWD_COLS[b % CROWD_COLS.length]; ctx.beginPath(); ctx.moveTo(x + b * 55, 30); ctx.lineTo(x + b * 55 + 50, 30); ctx.lineTo(x + b * 55 + 25, 62); ctx.fill(); } }
+    } else if (set === 'gym') {
+      ctx.fillStyle = TH.primary; ctx.fillRect(x + 60, 40, 140, 70); ctx.fillStyle = '#fff'; ctx.font = '900 20px ' + FONT; ctx.textAlign = 'center'; ctx.fillText('CHAMPS', x + 130, 82);
+      ctx.fillStyle = TH.secondary; ctx.fillRect(x + 250, 40, 140, 70); ctx.fillStyle = '#fff'; ctx.fillText(String(G.school).split(' ')[0].toUpperCase(), x + 320, 82);
+      for (var r = 0; r < 4; r++) { ctx.fillStyle = shade('#8a6a45', r * 10); ctx.fillRect(x, 200 + r * 28, 440, 22); }
+    } else if (set === 'cafeteria') {
+      drawWindow(x + 40, 80); ctx.fillStyle = '#2b2d42'; ctx.fillRect(x + 250, 70, 160, 110); ctx.fillStyle = '#ffd23f'; ctx.font = '700 18px ' + FONT; ctx.textAlign = 'center';
+      ctx.fillText('LUNCH MENU', x + 330, 100); ctx.fillStyle = '#fff'; ctx.font = '15px ' + FONT; ctx.fillText('Pizza · Apples', x + 330, 130); ctx.fillText('Milk · Salad', x + 330, 155);
+    } else if (set === 'library') {
+      for (var sh = 0; sh < 2; sh++) drawShelf(x + 30 + sh * 210, 70, 190, 240);
+    } else if (set === 'hallway') {
+      for (var l = 0; l < 8; l++) { ctx.fillStyle = l % 2 ? TH.primary : shade(TH.primary, -25); ctx.fillRect(x + l * 55, 120, 52, 200);
+        ctx.fillStyle = 'rgba(0,0,0,0.25)'; for (var v = 0; v < 3; v++) ctx.fillRect(x + l * 55 + 12, 135 + v * 6, 28, 3); circ(x + l * 55 + 42, 230, 3, '#ddd'); }
+    } else {
+      ctx.fillStyle = '#9aa9b8'; ctx.fillRect(x + 20, 210, 400, 110); ctx.fillStyle = '#334'; ctx.fillRect(x + 20, 200, 400, 12);
+      drawWindow(x + 140, 50);
+    }
+  });
+  var top = 405;
+  if (set === 'library') { ctx.fillStyle = '#a23b4a'; ctx.fillRect(0, top, W, H - top); repeatX(1, 60, function (x) { ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fillRect(x, top, 30, H); }); }
+  else if (set === 'cafeteria' || set === 'hallway' || set === 'lab') {
+    repeatX(1, 60, function (x, i) { for (var r = 0; r < 3; r++) { ctx.fillStyle = (i + r) % 2 ? '#f0f0f0' : (set === 'hallway' ? '#9fb6cd' : '#c94c4c'); ctx.fillRect(x, top + r * 45, 60, 45); } });
+  } else {
+    repeatX(1, 90, function (x, i) { ctx.fillStyle = i % 2 ? '#d29b5c' : '#c88f50'; ctx.fillRect(x, top, 90, H - top); });
+    if (set === 'gym') { ctx.fillStyle = '#fff'; ctx.fillRect(0, top + 40, W, 4); ctx.fillStyle = TH.primary; ctx.fillRect(0, top + 90, W, 4); }
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.fillRect(0, top, W, 5);
+}
+function drawWindow(x, y) {
+  ctx.fillStyle = '#fff'; ctx.fillRect(x - 6, y - 6, 192, 152);
+  var g = ctx.createLinearGradient(0, y, 0, y + 140); g.addColorStop(0, '#7cc7ff'); g.addColorStop(1, '#d4f0ff');
+  ctx.fillStyle = g; ctx.fillRect(x, y, 180, 140); ctx.fillStyle = '#fff'; ctx.fillRect(x + 87, y, 6, 140); ctx.fillRect(x, y + 67, 180, 6);
+  circ(x + 50, y + 110, 26, '#4cb85a'); circ(x + 130, y + 118, 30, '#3fa34d');
+}
+function drawShelf(x, y, w, h) {
+  ctx.fillStyle = '#6b4226'; ctx.fillRect(x, y, w, h);
+  for (var r = 0; r < 4; r++) { var sy = y + 10 + r * 58; ctx.fillStyle = '#4e2f1a'; ctx.fillRect(x + 6, sy + 48, w - 12, 6);
+    for (var b = 0; b < 11; b++) { var bh = 34 + hash(x + r * 11 + b) % 12; ctx.fillStyle = CROWD_COLS[hash(r * 13 + b + x) % CROWD_COLS.length]; ctx.fillRect(x + 10 + b * 16, sy + 48 - bh, 13, bh); } }
+}
+
+// ---------- props (world space) ----------
+function drawProp(p) {
+  var x = p.wx - camX, y = GROUND;
+  if (x < -260 || x > W + 260) return;
+  var t = p.type;
+  if (t === 'tree') drawTree(x, y, 1);
+  else if (t === 'bench') { ctx.fillStyle = '#8b5a2b'; ctx.fillRect(x - 60, y - 40, 120, 10); ctx.fillRect(x - 60, y - 64, 120, 8); ctx.fillStyle = '#444'; ctx.fillRect(x - 52, y - 30, 6, 30); ctx.fillRect(x + 46, y - 30, 6, 30); }
+  else if (t === 'goal') { ctx.strokeStyle = '#fff'; ctx.lineWidth = 7; ctx.strokeRect(x - 80, y - 120, 160, 120); ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    for (var i = -80; i <= 80; i += 16) { ctx.beginPath(); ctx.moveTo(x + i, y - 120); ctx.lineTo(x + i * 0.8, y); ctx.stroke(); } for (var j = 0; j < 120; j += 16) { ctx.beginPath(); ctx.moveTo(x - 80, y - j); ctx.lineTo(x + 80, y - j); ctx.stroke(); } }
+  else if (t === 'desk') { ctx.fillStyle = '#c98b4a'; ctx.fillRect(x - 50, y - 62, 100, 12); ctx.fillStyle = '#7a8899'; ctx.fillRect(x - 44, y - 50, 6, 50); ctx.fillRect(x + 38, y - 50, 6, 50); ctx.font = '26px ' + FONT; ctx.textAlign = 'center'; ctx.fillText('📚', x + 18, y - 64); }
+  else if (t === 'table') { ctx.fillStyle = '#e9edf2'; ctx.fillRect(x - 90, y - 58, 180, 12); ctx.fillStyle = '#8a96a3'; ctx.fillRect(x - 80, y - 46, 8, 46); ctx.fillRect(x + 72, y - 46, 8, 46); ctx.font = '26px ' + FONT; ctx.textAlign = 'center'; ctx.fillText('🍎', x - 40, y - 60); ctx.fillText('🥪', x + 30, y - 60); }
+  else if (t === 'bookshelf') drawShelf(x - 95, y - 250, 190, 250);
+  else if (t === 'swing') { ctx.strokeStyle = '#d64545'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(x - 80, y); ctx.lineTo(x - 60, y - 170); ctx.lineTo(x + 60, y - 170); ctx.lineTo(x + 80, y); ctx.stroke();
+    var sw = Math.sin(S.time * 2) * 12; ctx.lineWidth = 2; ctx.strokeStyle = '#555'; ctx.beginPath(); ctx.moveTo(x - 20, y - 170); ctx.lineTo(x - 20 + sw, y - 50); ctx.moveTo(x + 20, y - 170); ctx.lineTo(x + 20 + sw, y - 50); ctx.stroke(); ctx.fillStyle = '#333'; ctx.fillRect(x - 26 + sw, y - 52, 52, 8); ctx.lineWidth = 1; }
+  else if (t === 'slide') { ctx.fillStyle = '#3a86ff'; ctx.fillRect(x - 70, y - 150, 10, 150); ctx.fillRect(x - 30, y - 150, 10, 150); ctx.fillStyle = '#ffbe0b'; ctx.beginPath(); ctx.moveTo(x - 20, y - 150); ctx.lineTo(x + 90, y - 6); ctx.lineTo(x + 90, y); ctx.lineTo(x - 20, y - 136); ctx.fill(); ctx.fillStyle = '#ff006e'; ctx.fillRect(x - 70, y - 156, 60, 10); }
+  else if (t === 'cones') { for (var c = 0; c < 3; c++) { ctx.fillStyle = '#ff7b00'; ctx.beginPath(); ctx.moveTo(x - 60 + c * 60, y - 34); ctx.lineTo(x - 74 + c * 60, y); ctx.lineTo(x - 46 + c * 60, y); ctx.fill(); ctx.fillStyle = '#fff'; ctx.fillRect(x - 66 + c * 60, y - 18, 12, 4); } }
+  else if (t === 'hoop') { ctx.fillStyle = '#555'; ctx.fillRect(x - 4, y - 220, 8, 220); ctx.fillStyle = '#fff'; ctx.fillRect(x - 40, y - 250, 80, 54); ctx.strokeStyle = '#ff5a1f'; ctx.lineWidth = 4; ctx.beginPath(); ctx.ellipse(x, y - 196, 22, 5, 0, 0, Math.PI * 2); ctx.stroke(); ctx.lineWidth = 1; }
+  else if (t === 'plant') { ctx.fillStyle = '#c0562b'; ctx.fillRect(x - 18, y - 36, 36, 36); circ(x, y - 54, 22, '#3e9b4f'); circ(x - 14, y - 44, 14, '#48a95a'); circ(x + 14, y - 46, 14, '#358a45'); }
+  else if (t === 'fence') { ctx.fillStyle = '#fff'; for (var f = 0; f < 6; f++) ctx.fillRect(x - 90 + f * 34, y - 60, 14, 60); ctx.fillRect(x - 94, y - 46, 190, 8); }
+  else if (t === 'bleachers') { for (var r = 0; r < 4; r++) { ctx.fillStyle = shade('#9aa5b1', r * 12); ctx.fillRect(x - 120 + r * 15, y - 30 - r * 30, 240 - r * 30, 12); } }
+  else if (t === 'flag') { ctx.fillStyle = '#ccc'; ctx.fillRect(x, y - 200, 5, 200); var wv = Math.sin(S.time * 4) * 6; ctx.fillStyle = TH.primary; ctx.beginPath(); ctx.moveTo(x + 5, y - 200); ctx.quadraticCurveTo(x + 40, y - 190 + wv, x + 80, y - 196); ctx.lineTo(x + 80, y - 150); ctx.quadraticCurveTo(x + 40, y - 146 + wv, x + 5, y - 154); ctx.fill(); }
+  else if (t === 'sandbox') { ctx.fillStyle = '#8b5a2b'; ctx.fillRect(x - 90, y - 26, 180, 26); ctx.fillStyle = '#f2d68a'; ctx.fillRect(x - 82, y - 30, 164, 10); ctx.font = '24px ' + FONT; ctx.textAlign = 'center'; ctx.fillText('🪣', x - 30, y - 28); }
+  else { ctx.font = ((p.size || 48)) + 'px ' + FONT; ctx.textAlign = 'center'; ctx.fillText(p.emoji || '⭐', x, y - 4 + Math.sin(S.time * 2 + p.wx) * 2); }
+}
+
+function drawSign(sg) {
+  var x = sg.wx - camX, y = GROUND; if (x < -100 || x > W + 100) return;
+  ctx.fillStyle = '#7a5230'; ctx.fillRect(x - 4, y - 90, 8, 90);
+  ctx.fillStyle = sg.read ? '#e8d5b0' : '#ffe08a'; rr(x - 34, y - 130, 68, 48, 8); ctx.fill();
+  ctx.strokeStyle = '#7a5230'; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 1;
+  ctx.fillStyle = '#5a3a1a'; ctx.font = '900 30px ' + FONT; ctx.textAlign = 'center'; ctx.fillText(sg.read ? '✓' : '?', x, y - 95);
+  if (!sg.read) { ctx.globalAlpha = 0.4 + 0.3 * Math.sin(S.time * 5); circ(x, y - 106, 44, 'rgba(255,230,120,0.35)'); ctx.globalAlpha = 1; }
+}
+
+function drawCoin(c) {
+  if (c.got) return; var x = c.wx - camX; if (x < -30 || x > W + 30) return;
+  var y = c.y + Math.sin(S.time * 3 + c.wx) * 4, sx = Math.abs(Math.cos(S.time * 3 + c.wx * 0.01));
+  ctx.save(); ctx.translate(x, y); ctx.scale(Math.max(0.15, sx), 1);
+  circ(0, 0, 13, '#f5b301'); circ(0, 0, 10, '#ffd23f'); ctx.fillStyle = '#c98a00'; ctx.font = '900 14px ' + FONT; ctx.textAlign = 'center'; ctx.fillText('★', 0, 5);
+  ctx.restore();
+}
+
+function drawExit() {
+  var x = scene.worldW - 70 - camX; if (x < -120 || x > W + 120) return;
+  var open = sceneComplete();
+  if (open) {
+    var b = Math.sin(S.time * 5) * 6;
+    ctx.fillStyle = '#7a5230'; ctx.fillRect(x - 4, GROUND - 120, 8, 120);
+    ctx.fillStyle = TH.accent; rr(x - 60 + b, GROUND - 170, 120, 50, 10); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '900 22px ' + FONT; ctx.textAlign = 'center';
+    ctx.fillText(S.sceneIdx === G.scenes.length - 1 ? 'FINALE ▶' : 'NEXT ▶', x + b, GROUND - 137);
+  } else {
+    for (var c = 0; c < 3; c++) { ctx.fillStyle = '#ff7b00'; ctx.beginPath(); ctx.moveTo(x - 30 + c * 30, GROUND - 40); ctx.lineTo(x - 42 + c * 30, GROUND); ctx.lineTo(x - 18 + c * 30, GROUND); ctx.fill(); }
+    ctx.fillStyle = '#ffd23f'; ctx.fillRect(x - 50, GROUND - 34, 100, 8);
+  }
+}
+
+function drawPad(m) {
+  if (!m || m.done) return; var x = m.wx - camX; if (x < -100 || x > W + 100) return;
+  var ready = encountersDone();
+  ctx.globalAlpha = ready ? 0.5 + 0.3 * Math.sin(S.time * 6) : 0.25;
+  ctx.fillStyle = TH.accent; ctx.beginPath(); ctx.ellipse(x, GROUND, 60, 14, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
+  ctx.fillStyle = '#ccc'; ctx.fillRect(x - 2, GROUND - 110, 4, 110); ctx.fillStyle = ready ? TH.accent : '#999';
+  ctx.beginPath(); ctx.moveTo(x + 2, GROUND - 110); ctx.lineTo(x + 60, GROUND - 95); ctx.lineTo(x + 2, GROUND - 80); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = '900 13px ' + FONT; ctx.textAlign = 'center'; ctx.fillText('⚡', x + 22, GROUND - 90);
+}
+
+var EMOTES = { heart: '❤️', star: '⭐', tear: '💧', question: '❓', exclaim: '❗', music: '🎵', cloud: '🌧️', thumbs: '👍', sparkle: '✨' };
+
+function limb(x, y, ang, len, w, col, end, endCol, dir) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
+  ctx.fillStyle = col; rr(-w / 2, 0, w, len, w / 2); ctx.fill();
+  if (end === 'shoe') { ctx.fillStyle = endCol; rr(-w / 2 - (dir < 0 ? 7 : 1), len - 6, w + 8, 8, 4); ctx.fill(); }
+  else if (end === 'hand') circ(0, len, w * 0.62, endCol);
+  ctx.restore();
+}
+
+function drawActor(a) {
+  var x = a.x - camX; if (x < -80 || x > W + 80) return;
+  var L = a.c.look || {}, s = a.c.type === 'adult' ? 1.22 : 1, dir = a.dir || 1;
+  var moving = a.moving, t = a.walkT || 0, emo = a.emotion || 'neutral';
+  var swing = moving ? Math.sin(t) * 0.55 : 0;
+  var bob = moving ? Math.abs(Math.sin(t)) * 3 : Math.sin(S.time * 2 + hash(a.id)) * 1.2;
+  var air = a.y < GROUND ? GROUND - a.y : 0;
+  if (emo === 'excited' && !moving) bob += Math.abs(Math.sin(S.time * 8)) * 6;
+  ctx.save(); ctx.translate(x, GROUND);
+  ctx.fillStyle = 'rgba(0,0,0,' + (0.2 - Math.min(air, 80) / 600) + ')'; ctx.beginPath(); ctx.ellipse(0, 0, 26 * s - air / 8, 6, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.translate(0, -air - bob); ctx.scale(s, s);
+  var skin = L.skin || '#f1c27d', shirt = L.shirt || '#3a86ff', pants = L.pants || '#2b2d42', hair = L.hair || '#3b2414';
+  var style = L.hairStyle || 'short';
+  // back hair
+  if (style === 'long' || style === 'braids') { ctx.fillStyle = hair; rr(-25, -122, 50, style === 'long' ? 56 : 30, 14); ctx.fill(); }
+  if (style === 'afro') circ(0, -108, 31, hair);
+  // legs
+  var legA = air > 0 ? 0.35 : swing;
+  limb(-7, -42, legA, 40, 10, pants, 'shoe', '#22223b', dir);
+  limb(7, -42, -legA, 40, 10, pants, 'shoe', '#22223b', dir);
+  // arms (cheer pose when excited / celebrating)
+  var up = emo === 'excited' || a.cheer > 0;
+  var armA = up ? 2.7 + Math.sin(S.time * 10) * 0.2 : (moving ? -swing : Math.sin(S.time * 1.5) * 0.05);
+  limb(-17, -76, up ? armA : armA + 0.08, 32, 8, shirt, 'hand', skin, dir);
+  // body
+  ctx.fillStyle = shirt; rr(-18, -82, 36, 46, 10); ctx.fill();
+  ctx.fillStyle = shade(shirt, -30); ctx.fillRect(-18, -42, 36, 6);
+  if (L.jersey) { ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.font = '900 16px ' + FONT; ctx.textAlign = 'center'; ctx.fillText(String(L.jersey).slice(0, 3), 0, -53); }
+  if (L.accessory === 'whistle') { ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(-8, -82); ctx.lineTo(0, -64); ctx.lineTo(8, -82); ctx.stroke(); circ(0, -62, 4, '#c0c0c0'); }
+  limb(17, -76, up ? -armA : -armA - 0.08, 32, 8, shade(shirt, 12), 'hand', skin, dir);
+  // head
+  circ(0, -102, 23, skin);
+  ctx.fillStyle = hair;
+  if (style === 'short' || style === 'long' || style === 'ponytail' || style === 'bun' || style === 'braids') {
+    ctx.beginPath(); ctx.arc(0, -104, 24, Math.PI * 1.02, Math.PI * 1.98); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(dir * 6, -118, 17, 8, dir * 0.25, 0, Math.PI * 2); ctx.fill();
+  }
+  if (style === 'ponytail') { circ(-dir * 25, -104, 9, hair); circ(-dir * 30, -92, 8, hair); ctx.fillStyle = TH.accent; ctx.fillRect(-dir * 24 - 3, -112, 6, 6); }
+  if (style === 'bun') circ(0, -130, 11, hair);
+  if (style === 'braids') { for (var bs = -1; bs <= 1; bs += 2) { for (var bi = 0; bi < 4; bi++) circ(bs * 24, -96 + bi * 10, 6, hair); } }
+  if (style === 'curly') { for (var ci = 0; ci < 9; ci++) { var ang = Math.PI + ci * Math.PI / 8; circ(Math.cos(ang) * 22, -104 + Math.sin(ang) * 22, 9, hair); } }
+  if (style === 'afro') { ctx.beginPath(); ctx.arc(0, -106, 30, Math.PI * 1.05, Math.PI * 1.95); ctx.fill(); }
+  if (style === 'buzz') { ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.arc(0, -103, 23.5, Math.PI * 1.05, Math.PI * 1.95); ctx.fill(); ctx.globalAlpha = 1; }
+  if (style === 'spiky') { for (var si = -2; si <= 2; si++) { ctx.beginPath(); ctx.moveTo(si * 9 - 7, -118); ctx.lineTo(si * 9, -136 + Math.abs(si) * 3); ctx.lineTo(si * 9 + 7, -118); ctx.fill(); } ctx.beginPath(); ctx.arc(0, -104, 24, Math.PI * 1.05, Math.PI * 1.95); ctx.fill(); }
+  // face
+  var ex = dir * 5, blink = (Math.floor(S.time * 10 + hash(a.id)) % 40) === 0;
+  ctx.fillStyle = '#1f1f2e';
+  for (var e = -1; e <= 1; e += 2) {
+    var exx = ex + e * 8;
+    if (blink || emo === 'happy' && a.cheer > 0) { ctx.fillRect(exx - 4, -104, 8, 2); }
+    else if (emo === 'surprised') { circ(exx, -104, 4, '#1f1f2e'); circ(exx + 1, -105, 1.3, '#fff'); }
+    else { ctx.beginPath(); ctx.ellipse(exx, -104, 3, 4, 0, 0, Math.PI * 2); ctx.fill(); circ(exx + dir, -105.5, 1.1, '#fff'); ctx.fillStyle = '#1f1f2e'; }
+    ctx.strokeStyle = '#3a2a1a'; ctx.lineWidth = 2; ctx.beginPath();
+    if (emo === 'angry') { ctx.moveTo(exx - 5, -114 - e * 2 * dir); ctx.lineTo(exx + 5, -112 + e * 2 * dir); }
+    else if (emo === 'sad' || emo === 'worried') { ctx.moveTo(exx - 5, -112 + e * 2); ctx.lineTo(exx + 5, -112 - e * 2); }
+    ctx.stroke();
+  }
+  if (emo === 'happy' || emo === 'excited' || emo === 'shy') { ctx.globalAlpha = emo === 'shy' ? 0.7 : 0.45; circ(ex - 13, -95, 4.5, '#ff7a8a'); circ(ex + 13, -95, 4.5, '#ff7a8a'); ctx.globalAlpha = 1; }
+  var mx = ex, my = -92, talkOpen = a.talking > 0 && Math.floor(S.time * 9) % 2 === 0;
+  ctx.strokeStyle = '#5a1f1f'; ctx.fillStyle = '#7a2230'; ctx.lineWidth = 2.2; ctx.beginPath();
+  if (talkOpen) { ctx.ellipse(mx, my, 5, 4, 0, 0, Math.PI * 2); ctx.fill(); }
+  else if (emo === 'happy' || emo === 'shy') { ctx.arc(mx, my - 3, emo === 'shy' ? 4 : 6, 0.2, Math.PI - 0.2); ctx.stroke(); }
+  else if (emo === 'excited') { ctx.arc(mx, my - 2, 7, 0, Math.PI); ctx.closePath(); ctx.fill(); }
+  else if (emo === 'sad') { ctx.arc(mx, my + 4, 6, Math.PI + 0.3, -0.3); ctx.stroke(); }
+  else if (emo === 'surprised') { ctx.ellipse(mx, my, 4, 5, 0, 0, Math.PI * 2); ctx.fill(); }
+  else if (emo === 'worried') { ctx.moveTo(mx - 6, my); ctx.quadraticCurveTo(mx - 3, my - 3, mx, my); ctx.quadraticCurveTo(mx + 3, my + 3, mx + 6, my); ctx.stroke(); }
+  else if (emo === 'angry') { ctx.arc(mx, my + 5, 6, Math.PI + 0.5, -0.5); ctx.stroke(); }
+  else { ctx.moveTo(mx - 5, my); ctx.lineTo(mx + 5, my); ctx.stroke(); }
+  if (emo === 'sad') { var ty = -98 + (S.time * 20 % 14); ctx.fillStyle = '#4ea8ff'; ctx.beginPath(); ctx.arc(ex + 9, ty, 2.6, 0, Math.PI * 2); ctx.fill(); }
+  // accessories
+  if (L.accessory === 'cap') { ctx.fillStyle = shirt; ctx.beginPath(); ctx.arc(0, -108, 24, Math.PI, 0); ctx.fill(); ctx.fillRect(dir > 0 ? 4 : -32, -110, 28, 6); ctx.fillStyle = '#fff'; circ(0, -128, 3, '#fff'); }
+  if (L.accessory === 'glasses') { ctx.strokeStyle = '#222'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(ex - 8, -104, 6, 0, Math.PI * 2); ctx.moveTo(ex + 14, -104); ctx.arc(ex + 8, -104, 6, 0, Math.PI * 2); ctx.moveTo(ex - 2, -104); ctx.lineTo(ex + 2, -104); ctx.stroke(); }
+  if (L.accessory === 'headband') { ctx.fillStyle = TH.accent; ctx.fillRect(-23, -118, 46, 6); }
+  if (L.accessory === 'bow') { ctx.fillStyle = '#ff4d8d'; ctx.beginPath(); ctx.moveTo(dir * 14, -124); ctx.lineTo(dir * 4, -132); ctx.lineTo(dir * 4, -116); ctx.fill(); ctx.beginPath(); ctx.moveTo(dir * 14, -124); ctx.lineTo(dir * 24, -132); ctx.lineTo(dir * 24, -116); ctx.fill(); }
+  ctx.restore();
+  // name tag + markers
+  if (a.id !== 'player' && !a.follower && S.mode === 'explore') {
+    ctx.font = '700 13px ' + FONT; ctx.textAlign = 'center'; var nw = ctx.measureText(a.c.name).width + 14;
+    ctx.fillStyle = 'rgba(15,20,40,0.65)'; rr(x - nw / 2, GROUND + 8, nw, 20, 10); ctx.fill(); ctx.fillStyle = '#fff'; ctx.fillText(a.c.name, x, GROUND + 22);
+    var mark = a.enc && !a.enc.done ? '❗' : (a.amb && Math.abs(player.x - a.x) < 110 ? '💬' : '');
+    if (mark) { ctx.font = '30px ' + FONT; ctx.fillText(mark, x, GROUND - 150 * s - Math.abs(Math.sin(S.time * 4)) * 10); }
+  }
+  if (a.emote && a.emoteT > 0) {
+    var pop = Math.min(1, (2.2 - a.emoteT) * 6 + 0.2);
+    ctx.save(); ctx.translate(x + 28 * dir, GROUND - 150 * s - (2.2 - a.emoteT) * 12); ctx.scale(pop, pop);
+    circ(0, 0, 22, '#fff'); ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.font = '26px ' + FONT; ctx.textAlign = 'center'; ctx.fillText(EMOTES[a.emote] || '✨', 0, 9); ctx.restore();
+  }
+}
+
+function drawBubble(line, shown) {
+  var who = line.speaker, text = line.text;
+  ctx.font = '600 ' + FS + 'px ' + FONT;
+  if (who === 'narrator') {
+    var nl = wrapText(text, 760), nh = nl.length * (FS + 8) + 26;
+    ctx.fillStyle = 'rgba(10,14,35,0.86)'; rr(80, 64, 800, nh, 14); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; drawReveal(nl, 480, 64 + 13 + FS, shown, FS + 8, 'center');
+    return;
+  }
+  var a = actorFor(who); if (!a) return;
+  var headY = GROUND - (a.c.type === 'adult' ? 172 : 140) - (GROUND - a.y);
+  var ax = a.x - camX, maxW = 330;
+  var lines = wrapText(text, maxW), lh = FS + 7, bw = 0;
+  for (var i = 0; i < lines.length; i++) bw = Math.max(bw, ctx.measureText(lines[i]).width);
+  bw += 32; var bh = lines.length * lh + 26;
+  var bx = clamp(ax - bw / 2, 10, W - bw - 10), by = Math.max(58, headY - bh - 24);
+  var isP = who === 'player';
+  ctx.fillStyle = 'rgba(0,0,0,0.18)'; rr(bx + 4, by + 5, bw, bh, 16); ctx.fill();
+  ctx.fillStyle = '#fff'; rr(bx, by, bw, bh, 16); ctx.fill();
+  ctx.strokeStyle = isP ? TH.primary : '#22223b'; ctx.lineWidth = 3; ctx.stroke();
+  var tx = clamp(ax, bx + 20, bx + bw - 20);
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.moveTo(tx - 10, by + bh - 2); ctx.lineTo(tx + 2, by + bh + 18); ctx.lineTo(tx + 10, by + bh - 2); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(tx - 10, by + bh); ctx.lineTo(tx + 2, by + bh + 18); ctx.lineTo(tx + 10, by + bh); ctx.stroke(); ctx.lineWidth = 1;
+  var nm = charName(who); ctx.font = '800 13px ' + FONT; var nw = ctx.measureText(nm).width + 16;
+  ctx.fillStyle = isP ? TH.primary : '#22223b'; rr(bx + 12, by - 11, nw, 22, 11); ctx.fill(); ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.fillText(nm, bx + 20, by + 4);
+  ctx.font = '600 ' + FS + 'px ' + FONT; ctx.fillStyle = '#1d1d2c';
+  drawReveal(lines, bx + 16, by + 16 + FS, shown, lh, 'left');
+  if (shown >= text.length) { ctx.fillStyle = TH.primary; ctx.font = '14px ' + FONT; ctx.textAlign = 'right'; ctx.fillText('▼', bx + bw - 12, by + bh - 6 + Math.sin(S.time * 8) * 2); }
+}
+function drawReveal(lines, x, y, shown, lh, align) {
+  ctx.textAlign = align; var left = shown;
+  for (var i = 0; i < lines.length; i++) {
+    if (left <= 0) break; var part = lines[i].slice(0, left); left -= lines[i].length + 1;
+    if (align === 'left') ctx.fillText(part, x, y + i * lh);
+    else { var full = ctx.measureText(lines[i]).width; ctx.textAlign = 'left'; ctx.fillText(part, x - full / 2, y + i * lh); }
+  }
+}
+
+// ---------- particles & popups (screen space) ----------
+function confetti(n, x, y) {
+  var cols = [TH.primary, TH.secondary, TH.accent, '#ffd23f', '#ff4d8d', '#ffffff'];
+  for (var i = 0; i < n; i++) particles.push({ x: x == null ? rand(0, W) : x, y: y == null ? -10 : y, vx: rand(-260, 260), vy: y == null ? rand(40, 200) : rand(-520, -180),
+    g: 420, life: rand(1.6, 3), r: rand(4, 8), rot: rand(0, 6), vr: rand(-8, 8), col: cols[i % cols.length] });
+}
+function popup(text, x, y, col, big) { popups.push({ text: text, x: x, y: y, col: col || '#fff', life: big ? 1.8 : 1.1, max: big ? 1.8 : 1.1, big: !!big }); }
+function updateFx(dt) {
+  for (var i = particles.length - 1; i >= 0; i--) { var p = particles[i]; p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt; p.life -= dt; if (p.life <= 0 || p.y > H + 20) particles.splice(i, 1); }
+  for (var j = popups.length - 1; j >= 0; j--) { popups[j].life -= dt; popups[j].y -= (popups[j].big ? 20 : 60) * dt; if (popups[j].life <= 0) popups.splice(j, 1); }
+}
+function drawFx() {
+  for (var i = 0; i < particles.length; i++) { var p = particles[i]; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = Math.min(1, p.life); ctx.fillStyle = p.col; ctx.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); ctx.restore(); }
+  ctx.globalAlpha = 1;
+  for (var j = 0; j < popups.length; j++) {
+    var q = popups[j], t = q.life / q.max, sc = q.big ? 1 + Math.max(0, (t - 0.8)) * 3 : 1;
+    ctx.save(); ctx.translate(q.x, q.y); ctx.scale(sc, sc); ctx.globalAlpha = Math.min(1, t * 2.5);
+    ctx.font = '900 ' + (q.big ? 54 : 24) + 'px ' + FONT; ctx.textAlign = 'center'; ctx.lineWidth = q.big ? 8 : 5; ctx.strokeStyle = 'rgba(10,10,30,0.85)';
+    ctx.strokeText(q.text, 0, 0); ctx.fillStyle = q.col; ctx.fillText(q.text, 0, 0); ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
+
+var D = null, M = null, curEnc = null, attempt = 1, disabled = {}, toastT = null, blockMsgT = 0;
+var TOTAL_ENC = 0, TOTAL_MG = 0, TOTAL_SIGNS = 0;
+G.scenes.forEach(function (sc) { TOTAL_ENC += (sc.encounters || []).length; if (sc.minigame) TOTAL_MG++; TOTAL_SIGNS += (sc.signs || []).length; });
+S.maxScore = Math.max(1, TOTAL_ENC * 100 + TOTAL_MG * 120 + TOTAL_SIGNS * 15);
+
+function mkActor(id, x, mood) { var c = CH[id] || { id: id, name: id, type: 'kid', look: {} };
+  return { id: id, c: c, x: x, y: GROUND, dir: -1, walkT: 0, moving: false, emotion: mood || 'neutral', emote: null, emoteT: 0, talking: 0, cheer: 0 }; }
+
+function loadScene(idx) {
+  S.sceneIdx = idx; var sc = G.scenes[idx];
+  var encs = sc.encounters || [], n = encs.length;
+  var worldW = 1300 + n * 650 + (sc.minigame ? 450 : 0);
+  scene = { setting: sc.setting, timeOfDay: sc.timeOfDay, title: sc.title, data: sc, worldW: worldW, props: [], signs: [], coins: [], mg: null };
+  var span = worldW - (sc.minigame ? 760 : 500);
+  var pos = function (f) { return 260 + clamp(Number(f) || 0.5, 0, 1) * (span - 260); };
+  actors = [];
+  encs.forEach(function (e, i) { e.done = false; var a = mkActor(e.npc, 260 + (i + 1) / (n + 1) * (span - 120), e.mood); a.enc = e; actors.push(a); });
+  (sc.ambient || []).forEach(function (am) { var a = mkActor(am.npc, pos(am.x), am.mood || 'happy'); a.amb = am; a.dir = 1; actors.push(a); });
+  (sc.props || []).forEach(function (p) { scene.props.push({ type: p.type, emoji: p.emoji, size: p.size, wx: pos(p.x) }); });
+  (sc.signs || []).forEach(function (s) { scene.signs.push({ title: s.title, text: s.text, wx: pos(s.x), read: false }); });
+  if (sc.minigame) scene.mg = { data: sc.minigame, wx: worldW - 330, done: false };
+  for (var cx = 420; G.coins !== false && cx < worldW - 220; cx += 170) {
+    var near = actors.some(function (a) { return Math.abs(a.x - cx) < 70; });
+    if (!near) scene.coins.push({ wx: cx, y: (cx / 170 | 0) % 4 === 0 ? GROUND - 150 : GROUND - 45, got: false });
+  }
+  player.x = 140; player.y = GROUND; player.vy = 0; player.dir = 1; player.targetX = null; player.emotion = 'happy';
+  hist = []; team.forEach(function (t, i) { t.x = 100 - (i + 1) * 55; t.dir = 1; t.emotion = 'happy'; actors.push(t); });
+  camX = 0; hideInfo();
+  showCard();
+}
+
+function encountersDone() { return actors.every(function (a) { return !a.enc || a.enc.done; }); }
+function sceneComplete() { return encountersDone() && (!scene.mg || scene.mg.done); }
+function goalText() {
+  for (var i = 0; i < actors.length; i++) if (actors[i].enc && !actors[i].enc.done) return (K2 ? 'Go see ' : 'Talk to ') + actors[i].c.name + ' ❗';
+  if (scene.mg && !scene.mg.done) return 'Step on the ⚡ ' + TH.challengeWord + ' pad';
+  return 'Walk to the ' + (S.sceneIdx === G.scenes.length - 1 ? 'FINALE' : 'NEXT') + ' sign ▶';
+}
+
+// ---------- HUD / overlays ----------
+function updateHud() {
+  $('hScore').textContent = String(S.score);
+  $('hStreak').textContent = S.streak > 0 ? '🔥 x' + S.streak : '—';
+  $('hRank').textContent = TH.rankNames[S.rank] || '';
+  $('hMatch').textContent = TH.challengeWord.toUpperCase() + ' ' + (S.sceneIdx + 1) + '/' + G.scenes.length;
+  $('hTitle').textContent = G.scenes[S.sceneIdx] ? G.scenes[S.sceneIdx].title : '';
+  $('hGoal').textContent = scene && S.mode !== 'finale' ? goalText() : '';
+  $('hProg').style.width = Math.min(100, S.score / S.maxScore * 100) + '%';
+}
+function addScore(n, x, y) {
+  if (!n) return; S.score = Math.max(0, S.score + n);
+  if (x != null) popup((n > 0 ? '+' : '') + n, x, y, n > 0 ? '#7CFF8A' : '#ff6b6b');
+  var f = S.score / S.maxScore, r = f >= 0.75 ? 3 : f >= 0.5 ? 2 : f >= 0.25 ? 1 : 0;
+  r = Math.min(r, TH.rankNames.length - 1);
+  if (r > S.rank) { S.rank = r; setTimeout(function () { SFX.rank(); confetti(140); crowd = 1;
+    popup('RANK UP!', W / 2, 200, '#ffd23f', true); popup(TH.rankNames[r].toUpperCase(), W / 2, 262, '#fff', true); toast('🏆 New rank: ' + TH.rankNames[r]); }, 600); }
+  updateHud();
+}
+function toast(msg) { var t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('show'); }, 2400); }
+function show(id) { $(id).classList.add('show'); }
+function hide(id) { $(id).classList.remove('show'); }
+function showInfo(sg) { $('infoT').textContent = sg.title; $('infoB').textContent = sg.text; show('info'); }
+function hideInfo() { hide('info'); }
+
+function showCard() {
+  S.mode = 'card'; var sc = G.scenes[S.sceneIdx];
+  $('cardK').textContent = TH.challengeWord.toUpperCase() + ' ' + (S.sceneIdx + 1) + ' OF ' + G.scenes.length;
+  $('cardT').textContent = sc.title; $('cardS').textContent = sc.subtitle || sc.objective || '';
+  show('card'); SFX.whistle(); say(sc.title + '. ' + (sc.subtitle || ''), 'narrator'); updateHud();
+  clearTimeout(showCard.t); showCard.t = setTimeout(closeCard, 3200);
+}
+function closeCard() {
+  if (S.mode !== 'card') return; hide('card'); S.mode = 'explore'; updateHud();
+  if (S.sceneIdx === 0) { show('hint'); setTimeout(function () { hide('hint'); }, 6500); }
+}
+
+// ---------- dialogue ----------
+function runLines(lines, done) {
+  lines = (lines || []).filter(function (l) { return l && l.text; });
+  if (!lines.length) { done && done(); return; }
+  S.mode = 'dialog'; D = { lines: lines, i: 0, shown: 0, done: done, acc: 0 }; startLine();
+}
+function startLine() {
+  var l = D.lines[D.i], a = actorFor(l.speaker);
+  if (a) { if (l.emotion) a.emotion = l.emotion; if (l.emote && l.emote !== 'none') { a.emote = l.emote; a.emoteT = 2.2; } }
+  if (a && curEnc) { var other = a === player ? curEnc.actor : player; if (other) { a.dir = other.x > a.x ? 1 : -1; } }
+  say(l.text, l.speaker);
+}
+function advance() {
+  if (!D) return; var l = D.lines[D.i];
+  if (D.shown < l.text.length) { D.shown = l.text.length; return; }
+  D.i++; D.shown = 0;
+  if (D.i >= D.lines.length) { var cb = D.done; D = null; actors.concat([player]).forEach(function (a) { a.talking = 0; }); cb && cb(); return; }
+  startLine();
+}
+
+// ---------- encounters ----------
+function startEncounter(a) {
+  curEnc = { enc: a.enc, actor: a }; attempt = 1; disabled = {};
+  player.targetX = null; player.moving = false; touch.left = touch.right = false;
+  a.dir = player.x < a.x ? -1 : 1; player.dir = -a.dir; hideInfo();
+  runLines(a.enc.intro, showChoices);
+}
+function showChoices() {
+  S.mode = 'choice'; var e = curEnc.enc, box = $('choices');
+  $('cPrompt').textContent = e.prompt; say(e.prompt, 'narrator');
+  var list = $('cList'); list.innerHTML = '';
+  e.choices.forEach(function (c, i) {
+    var b = document.createElement('button'); b.className = 'choice'; b.disabled = !!disabled[i];
+    b.innerHTML = '<span class="key">' + (i + 1) + '</span><span>' + esc(c.text) + '</span>';
+    b.onclick = function () { choose(i); }; list.appendChild(b);
+  });
+  box.classList.add('show');
+}
+function choose(i) {
+  if (S.mode !== 'choice' || disabled[i]) return;
+  var e = curEnc.enc, c = e.choices[i]; if (!c) return;
+  hide('choices'); hush(); SFX.pop();
+  player.emotion = c.quality === 'poor' ? 'worried' : 'happy';
+  var lines = []; if (c.playerLine) lines.push({ speaker: 'player', text: c.playerLine });
+  runLines(lines.concat(c.reaction || []), function () { verdict(i, c); });
+}
+function verdict(i, c) {
+  S.mode = 'coach'; var e = curEnc.enc, a = curEnc.actor, sx = a.x - camX, pts = 0;
+  if (c.quality === 'best') {
+    pts = attempt === 1 ? 100 : 60; S.streak = attempt === 1 ? S.streak + 1 : 0; S.bestStreak = Math.max(S.bestStreak, S.streak);
+    if (attempt === 1) S.bestCount++;
+    SFX.good(); setTimeout(SFX.cheer, 250); crowd = 1; confetti(90, sx, GROUND - 120); a.cheer = 2; player.cheer = 2;
+    if (!a.emote) { a.emote = 'heart'; a.emoteT = 2.2; }
+    if (S.streak >= 2) { var co = TH.streakCallouts, txt = co[Math.min(S.streak - 2, co.length - 1)]; setTimeout(function () { popup(txt, W / 2, 190, '#ffd23f', true); }, 300); }
+  } else if (c.quality === 'okay') { pts = 50; SFX.okay(); crowd = 0.4; }
+  else { S.streak = 0; SFX.bad(); shake = 0.35; disabled[i] = true; }
+  S.answered++;
+  addScore(pts, sx, GROUND - 170);
+  var cls = c.quality, head = TH.verdicts[c.quality] || '';
+  $('coachH').textContent = head; $('coachH').className = 'coachH ' + cls;
+  $('coachB').textContent = c.feedback || '';
+  $('coachO').textContent = e.objective ? '🎯 ' + e.objective : '';
+  $('coachBtn').textContent = c.quality === 'poor' ? '↺ Try again' : 'Continue ▶';
+  show('coach'); say(head + '. ' + (c.feedback || ''), 'narrator');
+}
+function coachContinue() {
+  if (S.mode !== 'coach') return; hide('coach'); hush();
+  var e = curEnc.enc, a = curEnc.actor, last = $('coachBtn').textContent.indexOf('Try') >= 0;
+  if (last) { attempt++; a.emotion = e.mood || 'neutral'; player.emotion = 'neutral'; showChoices(); return; }
+  runLines(e.outro || [], function () {
+    e.done = true; curEnc = null; S.mode = 'explore';
+    if (e.joinsTeam !== false) { a.follower = true; a.enc = null; a.emotion = 'happy'; team.push(a); SFX.coin();
+      toast('🤝 ' + a.c.name + ' joined your team!'); }
+    if (encountersDone() && !scene.mg) setTimeout(function () { toast('⭐ ' + goalText()); }, 900);
+    updateHud();
+  });
+}
+
+// ---------- mini-game: catch ----------
+function startMinigame() {
+  var d = scene.mg.data; S.mode = 'mgintro'; player.targetX = null;
+  $('mgT').textContent = d.title; $('mgI').textContent = d.instructions;
+  $('mgG').textContent = '✅ Catch: ' + d.goodLabel; $('mgB').textContent = '❌ Dodge: ' + d.badLabel;
+  show('mg'); say(d.title + '. ' + d.instructions, 'narrator');
+}
+function beginMinigame() {
+  hide('mg'); hush(); var d = scene.mg.data;
+  M = { t: d.durationSec || 30, dur: d.durationSec || 30, items: [], spawn: 0.6, good: 0, bad: 0, gi: 0, bi: 0, caughtBad: [] };
+  S.mode = 'minigame'; SFX.whistle();
+}
+function updateMinigame(dt) {
+  var d = scene.mg.data; M.t -= dt; M.spawn -= dt;
+  if (M.spawn <= 0 && M.t > 1.5) {
+    M.spawn = K2 ? 1.25 : 0.95; var isGood = Math.random() < 0.6 || !d.bad.length;
+    var txt = isGood ? d.good[M.gi++ % d.good.length] : d.bad[M.bi++ % d.bad.length];
+    M.items.push({ text: txt, good: isGood, x: rand(110, W - 110), y: 60, vy: K2 ? rand(80, 115) : rand(110, 160) });
+  }
+  var px = player.x - camX;
+  for (var i = M.items.length - 1; i >= 0; i--) {
+    var it = M.items[i]; it.y += it.vy * dt;
+    ctx.font = '700 ' + (FS - 2) + 'px ' + FONT; var w = ctx.measureText(it.text).width + 30;
+    if (it.y > GROUND - 150 && it.y < GROUND - 70 && Math.abs(it.x - px) < w / 2 + 18) {
+      if (it.good) { M.good++; SFX.coin(); addScore(15, it.x, it.y - 20); player.emotion = 'excited'; player.cheer = 0.6; }
+      else { M.bad++; M.caughtBad.push(it.text); SFX.bad(); popup('Oops!', it.x, it.y - 20, '#ff6b6b'); shake = 0.25; player.emotion = 'surprised'; }
+      M.items.splice(i, 1); continue;
+    }
+    if (it.y > H + 30) M.items.splice(i, 1);
+  }
+  if (M.t <= 0) endMinigame();
+}
+function drawMinigame() {
+  if (!M) return;
+  M.items.forEach(function (it) {
+    ctx.font = '700 ' + (FS - 2) + 'px ' + FONT; var w = ctx.measureText(it.text).width + 30, h = FS + 16;
+    ctx.fillStyle = 'rgba(0,0,0,0.2)'; rr(it.x - w / 2 + 3, it.y - h / 2 + 4, w, h, h / 2); ctx.fill();
+    ctx.fillStyle = '#fff'; rr(it.x - w / 2, it.y - h / 2, w, h, h / 2); ctx.fill(); ctx.strokeStyle = TH.secondary; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 1;
+    ctx.fillStyle = '#1d1d2c'; ctx.textAlign = 'center'; ctx.fillText(it.text, it.x, it.y + FS / 3);
+  });
+  ctx.fillStyle = 'rgba(10,14,35,0.7)'; rr(W / 2 - 160, 62, 320, 18, 9); ctx.fill();
+  ctx.fillStyle = TH.accent; rr(W / 2 - 157, 65, 314 * Math.max(0, M.t / M.dur), 12, 6); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = '800 16px ' + FONT; ctx.textAlign = 'center'; ctx.fillText('✅ ' + M.good + '    ⏱ ' + Math.ceil(Math.max(0, M.t)) + 's', W / 2, 100);
+}
+function endMinigame() {
+  var d = scene.mg.data; S.mode = 'mgdone';
+  if (M.good >= 3) { SFX.good(); SFX.cheer(); crowd = 1; confetti(100); }
+  $('mgT').textContent = M.good >= 3 ? 'Great catching!' : 'Nice effort!';
+  $('mgI').textContent = 'You caught ' + M.good + ' ' + d.goodLabel.toLowerCase() + '.' + (M.caughtBad.length ? ' Watch out next time for: “' + M.caughtBad.slice(0, 2).join('”, “') + '”.' : ' You dodged every tricky one!');
+  $('mgG').textContent = ''; $('mgB').textContent = ''; $('mgBtn').textContent = 'Continue ▶';
+  show('mg'); say($('mgT').textContent + ' ' + $('mgI').textContent, 'narrator');
+}
+function mgButton() {
+  if (S.mode === 'mgintro') beginMinigame();
+  else if (S.mode === 'mgdone') { hide('mg'); hush(); scene.mg.done = true; M = null; S.mode = 'explore'; $('mgBtn').textContent = 'Start! ▶'; player.emotion = 'happy'; toast('⭐ ' + goalText()); updateHud(); }
+}
+
+// ---------- finale ----------
+function startFinale() {
+  S.mode = 'finale'; hideInfo(); hush();
+  scene = { setting: 'stadium', timeOfDay: 'night', worldW: W, props: [{ type: 'flag', wx: 120 }, { type: 'flag', wx: 840 }], signs: [], coins: [], mg: null, title: G.finale.title };
+  camX = 0; actors = []; var all = [player].concat(team), gap = Math.min(110, 700 / Math.max(1, all.length));
+  all.forEach(function (a, i) { a.x = W / 2 + (i - (all.length - 1) / 2) * gap; a.y = GROUND; a.dir = 1; a.emotion = 'excited'; a.cheer = 999; a.moving = false; a.follower = true; if (a !== player) actors.push(a); });
+  crowd = 1; SFX.rank(); setTimeout(SFX.cheer, 400);
+  $('fT').textContent = G.finale.title; $('fM').textContent = G.finale.message;
+  $('fRank').textContent = TH.rankNames[S.rank]; $('fScore').textContent = S.score;
+  $('fBest').textContent = S.bestCount + '/' + TOTAL_ENC; $('fStreak').textContent = S.bestStreak;
+  $('fTeam').textContent = team.length; $('fFacts').textContent = S.facts + '/' + TOTAL_SIGNS;
+  $('fList').innerHTML = (G.finale.takeaways || []).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('');
+  setTimeout(function () { show('finale'); say(G.finale.title + '. ' + G.finale.message, 'narrator'); }, 1400);
+  updateHud(); $('hGoal').textContent = '🏆 ' + TH.rankNames[S.rank];
+  try { window.parent.postMessage({ type: 'edugame:complete', title: G.title, score: S.score, maxScore: S.maxScore, rank: TH.rankNames[S.rank], bestAnswers: S.bestCount, totalChallenges: TH && TOTAL_ENC }, '*'); } catch (e) { /* not embedded */ }
+}
+
+// ---------- input routing ----------
+function nearAmbient() { for (var i = 0; i < actors.length; i++) { var a = actors[i]; if (a.amb && !a.follower && Math.abs(a.x - player.x) < 110) return a; } return null; }
+function talkAmbient(a) { a.dir = player.x < a.x ? -1 : 1; player.dir = -a.dir; curEnc = { actor: a }; runLines(a.amb.lines, function () { curEnc = null; S.mode = 'explore'; }); }
+function jump() { if (player.onGround && S.mode === 'explore') { player.vy = -600; player.onGround = false; SFX.jump(); } }
+function onKey(k) {
+  ac();
+  if (S.mode === 'title' && (k === 'Enter' || k === ' ')) return startGame();
+  if (S.mode === 'card') return closeCard();
+  if (S.mode === 'dialog' && (k === ' ' || k === 'Enter' || k === 'e' || k === 'E')) return advance();
+  if (S.mode === 'choice' && k >= '1' && k <= '9') return choose(Number(k) - 1);
+  if (S.mode === 'coach' && (k === 'Enter' || k === ' ')) return coachContinue();
+  if ((S.mode === 'mgintro' || S.mode === 'mgdone') && (k === 'Enter' || k === ' ')) return mgButton();
+  if (S.mode === 'explore') {
+    if (k === 'ArrowUp' || k === 'w' || k === 'W' || k === ' ') jump();
+    if (k === 'e' || k === 'E' || k === 'Enter') { var a = nearAmbient(); if (a) talkAmbient(a); }
+  }
+}
+cv.addEventListener('pointerdown', function (e) {
+  ac(); var p = canvasPoint(e);
+  if (S.mode === 'dialog') return advance();
+  if (S.mode === 'card') return closeCard();
+  if (S.mode === 'minigame') { player.targetX = camX + p.x; return; }
+  if (S.mode !== 'explore') return;
+  for (var i = 0; i < actors.length; i++) { var a = actors[i]; if (a.amb && !a.follower && Math.abs(a.x - camX - p.x) < 40 && p.y > GROUND - 160 && p.y < GROUND + 20) {
+    if (Math.abs(a.x - player.x) < 130) return talkAmbient(a); player.targetX = a.x - 70 * (a.x > player.x ? 1 : -1); return; } }
+  if (p.y < GROUND - 180 && Math.abs(p.x - (player.x - camX)) < 120) return jump();
+  player.targetX = camX + p.x;
+});
+cv.addEventListener('pointermove', function (e) { if (S.mode === 'minigame' && e.buttons) player.targetX = camX + canvasPoint(e).x; });
+
+function startGame() { hide('title'); ac(); S.mode = 'loading'; loadScene(0); }
+
+// ---------- update ----------
+function update(dt) {
+  S.time += dt; crowd = Math.max(0, crowd - dt * 0.35); shake = Math.max(0, shake - dt);
+  if (S.mode === 'title' || !scene) return;
+  var canMove = S.mode === 'explore' || S.mode === 'minigame';
+  var speed = K2 ? 210 : 240, vx = 0;
+  if (canMove) {
+    if (held('left')) { vx = -speed; player.targetX = null; } else if (held('right')) { vx = speed; player.targetX = null; }
+    else if (player.targetX != null) { var dx = player.targetX - player.x; if (Math.abs(dx) < 6) player.targetX = null; else vx = dx > 0 ? speed : -speed; }
+  }
+  player.x += vx * dt; player.moving = vx !== 0; if (vx) player.dir = vx > 0 ? 1 : -1;
+  if (player.moving) player.walkT += dt * 12;
+  player.vy += 1600 * dt; player.y += player.vy * dt; if (player.y >= GROUND) { player.y = GROUND; player.vy = 0; player.onGround = true; }
+  if (S.mode === 'minigame') { player.x = clamp(player.x, camX + 50, camX + W - 50); updateMinigame(dt); }
+  if (S.mode === 'explore') exploreRules();
+  player.x = clamp(player.x, 40, scene.worldW - 50);
+  // followers
+  if (player.moving) { hist.unshift(player.x); if (hist.length > 400) hist.pop(); }
+  team.forEach(function (f, i) {
+    if (S.mode === 'finale') return;
+    var tx = hist[(i + 1) * 20]; if (tx == null) tx = player.x - (i + 1) * 55 * player.dir;
+    var d = tx - f.x; f.moving = Math.abs(d) > 2 && S.mode !== 'dialog'; if (f.moving) { f.x += d * Math.min(1, dt * 6); f.walkT += dt * 12; f.dir = d > 0 ? 1 : -1; } else if (S.mode === 'explore') f.dir = player.dir;
+  });
+  actors.concat([player]).forEach(function (a) { if (a.emoteT > 0) { a.emoteT -= dt; if (a.emoteT <= 0) a.emote = null; } if (a.cheer > 0) a.cheer -= dt; a.talking = 0; });
+  if (D) { var l = D.lines[D.i], before = D.shown; D.shown = Math.min(l.text.length, D.shown + dt * (K2 ? 36 : 52));
+    if (Math.floor(D.shown / 3) > Math.floor(before / 3)) SFX.blip(l.speaker === 'player' ? 120 : (hash(l.speaker) % 200));
+    var sp = actorFor(l.speaker); if (sp && D.shown < l.text.length) sp.talking = 1; }
+  // camera
+  var target = player.x - W * 0.38;
+  if (curEnc && curEnc.actor && (S.mode === 'dialog' || S.mode === 'choice' || S.mode === 'coach')) target = (player.x + curEnc.actor.x) / 2 - W / 2;
+  if (S.mode !== 'minigame') camX = lerp(camX, clamp(target, 0, Math.max(0, scene.worldW - W)), Math.min(1, dt * 5));
+  updateFx(dt);
+  if (S.mode === 'finale' && Math.random() < dt * 3) confetti(12, rand(100, W - 100), rand(120, 300));
+}
+function exploreRules() {
+  for (var i = 0; i < actors.length; i++) {
+    var a = actors[i]; if (!a.enc || a.enc.done) continue;
+    if (player.x > a.x - 80) { player.x = Math.min(player.x, a.x - 80); if (player.onGround) { startEncounter(a); return; } }
+  }
+  for (var c = 0; c < scene.coins.length; c++) { var co = scene.coins[c]; if (!co.got && Math.abs(co.wx - player.x) < 26 && Math.abs((player.y - 60) - co.y) < 55) {
+    co.got = true; S.coins++; SFX.coin(); S.score += 5; popup('+5 ' + TH.coinName, co.wx - camX, co.y - 10, '#ffd23f'); updateHud(); } }
+  var nearSign = null; scene.signs.forEach(function (sg) { if (Math.abs(sg.wx - player.x) < 60) nearSign = sg; });
+  if (nearSign) { if (!nearSign.read) { nearSign.read = true; S.facts++; SFX.pop(); addScore(15, nearSign.wx - camX, GROUND - 150); say(nearSign.title + '. ' + nearSign.text, 'narrator'); } showInfo(nearSign); } else hideInfo();
+  if (scene.mg && !scene.mg.done && encountersDone() && Math.abs(scene.mg.wx - player.x) < 45) { startMinigame(); return; }
+  if (player.x > scene.worldW - 95) {
+    if (sceneComplete()) { S.mode = 'transition'; fade(function () { if (S.sceneIdx + 1 < G.scenes.length) loadScene(S.sceneIdx + 1); else startFinale(); }); }
+    else { player.x = scene.worldW - 95; if (S.time - blockMsgT > 2.5) { blockMsgT = S.time; toast('🚧 First: ' + goalText()); } }
+  }
+}
+function fade(cb) { var f = $('fade'); f.classList.add('show'); setTimeout(function () { cb(); setTimeout(function () { f.classList.remove('show'); }, 120); }, 450); }
+
+// ---------- render ----------
+function render() {
+  ctx.save();
+  if (shake > 0) ctx.translate(rand(-6, 6) * shake * 3, rand(-4, 4) * shake * 3);
+  if (!scene) { var g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#0a1238'); g.addColorStop(1, shade(TH.primary, -60)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); ctx.restore(); return; }
+  drawBackground();
+  scene.props.forEach(drawProp); scene.signs.forEach(drawSign); drawPad(scene.mg); if (S.mode !== 'finale') drawExit(); scene.coins.forEach(drawCoin);
+  if (S.mode === 'finale') { ctx.font = '120px ' + FONT; ctx.textAlign = 'center'; ctx.fillText('🏆', W / 2, 250 + Math.sin(S.time * 2) * 6); }
+  actors.filter(function (a) { return !a.follower; }).forEach(drawActor);
+  team.forEach(drawActor);
+  drawActor(player);
+  if (D) drawBubble(D.lines[D.i], Math.floor(D.shown));
+  drawMinigame();
+  ctx.restore();
+  drawFx();
+}
+
+var last = 0;
+function loop(ts) { var dt = Math.min(0.05, (ts - last) / 1000 || 0); last = ts; update(dt); render(); requestAnimationFrame(loop); }
+
+// ---------- boot ----------
+function boot() {
+  resize();
+  document.title = G.title;
+  $('tSchool').textContent = G.school; $('tTitle').textContent = G.title; $('tSub').textContent = G.subtitle || '';
+  $('tObj').innerHTML = (G.objectives || []).map(function (o) { return '<li>' + esc(o) + '</li>'; }).join('');
+  $('hSchool').textContent = G.school;
+  $('playBtn').onclick = startGame; $('coachBtn').onclick = coachContinue; $('mgBtn').onclick = mgButton;
+  $('cardBox').onclick = closeCard; $('againBtn').onclick = function () { location.reload(); };
+  $('muteBtn').onclick = function () { S.muted = !S.muted; this.textContent = S.muted ? '🔇' : '🔊'; if (S.muted) hush(); };
+  $('readBtn').onclick = function () { S.read = !S.read; this.classList.toggle('off', !S.read); if (!S.read) hush(); toast(S.read ? '🗣️ Read-aloud ON' : 'Read-aloud OFF'); };
+  $('readBtn').classList.toggle('off', !S.read);
+  bindHold('tLeft', 'left'); bindHold('tRight', 'right');
+  $('tJump').addEventListener('pointerdown', function (e) { e.preventDefault(); onKey('ArrowUp'); });
+  $('tTalk').addEventListener('pointerdown', function (e) { e.preventDefault(); onKey(S.mode === 'explore' ? 'e' : 'Enter'); });
+  updateHud(); requestAnimationFrame(loop);
+}
+boot();
+
+})();
+</script>
+</body>
+</html>
