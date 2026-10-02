@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Docs Review Game</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100%;
+      overflow: auto;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    .game-container {
+      width: 100%;
+      min-height: 100%;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .game-header {
+      text-align: center;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .game-title {
+      font-size: 42px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .game-subtitle {
+      font-size: 20px;
+      opacity: 0.9;
+    }
+
+    .screen {
+      max-width: 800px;
+      width: 100%;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+
+    .welcome-screen {
+      text-align: center;
+    }
+
+    .instructions {
+      font-size: 18px;
+      line-height: 1.6;
+      margin: 30px 0;
+      text-align: left;
+    }
+
+    .player-input-container {
+      margin: 30px 0;
+    }
+
+    .player-input-label {
+      display: block;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .player-input {
+      width: 100%;
+      max-width: 400px;
+      padding: 15px;
+      font-size: 18px;
+      border: 2px solid;
+      border-radius: 10px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .player-input:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn {
+      padding: 15px 40px;
+      font-size: 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .quiz-screen {
+      display: none;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      transition: width 0.3s;
+    }
+
+    .question-number {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+
+    .question-text {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 30px;
+      line-height: 1.4;
+    }
+
+    .answers-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .answer-btn {
+      width: 100%;
+      padding: 20px;
+      font-size: 18px;
+      text-align: left;
+      border: 3px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+
+    .answer-btn:hover:not(:disabled) {
+      transform: translateX(10px);
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .answer-btn:disabled {
+      cursor: not-allowed;
+    }
+
+    .answer-btn.correct {
+      border-color: #10b981;
+      animation: correctPulse 0.5s;
+    }
+
+    .answer-btn.incorrect {
+      border-color: #ef4444;
+      animation: incorrectShake 0.5s;
+    }
+
+    @keyframes correctPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    @keyframes incorrectShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .feedback {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      line-height: 1.6;
+      display: none;
+    }
+
+    .next-btn-container {
+      margin-top: 30px;
+      text-align: center;
+      display: none;
+    }
+
+    .results-screen {
+      display: none;
+      text-align: center;
+    }
+
+    .score-display {
+      font-size: 72px;
+      font-weight: bold;
+      margin: 30px 0;
+    }
+
+    .score-message {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .score-details {
+      font-size: 20px;
+      margin: 20px 0;
+      opacity: 0.9;
+    }
+
+    .leaderboard {
+      margin-top: 40px;
+      text-align: left;
+    }
+
+    .leaderboard-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .leaderboard-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      font-size: 18px;
+    }
+
+    .leaderboard-rank {
+      font-weight: bold;
+      font-size: 24px;
+      margin-right: 15px;
+    }
+
+    .leaderboard-name {
+      flex-grow: 1;
+    }
+
+    .leaderboard-score {
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .trophy {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="game-container" id="gameContainer">
+   <div class="game-header">
+    <div class="game-title" id="gameTitle">
+     Google Docs Mastery Challenge
+    </div>
+    <div class="game-subtitle">
+     Final Exam Review Game
+    </div>
+   </div><!-- Welcome Screen -->
+   <div class="screen welcome-screen" id="welcomeScreen">
+    <div class="instructions" id="instructionsText">
+     Test your Google Docs knowledge with 20 questions covering all essential topics! Each correct answer earns you points. Can you achieve a perfect score?
+    </div>
+    <div class="player-input-container"><label class="player-input-label" for="playerName">Enter Your Name:</label> <input type="text" id="playerName" class="player-input" placeholder="Your name here">
+    </div><button class="btn" id="startBtn" disabled>Start Challenge</button>
+   </div><!-- Quiz Screen -->
+   <div class="screen quiz-screen" id="quizScreen">
+    <div class="progress-bar" id="progressBar">
+     <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="question-number" id="questionNumber">
+     Question 1 of 20
+    </div>
+    <div class="question-text" id="questionText"></div>
+    <div class="answers-container" id="answersContainer"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="next-btn-container" id="nextBtnContainer"><button class="btn" id="nextBtn">Next Question</button>
+    </div>
+   </div><!-- Results Screen -->
+   <div class="screen results-screen" id="resultsScreen">
+    <div class="trophy" id="trophy">
+     🏆
+    </div>
+    <div class="score-message" id="scoreMessage"></div>
+    <div class="score-display" id="scoreDisplay"></div>
+    <div class="score-details" id="scoreDetails"></div><button class="btn" id="playAgainBtn" style="margin-top: 30px;">Play Again</button>
+    <div class="leaderboard" id="leaderboard">
+     <div class="leaderboard-title">
+      🏅 Top Scores
+     </div>
+     <div id="leaderboardEntries"></div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      background_color: "#4f46e5",
+      surface_color: "#ffffff",
+      text_color: "#1f2937",
+      primary_action_color: "#0ea5e9",
+      secondary_action_color: "#8b5cf6",
+      font_family: "Segoe UI",
+      font_size: 16,
+      game_title: "Google Docs Mastery Challenge",
+      instructions_text: "Test your Google Docs knowledge with 20 questions covering all essential topics! Each correct answer earns you points. Can you achieve a perfect score?",
+      start_button_text: "Start Challenge"
+    };
+
+    let currentScores = [];
+
+    const questions = [
+      {
+        topic: "Getting Started",
+        question: "How do you access Google Docs?",
+        answers: ["Only through Gmail", "Via Google Drive or docs.google.com", "Only by downloading software", "Through Google Maps"],
+        correct: 1,
+        explanation: "Google Docs can be accessed through Google Drive or by going directly to docs.google.com."
+      },
+      {
+        topic: "Basic Features",
+        question: "What is the keyboard shortcut for making text bold?",
+        answers: ["Ctrl/Cmd + I", "Ctrl/Cmd + U", "Ctrl/Cmd + B", "Ctrl/Cmd + P"],
+        correct: 2,
+        explanation: "Ctrl+B (Windows) or Cmd+B (Mac) applies bold formatting to selected text."
+      },
+      {
+        topic: "Document Structure",
+        question: "What feature helps you organize long documents with clickable navigation?",
+        answers: ["Table of Contents", "Page Numbers", "Footnotes", "Comments"],
+        correct: 0,
+        explanation: "A Table of Contents automatically generates a clickable outline based on your heading styles."
+      },
+      {
+        topic: "Formatting",
+        question: "Which tool allows you to copy formatting from one section to another?",
+        answers: ["Paint Bucket", "Format Painter", "Style Copier", "Format Brush"],
+        correct: 1,
+        explanation: "The Format Painter (paint roller icon) copies formatting from selected text to other text."
+      },
+      {
+        topic: "Collaboration",
+        question: "What are the three permission levels when sharing a Google Doc?",
+        answers: ["Open, Close, Edit", "Viewer, Commenter, Editor", "Read, Write, Delete", "Basic, Advanced, Admin"],
+        correct: 1,
+        explanation: "The three permission levels are Viewer (read-only), Commenter (can add comments), and Editor (can make changes)."
+      },
+      {
+        topic: "Styles",
+        question: "What are heading styles primarily used for?",
+        answers: ["Making text colorful", "Creating document hierarchy and navigation", "Adding images", "Printing documents"],
+        correct: 1,
+        explanation: "Heading styles (H1, H2, H3) create document structure and enable automatic table of contents generation."
+      },
+      {
+        topic: "Insert Features",
+        question: "Which feature allows you to add clickable references within your document?",
+        answers: ["Hyperlinks", "Bookmarks and Links", "Page Breaks", "Headers"],
+        correct: 1,
+        explanation: "Bookmarks let you create anchor points in your document, and links can jump to those bookmarks."
+      },
+      {
+        topic: "Images",
+        question: "What text wrapping option makes text flow around an image?",
+        answers: ["In line", "Wrap text", "Break text", "Behind text"],
+        correct: 1,
+        explanation: "Wrap text allows text to flow around the sides of an image for better document layout."
+      },
+      {
+        topic: "Tables",
+        question: "How do you add a new row to an existing table?",
+        answers: ["Draw it manually", "Right-click and select Insert row", "Copy and paste cells", "Use the Table menu only"],
+        correct: 1,
+        explanation: "Right-clicking in a table cell gives you options to insert rows above or below the current row."
+      },
+      {
+        topic: "Page Setup",
+        question: "What feature allows you to add information that appears at the top of every page?",
+        answers: ["Title", "Header", "Caption", "Banner"],
+        correct: 1,
+        explanation: "Headers appear at the top of every page and are ideal for document titles, dates, or page numbers."
+      },
+      {
+        topic: "Version History",
+        question: "What feature lets you see all changes made to a document over time?",
+        answers: ["Change Log", "Version History", "Edit Tracker", "Time Machine"],
+        correct: 1,
+        explanation: "Version History shows all changes with timestamps and allows you to restore previous versions."
+      },
+      {
+        topic: "Comments",
+        question: "What's the difference between Comments and Suggestions?",
+        answers: ["There is no difference", "Comments are notes; Suggestions are proposed edits", "Comments are permanent; Suggestions are temporary", "Suggestions require approval; Comments don't"],
+        correct: 1,
+        explanation: "Comments are discussion notes that don't change the document. Suggestions are proposed edits that can be accepted or rejected."
+      },
+      {
+        topic: "Voice Typing",
+        question: "Where do you find the Voice Typing feature?",
+        answers: ["File menu", "Edit menu", "Tools menu", "Format menu"],
+        correct: 2,
+        explanation: "Voice Typing is located in the Tools menu and allows you to dictate text using your microphone."
+      },
+      {
+        topic: "Templates",
+        question: "What is the benefit of using a template?",
+        answers: ["It's faster to type", "It provides pre-designed formatting and structure", "It makes documents private", "It automatically checks spelling"],
+        correct: 1,
+        explanation: "Templates provide professional formatting and structure, saving time on document setup."
+      },
+      {
+        topic: "Find and Replace",
+        question: "What's the keyboard shortcut for Find and Replace?",
+        answers: ["Ctrl/Cmd + F", "Ctrl/Cmd + H", "Ctrl/Cmd + R", "Ctrl/Cmd + S"],
+        correct: 1,
+        explanation: "Ctrl+H (Windows) or Cmd+Shift+H (Mac) opens Find and Replace to search and change text throughout the document."
+      },
+      {
+        topic: "Pagination",
+        question: "What does a Page Break do?",
+        answers: ["Deletes a page", "Forces content to start on a new page", "Splits the screen", "Saves the document"],
+        correct: 1,
+        explanation: "A page break forces the following content to begin on a new page, useful for starting chapters or sections."
+      },
+      {
+        topic: "Spelling and Grammar",
+        question: "How does Google Docs indicate spelling errors?",
+        answers: ["Green underline", "Red underline", "Blue underline", "Yellow highlight"],
+        correct: 1,
+        explanation: "Spelling errors are marked with a red underline, and grammar suggestions appear with blue underlines."
+      },
+      {
+        topic: "Lists",
+        question: "What's the difference between a bulleted list and a numbered list?",
+        answers: ["Bullets are for ordered items; numbers are for unordered", "Numbers show sequence or priority; bullets don't imply order", "They are the same", "Bullets are for long lists only"],
+        correct: 1,
+        explanation: "Numbered lists show order or sequence, while bulleted lists are for items without a specific order."
+      },
+      {
+        topic: "Document Outline",
+        question: "What feature shows a navigation sidebar based on your headings?",
+        answers: ["Table of Contents", "Document Outline", "Page Navigator", "Section Guide"],
+        correct: 1,
+        explanation: "The Document Outline (View menu) shows a clickable sidebar with all headings for easy navigation."
+      },
+      {
+        topic: "Exporting",
+        question: "Which format should you use to ensure anyone can open your document, even without Google Docs?",
+        answers: [".gdoc", "PDF", ".docx only", ".txt"],
+        correct: 1,
+        explanation: "PDF (Portable Document Format) can be opened on any device and preserves formatting perfectly."
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let playerName = "";
+    let questionsAnswered = 0;
+
+    const dataHandler = {
+      onDataChanged(data) {
+        currentScores = data.sort((a, b) => b.score - a.score).slice(0, 10);
+        if (document.getElementById('resultsScreen').style.display !== 'none') {
+          renderLeaderboard();
+        }
+      }
+    };
+
+    async function onConfigChange(config) {
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryActionColor = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryActionColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      const fontFamily = config.font_family || defaultConfig.font_family;
+      const fontSize = config.font_size || defaultConfig.font_size;
+      
+      document.getElementById('gameContainer').style.background = `linear-gradient(135deg, ${backgroundColor} 0%, ${secondaryActionColor} 100%)`;
+      
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(screen => {
+        screen.style.backgroundColor = surfaceColor;
+        screen.style.color = textColor;
+      });
+      
+      const baseFontStack = 'Arial, sans-serif';
+      document.body.style.fontFamily = `${fontFamily}, ${baseFontStack}`;
+      
+      const titleElements = document.querySelectorAll('.game-title, .game-subtitle');
+      titleElements.forEach(el => el.style.fontFamily = `${fontFamily}, ${baseFontStack}`);
+      
+      document.querySelector('.game-title').style.fontSize = `${fontSize * 2.625}px`;
+      document.querySelector('.game-subtitle').style.fontSize = `${fontSize * 1.25}px`;
+      document.querySelector('.instructions').style.fontSize = `${fontSize * 1.125}px`;
+      document.querySelector('.player-input-label').style.fontSize = `${fontSize * 1.125}px`;
+      document.querySelector('.player-input').style.fontSize = `${fontSize * 1.125}px`;
+      document.querySelector('.question-text').style.fontSize = `${fontSize * 1.5}px`;
+      
+      const answerBtns = document.querySelectorAll('.answer-btn');
+      answerBtns.forEach(btn => {
+        btn.style.fontSize = `${fontSize * 1.125}px`;
+        btn.style.fontFamily = `${fontFamily}, ${baseFontStack}`;
+      });
+      
+      document.querySelector('.player-input').style.borderColor = primaryActionColor;
+      document.getElementById('progressBar').style.backgroundColor = `${primaryActionColor}33`;
+      document.getElementById('progressFill').style.backgroundColor = primaryActionColor;
+      
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(btn => {
+        btn.style.backgroundColor = primaryActionColor;
+        btn.style.color = '#ffffff';
+        btn.style.fontSize = `${fontSize * 1.25}px`;
+        btn.style.fontFamily = `${fontFamily}, ${baseFontStack}`;
+      });
+      
+      const answerButtons = document.querySelectorAll('.answer-btn');
+      answerButtons.forEach(btn => {
+        btn.style.backgroundColor = `${secondaryActionColor}22`;
+        btn.style.color = textColor;
+      });
+      
+      const leaderboardEntries = document.querySelectorAll('.leaderboard-entry');
+      leaderboardEntries.forEach((entry, index) => {
+        if (index === 0) {
+          entry.style.backgroundColor = `${primaryActionColor}33`;
+        } else {
+          entry.style.backgroundColor = `${secondaryActionColor}22`;
+        }
+      });
+      
+      document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+      document.getElementById('instructionsText').textContent = config.instructions_text || defaultConfig.instructions_text;
+      document.getElementById('startBtn').textContent = config.start_button_text || defaultConfig.start_button_text;
+    }
+
+    document.getElementById('playerName').addEventListener('input', (e) => {
+      const startBtn = document.getElementById('startBtn');
+      startBtn.disabled = e.target.value.trim().length === 0;
+    });
+
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+    document.getElementById('playAgainBtn').addEventListener('click', resetGame);
+
+    function startGame() {
+      playerName = document.getElementById('playerName').value.trim();
+      currentQuestion = 0;
+      score = 0;
+      questionsAnswered = 0;
+      
+      document.getElementById('welcomeScreen').style.display = 'none';
+      document.getElementById('quizScreen').style.display = 'block';
+      
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const q = questions[currentQuestion];
+      
+      document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+      document.getElementById('questionText').textContent = q.question;
+      
+      const progress = ((currentQuestion) / questions.length) * 100;
+      document.getElementById('progressFill').style.width = `${progress}%`;
+      
+      const answersContainer = document.getElementById('answersContainer');
+      answersContainer.innerHTML = '';
+      
+      q.answers.forEach((answer, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = answer;
+        btn.addEventListener('click', () => selectAnswer(index));
+        answersContainer.appendChild(btn);
+      });
+      
+      document.getElementById('feedback').style.display = 'none';
+      document.getElementById('nextBtnContainer').style.display = 'none';
+    }
+
+    function selectAnswer(selectedIndex) {
+      const q = questions[currentQuestion];
+      const answerBtns = document.querySelectorAll('.answer-btn');
+      
+      answerBtns.forEach(btn => btn.disabled = true);
+      
+      const feedback = document.getElementById('feedback');
+      const config = window.elementSdk.config;
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+      
+      if (selectedIndex === q.correct) {
+        score++;
+        answerBtns[selectedIndex].classList.add('correct');
+        feedback.style.backgroundColor = `${primaryColor}22`;
+        feedback.style.borderLeft = `4px solid ${primaryColor}`;
+        feedback.innerHTML = `<strong>✓ Correct!</strong><br>${q.explanation}`;
+      } else {
+        answerBtns[selectedIndex].classList.add('incorrect');
+        answerBtns[q.correct].classList.add('correct');
+        feedback.style.backgroundColor = '#fef2f2';
+        feedback.style.borderLeft = '4px solid #ef4444';
+        feedback.innerHTML = `<strong>✗ Not quite.</strong><br>${q.explanation}`;
+      }
+      
+      questionsAnswered++;
+      feedback.style.display = 'block';
+      document.getElementById('nextBtnContainer').style.display = 'block';
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    async function showResults() {
+      const percentage = Math.round((score / questions.length) * 100);
+      
+      document.getElementById('quizScreen').style.display = 'none';
+      document.getElementById('resultsScreen').style.display = 'block';
+      
+      let trophy = '🏆';
+      let message = 'Congratulations!';
+      
+      if (percentage === 100) {
+        trophy = '🏆✨';
+        message = 'Perfect Score! You\'re a Google Docs Master!';
+      } else if (percentage >= 80) {
+        trophy = '🏆';
+        message = 'Excellent Work!';
+      } else if (percentage >= 60) {
+        trophy = '🥈';
+        message = 'Good Job!';
+      } else {
+        trophy = '🥉';
+        message = 'Keep Practicing!';
+      }
+      
+      document.getElementById('trophy').textContent = trophy;
+      document.getElementById('scoreMessage').textContent = message;
+      document.getElementById('scoreDisplay').textContent = `${score}/${questions.length}`;
+      document.getElementById('scoreDetails').textContent = `${percentage}% correct`;
+      
+      const result = await window.dataSdk.create({
+        player_name: playerName,
+        score: score,
+        total_questions: questions.length,
+        completed_at: new Date().toISOString()
+      });
+      
+      if (!result.isOk) {
+        console.error('Failed to save score');
+      }
+    }
+
+    function renderLeaderboard() {
+      const leaderboardEntries = document.getElementById('leaderboardEntries');
+      leaderboardEntries.innerHTML = '';
+      
+      const config = window.elementSdk.config;
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      
+      if (currentScores.length === 0) {
+        leaderboardEntries.innerHTML = '<p style="text-align: center; opacity: 0.7;">No scores yet. Be the first!</p>';
+        return;
+      }
+      
+      currentScores.forEach((entry, index) => {
+        const div = document.createElement('div');
+        div.className = 'leaderboard-entry';
+        
+        if (index === 0) {
+          div.style.backgroundColor = `${primaryColor}33`;
+        } else {
+          div.style.backgroundColor = `${secondaryColor}22`;
+        }
+        
+        const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+        
+        div.innerHTML = `
+          <span class="leaderboard-rank">${rankEmoji}</span>
+          <span class="leaderboard-name">${entry.player_name}</span>
+          <span class="leaderboard-score">${entry.score}/${entry.total_questions}</span>
+        `;
+        
+        leaderboardEntries.appendChild(div);
+      });
+    }
+
+    function resetGame() {
+      currentQuestion = 0;
+      score = 0;
+      questionsAnswered = 0;
+      
+      document.getElementById('resultsScreen').style.display = 'none';
+      document.getElementById('welcomeScreen').style.display = 'block';
+      document.getElementById('playerName').value = '';
+      document.getElementById('startBtn').disabled = true;
+    }
+
+    async function init() {
+      const dataResult = await window.dataSdk.init(dataHandler);
+      if (!dataResult.isOk) {
+        console.error('Failed to initialize data SDK');
+      }
+      
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["instructions_text", config.instructions_text || defaultConfig.instructions_text],
+          ["start_button_text", config.start_button_text || defaultConfig.start_button_text]
+        ])
+      });
+      
+      await onConfigChange(window.elementSdk.config);
+    }
+
+    init();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ae65db83640b983',t:'MTc2NTgwNjE2NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
